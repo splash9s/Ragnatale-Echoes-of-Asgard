@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realm of Ascendance: Vanguard Edition v1.6 (Part 1)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif; }
+        .panel { background: rgba(30, 41, 59, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .log-box { scrollbar-width: thin; scrollbar-color: #475569 #1e293b; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-6 relative">
+
+    <!-- BGM AUDIO -->
+    <audio id="game-bgm" loop>
+        <source src="https://nu.vgmtreasurechest.com/soundtracks/ragnarok-online-original-soundtrack/dseujldi/1-08.%20Theme%20of%20Prontera.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- VIEW: NAME & AVATAR SELECTION MODAL -->
+    <div id="view-name-select" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4 hidden">
+        <div class="panel p-8 rounded-2xl max-w-md w-full border border-amber-500/50 shadow-2xl flex flex-col gap-6 text-center">
+            <div>
+                <h1 class="text-2xl font-black tracking-wider text-amber-400 mb-1">REALM OF ASCENDANCE</h1>
+                <p class="text-xs text-slate-400">Vanguard Class Prototype</p>
+            </div>
+            
+            <div class="flex flex-col gap-2 text-left">
+                <label class="text-xs font-bold text-amber-300">Choose Your Avatar (5 Options):</label>
+                <div class="grid grid-cols-5 gap-2" id="avatar-selection-grid"></div>
+                <div class="mt-2 flex flex-col gap-1">
+                    <label class="text-[10px] text-slate-400">Or upload custom photo:</label>
+                    <input type="file" id="custom-avatar-file" accept="image/*" onchange="handleCustomAvatarUpload(event)" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-slate-950 hover:file:bg-amber-500 cursor-pointer" />
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 text-left">
+                <label class="text-xs font-bold text-amber-300">Enter Your Character Name:</label>
+                <input id="input-player-name" type="text" placeholder="e.g. Siegfried" class="w-full bg-slate-900 border border-slate-700 text-sm text-slate-200 rounded-xl p-3 focus:outline-none focus:border-amber-500" value="VanguardHero" />
+            </div>
+            <button onclick="startGameWithName()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-extrabold text-sm rounded-xl transition shadow-lg shadow-amber-600/20">Begin Journey</button>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP OVERLAY -->
+    <div id="game-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+        <div class="panel p-6 rounded-2xl max-w-md w-full border border-amber-500/50 shadow-2xl flex flex-col gap-4 text-center">
+            <h3 id="modal-title" class="text-xl font-bold text-amber-400">Notice</h3>
+            <p id="modal-message" class="text-sm text-slate-300">Message content goes here.</p>
+            <div id="modal-content-area" class="flex flex-col gap-2"></div>
+            <button id="modal-close-btn" onclick="closeModal()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl transition">Confirm</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="w-full max-w-6xl flex flex-col gap-2 pb-4 border-b border-slate-800">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black tracking-wider text-amber-400">REALM OF ASCENDANCE <span class="text-xs font-normal text-slate-400">v1.6</span></h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <button onclick="manualSaveGame()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] rounded border border-slate-700 transition">Save Game</button>
+                    <button onclick="resetSaveGame()" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 text-[10px] rounded border border-red-800 transition">Reset Save</button>
+                    <button onclick="toggleBgm()" id="bgm-toggle-btn" class="px-2 py-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 text-[10px] rounded border border-indigo-700 transition">Play BGM</button>
+                </div>
+            </div>
+
+            <!-- Avatar Upper Right -->
+            <div class="flex flex-col items-center bg-slate-900/80 p-3 px-5 rounded-xl border border-slate-800 text-center">
+                <div id="header-avatar-container" class="w-12 h-12 rounded-full bg-slate-800 border-2 border-amber-500/60 flex items-center justify-center text-xl shadow-md overflow-hidden flex-shrink-0 mb-1">
+                    ⚔️
+                </div>
+                <div id="header-player-name" class="text-xs font-bold text-amber-300 leading-tight">Hero</div>
+                <div class="text-[10px] text-slate-400">Class: <span class="text-blue-400 font-semibold">Vanguard</span></div>
+            </div>
+        </div>
+
+        <div id="player-status-bar" class="flex gap-4 text-xs md:text-sm font-semibold pt-1">
+            <span class="text-emerald-400">Base Lv. <span id="header-base-lv">1</span></span>
+            <span class="text-indigo-400">Job Lv. <span id="header-job-lv">1</span></span>
+            <span id="header-gold" class="text-yellow-400">150 Zeny</span>
+        </div>
+
+        <!-- Progress Bars -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 text-xs mt-1">
+            <div class="space-y-1">
+                <div class="flex justify-between text-emerald-400 font-semibold">
+                    <span>Base EXP Progress</span>
+                    <span id="top-base-exp-text">0 / 50 (0%)</span>
+                </div>
+                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div id="top-base-exp-bar" class="bg-emerald-500 h-full w-[0%] transition-all"></div>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <div class="flex justify-between text-indigo-400 font-semibold">
+                    <span>Job EXP Progress</span>
+                    <span id="top-job-exp-text">0 / 40 (0%)</span>
+                </div>
+                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div id="top-job-exp-bar" class="bg-indigo-500 h-full w-[0%] transition-all"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main id="app" class="w-full max-w-6xl my-6 flex-1 flex flex-col gap-6">
+
+        <!-- VIEW: TOWN HUB -->
+        <div id="view-town" class="flex flex-col gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 flex flex-col gap-6">
+                    <div class="panel p-6 rounded-xl shadow-xl flex flex-col justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-amber-300">Haven of Dawn</h2>
+                            <p class="text-sm text-slate-400 mt-1">Manage character stats, inventory, equipment, skill progression, or head out on expeditions.</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onclick="switchView('character')" class="panel p-5 rounded-xl hover:border-amber-500/50 transition text-left group">
+                            <h3 class="font-bold text-amber-400 group-hover:text-amber-300">1. Character, Skills & Inventory</h3>
+                            <p class="text-xs text-slate-400 mt-1">Equipped gear, stats, 30-slot inventory, and Vanguard skills.</p>
+                        </button>
+                        <button onclick="switchView('forge')" class="panel p-5 rounded-xl hover:border-amber-500/50 transition text-left group">
+                            <h3 class="font-bold text-amber-400 group-hover:text-amber-300">2. Artisan Forge & Armory</h3>
+                            <p class="text-xs text-slate-400 mt-1">Buy individual weapons, armor (Levels 1 to 50), and potions.</p>
+                        </button>
+                        <button onclick="switchView('expeditions')" class="panel p-5 rounded-xl bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 transition text-left group md:col-span-2">
+                            <h3 class="font-bold text-amber-300 group-hover:text-amber-200">3. Expedition Gate</h3>
+                            <p class="text-xs text-amber-200/70 mt-1">Choose Map Lv 1, 10, 20, 30, 40, 50 (Escalating difficulty with combat runes every 5 stages).</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Side Activity Log in Town -->
+                <div class="panel p-4 rounded-xl flex flex-col min-h-[300px]">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Activity Log</h4>
+                    <div id="town-activity-log" class="log-box flex-1 overflow-y-auto max-h-[350px] text-xs space-y-1 font-mono">
+                        <div class="text-slate-400">[System] Welcome to Haven of Dawn. Ready for expedition.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: EXPEDITION SELECTION -->
+        <div id="view-expeditions" class="hidden flex flex-col gap-6">
+            <div class="panel p-4 rounded-xl flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-amber-300">Expedition Gate</h2>
+                    <p class="text-xs text-slate-400">Select exploration zone. Difficulty ramps up significantly per map level.</p>
+                </div>
+                <button onclick="switchView('town')" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded font-medium transition">Back to Town</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="panel p-5 rounded-xl border-l-4 border-amber-500 flex flex-col justify-between gap-4">
+                    <div>
+                        <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Campaign Mode</span>
+                        <h3 class="font-bold text-slate-100 text-base">Campaign Expedition</h3>
+                        <p class="text-xs text-slate-400 mt-1">Staged maps with increasing difficulty and set boss drops.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <select id="campaign-map-select" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded p-2">
+                            <option value="map1">Map Lv. 1 (11 Stages, Drops Lv. 1 Gear)</option>
+                            <option value="map10">Map Lv. 10 (12 Stages, Drops Lv. 10 Gear)</option>
+                            <option value="map20">Map Lv. 20 (14 Stages, Drops Lv. 20 Gear)</option>
+                            <option value="map30">Map Lv. 30 (15 Stages, Drops Lv. 30 Gear)</option>
+                            <option value="map40">Map Lv. 40 (18 Stages, Drops Lv. 40 Gear)</option>
+                            <option value="map50">Map Lv. 50 (20 Stages, Drops Lv. 50 Gear)</option>
+                        </select>
+                        <button onclick="startExpedition('campaign')" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded transition">Start Campaign Run</button>
+                    </div>
+                </div>
+
+                <div class="panel p-5 rounded-xl border-l-4 border-purple-500 flex flex-col justify-between gap-4">
+                    <div>
+                        <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Endless Mode</span>
+                        <h3 class="font-bold text-slate-100 text-base">Endless Void Tower</h3>
+                        <p class="text-xs text-slate-400 mt-1">Non-stop waves of escalating threats to test maximum build endurance.</p>
+                    </div>
+                    <button onclick="startExpedition('endless')" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-slate-100 font-bold text-xs rounded transition">Enter Endless Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: CHARACTER, SKILLS, INVENTORY & EQUIPMENT -->
+        <div id="view-character" class="hidden flex flex-col gap-6">
+            <div class="panel p-4 rounded-xl flex justify-between items-center">
+                <h2 class="text-lg font-bold text-amber-300">Character Overview, Skills & Inventory</h2>
+                <button onclick="switchView('town')" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded font-medium transition">Back to Town</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- COLUMN 1: EQUIPPED GEAR & SKILLS -->
+                <div class="flex flex-col gap-6">
+                    <div class="panel p-5 rounded-xl flex flex-col gap-4">
+                        <h3 class="text-md font-bold text-slate-200 border-b border-slate-700 pb-2">Equipped Gear</h3>
+                        <div class="space-y-3 text-xs" id="equipment-slots-container"></div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-800">
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <span class="text-slate-400">Current Weight:</span>
+                                <span id="weight-text" class="text-slate-200">120 / 2000</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                                <div id="weight-bar" class="bg-amber-500 h-full w-[6%]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vanguard Skill Tree Integration -->
+                    <div class="panel p-5 rounded-xl flex flex-col gap-4">
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                            <h3 class="text-md font-bold text-slate-200">Vanguard Skills</h3>
+                            <span class="text-xs text-amber-400 font-bold">SP: <span id="sp-count">0</span></span>
+                        </div>
+                        <div class="space-y-3 text-xs" id="skill-tree-container"></div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 2: 30-SLOT INVENTORY -->
+                <div class="panel p-5 rounded-xl flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                        <h3 class="text-md font-bold text-slate-200">Inventory (30 Slots)</h3>
+                        <span class="text-xs text-slate-400" id="inventory-count">0 / 30</span>
+                    </div>
+                    <div id="inventory-grid" class="grid grid-cols-5 gap-2 max-h-[420px] overflow-y-auto p-1"></div>
+                    <p class="text-[10px] text-slate-400 mt-2 italic">* Click item to equip/consume. Unequipping frees slot.</p>
+                </div>
+
+                <!-- COLUMN 3: STATS & ALLOCATION -->
+                <div class="panel p-5 rounded-xl flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                        <h3 class="text-md font-bold text-slate-200">Status Allocation</h3>
+                        <span class="text-xs text-amber-400 font-bold">Stat Points: <span id="stat-points">5</span></span>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
+                            <span class="font-bold text-red-400 w-12">STR</span>
+                            <span id="stat-str" class="font-bold text-slate-200 px-2">1</span>
+                            <button onclick="addStat('str')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
+                            <span class="font-bold text-emerald-400 w-12">AGI</span>
+                            <span id="stat-agi" class="font-bold text-slate-200 px-2">1</span>
+                            <button onclick="addStat('agi')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
+                            <span class="font-bold text-yellow-400 w-12">VIT</span>
+                            <span id="stat-vit" class="font-bold text-slate-200 px-2">1</span>
+                            <button onclick="addStat('vit')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
+                            <span class="font-bold text-blue-400 w-12">INT</span>
+                            <span id="stat-int" class="font-bold text-slate-200 px-2">1</span>
+                            <button onclick="addStat('int')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
+                            <span class="font-bold text-purple-400 w-12">DEX</span>
+                            <span id="stat-dex" class="font-bold text-slate-200 px-2">1</span>
+                            <button onclick="addStat('dex')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
+                            <span class="font-bold text-cyan-400 w-12">LUK</span>
+                            <span id="stat-luk" class="font-bold text-slate-200 px-2">1</span>
+                            <button onclick="addStat('luk')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 pt-3 border-t border-slate-800 grid grid-cols-2 gap-2 text-xs font-mono">
+                        <div>ATK: <span id="derived-atk" class="text-amber-300">15</span></div>
+                        <div>DEF: <span id="derived-def" class="text-amber-300">7</span></div>
+                        <div>HIT: <span id="derived-hit" class="text-amber-300">102</span></div>
+                        <div>FLEE: <span id="derived-flee" class="text-amber-300">102</span></div>
+                        <div>CRIT: <span id="derived-crit" class="text-amber-300">1%</span></div>
+                        <div>ASPD: <span id="derived-aspd" class="text-amber-300">135</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: ARTISAN FORGE & SHOP -->
+        <div id="view-forge" class="hidden flex flex-col gap-6">
+            <div class="panel p-4 rounded-xl flex justify-between items-center">
+                <h2 class="text-lg font-bold text-amber-300">The Artisan Forge & Armory</h2>
+                <button onclick="switchView('town')" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded font-medium transition">Back to Town</button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Consumables Shop -->
+                <div class="panel p-6 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-md font-bold text-amber-200 border-b border-slate-700 pb-2">Consumables</h3>
+                        <div class="mt-3 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-sm">Minor Healing Potion (Weight: 15)</h4>
+                                <p class="text-xs text-slate-400">Restores 50 HP automatically or from inventory.</p>
+                            </div>
+                            <button onclick="buyPotion()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded transition">Buy (50 Zeny)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Individual Equipment Shop -->
+                <div class="panel p-6 rounded-xl flex flex-col gap-4">
+                    <h3 class="text-md font-bold text-amber-200 border-b border-slate-700 pb-2">Individual Equipment Shop (Levels 1-50)</h3>
+                    <div class="space-y-2 text-xs max-h-[350px] overflow-y-auto pr-1" id="shop-items-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: EXPEDITION / COMBAT -->
+        <div id="view-combat" class="hidden flex flex-col gap-6 flex-1">
+            <div class="panel p-4 rounded-xl flex justify-between items-center">
+                <div>
+                    <span id="node-mode-tag" class="text-xs text-amber-400 uppercase tracking-wider font-semibold">Campaign Run</span>
+                    <h2 id="node-title" class="text-lg font-bold text-slate-100">Map Lv. 1 — Stage 1 / 11</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="next-stage-btn" onclick="proceedToNextStage()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-sm rounded shadow-lg transition">Continue to Next Stage</button>
+                    <button id="retreat-btn" onclick="returnToTown()" class="px-4 py-2 bg-red-900/60 hover:bg-red-800 text-sm rounded font-medium transition border border-red-700/50">Retreat to Town</button>
+                </div>
+            </div>
+
+            <!-- Battle Arena Grid + Right Activity Log -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2 flex flex-col gap-4">
+                    <!-- Player Box -->
+                    <div class="panel p-5 rounded-xl flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <span id="combat-player-name" class="font-bold text-blue-400">Hero</span>
+                            <span id="player-hp-text" class="text-xs font-semibold">100 / 100 HP</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                            <div id="player-hp-bar" class="bg-blue-500 h-full w-full transition-all duration-200"></div>
+                        </div>
+                        
+                        <div class="space-y-1 mt-2 text-[11px]">
+                            <div class="flex justify-between text-slate-400 pt-1">
+                                <span>Potions in Inventory: <span id="player-potions">3</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monsters Lined Up Box -->
+                    <div class="panel p-5 rounded-xl flex flex-col gap-3">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stage Monsters Lineup</h4>
+                        <div id="monsters-lineup-container" class="flex flex-col gap-2.5 mt-1"></div>
+                    </div>
+                </div>
+
+                <!-- Right Side Activity Log -->
+                <div class="panel p-4 rounded-xl flex flex-col min-h-[240px]">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Activity Log</h4>
+                    <div id="combat-activity-log" class="log-box flex-1 overflow-y-auto max-h-[320px] text-xs space-y-1 font-mono">
+                        <div class="text-slate-400">[System] Expedition initialized. Entering gates...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Game Logic Script (Part 2) -->
+    <script>
+        const AVATARS = ["⚔️", "🛡️", "🔮", "🗡️", "🏹"];
+        
+        const SHOP_ITEMS = [
+            { id: "w1", name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, price: 50, stats: { atk: 10 }, desc: "Atk +10" },
+            { id: "s1", name: "Wooden Buckler", slot: "shield", levelReq: 1, price: 40, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
+            { id: "a1", name: "Iron Cuirass", slot: "armor", levelReq: 1, price: 60, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
+            { id: "g1", name: "Cotton Cloak", slot: "garment", levelReq: 1, price: 30, stats: { flee: 2 }, desc: "FLEE +2" },
+            { id: "f1", name: "Leather Boots", slot: "footgear", levelReq: 1, price: 30, stats: { hp: 20 }, desc: "HP +20" },
+            { id: "d1", name: "Rookie Dagger", slot: "weapon", levelReq: 1, price: 45, stats: { atk: 8, crit: 3 }, desc: "Atk +8, CRIT +3%" },
+            { id: "sp1", name: "Training Spear", slot: "weapon", levelReq: 1, price: 50, stats: { atk: 11, hit: 5 }, desc: "Atk +11, HIT +5" },
+            { id: "m1", name: "Acolyte Mace", slot: "weapon", levelReq: 1, price: 45, stats: { atk: 9, def: 2 }, desc: "Atk +9, DEF +2" },
+            { id: "th1", name: "Two-Handed Claymore (2H)", slot: "weapon", levelReq: 1, price: 90, stats: { atk: 16 }, desc: "Atk +16 (Takes Shield slot)" },
+
+            { id: "w10", name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, price: 150, stats: { atk: 25 }, desc: "Atk +25" },
+            { id: "s10", name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, price: 120, stats: { def: 6, block: 10 }, desc: "DEF +6, Block +10%" },
+            { id: "a10", name: "Steel Plate Armor", slot: "armor", levelReq: 10, price: 180, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
+            { id: "g10", name: "Chain Mail Mantle", slot: "garment", levelReq: 10, price: 100, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
+            { id: "f10", name: "Armored Greaves", slot: "footgear", levelReq: 10, price: 100, stats: { hp: 50, def: 3 }, desc: "HP +50, DEF +3" },
+            { id: "d10", name: "Assassin Main Gauche", slot: "weapon", levelReq: 10, price: 140, stats: { atk: 20, crit: 7 }, desc: "Atk +20, CRIT +7%" },
+            { id: "sp10", name: "Pike Spear", slot: "weapon", levelReq: 10, price: 160, stats: { atk: 28, hit: 10 }, desc: "Atk +28, HIT +10" },
+            { id: "m10", name: "War Mace", slot: "weapon", levelReq: 10, price: 145, stats: { atk: 24, def: 5 }, desc: "Atk +24, DEF +5" },
+            { id: "th10", name: "Bastard Sword (2H)", slot: "weapon", levelReq: 10, price: 280, stats: { atk: 38 }, desc: "Atk +38 (Takes Shield slot)" },
+
+            { id: "w20", name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, price: 400, stats: { atk: 50, crit: 5 }, desc: "Atk +50, CRIT +5%" },
+            { id: "s20", name: "Royal Aegis", slot: "shield", levelReq: 20, price: 350, stats: { def: 12, block: 15 }, desc: "DEF +12, Block +15%" },
+            { id: "a20", name: "Mithril Cuirass", slot: "armor", levelReq: 20, price: 500, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
+            { id: "g20", name: "Valkyrie Cloak", slot: "garment", levelReq: 20, price: 300, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
+            { id: "f20", name: "Knight Striders", slot: "footgear", levelReq: 20, price: 300, stats: { hp: 100, aspd: 5 }, desc: "HP +100, ASPD +5" },
+            { id: "d20", name: "Katar Kris", slot: "weapon", levelReq: 20, price: 380, stats: { atk: 45, crit: 12 }, desc: "Atk +45, CRIT +12%" },
+            { id: "sp20", name: "Glaive Spear", slot: "weapon", levelReq: 20, price: 420, stats: { atk: 55, hit: 15 }, desc: "Atk +55, HIT +15" },
+            { id: "m20", name: "Morning Star", slot: "weapon", levelReq: 20, price: 390, stats: { atk: 48, def: 10 }, desc: "Atk +48, DEF +10" },
+            { id: "th20", name: "Zweihander (2H)", slot: "weapon", levelReq: 20, price: 750, stats: { atk: 75 }, desc: "Atk +75 (Takes Shield slot)" },
+
+            { id: "w30", name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, price: 1000, stats: { atk: 90, crit: 10 }, desc: "Atk +90, CRIT +10%" },
+            { id: "s30", name: "Shield of Asgard", slot: "shield", levelReq: 30, price: 900, stats: { def: 20, block: 25 }, desc: "DEF +20, Block +25%" },
+            { id: "a30", name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, price: 1300, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
+            { id: "g30", name: "Winged Shroud", slot: "garment", levelReq: 30, price: 800, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
+            { id: "f30", name: "Boots of Swift Retribution", slot: "footgear", levelReq: 30, price: 800, stats: { hp: 200, aspd: 12 }, desc: "HP +200, ASPD +12" },
+            { id: "d30", name: "Main Gauche of Shadows", slot: "weapon", levelReq: 30, price: 950, stats: { atk: 82, crit: 20 }, desc: "Atk +82, CRIT +20%" },
+            { id: "sp30", name: "Gungnir Vanguard", slot: "weapon", levelReq: 30, price: 1050, stats: { atk: 98, hit: 25 }, desc: "Atk +98, HIT +25" },
+            { id: "m30", name: "Mjolnir Prototype", slot: "weapon", levelReq: 30, price: 1000, stats: { atk: 95, def: 20 }, desc: "Atk +95, DEF +20" },
+            { id: "th30", name: "Ragnarok Greatsword (2H)", slot: "weapon", levelReq: 30, price: 2000, stats: { atk: 140, crit: 5 }, desc: "Atk +140, CRIT +5% (Takes Shield slot)" },
+
+            { id: "w40", name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, price: 2500, stats: { atk: 140, crit: 15 }, desc: "Atk +140, CRIT +15%" },
+            { id: "s40", name: "Aegis of Light", slot: "shield", levelReq: 40, price: 2200, stats: { def: 32, block: 30 }, desc: "DEF +32, Block +30%" },
+            { id: "a40", name: "Solar Plate", slot: "armor", levelReq: 40, price: 3000, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
+            { id: "g40", name: "Solar Mantle", slot: "garment", levelReq: 40, price: 1800, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
+            { id: "f40", name: "Solar Greaves", slot: "footgear", levelReq: 40, price: 1800, stats: { hp: 350, aspd: 18 }, desc: "HP +350, ASPD +18" },
+            { id: "d40", name: "Solar Kris", slot: "weapon", levelReq: 40, price: 2400, stats: { atk: 130, crit: 25 }, desc: "Atk +130, CRIT +25%" },
+            { id: "sp40", name: "Solar Spear", slot: "weapon", levelReq: 40, price: 2600, stats: { atk: 150, hit: 35 }, desc: "Atk +150, HIT +35" },
+            { id: "m40", name: "Solar Mace", slot: "weapon", levelReq: 40, price: 2450, stats: { atk: 145, def: 30 }, desc: "Atk +145, DEF +30" },
+            { id: "th40", name: "Solar Greatsword (2H)", slot: "weapon", levelReq: 40, price: 4500, stats: { atk: 220, crit: 10 }, desc: "Atk +220, CRIT +10% (Takes Shield slot)" },
+
+            { id: "w50", name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, price: 5000, stats: { atk: 210, crit: 20 }, desc: "Atk +210, CRIT +20%" },
+            { id: "s50", name: "Ultimate Aegis", slot: "shield", levelReq: 50, price: 4500, stats: { def: 50, block: 40 }, desc: "DEF +50, Block +40%" },
+            { id: "a50", name: "Armor of the Gods", slot: "armor", levelReq: 50, price: 6500, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
+            { id: "g50", name: "Shroud of Eternity", slot: "garment", levelReq: 50, price: 3800, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
+            { id: "f50", name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" },
+            { id: "d50", name: "Katar of Destruction", slot: "weapon", levelReq: 50, price: 4800, stats: { atk: 195, crit: 35 }, desc: "Atk +195, CRIT +35%" },
+            { id: "sp50", name: "Gungnir Prime", slot: "weapon", levelReq: 50, price: 5200, stats: { atk: 225, hit: 50 }, desc: "Atk +225, HIT +50" },
+            { id: "m50", name: "Mjolnir Awakened", slot: "weapon", levelReq: 50, price: 5000, stats: { atk: 220, def: 45 }, desc: "Atk +220, DEF +45" },
+            { id: "th50", name: "Ragnarok World-Ender (2H)", slot: "weapon", levelReq: 50, price: 9500, stats: { atk: 330, crit: 15 }, desc: "Atk +330, CRIT +15% (Takes Shield slot)" }
+        ];
+
+        const GEAR_POOL = {
+            map1: [
+                { name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
+                { name: "Wooden Buckler", slot: "shield", levelReq: 1, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
+                { name: "Iron Cuirass", slot: "armor", levelReq: 1, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
+                { name: "Cotton Cloak", slot: "garment", levelReq: 1, stats: { flee: 2 }, desc: "FLEE +2" },
+                { name: "Leather Boots", slot: "footgear", levelReq: 1, stats: { hp: 20 }, desc: "HP +20" }
+            ],
+            map10: [
+                { name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, stats: { atk: 25 }, desc: "Atk +25" },
+                { name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, stats: { def: 6, block: 10 }, desc: "DEF +6, Block +10%" },
+                { name: "Steel Plate Armor", slot: "armor", levelReq: 10, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
+                { name: "Chain Mail Mantle", slot: "garment", levelReq: 10, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
+                { name: "Armored Greaves", slot: "footgear", levelReq: 10, stats: { hp: 50, def: 3 }, desc: "HP +50, DEF +3" }
+            ],
+            map20: [
+                { name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, stats: { atk: 50, crit: 5 }, desc: "Atk +50, CRIT +5%" },
+                { name: "Royal Aegis", slot: "shield", levelReq: 20, stats: { def: 12, block: 15 }, desc: "DEF +12, Block +15%" },
+                { name: "Mithril Cuirass", slot: "armor", levelReq: 20, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
+                { name: "Valkyrie Cloak", slot: "garment", levelReq: 20, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
+                { name: "Knight Striders", slot: "footgear", levelReq: 20, stats: { hp: 100, aspd: 5 }, desc: "HP +100, ASPD +5" }
+            ],
+            map30: [
+                { name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, stats: { atk: 90, crit: 10 }, desc: "Atk +90, CRIT +10%" },
+                { name: "Shield of Asgard", slot: "shield", levelReq: 30, stats: { def: 20, block: 25 }, desc: "DEF +20, Block +25%" },
+                { name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
+                { name: "Winged Shroud", slot: "garment", levelReq: 30, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
+                { name: "Boots of Swift Retribution", slot: "footgear", levelReq: 30, stats: { hp: 200, aspd: 12 }, desc: "HP +200, ASPD +12" }
+            ],
+            map40: [
+                { name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, stats: { atk: 140, crit: 15 }, desc: "Atk +140, CRIT +15%" },
+                { name: "Aegis of Light", slot: "shield", levelReq: 40, stats: { def: 32, block: 30 }, desc: "DEF +32, Block +30%" },
+                { name: "Solar Plate", slot: "armor", levelReq: 40, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
+                { name: "Solar Mantle", slot: "garment", levelReq: 40, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
+                { name: "Solar Greaves", slot: "footgear", levelReq: 40, stats: { hp: 350, aspd: 18 }, desc: "HP +350, ASPD +18" }
+            ],
+            map50: [
+                { name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, stats: { atk: 210, crit: 20 }, desc: "Atk +210, CRIT +20%" },
+                { name: "Ultimate Aegis", slot: "shield", levelReq: 50, stats: { def: 50, block: 40 }, desc: "DEF +50, Block +40%" },
+                { name: "Armor of the Gods", slot: "armor", levelReq: 50, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
+                { name: "Shroud of Eternity", slot: "garment", levelReq: 50, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
+                { name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
+            ]
+        };
+
+        const GAME_DATA = {
+            maps: {
+                map1: {
+                    title: "Map Lv. 1",
+                    maxStages: 11,
+                    dropKey: 'map1',
+                    enemies: [
+                        { name: "Poring", hp: 35, maxHp: 35, atkMin: 4, atkMax: 6, hit: 75, flee: 75, baseExp: 15, jobExp: 10, gold: 15, isRanged: false },
+                        { name: "Fabre", hp: 45, maxHp: 45, atkMin: 6, atkMax: 9, hit: 80, flee: 80, baseExp: 20, jobExp: 15, gold: 25, isRanged: false },
+                        { name: "Archer Goblin (Ranged)", hp: 30, maxHp: 30, atkMin: 5, atkMax: 8, hit: 85, flee: 70, baseExp: 25, jobExp: 18, gold: 30, isRanged: true }
+                    ],
+                    boss: { name: "Giant Moss Poring (Boss)", hp: 150, maxHp: 150, atkMin: 12, atkMax: 16, hit: 85, flee: 70, baseExp: 80, jobExp: 50, gold: 80, isBoss: true, isRanged: false }
+                },
+                map10: {
+                    title: "Map Lv. 10",
+                    maxStages: 12,
+                    dropKey: 'map10',
+                    enemies: [
+                        { name: "Cave Bat", hp: 85, maxHp: 85, atkMin: 14, atkMax: 20, hit: 105, flee: 115, baseExp: 35, jobExp: 25, gold: 45, isRanged: false },
+                        { name: "Rock Golem", hp: 140, maxHp: 140, atkMin: 22, atkMax: 30, hit: 100, flee: 80, baseExp: 50, jobExp: 35, gold: 60, isRanged: false },
+                        { name: "Ranged Sniper Kobold", hp: 75, maxHp: 75, atkMin: 18, atkMax: 26, hit: 115, flee: 100, baseExp: 55, jobExp: 40, gold: 70, isRanged: true }
+                    ],
+                    boss: { name: "Cavern Behemoth (Boss)", hp: 450, maxHp: 450, atkMin: 35, atkMax: 48, hit: 120, flee: 90, baseExp: 220, jobExp: 150, gold: 250, isBoss: true, isRanged: false }
+                },
+                map20: {
+                    title: "Map Lv. 20",
+                    maxStages: 14,
+                    dropKey: 'map20',
+                    enemies: [
+                        { name: "Desert Scorpion", hp: 220, maxHp: 220, atkMin: 40, atkMax: 55, hit: 140, flee: 130, baseExp: 90, jobExp: 65, gold: 120, isRanged: false },
+                        { name: "Sand Warrior", hp: 300, maxHp: 300, atkMin: 55, atkMax: 70, hit: 150, flee: 110, baseExp: 130, jobExp: 95, gold: 180, isRanged: false },
+                        { name: "Wind Archer", hp: 190, maxHp: 190, atkMin: 48, atkMax: 65, hit: 160, flee: 140, baseExp: 140, jobExp: 100, gold: 190, isRanged: true }
+                    ],
+                    boss: { name: "Ancient Pharaoh (Boss)", hp: 1100, maxHp: 1100, atkMin: 85, atkMax: 110, hit: 170, flee: 130, baseExp: 600, jobExp: 400, gold: 750, isBoss: true, isRanged: false }
+                },
+                map30: {
+                    title: "Map Lv. 30",
+                    maxStages: 15,
+                    dropKey: 'map30',
+                    enemies: [
+                        { name: "Abyssal Imp", hp: 450, maxHp: 450, atkMin: 90, atkMax: 120, hit: 190, flee: 180, baseExp: 240, jobExp: 180, gold: 350, isRanged: false },
+                        { name: "Hellhound", hp: 600, maxHp: 600, atkMin: 120, atkMax: 155, hit: 210, flee: 160, baseExp: 320, jobExp: 240, gold: 480, isRanged: false },
+                        { name: "Demon Gunner", hp: 420, maxHp: 420, atkMin: 110, atkMax: 145, hit: 220, flee: 190, baseExp: 350, jobExp: 260, gold: 500, isRanged: true }
+                    ],
+                    boss: { name: "Lord of the Abyss (Boss)", hp: 2600, maxHp: 2600, atkMin: 190, atkMax: 240, hit: 240, flee: 190, baseExp: 1500, jobExp: 1000, gold: 2000, isBoss: true, isRanged: false }
+                },
+                map40: {
+                    title: "Map Lv. 40",
+                    maxStages: 18,
+                    dropKey: 'map40',
+                    enemies: [
+                        { name: "Celestial Sentinel", hp: 950, maxHp: 950, atkMin: 210, atkMax: 270, hit: 270, flee: 250, baseExp: 650, jobExp: 480, gold: 900, isRanged: false },
+                        { name: "Seraphim Echo", hp: 1200, maxHp: 1200, atkMin: 260, atkMax: 330, hit: 300, flee: 280, baseExp: 850, jobExp: 620, gold: 1200, isRanged: false },
+                        { name: "Heavenly Ballista", hp: 850, maxHp: 850, atkMin: 240, atkMax: 310, hit: 310, flee: 270, baseExp: 900, jobExp: 680, gold: 1300, isRanged: true }
+                    ],
+                    boss: { name: "Archangel Corrupted (Boss)", hp: 5500, maxHp: 5500, atkMin: 400, atkMax: 500, hit: 340, flee: 270, baseExp: 4000, jobExp: 2800, gold: 5000, isBoss: true, isRanged: false }
+                },
+                map50: {
+                    title: "Map Lv. 50",
+                    maxStages: 20,
+                    dropKey: 'map50',
+                    enemies: [
+                        { name: "World Ender Minion", hp: 2000, maxHp: 2000, atkMin: 450, atkMax: 580, hit: 380, flee: 350, baseExp: 1600, jobExp: 1200, gold: 2500, isRanged: false },
+                        { name: "Astral Horror", hp: 2800, maxHp: 2800, atkMin: 580, atkMax: 720, hit: 430, flee: 390, baseExp: 2400, jobExp: 1800, gold: 3800, isRanged: false },
+                        { name: "Void Sniper", hp: 1900, maxHp: 1900, atkMin: 520, atkMax: 680, hit: 450, flee: 400, baseExp: 2600, jobExp: 1950, gold: 4000, isRanged: true }
+                    ],
+                    boss: { name: "Ragnarok World-Eater (Boss)", hp: 12000, maxHp: 12000, atkMin: 850, atkMax: 1100, hit: 480, flee: 410, baseExp: 10000, jobExp: 7500, gold: 15000, isBoss: true, isRanged: false }
+                }
+            }
+        };
+
+        // ==========================================
+        // GAME STATE
+        // ==========================================
+        let player = {
+            name: "Hero",
+            avatar: "⚔️",
+            baseLv: 1,
+            baseExp: 0,
+            baseMaxExp: 50,
+            jobLv: 1,
+            jobExp: 0,
+            jobMaxExp: 40,
+            hp: 120,
+            gold: 150,
+            statPoints: 5,
+            jobSp: 0,
+            potions: 3,
+            stats: { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 },
+            skills: {
+                bulwark: { name: "Bulwark Stance", maxLv: 10, desc: "Increases block chance and defense bonus.", level: 0 },
+                crushing: { name: "Crushing Impact", maxLv: 10, desc: "Heavy strike dealing bonus physical damage.", level: 0 },
+                recovery: { name: "Recovery", maxLv: 10, desc: "Regen 1 HP every 1 sec per level.", level: 0 },
+                moneyDrop: { name: "Greed / Money Drop", maxLv: 10, desc: "Increase money drop +1% every level.", level: 0 }
+            },
+            equipped: {
+                weapon: { name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
+                shield: { name: "Wooden Buckler", slot: "shield", levelReq: 1, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
+                armor: { name: "Iron Cuirass", slot: "armor", levelReq: 1, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
+                garment: { name: "Cotton Cloak", slot: "garment", levelReq: 1, stats: { flee: 2 }, desc: "FLEE +2" },
+                footgear: { name: "Leather Boots", slot: "footgear", levelReq: 1, stats: { hp: 20 }, desc: "HP +20" }
+            },
+            inventory: new Array(30).fill(null),
+            runes: {
+                critBonus: 0,
+                maxHpBonus: 0,
+                firstHitBonus: 0,
+                alwaysCritFirst: false,
+                chainAttackCount: 0,
+                randomHitCount: 0
+            }
+        };
+
+        let currentMode = 'campaign';
+        let activeMap = null;
+        let currentStage = 1;
+        let maxStages = 11;
+        let combatInterval = null;
+        let hpRegenInterval = null;
+        let monstersList = [];
+        let isFirstHitOfBattle = true;
+        let selectedAvatarChoice = "⚔️";
+        let isBgmPlaying = false;
+
+        function toggleBgm() {
+            let bgm = document.getElementById('game-bgm');
+            let btn = document.getElementById('bgm-toggle-btn');
+            if (isBgmPlaying) {
+                bgm.pause();
+                isBgmPlaying = false;
+                btn.innerText = "Play BGM";
+                btn.className = "px-2 py-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 text-[10px] rounded border border-indigo-700 transition";
+            } else {
+                bgm.play().then(() => {
+                    isBgmPlaying = true;
+                    btn.innerText = "Pause BGM";
+                    btn.className = "px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-slate-950 font-bold text-[10px] rounded border border-indigo-400 transition";
+                }).catch(e => console.log("Audio play blocked:", e));
+            }
+        }
+
+        function saveGame() {
+            try {
+                const saveData = JSON.stringify(player);
+                localStorage.setItem('realmOfAscendance_save', saveData);
+            } catch (e) {
+                console.error("Failed to save game:", e);
+            }
+        }
+
+        function loadGame() {
+            try {
+                const savedData = localStorage.getItem('realmOfAscendance_save');
+                if (savedData) {
+                    const parsed = JSON.parse(savedData);
+                    player = Object.assign(player, parsed);
+                    return true;
+                }
+            } catch (e) {
+                console.error("Failed to load game:", e);
+            }
+            return false;
+        }
+
+        function manualSaveGame() {
+            saveGame();
+            showModal("Game Saved", "Your progress has been successfully saved to browser local storage!");
+        }
+
+        function resetSaveGame() {
+            if (confirm("Are you sure you want to reset all save data?")) {
+                localStorage.removeItem('realmOfAscendance_save');
+                location.reload();
+            }
+        }
+
+        function renderAvatarSelection() {
+            let grid = document.getElementById('avatar-selection-grid');
+            grid.innerHTML = '';
+            AVATARS.forEach((av, idx) => {
+                let isSelected = (av === selectedAvatarChoice);
+                let borderClass = isSelected ? 'border-amber-400 bg-amber-500/20' : 'border-slate-700 bg-slate-900';
+                grid.innerHTML += `
+                    <div onclick="selectAvatar('${av}')" class="h-12 rounded-xl border ${borderClass} flex items-center justify-center text-xl cursor-pointer hover:border-amber-400 transition">
+                        ${av}
+                    </div>
+                `;
+            });
+        }
+
+        function selectAvatar(av) {
+            selectedAvatarChoice = av;
+            renderAvatarSelection();
+        }
+
+        function handleCustomAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedAvatarChoice = e.target.result;
+                    let grid = document.getElementById('avatar-selection-grid');
+                    grid.innerHTML += `<div class="h-12 rounded-xl border border-amber-400 bg-amber-500/20 flex items-center justify-center text-xl overflow-hidden"><img src="${selectedAvatarChoice}" class="w-full h-full object-cover" /></div>`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function startGameWithName() {
+            let nameInput = document.getElementById('input-player-name').value.trim();
+            if (nameInput) {
+                player.name = nameInput;
+            }
+            player.avatar = selectedAvatarChoice;
+            saveGame();
+
+            document.getElementById('header-player-name').innerText = player.name;
+            document.getElementById('combat-player-name').innerText = player.name;
+            updateAvatarDisplay();
+            document.getElementById('view-name-select').classList.add('hidden');
+            logMessage(`[System] Welcome, ${player.name} to Haven of Dawn!`, 'winlose');
+            updateUI();
+        }
+
+        function updateAvatarDisplay() {
+            let container = document.getElementById('header-avatar-container');
+            if (player.avatar && player.avatar.startsWith('data:image')) {
+                container.innerHTML = `<img src="${player.avatar}" class="w-full h-full object-cover" />`;
+            } else {
+                container.innerText = player.avatar || "⚔️";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (loadGame()) {
+                document.getElementById('view-name-select').classList.add('hidden');
+                document.getElementById('header-player-name').innerText = player.name;
+                document.getElementById('combat-player-name').innerText = player.name;
+                updateAvatarDisplay();
+                logMessage(`[System] Loaded save data for ${player.name}.`, 'winlose');
+                updateUI();
+            } else {
+                renderAvatarSelection();
+                document.getElementById('view-name-select').classList.remove('hidden');
+            }
+
+            if (hpRegenInterval) clearInterval(hpRegenInterval);
+            hpRegenInterval = setInterval(() => {
+                if (player.skills.recovery && player.skills.recovery.level > 0) {
+                    let regenAmount = player.skills.recovery.level;
+                    let derived = getDerivedStats();
+                    if (player.hp > 0 && player.hp < derived.maxHp) {
+                        player.hp = Math.min(derived.maxHp, player.hp + regenAmount);
+                        updateUI();
+                    }
+                }
+            }, 1000);
+        });
+
+        function showModal(title, message, customHTML = '', onCloseCallback = null) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            let area = document.getElementById('modal-content-area');
+            area.innerHTML = customHTML;
+            let btn = document.getElementById('modal-close-btn');
+            if (customHTML) {
+                btn.classList.add('hidden');
+            } else {
+                btn.classList.remove('hidden');
+            }
+            window.modalCallback = onCloseCallback;
+            document.getElementById('game-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('game-modal').classList.add('hidden');
+            if (window.modalCallback) {
+                let cb = window.modalCallback;
+                window.modalCallback = null;
+                cb();
+            }
+        }
+
+        function getDerivedStats() {
+            let maxHp = 100 + (player.stats.vit * 15) + (player.baseLv * 10) + player.runes.maxHpBonus;
+            let atk = 10 + (player.stats.str * 2) + Math.floor(player.stats.luk / 3);
+            let def = 2 + (player.stats.vit * 1) + player.skills.bulwark.level;
+            let hit = 100 + player.baseLv + player.stats.dex;
+            let flee = 100 + player.baseLv + player.stats.agi;
+            let crit = 1 + Math.floor(player.stats.luk / 3) + player.runes.critBonus;
+            let aspd = 130 + Math.floor(player.stats.agi * 0.8) + Math.floor(player.stats.dex * 0.2);
+
+            for (let slot in player.equipped) {
+                let item = player.equipped[slot];
+                if (item && item.stats) {
+                    if (item.stats.atk) atk += item.stats.atk;
+                    if (item.stats.def) def += item.stats.def;
+                    if (item.stats.hp) maxHp += item.stats.hp;
+                    if (item.stats.flee) flee += item.stats.flee;
+                    if (item.stats.crit) crit += item.stats.crit;
+                    if (item.stats.aspd) aspd += item.stats.aspd;
+                    if (item.stats.hit) hit += item.stats.hit;
+                }
+            }
+
+            let maxWeight = 2000 + (player.stats.str * 30);
+            let currentWeight = 120 + (player.potions * 15);
+            for (let item of player.inventory) {
+                if (item) currentWeight += 10;
+            }
+
+            return { maxHp, atk, def, hit, flee, crit, aspd, maxWeight, currentWeight };
+        }
+
+        function switchView(viewName) {
+            document.getElementById('view-town').classList.add('hidden');
+            document.getElementById('view-expeditions').classList.add('hidden');
+            document.getElementById('view-character').classList.add('hidden');
+            document.getElementById('view-forge').classList.add('hidden');
+            document.getElementById('view-combat').classList.add('hidden');
+
+            if(viewName === 'town') document.getElementById('view-town').classList.remove('hidden');
+            if(viewName === 'expeditions') document.getElementById('view-expeditions').classList.remove('hidden');
+            if(viewName === 'character') document.getElementById('view-character').classList.remove('hidden');
+            if(viewName === 'forge') {
+                document.getElementById('view-forge').classList.remove('hidden');
+                renderShop();
+            }
+            if(viewName === 'combat') document.getElementById('view-combat').classList.remove('hidden');
+            updateUI();
+            saveGame();
+        }
+
+        function renderShop() {
+            let shopContainer = document.getElementById('shop-items-container');
+            shopContainer.innerHTML = '';
+            SHOP_ITEMS.forEach(item => {
+                shopContainer.innerHTML += `
+                    <div class="p-2.5 bg-slate-900/60 rounded border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-amber-300 block">${item.name} (Req. Lv ${item.levelReq})</span>
+                            <span class="text-[10px] text-slate-400">${item.desc}</span>
+                        </div>
+                        <button onclick="buyShopItem('${item.id}')" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded">${item.price} Zeny</button>
+                    </div>
+                `;
+            });
+        }
+
+        function buyShopItem(itemId) {
+            let itemTemplate = SHOP_ITEMS.find(i => i.id === itemId);
+            if (!itemTemplate) return;
+            if (player.gold < itemTemplate.price) {
+                showModal("Purchase Failed", "Not enough Zeny to purchase this item!");
+                return;
+            }
+            let emptyIdx = player.inventory.findIndex(s => s === null);
+            if (emptyIdx === -1) {
+                showModal("Purchase Failed", "Inventory is full!");
+                return;
+            }
+            player.gold -= itemTemplate.price;
+            player.inventory[emptyIdx] = { ...itemTemplate };
+            logMessage(`[Shop] Purchased ${itemTemplate.name}!`, 'drop');
+            showModal("Purchase Successful", `You successfully purchased ${itemTemplate.name} for ${itemTemplate.price} Zeny!`);
+            updateUI();
+            saveGame();
+        }
+
+        function updateUI() {
+            let derived = getDerivedStats();
+            player.hp = Math.min(player.hp, derived.maxHp);
+
+            document.getElementById('header-player-name').innerText = player.name;
+            document.getElementById('combat-player-name').innerText = player.name;
+            updateAvatarDisplay();
+            document.getElementById('header-base-lv').innerText = player.baseLv;
+            document.getElementById('header-job-lv').innerText = player.jobLv;
+            document.getElementById('header-gold').innerText = `${player.gold} Zeny`;
+
+            let baseExpPct = Math.min(100, Math.floor((player.baseExp / player.baseMaxExp) * 100));
+            let jobExpPct = Math.min(100, Math.floor((player.jobExp / player.jobMaxExp) * 100));
+            document.getElementById('top-base-exp-text').innerText = `${player.baseExp} / ${player.baseMaxExp} (${baseExpPct}%)`;
+            document.getElementById('top-base-exp-bar').style.width = `${baseExpPct}%`;
+            document.getElementById('top-job-exp-text').innerText = `${player.jobExp} / ${player.jobMaxExp} (${jobExpPct}%)`;
+            document.getElementById('top-job-exp-bar').style.width = `${jobExpPct}%`;
+
+            let eqContainer = document.getElementById('equipment-slots-container');
+            eqContainer.innerHTML = '';
+            for (let [slot, gear] of Object.entries(player.equipped)) {
+                eqContainer.innerHTML += `
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded border border-slate-800">
+                        <div>
+                            <span class="text-slate-400 capitalize block">${slot}</span>
+                            <span class="font-semibold text-slate-200">${gear ? gear.name : 'Empty'}</span>
+                        </div>
+                        ${gear ? `<button onclick="unequipItem('${slot}')" class="px-2.5 py-1 bg-red-600/30 hover:bg-red-600/50 text-[10px] text-red-300 font-bold rounded">Unequip</button>` : ''}
+                    </div>
+                `;
+            }
+
+            let invGrid = document.getElementById('inventory-grid');
+            invGrid.innerHTML = '';
+            let filledSlots = 0;
+            player.inventory.forEach((item, index) => {
+                if (item) filledSlots++;
+                let itemName = item ? item.name : '';
+                let itemColor = item && item.type === 'potion' ? 'text-emerald-400 font-bold' : 'text-amber-300 font-bold';
+                invGrid.innerHTML += `
+                    <div onclick="useOrEquipItem(${index})" class="h-14 bg-slate-900/80 border border-slate-700/60 rounded flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:border-amber-500 transition relative group">
+                        <span class="text-[9px] ${itemColor} truncate w-full">${itemName}</span>
+                        <span class="text-[8px] text-slate-500 absolute bottom-1 right-1">${index + 1}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('inventory-count').innerText = `${filledSlots} / 30`;
+
+            document.getElementById('stat-points').innerText = player.statPoints;
+            document.getElementById('stat-str').innerText = player.stats.str;
+            document.getElementById('stat-agi').innerText = player.stats.agi;
+            document.getElementById('stat-vit').innerText = player.stats.vit;
+            document.getElementById('stat-int').innerText = player.stats.int;
+            document.getElementById('stat-dex').innerText = player.stats.dex;
+            document.getElementById('stat-luk').innerText = player.stats.luk;
+
+            document.getElementById('derived-atk').innerText = derived.atk;
+            document.getElementById('derived-def').innerText = derived.def;
+            document.getElementById('derived-hit').innerText = derived.hit;
+            document.getElementById('derived-flee').innerText = derived.flee;
+            document.getElementById('derived-crit').innerText = `${derived.crit}%`;
+            document.getElementById('derived-aspd').innerText = derived.aspd;
+
+            document.getElementById('weight-text').innerText = `${derived.currentWeight} / ${derived.maxWeight}`;
+            document.getElementById('weight-bar').style.width = `${Math.min(100, (derived.currentWeight / derived.maxWeight) * 100)}%`;
+
+            document.getElementById('sp-count').innerText = player.jobSp;
+            let skillContainer = document.getElementById('skill-tree-container');
+            skillContainer.innerHTML = '';
+            for (let [sKey, skillObj] of Object.entries(player.skills)) {
+                skillContainer.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-900/40 p-2.5 rounded border border-slate-800">
+                        <div>
+                            <h4 class="font-bold text-slate-200">${skillObj.name} (Lv. ${skillObj.level}/${skillObj.maxLv})</h4>
+                            <p class="text-[10px] text-slate-400">${skillObj.desc}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="upgradeSkill('${sKey}')" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded text-[10px]">+1 SP</button>
+                            ${skillObj.level > 0 ? `<button onclick="redoneSkill('${sKey}')" class="px-2 py-1 bg-red-800 hover:bg-red-700 text-slate-100 font-bold rounded text-[10px]" title="Refund 1 SP">Redone</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('player-hp-text').innerText = `${player.hp} / ${derived.maxHp} HP`;
+            document.getElementById('player-hp-bar').style.width = `${(player.hp / derived.maxHp) * 100}%`;
+            document.getElementById('player-potions').innerText = player.potions;
+
+            let lineupContainer = document.getElementById('monsters-lineup-container');
+            if (lineupContainer && monstersList.length > 0) {
+                lineupContainer.innerHTML = '';
+                monstersList.forEach((m, idx) => {
+                    let isTarget = (idx === 0);
+                    let borderColor = isTarget ? 'border-amber-500 bg-slate-900/90 shadow-md' : 'border-slate-800 bg-slate-950/40 opacity-70';
+                    let ordinals = ["1st", "2nd", "3rd", "4th", "5th"];
+                    let ordText = ordinals[idx] || `${idx + 1}th`;
+                    let hpPct = Math.max(0, (m.hp / m.maxHp) * 100);
+                    let rangedBadge = m.isRanged ? '<span class="text-[9px] bg-purple-900/80 text-purple-300 px-1.5 py-0.5 rounded ml-1 font-semibold">Ranged</span>' : '';
+
+                    lineupContainer.innerHTML += `
+                        <div class="p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-red-400">${ordText}: ${m.name} ${rangedBadge} ${isTarget ? '<span class="text-[10px] text-amber-400 ml-1">(Target)</span>' : ''}</span>
+                                <span class="font-mono text-[11px]">${Math.max(0, m.hp)} / ${m.maxHp} HP</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50">
+                                <div class="bg-red-500 h-full transition-all duration-200" style="width: ${hpPct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function addStat(statKey) {
+            if (player.statPoints > 0) {
+                player.statPoints--;
+                player.stats[statKey]++;
+                updateUI();
+                saveGame();
+            }
+        }
+
+        function upgradeSkill(skillKey) {
+            let skillObj = player.skills[skillKey];
+            if (player.jobSp > 0 && skillObj.level < skillObj.maxLv) {
+                player.jobSp--;
+                skillObj.level++;
+                updateUI();
+                saveGame();
+            } else {
+                alert("Not enough SP or skill is maxed out!");
+            }
+        }
+
+        function redoneSkill(skillKey) {
+            let skillObj = player.skills[skillKey];
+            if (skillObj.level > 0) {
+                skillObj.level--;
+                player.jobSp++;
+                logMessage(`[Skill] Refunded 1 SP from ${skillObj.name}.`, 'levelup');
+                updateUI();
+                saveGame();
+            }
+        }
+
+        function addItemToInventory(item) {
+            let emptyIdx = player.inventory.findIndex(slot => slot === null);
+            if (emptyIdx !== -1) {
+                player.inventory[emptyIdx] = item;
+                logMessage(`[Inventory] Acquired ${item.name}!`, 'drop');
+                updateUI();
+                saveGame();
+                return true;
+            } else {
+                logMessage(`[Inventory Full] Could not store ${item.name}, inventory is full!`, 'combat');
+                return false;
+            }
+        }
+
+        function unequipItem(slot) {
+            let item = player.equipped[slot];
+            if (!item) return;
+            let emptyIdx = player.inventory.findIndex(s => s === null);
+            if (emptyIdx === -1) {
+                alert("Inventory is full! Cannot unequip.");
+                return;
+            }
+            player.inventory[emptyIdx] = { ...item };
+            player.equipped[slot] = null;
+            logMessage(`[Equipment] Unequipped ${item.name}. Slot is now empty.`, 'drop');
+            updateUI();
+            saveGame();
+        }
+
+        function useOrEquipItem(index) {
+            let item = player.inventory[index];
+            if (!item) return;
+            
+            if (item.type === 'potion') {
+                let derived = getDerivedStats();
+                if (player.hp >= derived.maxHp) {
+                    alert("HP is already full!");
+                    return;
+                }
+                player.inventory[index] = null;
+                player.hp = Math.min(derived.maxHp, player.hp + 50);
+                logMessage(`[Item] Used Minor Healing Potion. Restored 50 HP.`, 'drop');
+                updateUI();
+                saveGame();
+                return;
+            }
+
+            if (item.slot) {
+                if (player.baseLv < item.levelReq) {
+                    alert(`Required Base Level ${item.levelReq} to equip ${item.name}!`);
+                    return;
+                }
+
+                if (item.name.includes("(2H)")) {
+                    if (player.equipped['shield']) {
+                        let emptyIdx = player.inventory.findIndex(s => s === null);
+                        if (emptyIdx === -1) {
+                            alert("Inventory full! Cannot unequip shield for 2-Handed weapon.");
+                            return;
+                        }
+                        player.inventory[emptyIdx] = player.equipped['shield'];
+                        player.equipped['shield'] = null;
+                        logMessage(`[Equipment] Stored shield to equip 2-Handed weapon.`, 'drop');
+                    }
+                }
+
+                let currentEquipped = player.equipped[item.slot];
+                player.equipped[item.slot] = item;
+                player.inventory[index] = currentEquipped || null;
+                logMessage(`[Equipment] Equipped ${item.name}.`, 'drop');
+                updateUI();
+                saveGame();
+            }
+        }
+
+        function buyPotion() {
+            let derived = getDerivedStats();
+            if (derived.currentWeight + 15 > derived.maxWeight) {
+                alert("Cannot buy! Overweight limit.");
+                return;
+            }
+            if (player.gold >= 50) {
+                player.gold -= 50;
+                player.potions++;
+                addItemToInventory({ name: "Healing Potion", type: "potion", desc: "Restores 50 HP" });
+                showModal("Purchase Successful", "You purchased a Minor Healing Potion for 50 Zeny!");
+                updateUI();
+                saveGame();
+            } else {
+                showModal("Purchase Failed", "Not enough Zeny!");
+            }
+        }
+
+        function logMessage(msg, type = 'combat') {
+            ['town-activity-log', 'combat-activity-log'].forEach(id => {
+                const box = document.getElementById(id);
+                if (box) {
+                    const div = document.createElement('div');
+                    div.innerHTML = msg;
+                    if (type === 'combat') div.className = "text-red-400";
+                    else if (type === 'winlose') div.className = "text-blue-400 font-bold";
+                    else if (type === 'drop') div.className = "text-yellow-400 font-bold";
+                    else if (type === 'levelup') div.className = "text-purple-400 font-bold";
+                    else div.className = "text-slate-300";
+                    
+                    box.appendChild(div);
+                    box.scrollTop = box.scrollHeight;
+                }
+            });
+        }
+
+        function startExpedition(mode) {
+            currentMode = mode;
+            let derived = getDerivedStats();
+            player.hp = derived.maxHp;
+            document.getElementById('next-stage-btn').classList.add('hidden');
+
+            if (currentMode === 'campaign') {
+                let mapKey = document.getElementById('campaign-map-select').value;
+                activeMap = GAME_DATA.maps[mapKey];
+                currentStage = 1;
+                maxStages = activeMap.maxStages;
+                document.getElementById('node-mode-tag').innerText = "Campaign Run";
+                document.getElementById('node-title').innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages}`;
+                logMessage(`[Expedition] Entering ${activeMap.title} (Campaign Mode)...`, 'winlose');
+            } else {
+                activeMap = { 
+                    title: "Endless Void Tower", 
+                    dropKey: 'map50',
+                    maxStages: 999,
+                    enemies: [...GAME_DATA.maps.map1.enemies, ...GAME_DATA.maps.map20.enemies, ...GAME_DATA.maps.map50.enemies],
+                    boss: { name: "Void Lord", hp: 15000, maxHp: 15000, atkMin: 950, atkMax: 1250, hit: 500, flee: 450, baseExp: 15000, jobExp: 11000, gold: 20000, isBoss: true, isRanged: false }
+                };
+                currentStage = 1;
+                maxStages = 999;
+                document.getElementById('node-mode-tag').innerText = "Endless Mode";
+                document.getElementById('node-title').innerText = `Void Tower — Wave ${currentStage}`;
+                logMessage(`[Expedition] Entering Endless Void Tower...`, 'winlose');
+            }
+
+            switchView('combat');
+            spawnStageMonsters();
+
+            if(combatInterval) clearInterval(combatInterval);
+            let intervalTime = Math.max(400, 2000 - (derived.aspd * 10));
+            combatInterval = setInterval(runCombatTick, intervalTime);
+        }
+
+        function spawnStageMonsters() {
+            isFirstHitOfBattle = true;
+            monstersList = [];
+            
+            if (currentMode === 'campaign' && currentStage === maxStages) {
+                let bossCopy = { ...activeMap.boss };
+                monstersList.push(bossCopy);
+            } else {
+                let count = Math.floor(Math.random() * 4) + 2;
+                let mapDifficultyMultiplier = 1 + ((currentStage - 1) * 0.12);
+                if (activeMap.title.includes("Map Lv. 10")) mapDifficultyMultiplier *= 1.5;
+                if (activeMap.title.includes("Map Lv. 20")) mapDifficultyMultiplier *= 2.2;
+                if (activeMap.title.includes("Map Lv. 30")) mapDifficultyMultiplier *= 3.2;
+                if (activeMap.title.includes("Map Lv. 40")) mapDifficultyMultiplier *= 4.5;
+                if (activeMap.title.includes("Map Lv. 50")) mapDifficultyMultiplier *= 6.0;
+
+                let mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : mapDifficultyMultiplier;
+                for (let i = 0; i < count; i++) {
+                    let template = activeMap.enemies[Math.floor(Math.random() * activeMap.enemies.length)];
+                    monstersList.push({
+                        ...template,
+                        hp: Math.floor(template.hp * mult),
+                        maxHp: Math.floor(template.maxHp * mult),
+                        atkMin: Math.floor(template.atkMin * mult),
+                        atkMax: Math.floor(template.atkMax * mult),
+                        hit: Math.floor(template.hit * (1 + (currentStage * 0.02))),
+                        flee: Math.floor(template.flee * (1 + (currentStage * 0.02))),
+                        isBoss: false
+                    });
+                }
+            }
+            updateUI();
+        }
+
+        function checkRuneSelectionPrompt(onCompleteCallback) {
+            const possibleRunes = [
+                { id: 'crit', name: "Permanent Rune of Precision", desc: "Permanent Critical Chance +10%", apply: () => player.runes.critBonus += 10 },
+                { id: 'hp', name: "Permanent Rune of Vitality", desc: "Permanent MAX HP +100", apply: () => { player.runes.maxHpBonus += 100; player.hp += 100; } },
+                { id: 'firstHit', name: "Permanent Rune of Momentum", desc: "Permanent First hit damage +50", apply: () => player.runes.firstHitBonus += 50 },
+                { id: 'alwaysCrit', name: "Permanent Rune of Certainty", desc: "Permanent First hit in every combat always critical", apply: () => player.runes.alwaysCritFirst = true },
+                { id: 'chainAttack', name: "Rune of Chain Strike", desc: "Attack damage 10% affects 2nd monster in lineup", apply: () => player.runes.chainAttackCount++ },
+                { id: 'randomHit', name: "Rune of Chaos Strike", desc: "Attack hits random enemy in stage lineup", apply: () => player.runes.randomHitCount++ }
+            ];
+
+            let shuffled = [...possibleRunes].sort(() => 0.5 - Math.random());
+            let choices = shuffled.slice(0, 3);
+
+            let html = `<p class="text-xs text-slate-300 mb-2">Milestone reached! Choose a PERMANENT Rune blessing for your character:</p><div class="flex flex-col gap-2">`;
+            choices.forEach((rune, idx) => {
+                html += `<button onclick="selectRuneChoice(${idx})" class="p-3 bg-slate-900 hover:bg-amber-600/30 border border-amber-500/40 rounded-xl text-left transition group">
+                    <span class="font-bold text-amber-300 block text-xs">${rune.name}</span>
+                    <span class="text-[10px] text-slate-400">${rune.desc}</span>
+                </button>`;
+            });
+            html += `</div>`;
+
+            window.tempRunesList = choices;
+            window.tempRuneCallback = onCompleteCallback;
+
+            showModal("Permanent Rune Awakening", "Select your permanent artifact blessing:", html, () => {});
+        }
+
+        window.selectRuneChoice = function(index) {
+            let chosen = window.tempRunesList[index];
+            chosen.apply();
+            logMessage(`[Permanent Rune Acquired] Activated ${chosen.name}: ${chosen.desc}`, 'levelup');
+            closeModal();
+            
+            if (window.tempRuneCallback) {
+                let cb = window.tempRuneCallback;
+                window.tempRuneCallback = null;
+                cb();
+            }
+            saveGame();
+        };
+
+        function runCombatTick() {
+            let derived = getDerivedStats();
+            if (player.hp <= 0 || monstersList.length === 0) return;
+
+            let targetIdx = 0;
+            if (player.runes.randomHitCount > 0 && monstersList.length > 1 && Math.random() < 0.5) {
+                targetIdx = Math.floor(Math.random() * monstersList.length);
+            }
+            let targetEnemy = monstersList[targetIdx];
+
+            let hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - targetEnemy.flee + 80) / 100));
+            if (Math.random() <= hitChance) {
+                let bonusDmg = player.skills.crushing.level * 3;
+                if (isFirstHitOfBattle) {
+                    bonusDmg += player.runes.firstHitBonus;
+                }
+                let pDmg = derived.atk + bonusDmg;
+
+                let isCrit = false;
+                if (isFirstHitOfBattle && player.runes.alwaysCritFirst) {
+                    isCrit = true;
+                } else if (Math.random() * 100 < derived.crit) {
+                    isCrit = true;
+                }
+
+                if (isCrit) {
+                    pDmg = Math.floor(pDmg * 1.5);
+                    logMessage(`[CRITICAL!] Vanguard strikes ${targetEnemy.name} for ${pDmg} critical damage!`, 'combat');
+                } else {
+                    logMessage(`[Combat] Vanguard strikes ${targetEnemy.name} for ${pDmg} damage.`, 'combat');
+                }
+                targetEnemy.hp -= pDmg;
+
+                if (player.runes.chainAttackCount > 0 && monstersList.length > 1) {
+                    let secondIdx = (targetIdx === 0) ? 1 : 0;
+                    let secondEnemy = monstersList[secondIdx];
+                    if (secondEnemy) {
+                        let chainDmg = Math.max(1, Math.floor(pDmg * 0.10 * player.runes.chainAttackCount));
+                        secondEnemy.hp -= chainDmg;
+                        logMessage(`[Chain Strike] Rune echoes ${chainDmg} damage to ${secondEnemy.name}!`, 'combat');
+                    }
+                }
+
+                isFirstHitOfBattle = false;
+            } else {
+                logMessage(`[MISS] Vanguard missed ${targetEnemy.name}!`, 'combat');
+                isFirstHitOfBattle = false;
+            }
+
+            monstersList = monstersList.filter(m => {
+                if (m.hp <= 0) {
+                    let bonusMultiplier = 1 + (player.skills.moneyDrop.level * 0.01);
+                    let finalGold = Math.floor(m.gold * bonusMultiplier);
+
+                    logMessage(`[Victory] Defeated ${m.name}! Gained ${m.baseExp} Base EXP, ${m.jobExp} Job EXP, ${finalGold} Zeny.`, 'winlose');
+                    player.gold += finalGold;
+                    player.baseExp += m.baseExp;
+                    player.jobExp += m.jobExp;
+                    
+                    if (player.baseExp >= player.baseMaxExp) {
+                        player.baseLv++;
+                        player.baseExp -= player.baseMaxExp;
+                        player.baseMaxExp = Math.floor(player.baseMaxExp * 1.35);
+                        player.statPoints += 3;
+                        logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points.`, 'levelup');
+                    }
+
+                    if (player.jobExp >= player.jobMaxExp) {
+                        player.jobLv++;
+                        player.jobExp -= player.jobMaxExp;
+                        player.jobMaxExp = Math.floor(player.jobMaxExp * 1.3);
+                        player.jobSp += 1;
+                        logMessage(`[JOB LEVEL UP!] Reached Job Level ${player.jobLv}! Gained 1 Skill Point (SP).`, 'levelup');
+                    }
+
+                    if (m.isBoss) {
+                        let poolKey = activeMap.dropKey || 'map1';
+                        let pool = GEAR_POOL[poolKey] || GEAR_POOL.map1;
+                        let randomGear = pool[Math.floor(Math.random() * pool.length)];
+                        let droppedItem = { ...randomGear };
+                        logMessage(`[BOSS DROP!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name}</span>!`, 'drop');
+                        addItemToInventory(droppedItem);
+                    }
+                    return false;
+                }
+                return true;
+            });
+
+            updateUI();
+
+            if (monstersList.length === 0) {
+                clearInterval(combatInterval);
+                logMessage(`[Stage Cleared] Stage ${currentStage} completed successfully! Click Continue when ready.`, 'drop');
+
+                let proceedNext = () => {
+                    document.getElementById('next-stage-btn').classList.add('hidden');
+                    currentStage++;
+
+                    if (currentMode === 'campaign' && currentStage > maxStages) {
+                        let poolKey = activeMap.dropKey || 'map1';
+                        let pool = GEAR_POOL[poolKey] || GEAR_POOL.map1;
+                        let mapRewardGear = pool[Math.floor(Math.random() * pool.length)];
+                        addItemToInventory(mapRewardGear);
+                        
+                        logMessage(`[Map Completed] All stages completed! Bonus Map Reward: <span style="color: yellow;">${mapRewardGear.name}</span>!`, 'drop');
+                        showModal("Map Completed!", `Victory! You have successfully completed ${activeMap.title}.\n\nLoot Dropped: <span style="color: yellow; font-weight: bold;">${mapRewardGear.name}</span>`, '', () => {
+                            switchView('town');
+                        });
+                        return;
+                    } else {
+                        if (currentMode === 'endless') {
+                            document.getElementById('node-title').innerText = `Void Tower — Wave ${currentStage}`;
+                        } else {
+                            let isBossStage = currentStage === maxStages;
+                            document.getElementById('node-title').innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages} ${isBossStage ? '(FINAL BOSS)' : ''}`;
+                        }
+                        
+                        let derivedStats = getDerivedStats();
+                        let intervalTime = Math.max(400, 2000 - (derivedStats.aspd * 10));
+                        combatInterval = setInterval(runCombatTick, intervalTime);
+                        
+                        spawnStageMonsters();
+                        return;
+                    }
+                };
+
+                if (currentStage % 5 === 0 && currentMode === 'campaign') {
+                    checkRuneSelectionPrompt(proceedNext);
+                } else {
+                    window.pendingStageProceed = proceedNext;
+                    document.getElementById('next-stage-btn').classList.remove('hidden');
+                }
+                return;
+            }
+
+            let attackingMonsters = monstersList.slice(0, 3);
+            attackingMonsters.forEach(activeEnemy => {
+                if (player.hp <= 0) return;
+                let enemyHitChance = Math.min(0.95, Math.max(0.2, (activeEnemy.hit - derived.flee + 80) / 100));
+                if (Math.random() <= enemyHitChance) {
+                    let eDmg = Math.max(1, Math.floor(Math.random() * (activeEnemy.atkMax - activeEnemy.atkMin + 1)) + activeEnemy.atkMin - derived.def);
+                    player.hp -= eDmg;
+                    let tag = activeEnemy.isRanged ? '[Ranged Attack]' : '[Combat]';
+                    logMessage(`${tag} ${activeEnemy.name} hits Vanguard for ${eDmg} damage.`, 'combat');
+                } else {
+                    logMessage(`[DODGE] Vanguard evaded ${activeEnemy.name}'s attack!`, 'combat');
+                }
+            });
+
+            if (player.hp < (derived.maxHp * 0.4) && player.potions > 0) {
+                player.potions--;
+                player.hp = Math.min(derived.maxHp, player.hp + 50);
+                logMessage(`[Item] Minor Healing Potion auto-triggered! Restored 50 HP.`, 'drop');
+            }
+
+            if (player.hp <= 0) {
+                clearInterval(combatInterval);
+                logMessage(`[Defeat] Vanguard has fallen in battle... Returning to town.`, 'winlose');
+                player.hp = derived.maxHp;
+                showModal("Expedition Failed", "Defeat! Vanguard has fallen in battle and retreated to town.", '', () => {
+                    switchView('town');
+                });
+            }
+            updateUI();
+        }
+
+        function proceedToNextStage() {
+            if (window.pendingStageProceed) {
+                let cb = window.pendingStageProceed;
+                window.pendingStageProceed = null;
+                cb();
+            }
+        }
+
+        function returnToTown() {
+            if(combatInterval) clearInterval(combatInterval);
+            document.getElementById('next-stage-btn').classList.add('hidden');
+            switchView('town');
+            logMessage(`[System] Returned safely to Haven of Dawn.`, 'winlose');
+        }
+    </script>
+</body>
+</html>
