@@ -1,0 +1,16 @@
+body {
+    background-color: #0f172a;
+    color: #f8fafc;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.panel {
+    background: rgba(30, 41, 59, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.log-box {
+    scrollbar-width: thin;
+    scrollbar-color: #475569 #1e293b;
+}
