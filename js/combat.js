@@ -366,7 +366,7 @@ function spawnStageMonsters() {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
             const count = Math.floor(Math.random() * 5) + 2;
-            const mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : 1 + ((currentStage - 1) * 0.12);
+            const mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || 0.12));
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
                 const base = {

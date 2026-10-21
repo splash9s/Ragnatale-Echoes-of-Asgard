@@ -80,7 +80,7 @@ const BUFF_POOL = [
     { key: 'atk',  name: "Fierce",     min: 2,  max: 12 },
     { key: 'def',  name: "Sturdy",     min: 1,  max: 8 },
     { key: 'hp',   name: "Healthy",    min: 15, max: 80 },
-    { key: 'crit', name: "Sharpened",  min: 1,  max: 5 },
+    { key: 'crit', name: "Sharpened",  min: 1,  max: 2 },
     { key: 'flee', name: "Agile",      min: 1,  max: 6 },
     { key: 'hit',  name: "Keen",       min: 1,  max: 6 },
     { key: 'aspd', name: "Swift", min: 1, max: 4 },

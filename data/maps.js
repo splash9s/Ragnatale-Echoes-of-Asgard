@@ -22,13 +22,13 @@ function makeMiniBoss(t) {
 const GAME_DATA = {
     maps: {
         map1: {
-            title: "Map Lv. 1", levelReq: 1, maxStages: 13, dropKey: 'map1',
+            title: "Map Lv. 1", levelReq: 1, maxStages: 17, stageGrowth: 0.07, dropKey: 'map1',
             enemies: [MONSTERS_DATA.poring, MONSTERS_DATA.fabre, MONSTERS_DATA.archerGoblin],
             boss: MONSTERS_DATA.bossGiantMossPoring,
             miniBoss: makeMiniBoss(MONSTERS_DATA.fabre)
         },
         map10: {
-            title: "Map Lv. 10", levelReq: 10, maxStages: 13, dropKey: 'map10',
+            title: "Map Lv. 10", levelReq: 10, maxStages: 17, dropKey: 'map10',
             enemies: [MONSTERS_DATA.caveBat, MONSTERS_DATA.rockGolem, MONSTERS_DATA.sniperKobold],
             boss: MONSTERS_DATA.bossCavernBehemoth,
             miniBoss: makeMiniBoss(MONSTERS_DATA.rockGolem)
@@ -62,8 +62,9 @@ const GAME_DATA = {
 };
 
 // Campaign paths: each path has its own element and its own progress through the 6 maps
-// Campaign maps per path: Lv 1 and Lv 10 only, 13 stages each (mini boss stage 9, MVP stage 13)
-const CAMPAIGN_MAP_KEYS = ['map1', 'map10'];
+// Campaign maps per path: Lv 1 to Lv 50, 13 stages each (mini boss stage 9, MVP stage 13)
+const CAMPAIGN_MAP_KEYS = ['map1', 'map10', 'map20', 'map30', 'map40', 'map50'];
+const CAMPAIGN_STAGES = 13;
 
 const CAMPAIGN_PATHS = {
     fire:  { name: "Fire Path",  element: 'fire',  icon: "🔥" },
@@ -81,6 +82,7 @@ Object.keys(CAMPAIGN_PATHS).forEach(pk => {
         const base = GAME_DATA.maps[mk];
         GAME_DATA.paths[pk].maps[mk] = {
             ...base,
+            maxStages: CAMPAIGN_STAGES,
             title: `${path.name} · ${base.title}`,
             enemies: base.enemies.map(tint),
             boss: tint(base.boss),
