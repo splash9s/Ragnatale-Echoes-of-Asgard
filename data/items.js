@@ -104,3 +104,35 @@ const GEAR_POOL = {
         { name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
     ]
 };
+
+// ---------- ITEM SETS ----------
+const SET_DATA = {
+    warrior: {
+        name: "Warrior Set", pieces: 5,
+        bonuses: [
+            { pieces: 2, desc: "ATK +10", stats: { atk: 10 } },
+            { pieces: 4, desc: "ATK +40, DEF +10, Max HP +200", stats: { atk: 40, def: 10, hp: 200 } }
+        ]
+    },
+    beach: {
+        name: "Beach Adventurer Set", pieces: 3,
+        bonuses: [
+            { pieces: 2, desc: "+5% Gold", goldBonus: 0.05 },
+            { pieces: 3, desc: "+5% more Gold, FLEE +3", goldBonus: 0.05, stats: { flee: 3 } }
+        ]
+    }
+};
+
+// Set pieces dropped from expeditions / chests
+GEAR_POOL.map1.push(
+    { name: "Beach Shirt", slot: "armor", levelReq: 1, setName: "beach", stats: { hp: 40 }, desc: "HP +40" },
+    { name: "Beach Sandals", slot: "footgear", levelReq: 1, setName: "beach", stats: { flee: 2 }, desc: "FLEE +2" },
+    { name: "Beach Sarong", slot: "garment", levelReq: 1, setName: "beach", stats: { def: 1 }, desc: "DEF +1" }
+);
+GEAR_POOL.map10.push(
+    { name: "Warrior Blade (1H)", slot: "weapon", levelReq: 10, setName: "warrior", stats: { atk: 22 }, desc: "Atk +22" },
+    { name: "Warrior Bulwark", slot: "shield", levelReq: 10, setName: "warrior", stats: { def: 5, block: 8 }, desc: "DEF +5, Block +8%" },
+    { name: "Warrior Plate", slot: "armor", levelReq: 10, setName: "warrior", stats: { hp: 100, def: 8 }, desc: "HP +100, DEF +8" },
+    { name: "Warrior Mantle", slot: "garment", levelReq: 10, setName: "warrior", stats: { flee: 4, def: 2 }, desc: "FLEE +4, DEF +2" },
+    { name: "Warrior Greaves", slot: "footgear", levelReq: 10, setName: "warrior", stats: { hp: 40, def: 2 }, desc: "HP +40, DEF +2" }
+);

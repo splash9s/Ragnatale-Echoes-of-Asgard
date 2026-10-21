@@ -5,6 +5,7 @@ const GAME_DATA = {
             levelReq: 1,
             maxStages: 11,
             dropKey: 'map1',
+            released: true,
             enemies: [
                 MONSTERS_DATA.poring,
                 MONSTERS_DATA.fabre,
@@ -17,6 +18,7 @@ const GAME_DATA = {
             levelReq: 10,
             maxStages: 12,
             dropKey: 'map10',
+            released: true,
             enemies: [
                 MONSTERS_DATA.caveBat,
                 MONSTERS_DATA.rockGolem,
@@ -29,6 +31,7 @@ const GAME_DATA = {
             levelReq: 20,
             maxStages: 14,
             dropKey: 'map20',
+            released: true,
             enemies: [
                 MONSTERS_DATA.desertScorpion,
                 MONSTERS_DATA.sandWarrior,
@@ -41,6 +44,7 @@ const GAME_DATA = {
             levelReq: 30,
             maxStages: 15,
             dropKey: 'map30',
+            released: false,
             enemies: [
                 MONSTERS_DATA.abyssalImp,
                 MONSTERS_DATA.hellhound,
@@ -53,6 +57,7 @@ const GAME_DATA = {
             levelReq: 40,
             maxStages: 18,
             dropKey: 'map40',
+            released: false,
             enemies: [
                 MONSTERS_DATA.celestialSentinel,
                 MONSTERS_DATA.seraphimEcho,
@@ -65,6 +70,7 @@ const GAME_DATA = {
             levelReq: 50,
             maxStages: 20,
             dropKey: 'map50',
+            released: false,
             enemies: [
                 MONSTERS_DATA.worldEnderMinion,
                 MONSTERS_DATA.astralHorror,

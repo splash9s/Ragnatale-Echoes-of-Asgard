@@ -3,348 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ragnatale: Vanguard Edition v1.6</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Ragnatale - Idle RPG</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #030712; color: #f8fafc; }
+        .pixel-font { font-family: 'Press Start 2P', monospace; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+    </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-6 relative">
 
-    <!-- BGM AUDIO -->
-    <audio id="game-bgm" loop>
-        <source src="https://nu.vgmtreasurechest.com/soundtracks/ragnarok-online-original-soundtrack/dseujldi/1-08.%20Theme%20of%20Prontera.mp3" type="audio/mp3">
-    </audio>
 
-    <!-- VIEW: NAME & AVATAR SELECTION MODAL -->
-    <div id="view-name-select" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4 hidden">
-        <div class="panel p-8 rounded-2xl max-w-md w-full border border-amber-500/50 shadow-2xl flex flex-col gap-6 text-center">
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- TOP HEADER / HUD -->
+    <header class="bg-slate-950/80 border-b border-slate-800/80 backdrop-blur sticky top-0 z-40 px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div id="header-avatar-container" class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-lg shadow-lg border border-amber-400/40 overflow-hidden">
+                ⚔️
+            </div>
             <div>
-                <h1 id="i18n-title" class="text-2xl font-black tracking-wider text-amber-400 mb-1">RAGNATALE</h1>
-                <p class="text-xs text-slate-400">Vanguard Class Prototype</p>
-            </div>
-            
-            <div class="flex flex-col gap-2 text-left">
-                <label id="i18n-choose-avatar" class="text-xs font-bold text-amber-300">Choose Your Avatar:</label>
-                <div class="grid grid-cols-5 gap-2" id="avatar-selection-grid"></div>
-                <div class="mt-2 flex flex-col gap-1">
-                    <label id="i18n-upload-avatar" class="text-[10px] text-slate-400">Or upload custom photo:</label>
-                    <input type="file" id="custom-avatar-file" accept="image/*" onchange="handleCustomAvatarUpload(event)" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-slate-950 hover:file:bg-amber-500 cursor-pointer" />
+                <h1 id="header-player-name" class="font-bold text-sm text-amber-400 tracking-wide">Hero</h1>
+                <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                    <span>Base Lv. <strong id="header-base-lv" class="text-slate-200">1</strong></span>
+                    <span>•</span>
+                    <span>Job Lv. <strong id="header-job-lv" class="text-slate-200">1</strong></span>
                 </div>
+                <div class="flex flex-col gap-1 w-44 mt-1">
+            <div class="flex justify-between text-[9px] text-slate-400 font-mono">
+                <span>Base EXP</span>
+                <span id="top-base-exp-text">0 / 50 (0%)</span>
             </div>
-
-            <div class="flex flex-col gap-2 text-left">
-                <label id="i18n-enter-name" class="text-xs font-bold text-amber-300">Enter Your Character Name:</label>
-                <input id="input-player-name" type="text" placeholder="e.g. Siegfried" class="w-full bg-slate-900 border border-slate-700 text-sm text-slate-200 rounded-xl p-3 focus:outline-none focus:border-amber-500" value="VanguardHero" />
+            <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                <div id="top-base-exp-bar" class="bg-amber-500 h-full transition-all duration-300" style="width: 0%"></div>
             </div>
-            <button id="i18n-begin-btn" onclick="startGameWithName()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-extrabold text-sm rounded-xl transition shadow-lg shadow-amber-600/20">Begin Journey</button>
+            <div class="flex justify-between text-[9px] text-slate-400 font-mono">
+                <span>Job EXP</span>
+                <span id="top-job-exp-text">0 / 40 (0%)</span>
+            </div>
+            <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                <div id="top-job-exp-bar" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
         </div>
+            </div>
+        </div>
+
+<div class="flex items-center gap-3">
+    <div class="px-3 py-1 bg-slate-900/90 rounded-xl border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold text-amber-300 shadow-inner">
+        <span>💰</span> <span id="header-gold">1000 Zeny</span>
     </div>
-
-    <!-- MODAL POPUP OVERLAY -->
-    <div id="game-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-        <div class="panel p-6 rounded-2xl max-w-md w-full border border-amber-500/50 shadow-2xl flex flex-col gap-4 text-center">
-            <h3 id="modal-title" class="text-xl font-bold text-amber-400">Notice</h3>
-            <p id="modal-message" class="text-sm text-slate-300">Message content</p>
-            <div id="modal-content-area" class="flex flex-col gap-2"></div>
-            <button id="modal-close-btn" onclick="closeModal()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl transition">Confirm</button>
-        </div>
+    <div onclick="switchView('diamond')" class="px-3 py-1 bg-slate-900/90 rounded-xl border border-purple-500/30 flex items-center gap-1.5 text-xs font-bold text-purple-300 shadow-inner cursor-pointer hover:border-purple-400 transition" title="Open Diamond Shop">
+        <span>💎</span> <span id="header-diamonds">1000</span>
     </div>
+    <!-- ADD BGM BUTTON HERE -->
+    <button id="bgm-toggle-btn" onclick="toggleBGM()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer" title="Toggle Music">🎵 Off</button>
+    <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer">🌐 EN/TH</button>
+</div>
 
-    <!-- HEADER -->
-    <header class="w-full max-w-6xl flex flex-col gap-2 pb-4 border-b border-slate-800">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-black tracking-wider text-amber-400">RAGNATALE <span class="text-xs font-normal text-slate-400">v1.6</span></h1>
-                <div class="flex items-center gap-2 mt-1">
-                    <button onclick="manualSaveGame()" id="i18n-btn-save" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] rounded border border-slate-700 transition">Save Game</button>
-                    <button onclick="resetSaveGame()" id="i18n-btn-reset" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 text-[10px] rounded border border-red-800 transition">Reset Save</button>
-                    <button onclick="toggleBgm()" id="bgm-toggle-btn" class="px-2 py-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 text-[10px] rounded border border-indigo-700 transition">Play BGM</button>
-                    <button onclick="toggleLanguage()" id="lang-toggle-btn" class="px-2 py-1 bg-amber-950/80 hover:bg-amber-900 text-amber-300 text-[10px] rounded border border-amber-700 transition font-bold">TH / EN</button>
-                </div>
-            </div>
-
-            <!-- Avatar Upper Right -->
-            <div class="flex flex-col items-center bg-slate-900/80 p-3 px-5 rounded-xl border border-slate-800 text-center">
-                <div id="header-avatar-container" class="w-12 h-12 rounded-full bg-slate-800 border-2 border-amber-500/60 flex items-center justify-center text-xl shadow-md overflow-hidden flex-shrink-0 mb-1">
-                    ⚔️
-                </div>
-                <div id="header-player-name" class="text-xs font-bold text-amber-300 leading-tight">Hero</div>
-                <div class="text-[10px] text-slate-400">Class: <span class="text-blue-400 font-semibold">Vanguard</span></div>
-            </div>
-        </div>
-
-        <div id="player-status-bar" class="flex gap-4 text-xs md:text-sm font-semibold pt-1">
-            <span class="text-emerald-400">Base Lv. <span id="header-base-lv">1</span></span>
-            <span class="text-indigo-400">Job Lv. <span id="header-job-lv">1</span></span>
-            <span id="header-gold" class="text-yellow-400">150 Zeny</span>
-        </div>
-
-        <!-- Progress Bars -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 text-xs mt-1">
-            <div class="space-y-1">
-                <div class="flex justify-between text-emerald-400 font-semibold">
-                    <span id="i18n-base-exp">Base EXP</span>
-                    <span id="top-base-exp-text">0 / 50 (0%)</span>
-                </div>
-                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                    <div id="top-base-exp-bar" class="bg-emerald-500 h-full w-[0%] transition-all"></div>
-                </div>
-            </div>
-            <div class="space-y-1">
-                <div class="flex justify-between text-indigo-400 font-semibold">
-                    <span id="i18n-job-exp">Job EXP</span>
-                    <span id="top-job-exp-text">0 / 40 (0%)</span>
-                </div>
-                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                    <div id="top-job-exp-bar" class="bg-indigo-500 h-full w-[0%] transition-all"></div>
-                </div>
-            </div>
-        </div>
+<!-- AUDIO ELEMENT -->
+<audio id="game-bgm" loop>
+    <source src="sound/bgm.wav" type="audio/wav">
+</audio>
     </header>
 
-    <!-- Main Container -->
-    <main id="app" class="w-full max-w-6xl my-6 flex-1 flex flex-col gap-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
 
-        <!-- VIEW: TOWN HUB -->
-        <div id="view-town" class="flex flex-col gap-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 flex flex-col gap-6">
-                    <div class="panel p-6 rounded-xl shadow-xl flex flex-col justify-between gap-4">
-                        <div>
-                            <h2 id="i18n-town-title" class="text-xl font-bold text-amber-300">Haven of Dawn</h2>
-                            <p id="i18n-town-desc" class="text-sm text-slate-400 mt-1">Manage character stats, inventory, equipment, skill progression, or head out on expeditions.</p>
-                        </div>
-                    </div>
-
-                    <!-- Navigation Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button onclick="switchView('character')" class="panel p-5 rounded-xl hover:border-amber-500/50 transition text-left group">
-                            <h3 id="i18n-menu-char" class="font-bold text-amber-400 group-hover:text-amber-300">1. Character, Skills & Inventory</h3>
-                            <p id="i18n-menu-char-desc" class="text-xs text-slate-400 mt-1">Equipped gear, stats, 30-slot inventory, and Vanguard skills.</p>
-                        </button>
-                        <button onclick="switchView('forge')" class="panel p-5 rounded-xl hover:border-amber-500/50 transition text-left group">
-                            <h3 id="i18n-menu-forge" class="font-bold text-amber-400 group-hover:text-amber-300">2. Artisan Forge & Armory</h3>
-                            <p id="i18n-menu-forge-desc" class="text-xs text-slate-400 mt-1">Buy individual weapons, armor (Levels 1 to 50), and potions.</p>
-                        </button>
-                        <button onclick="switchView('expeditions')" class="panel p-5 rounded-xl bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 transition text-left group md:col-span-2">
-                            <h3 id="i18n-menu-exp" class="font-bold text-amber-300 group-hover:text-amber-200">3. Expedition Gate</h3>
-                            <p id="i18n-menu-exp-desc" class="text-xs text-amber-200/70 mt-1">Choose Map Lv 1, 10, 20, 30, 40, 50 (Escalating difficulty with combat runes every 5 stages).</p>
-                        </button>
-                    </div>
+        <!-- NAME SELECTION MODAL -->
+        <div id="view-name-select" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
+                <div class="text-center">
+                    <h2 class="text-lg font-bold text-amber-400 pixel-font mb-1">RAGNATALE</h2>
+                    <p class="text-xs text-slate-400">Choose your avatar and enter your heroic name.</p>
                 </div>
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold text-slate-300">Avatar Icon</label>
+                    <div id="avatar-selection-grid" class="grid grid-cols-5 gap-2"></div>
+                    <label class="text-[10px] text-slate-400 mt-1">Or upload custom image:</label>
+                    <input type="file" accept="image/*" onchange="handleCustomAvatarUpload(event)" class="text-xs text-slate-400 file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-slate-950 hover:file:bg-amber-500 cursor-pointer">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-slate-300">Hero Name</label>
+                    <input type="text" id="input-player-name" value="VanguardHero" class="px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-400 text-slate-100">
+                </div>
+                <button onclick="startGameWithName()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
+                    Begin Journey
+                </button>
+            </div>
+        </div>
 
-                <!-- Right Side Activity Log in Town -->
-                <div class="panel p-4 rounded-xl flex flex-col min-h-[300px]">
-                    <h4 id="i18n-activity-log" class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Activity Log</h4>
-                    <div id="town-activity-log" class="log-box flex-1 overflow-y-auto max-h-[350px] text-xs space-y-1 font-mono">
-                        <div class="text-slate-400">[System] Welcome to Haven of Dawn. Ready for expedition.</div>
-                    </div>
+        <!-- VIEW: TOWN -->
+        <div id="view-town" class="flex flex-col gap-4 flex-1">
+            <div class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
+                <div>
+                    <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">🏰 Haven of Dawn</h2>
+                    <p class="text-xs text-slate-400 mt-1">Prepare your gear, refine weapons, accept daily quests, and embark on expeditions.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="manualSaveGame()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Save Game</button>
+                    <button onclick="resetSaveGame()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900 text-red-300 font-bold rounded-xl text-xs transition cursor-pointer">Reset Save</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <button onclick="switchView('character')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
+                    <span class="text-xl">🛡️</span>
+                    <span class="font-bold text-amber-300 text-xs">Character & Stats</span>
+                    <span class="text-[10px] text-slate-400">Inventory & skills.</span>
+                </button>
+                <button onclick="switchView('forge')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
+                    <span class="text-xl">🔨</span>
+                    <span class="font-bold text-amber-300 text-xs">Forge & Shop</span>
+                    <span class="text-[10px] text-slate-400">Armory & refining.</span>
+                </button>
+                <button onclick="switchView('diamond')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
+                    <span class="text-xl">💎</span>
+                    <span class="font-bold text-purple-300 text-xs">Diamond Shop</span>
+                    <span class="text-[10px] text-slate-400">Premium items & pets.</span>
+                </button>
+                <button onclick="switchView('expeditions')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
+                    <span class="text-xl">⚔️</span>
+                    <span class="font-bold text-amber-300 text-xs">Expeditions</span>
+                    <span class="text-[10px] text-slate-400">Dungeons & towers.</span>
+                </button>
+                <button onclick="switchView('quests')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
+                    <span class="text-xl">📜</span>
+                    <span class="font-bold text-amber-300 text-xs">Quests & Mail</span>
+                    <span class="text-[10px] text-slate-400">Daily tasks & mail.</span>
+                </button>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Activity Log</h3>
+                <div id="town-activity-log" class="h-32 overflow-y-auto flex flex-col gap-1 font-mono text-[11px] text-slate-300 pr-2">
+                    <div>[System] Welcome back to Haven of Dawn. Ready for adventure?</div>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW: EXPEDITION SELECTION -->
-        <div id="view-expeditions" class="hidden flex flex-col gap-6">
-            <div class="panel p-4 rounded-xl flex justify-between items-center">
+        <!-- VIEW: EXPEDITIONS -->
+        <div id="view-expeditions" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 id="i18n-exp-title" class="text-lg font-bold text-amber-300">Expedition Gate</h2>
-                    <p id="i18n-exp-subtitle" class="text-xs text-slate-400">Select exploration zone. Difficulty ramps up significantly per map level.</p>
+                    <h2 class="text-base font-bold text-amber-400">Expedition Gates</h2>
+                    <p class="text-xs text-slate-400">Choose your battleground and conquer floors.</p>
                 </div>
-                <button onclick="switchView('town')" id="i18n-btn-back" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded font-medium transition">Back to Town</button>
+                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="panel p-5 rounded-xl border-l-4 border-amber-500 flex flex-col justify-between gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
                     <div>
-                        <span id="i18n-camp-tag" class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Campaign Mode</span>
-                        <h3 id="i18n-camp-title" class="font-bold text-slate-100 text-base">Campaign Expedition</h3>
-                        <p id="i18n-camp-desc" class="text-xs text-slate-400 mt-1">Staged maps with increasing difficulty and set boss drops.</p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/40 uppercase">Campaign</span>
+                        <h3 class="text-sm font-bold text-slate-200 mt-2">Campaign Dungeons</h3>
                     </div>
-                    <div class="space-y-2">
-                        <select id="campaign-map-select" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded p-2">
-                            <option value="map1">Map Lv. 1 (11 Stages)</option>
-                            <option value="map10">Map Lv. 10 (12 Stages)</option>
-                            <option value="map20">Map Lv. 20 (14 Stages)</option>
-                            <option value="map30">Map Lv. 30 (15 Stages)</option>
-                            <option value="map40">Map Lv. 40 (18 Stages)</option>
-                            <option value="map50">Map Lv. 50 (20 Stages)</option>
-                        </select>
-                        <button onclick="startExpedition('campaign')" id="i18n-btn-camp" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded transition">Start Campaign Run</button>
-                    </div>
+                    <div id="campaign-map-list" class="grid grid-cols-2 gap-2"></div>
+                    <select id="campaign-map-select" class="hidden w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                        <option value="map1">Prontera Outskirts (Lv. 1)</option>
+                        <option value="map10">Payon Forest (Lv. 10)</option>
+                        <option value="map20">Geffen Magic Academy (Lv. 20)</option>
+                    </select>
+                    <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
                 </div>
-
-                <div class="panel p-5 rounded-xl border-l-4 border-purple-500 flex flex-col justify-between gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
                     <div>
-                        <span id="i18n-endless-tag" class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Endless Mode</span>
-                        <h3 id="i18n-endless-title" class="font-bold text-slate-100 text-base">Endless Void Tower</h3>
-                        <p id="i18n-endless-desc" class="text-xs text-slate-400 mt-1">Non-stop waves of escalating threats to test maximum build endurance.</p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless</span>
+                        <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower</h3>
                     </div>
-                    <button onclick="startExpedition('endless')" id="i18n-btn-endless" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-slate-100 font-bold text-xs rounded transition">Enter Endless Mode</button>
+                    <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW: CHARACTER, SKILLS, INVENTORY & EQUIPMENT -->
-        <div id="view-character" class="hidden flex flex-col gap-6">
-            <div class="panel p-4 rounded-xl flex justify-between items-center">
-                <h2 id="i18n-char-title" class="text-lg font-bold text-amber-300">Character Overview, Skills & Inventory</h2>
-                <button onclick="switchView('town')" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded font-medium transition">Back to Town</button>
+        <!-- VIEW: CHARACTER -->
+        <div id="view-character" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <h2 class="text-base font-bold text-amber-400">Character & Equipment</h2>
+                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="flex flex-col gap-6">
-                    <div class="panel p-5 rounded-xl flex flex-col gap-4">
-                        <h3 id="i18n-equip-title" class="text-md font-bold text-slate-200 border-b border-slate-700 pb-2">Equipped Gear</h3>
-                        <div class="space-y-3 text-xs" id="equipment-slots-container"></div>
-
-                        <div class="mt-4 pt-3 border-t border-slate-800">
-                            <div class="flex justify-between text-xs font-semibold mb-1">
-                                <span id="i18n-weight-label" class="text-slate-400">Current Weight:</span>
-                                <span id="weight-text" class="text-slate-200">120 / 2000</span>
-                            </div>
-                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
-                                <div id="weight-bar" class="bg-amber-500 h-full w-[6%]"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="panel p-5 rounded-xl flex flex-col gap-4">
-                        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                            <h3 id="i18n-skills-title" class="text-md font-bold text-slate-200">Vanguard Skills</h3>
-                            <span class="text-xs text-amber-400 font-bold">SP: <span id="sp-count">0</span></span>
-                        </div>
-                        <div class="space-y-3 text-xs" id="skill-tree-container"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="flex flex-col gap-4">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Equipped Gear</h3>
+                        <div id="equipment-slots-container" class="flex flex-col gap-2"></div>
+                        <div id="set-bonus-panel" class="flex flex-col gap-2"></div>
                     </div>
                 </div>
-
-                <div class="panel p-5 rounded-xl flex flex-col gap-4">
-                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                        <h3 id="i18n-inv-title" class="text-md font-bold text-slate-200">Inventory (30 Slots)</h3>
-                        <span class="text-xs text-slate-400" id="inventory-count">0 / 30</span>
-                    </div>
-                    <div id="inventory-grid" class="grid grid-cols-5 gap-2 max-h-[420px] overflow-y-auto p-1"></div>
-                    <p id="i18n-inv-hint" class="text-[10px] text-slate-400 mt-2 italic">* Click item to equip/consume. Unequipping frees slot.</p>
-                </div>
-
-                <div class="panel p-5 rounded-xl flex flex-col gap-4">
-                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                        <h3 id="i18n-stats-title" class="text-md font-bold text-slate-200">Status Allocation</h3>
-                        <span class="text-xs text-amber-400 font-bold"><span id="i18n-stat-pts">Stat Points</span>: <span id="stat-points">5</span></span>
-                    </div>
-
-                    <div class="space-y-2 text-xs">
-                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
-                            <span class="font-bold text-red-400 w-12">STR</span>
-                            <span id="stat-str" class="font-bold text-slate-200 px-2">1</span>
-                            <button onclick="addStat('str')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
-                            <span class="font-bold text-emerald-400 w-12">AGI</span>
-                            <span id="stat-agi" class="font-bold text-slate-200 px-2">1</span>
-                            <button onclick="addStat('agi')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
-                            <span class="font-bold text-yellow-400 w-12">VIT</span>
-                            <span id="stat-vit" class="font-bold text-slate-200 px-2">1</span>
-                            <button onclick="addStat('vit')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
-                            <span class="font-bold text-blue-400 w-12">INT</span>
-                            <span id="stat-int" class="font-bold text-slate-200 px-2">1</span>
-                            <button onclick="addStat('int')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
-                            <span class="font-bold text-purple-400 w-12">DEX</span>
-                            <span id="stat-dex" class="font-bold text-slate-200 px-2">1</span>
-                            <button onclick="addStat('dex')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded">
-                            <span class="font-bold text-cyan-400 w-12">LUK</span>
-                            <span id="stat-luk" class="font-bold text-slate-200 px-2">1</span>
-                            <button onclick="addStat('luk')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-slate-100 font-bold rounded">+1</button>
-                        </div>
-                    </div>
-
-                    <div class="mt-2 pt-3 border-t border-slate-800 grid grid-cols-2 gap-2 text-xs font-mono">
-                        <div>ATK: <span id="derived-atk" class="text-amber-300">15</span></div>
-                        <div>DEF: <span id="derived-def" class="text-amber-300">7</span></div>
-                        <div>HIT: <span id="derived-hit" class="text-amber-300">102</span></div>
-                        <div>FLEE: <span id="derived-flee" class="text-amber-300">102</span></div>
-                        <div>CRIT: <span id="derived-crit" class="text-amber-300">1%</span></div>
-                        <div>ASPD: <span id="derived-aspd" class="text-amber-300">135</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: ARTISAN FORGE & SHOP -->
-        <div id="view-forge" class="hidden flex flex-col gap-6">
-            <div class="panel p-4 rounded-xl flex justify-between items-center">
-                <h2 id="i18n-forge-title" class="text-lg font-bold text-amber-300">The Artisan Forge & Armory</h2>
-                <button onclick="switchView('town')" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded font-medium transition">Back to Town</button>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="panel p-6 rounded-xl flex flex-col justify-between">
-                    <div>
-                        <h3 id="i18n-consumables-title" class="text-md font-bold text-amber-200 border-b border-slate-700 pb-2">Consumables</h3>
-                        <div class="mt-3 flex justify-between items-center">
-                            <div>
-                                <h4 id="i18n-potion-name" class="font-bold text-sm">Minor Healing Potion (Weight: 15)</h4>
-                                <p id="i18n-potion-desc" class="text-xs text-slate-400">Restores 50 HP automatically or from inventory.</p>
-                            </div>
-                            <button onclick="buyPotion()" id="i18n-btn-buy" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded transition">Buy (50 Zeny)</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel p-6 rounded-xl flex flex-col gap-4">
-                    <h3 id="i18n-armory-title" class="text-md font-bold text-amber-200 border-b border-slate-700 pb-2">Individual Equipment Shop (Levels 1-50)</h3>
-                    <div class="space-y-2 text-xs max-h-[350px] overflow-y-auto pr-1" id="shop-items-container"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: EXPEDITION / COMBAT -->
-        <div id="view-combat" class="hidden flex flex-col gap-6 flex-1">
-            <div class="panel p-4 rounded-xl flex justify-between items-center">
-                <div>
-                    <span id="node-mode-tag" class="text-xs text-amber-400 uppercase tracking-wider font-semibold">Campaign Run</span>
-                    <h2 id="node-title" class="text-lg font-bold text-slate-100">Map Lv. 1 — Stage 1 / 11</h2>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button id="next-stage-btn" onclick="proceedToNextStage()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-sm rounded shadow-lg transition">Continue to Next Stage</button>
-                    <button id="retreat-btn" onclick="returnToTown()" id="i18n-btn-retreat" class="px-4 py-2 bg-red-900/60 hover:bg-red-800 text-sm rounded font-medium transition border border-red-700/50">Retreat to Town</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2 flex flex-col gap-4">
-                    <div class="panel p-5 rounded-xl flex flex-col gap-3">
+                <div class="flex flex-col gap-4">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
-                            <span id="combat-player-name" class="font-bold text-blue-400">Hero</span>
-                            <span id="player-hp-text" class="text-xs font-semibold">100 / 100 HP</span>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Attributes</h3>
+                            <span class="text-xs text-amber-400">Pts: <strong id="stat-points">5</strong></span>
                         </div>
-                        <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
-                            <div id="player-hp-bar" class="bg-blue-500 h-full w-full transition-all duration-200"></div>
-                        </div>
-                        
-                        <div class="space-y-1 mt-2 text-[11px]">
-                            <div class="flex justify-between text-slate-400 pt-1">
-                                <span>Potions in Inventory: <span id="player-potions">3</span></span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span>STR: <strong id="stat-str" class="text-amber-400">1</strong></span>
+                                <button onclick="addStat('str')" class="px-2 py-0.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer">+</button>
+                            </div>
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span>AGI: <strong id="stat-agi" class="text-amber-400">1</strong></span>
+                                <button onclick="addStat('agi')" class="px-2 py-0.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer">+</button>
+                            </div>
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span>VIT: <strong id="stat-vit" class="text-amber-400">1</strong></span>
+                                <button onclick="addStat('vit')" class="px-2 py-0.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer">+</button>
+                            </div>
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span>INT: <strong id="stat-int" class="text-amber-400">1</strong></span>
+                                <button onclick="addStat('int')" class="px-2 py-0.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer">+</button>
+                            </div>
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span>DEX: <strong id="stat-dex" class="text-amber-400">1</strong></span>
+                                <button onclick="addStat('dex')" class="px-2 py-0.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer">+</button>
+                            </div>
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span>LUK: <strong id="stat-luk" class="text-amber-400">1</strong></span>
+                                <button onclick="addStat('luk')" class="px-2 py-0.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer">+</button>
                             </div>
                         </div>
                     </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Combat Stats</h3>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ATK</span><strong id="derived-atk" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">DEF</span><strong id="derived-def" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">HIT</span><strong id="derived-hit" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">FLEE</span><strong id="derived-flee" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">CRIT Rate</span><strong id="derived-crit" class="text-slate-100">0%</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ASPD</span><strong id="derived-aspd" class="text-slate-100">0</strong></div>
+                            <div class="col-span-2 flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">Move Speed</span><strong id="derived-movement-speed" class="text-slate-100">0 m/s</strong></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Skill Tree</h3>
+                            <span class="text-xs text-purple-400">SP: <strong id="sp-count">0</strong></span>
+                        </div>
+                        <div id="skill-tree-container" class="flex flex-col gap-2"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inventory Bag</h3>
+                        <span id="inventory-count" class="text-xs font-mono text-slate-400">0 / 40</span>
+                    </div>
+                    <div id="inventory-grid" class="grid grid-cols-4 gap-2"></div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="panel p-5 rounded-xl flex flex-col gap-3">
-                        <h4 id="i18n-lineup-title" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stage Monsters Lineup</h4>
-                        <div id="monsters-lineup-container" class="flex flex-col gap-2.5 mt-1"></div>
+        <!-- VIEW: FORGE & SHOP -->
+        <div id="view-forge" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <h2 class="text-base font-bold text-amber-400">Blacksmith Forge & Shop</h2>
+                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="switchForgeSubTab('zeny')" id="forge-tab-btn-zeny" class="px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer">Zeny Shop</button>
+                <button onclick="switchForgeSubTab('refine')" id="forge-tab-btn-refine" class="px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Refining</button>
+            </div>
+            <div id="forge-zeny-section" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Consumables</h3>
+                    <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Armory & Equipment Shop</h3>
+                    <div id="shop-items-container" class="flex flex-col gap-2"></div>
+                </div>
+            </div>
+            <div id="forge-refine-section" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Refinement Workshop</h3>
+                <div id="refining-slots-container" class="flex flex-col gap-3"></div>
+            </div>
+        </div>
+
+        <!-- VIEW: DIAMOND SHOP -->
+        <div id="view-diamond" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-base font-bold text-purple-400">Diamond Cash Shop</h2>
+                    <p class="text-xs text-slate-400">Purchase premium services and revival potions.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-500/40">💎 Balance: <strong id="diamond-shop-balance">1000</strong></span>
+                    <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+                </div>
+            </div>
+            <div id="diamond-shop-items-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+
+        <!-- VIEW: QUESTS & MAIL -->
+        <div id="view-quests" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-base font-bold text-amber-400">Quests & Mailbox</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Complete daily objectives for chests and check developer messages.</p>
+                </div>
+                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daily Quests</h3>
+                    <div id="quests-container" class="flex flex-col gap-2"></div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mailbox</h3>
+                    <div id="mailbox-container" class="flex flex-col gap-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: COMBAT -->
+        <div id="view-combat" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <div>
+                    <span id="node-mode-tag" class="text-[10px] font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/40 uppercase">Campaign Mode</span>
+                    <h2 id="node-title" class="text-sm font-bold text-slate-200 mt-1">Prontera Outskirts — Stage 1 / 11</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button id="next-stage-btn" onclick="proceedToNextStage()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Next Stage</button>
+                    <button onclick="returnToTown()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900 text-red-300 font-bold rounded-xl text-xs transition cursor-pointer">Retreat to Town</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-xl">⚔️</div>
+                        <div>
+                            <h3 id="combat-player-name" class="font-bold text-sm text-slate-100">Hero</h3>
+                            <span class="text-[10px] text-slate-400 font-mono" id="player-hp-text">120 / 120 HP</span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                        <div id="player-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div>
+                    </div>
+                    <button onclick="manualDrinkPotion()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 font-bold rounded-xl text-xs transition cursor-pointer flex justify-between px-3 items-center">
+                        <span>Drink Potion</span>
+                        <span id="player-potions" class="font-mono text-[10px]">None</span>
+                    </button>
+                    <div class="flex justify-between text-[10px] text-slate-400 px-1">
+                        <span>Resurrection Potion</span>
+                        <span id="player-resurrection" class="font-mono">0 left</span>
+                    </div>
+                    <div class="flex flex-col gap-1 border-t border-slate-800 pt-3">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Runes This Run</h4>
+                        <div id="combat-rune-list" class="flex flex-col gap-1 text-[10px]"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5 text-[10px] border-t border-slate-800 pt-3">
+                        <div class="flex justify-between px-1"><span class="text-slate-400">ATK</span><strong id="combat-derived-atk" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">DEF</span><strong id="combat-derived-def" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">HIT</span><strong id="combat-derived-hit" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">FLEE</span><strong id="combat-derived-flee" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">CRIT</span><strong id="combat-derived-crit" class="text-slate-100">0%</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">ASPD</span><strong id="combat-derived-aspd" class="text-slate-100">0</strong></div>
                     </div>
                 </div>
 
-                <div class="panel p-4 rounded-xl flex flex-col min-h-[240px]">
-                    <h4 id="i18n-combat-log" class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Activity Log</h4>
-                    <div id="combat-activity-log" class="log-box flex-1 overflow-y-auto max-h-[320px] text-xs space-y-1 font-mono">
-                        <div class="text-slate-400">[System] Expedition initialized. Entering gates...</div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Enemies Lineup</h3>
+                    <div id="monsters-lineup-container" class="flex flex-col gap-2"></div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Combat Log</h3>
+                    <div id="combat-activity-log" class="h-48 overflow-y-auto flex flex-col gap-1 font-mono text-[11px] text-slate-300 pr-2">
+                        <div>[Combat] Battle started...</div>
                     </div>
                 </div>
             </div>
@@ -352,11 +377,77 @@
 
     </main>
 
-    <!-- Script เชื่อมโยงโมดูลย่อย -->
-    <script src="data/i18n.js"></script>
+    <!-- UNIVERSAL GAME MODAL -->
+    <div id="game-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full flex flex-col gap-4 shadow-2xl text-center">
+            <h3 id="modal-title" class="font-bold text-sm text-amber-400">Notification</h3>
+            <p id="modal-message" class="text-xs text-slate-300 whitespace-pre-line"></p>
+            <div id="modal-content-area"></div>
+            <button id="modal-close-btn" onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Confirm</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="data/items.js"></script>
     <script src="data/monsters.js"></script>
     <script src="data/maps.js"></script>
-    <script src="game.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/ui.js"></script>
+	<audio id="game-bgm" loop>
+    <source src="bgm.wav" type="audio/wav">
+</audio>
+
+<script>
+    let isBgmPlaying = false;
+
+    function toggleBGM() {
+        const bgm = document.getElementById('game-bgm');
+        const btn = document.getElementById('bgm-toggle-btn');
+        if (!bgm) return;
+
+        if (isBgmPlaying) {
+            bgm.pause();
+            isBgmPlaying = false;
+            if (btn) btn.innerText = "🎵 Off";
+        } else {
+            bgm.volume = 0.4;
+            bgm.play().then(() => {
+                isBgmPlaying = true;
+                if (btn) btn.innerText = "🎵 On";
+            }).catch(e => {
+                console.log("Audio play failed:", e);
+                alert("Make sure bgm.wav is in the correct folder.");
+            });
+        }
+    }
+
+    window.onload = function() {
+        renderAvatarSelection();
+        if (loadGame()) {
+            let nameSelectModal = document.getElementById('view-name-select');
+            if (nameSelectModal) {
+                nameSelectModal.classList.add('hidden');
+                nameSelectModal.style.display = 'none';
+            }
+            updateUI();
+            logMessage("[System] Game loaded successfully!", "winlose");
+        }
+    };
+</script>
+    <script>
+        window.onload = function() {
+            renderAvatarSelection();
+            if (loadGame()) {
+                let nameSelectModal = document.getElementById('view-name-select');
+                if (nameSelectModal) {
+                    nameSelectModal.classList.add('hidden');
+                    nameSelectModal.style.display = 'none';
+                }
+                updateUI();
+                logMessage("[System] Game loaded successfully!", "winlose");
+            }
+        };
+    </script>
 </body>
 </html>
