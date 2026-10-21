@@ -79,7 +79,7 @@ const RUNE_DEFS = {
     randomHitCount: { name: "Chaos Rune", rarity: 2, add: 1, desc: "Attacks have a 50% chance to strike random targets", text: v => `50% chance to strike random targets (x${v})` },
     thorn: { name: "Thorn Rune", rarity: 2, add: 10, desc: "Reflect 10% of melee damage taken", text: v => `Reflect ${v}% of melee damage taken` },
     critHeal: { name: "Critical Heal Rune", rarity: 2, add: 40, desc: "Critical hits restore 40 HP", text: v => `Critical hits restore ${v} HP` },
-    lifeline: { name: "Lifeline Rune", rarity: 2, add: 100, desc: "First damage each battle restores 100 HP", text: v => `First damage each battle restores ${v} HP` },
+    lifeline: { name: "Lifeline Rune", rarity: 2, add: 20, desc: "First damage each battle restores 20% max HP", text: v => `First damage each battle restores ${v}% max HP` },
     fortify: { name: "Fortify Rune", rarity: 2, add: 20, desc: "Every 3rd attack restores 20 armor", text: v => `Every 3rd attack restores ${v} armor` },
     evasion: { name: "Evasion Rune", rarity: 2, add: 40, desc: "Dodging restores 40 HP", text: v => `Dodging restores ${v} HP` },
     alwaysCritFirst: { name: "Assassination Rune", rarity: 3, flag: true, desc: "First hit of every battle is always a Critical Hit", text: () => "First hit of every battle is Critical" },
@@ -87,8 +87,7 @@ const RUNE_DEFS = {
     divineLight: { name: "Divine Light Rune", rarity: 3, add: 100, desc: "Every 3rd attack deals +100% ATK bonus damage", text: v => `Every 3rd attack deals +${v}% ATK bonus damage` },
     momentum: { name: "Momentum Rune", rarity: 3, add: 80, desc: "2 critical hits in a row restore 80 HP", text: v => `2 critical hits in a row restore ${v} HP` },
     retribution: { name: "Retribution Rune", rarity: 3, add: 60, desc: "Healing deals 60 damage to a random monster", text: v => `Healing deals ${v} damage to a random monster` },
-    backlineBreaker: { name: "Backline Breaker Rune", rarity: 3, flag: true, desc: "Every 2nd attack hits the 2nd monster for double damage", text: () => "Every 2nd attack hits the 2nd monster for double damage" },
-    killBlast: { name: "Shockwave Rune", rarity: 4, add: 50, desc: "Killing a monster deals 50% ATK to all others", text: v => `Killing a monster deals ${v}% ATK to all others` },
+    killBlast: { name: "Shockwave Rune", rarity: 4, add: 10, desc: "Killing an enemy deals 10% ATK to all other enemies", text: v => `Killing an enemy deals ${v}% ATK to all other enemies` },
     elementIgnore: { name: "Void Rune", rarity: 4, flag: true, desc: "Ignore monster elements", text: () => "Ignore monster elements" },
     bulwark: { name: "Bulwark Rune", rarity: 4, add: 1, desc: "Instantly fully restore armor when picked", text: v => `Instantly fully restore armor when picked (x${v})`, onApply: () => { player.armor = getDerivedStats().maxArmor; } },
     lastStand: { name: "Last Stand Rune", rarity: 5, add: 1, desc: "Instantly fully restore HP when picked", text: v => `Instantly fully restore HP when picked (x${v})`, onApply: () => { player.hp = getDerivedStats().maxHp; } },
@@ -245,6 +244,7 @@ function startExpedition(mode, opts = {}) {
     }
 
     switchView('combat');
+    player.inCombat = true;
     spawnStageMonsters();
 
     if (combatInterval) clearInterval(combatInterval);
@@ -290,10 +290,20 @@ function spawnStageMonsters() {
     const derived = getDerivedStats();
     player.armor = derived.maxArmor;
     monstersList = [];
+    const dailyScale = currentMode === 'daily' ? 0.7 : 1;
+    const scaled = (m) => ({
+        ...m,
+        hp: Math.floor(m.hp * dailyScale),
+        maxHp: Math.floor(m.maxHp * dailyScale),
+        atkMin: Math.floor(m.atkMin * dailyScale),
+        atkMax: Math.floor(m.atkMax * dailyScale),
+        hit: Math.floor(m.hit * dailyScale),
+        flee: Math.floor(m.flee * dailyScale)
+    });
 
     if (isBossStage()) {
         const boss = makeBoss(getBossTemplate());
-        monstersList.push(boss);
+        monstersList.push(dailyScale === 1 ? boss : scaled(boss));
         logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), Heavy Strike (every 4th attack, x2 damage), Regeneration (1.5% HP per turn).`, 'winlose');
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
@@ -302,7 +312,7 @@ function spawnStageMonsters() {
             const mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : 1 + ((currentStage - 1) * 0.12);
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
-                monstersList.push({
+                const base = {
                     ...template,
                     hp: Math.floor(template.hp * mult),
                     maxHp: Math.floor(template.maxHp * mult),
@@ -313,7 +323,8 @@ function spawnStageMonsters() {
                     isBoss: false,
                     rewarded: false,
                     ailments: {}
-                });
+                };
+                monstersList.push(dailyScale === 1 ? base : scaled(base));
             }
         }
     }
@@ -348,8 +359,8 @@ function awardKill(m) {
     let finalGold = Math.floor(((m.gold / 4) * (1 + (skillLvl('moneyDrop') * 0.01))) * derived.goldMultiplier);
     let baseExpGain = m.baseExp;
     let jobExpGain = m.jobExp;
-    if (isEvent && currentEvent === 'gold') finalGold *= 2;
-    if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; }
+    if (isEvent && currentEvent === 'gold') { finalGold *= 2; baseExpGain = 0; jobExpGain = 0; }
+    if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; finalGold = 0; }
 
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Job EXP and <span style="color: yellow;">${finalGold} Zeny</span>`, 'winlose');
     player.gold += finalGold;
@@ -447,7 +458,7 @@ function takePlayerDamage(dmg, m) {
 
     if (!battleFirstDamageTaken) {
         battleFirstDamageTaken = true;
-        if (runeN('lifeline') > 0) healPlayer(runeN('lifeline'), 'Lifeline');
+        if (runeN('lifeline') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('lifeline') / 100), 'Lifeline');
     }
 }
 
@@ -542,10 +553,6 @@ function runCombatTick() {
             logMessage(`[Element] ${elemMult > 1 ? 'Advantage' : 'Resisted'} x${elemMult} vs ${targetEnemy.name}`, elemMult > 1 ? 'drop' : 'combat');
         }
         let pDmg = Math.floor((derived.atk + bonusDmg) * elemMult);
-        if (player.runes.backlineBreaker && alive.indexOf(targetEnemy) > 0) {
-            pDmg *= 2;
-            logMessage(`[Backline Breaker] Double damage to ${targetEnemy.name} behind the front line!`, 'drop');
-        }
         if (attackCount % 3 === 0 && runeN('divineLight') > 0) {
             const extra = Math.floor(derived.atk * runeN('divineLight') / 100);
             pDmg += extra;
@@ -590,7 +597,7 @@ function runCombatTick() {
     // ---- Kills ----
     const newlyDead = monstersList.filter(m => m.hp <= 0 && !m.rewarded);
     if (runeN('killBlast') > 0 && newlyDead.length > 0) {
-        const blast = Math.floor(derived.atk * runeN('killBlast') / 100);
+        const blast = Math.floor(derived.atk * runeN('killBlast') / 100) * newlyDead.length;
         getAliveMonsters().forEach(m => { m.hp -= blast; });
         logMessage(`[Shockwave] ${blast} damage to all monsters`, 'drop');
     }
@@ -639,7 +646,9 @@ function runCombatTick() {
 }
 
 // Time between stages: faster movement means a shorter run (3 m/s = 2 seconds)
+// Time between stages: faster movement means a shorter walk. VIP skips the walk.
 function stageDelay() {
+    if (isVipActive()) return 300;
     const mv = getDerivedStats().movementSpeed || 3;
     return Math.max(400, Math.round(6000 / mv));
 }
@@ -703,10 +712,14 @@ function onStageCleared() {
             spawnStageMonsters();
         };
 
-        if ((currentMode === 'campaign' || currentMode === 'daily' || currentMode === 'event') && currentStage % 5 === 0) {
+        if ((currentMode === 'campaign' || currentMode === 'daily' || currentMode === 'event') && currentStage % 5 === 0 && currentStage < maxStages) {
             checkRuneSelectionPrompt(proceedNext);
         } else {
             window.pendingStageProceed = proceedNext;
+            if (isVipActive()) {
+                proceedToNextStage();
+                return;
+            }
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.remove('hidden');
         }
@@ -734,8 +747,8 @@ function returnToTown() {
 // Each event allows 3 plays per day (per event). Daily Challenge also locks once cleared that day.
 const EVENT_LIMIT = 3;
 const EVENT_CONFIG = {
-    gold: { name: "Gold Rush", desc: "Campaign maps with monsters at x1.5 HP and damage. Zeny x2. No item drops." },
-    xp: { name: "XP Farm", desc: "Campaign maps with monsters at x1.5 HP and damage. Base and Job EXP x2. No item drops." }
+    gold: { name: "Zeny Frenzy", desc: "Monsters at x1.5 HP and damage. Zeny x2, but no EXP. No item drops." },
+    xp: { name: "Wisdom Trial", desc: "Monsters at x1.5 HP and damage. Base and Job EXP x2, but no Zeny. No item drops." }
 };
 const EVENT_MAPS = {
     gold: [
@@ -806,4 +819,30 @@ function startEvent(kind, mapKey) {
     getEventState().plays[kind]++;
     saveGame();
     startExpedition('event', { kind, mapKey });
+}
+
+
+// Leaving combat restores HP and armor
+function restoreAfterCombat() {
+    if (!player.inCombat) return;
+    player.inCombat = false;
+    if (combatInterval) clearInterval(combatInterval);
+    const d = getDerivedStats();
+    player.hp = d.maxHp;
+    player.armor = d.maxArmor;
+}
+
+// ---------- VIP ----------
+function isVipActive() {
+    return (player.vipUntil || 0) > Date.now();
+}
+
+// VIP gives one Resurrection Potion by mail each day
+function grantVipDailyMail() {
+    if (!isVipActive()) return false;
+    if (player.vipLastMail === todayKey()) return false;
+    player.vipLastMail = todayKey();
+    if (!player.mailBox) player.mailBox = [];
+    player.mailBox.unshift({ id: Date.now(), title: "VIP Daily Reward", sender: "VIP Office", message: "Your VIP Pass grants 1 Resurrection Potion today.", rewards: { resurrection: 1 }, claimed: false });
+    return true;
 }

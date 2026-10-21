@@ -28,9 +28,9 @@ let player = {
     materials: { ironScraps: 0 },
     mailBox: createWelcomeMail(),
     dailyQuests: [
-        { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 15 monsters during expeditions.", target: 15, current: 0, rewardChest: "copper", completed: false },
-        { id: 'q_crit', title: "Precision Striker", desc: "Land 25 Critical hits in combat.", target: 25, current: 0, rewardChest: "silver", completed: false },
-        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 2,000 Zeny from expeditions.", target: 2000, current: 0, rewardChest: "gold", completed: false }
+        { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
+        { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
+        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Zeny from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
     ],
     questMilestoneClaimed: { 1: false, 2: false, 3: false },
     skills: {
@@ -171,7 +171,7 @@ function defaultRunes() {
         critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0,
         randomHitCount: 0, resurrectionUsed: false,
         dodge: 0, swiftRun: 0, focus: 0, thorn: 0, critHeal: 0, lifeline: 0, fortify: 0, evasion: 0,
-        vampire: 0, divineLight: 0, momentum: 0, retribution: 0, backlineBreaker: false,
+        vampire: 0, divineLight: 0, momentum: 0, retribution: 0,
         killBlast: 0, elementIgnore: false, bulwark: 0, lastStand: 0, angelOfDeath: false
     };
 }
@@ -228,7 +228,7 @@ function getDerivedStats() {
     let aspd = 130 + Math.floor(ST.agi * 0.8) + Math.floor(ST.dex * 0.2);
     let movementSpeed = (player.baseMovementSpeed || 3) + rn('swiftRun');
 
-    const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0, armor: 0 };
+    const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0, armor: 0, atkPct: 0 };
     let goldMultiplier = 1;
 
     if (!daily) {
@@ -251,6 +251,7 @@ function getDerivedStats() {
     }
 
     atk += extra.atk;
+    atk = Math.floor(atk * (1 + extra.atkPct / 100));
     def += extra.def;
     maxHp += extra.hp;
     flee += extra.flee;
@@ -287,6 +288,8 @@ function loadGame() {
                 player.mailBox = createWelcomeMail();
             }
             if (!player.dailyQuests) player.dailyQuests = [];
+            const QUEST_TARGETS = { q_porings: 45, q_crit: 175, q_gold: 30000 };
+            player.dailyQuests.forEach(q => { if (QUEST_TARGETS[q.id]) q.target = QUEST_TARGETS[q.id]; });
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (!player.materials) player.materials = { ironScraps: 0 };
             player.runes = { ...defaultRunes(), ...(player.runes || {}) };
@@ -313,6 +316,7 @@ function loadGame() {
                 player.materials.ironScraps = left;
             }
             if (typeof normalizeInventoryStacks === 'function') normalizeInventoryStacks();
+            if (typeof grantVipDailyMail === 'function') grantVipDailyMail();
             return true;
         }
     } catch (e) {

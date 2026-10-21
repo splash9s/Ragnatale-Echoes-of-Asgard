@@ -57,6 +57,7 @@
     <div onclick="switchView('diamond')" class="px-3 py-1 bg-slate-900/90 rounded-xl border border-purple-500/30 flex items-center gap-1.5 text-xs font-bold text-purple-300 shadow-inner cursor-pointer hover:border-purple-400 transition" title="Open Diamond Shop">
         <span>💎</span> <span id="header-diamonds">1000</span>
     </div>
+    <button id="bgm-toggle-btn" onclick="toggleBgm()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer">🎵 BGM</button>
     <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer">🌐 EN/TH</button>
 </div>
 
@@ -429,21 +430,41 @@
     <audio id="game-bgm" src="sound/bgm.wav" loop preload="auto"></audio>
 
 <script>
-    // BGM: loops at low volume. Browsers only allow autoplay after a user gesture,
-    // so if the first attempt is blocked, it starts on the player's first click or key press.
-    function initBgm() {
+    // BGM: loops at low volume. Browsers may block autoplay until the first click or key press,
+    // so the music also starts on the first interaction unless the player turned it off.
+    let bgmPaused = false;
+    function setBgmButton(playing) {
+        const btn = document.getElementById('bgm-toggle-btn');
+        if (btn) btn.innerText = playing ? '🎵 BGM On' : '🎵 BGM Off';
+    }
+    function playBgm() {
         const bgm = document.getElementById('game-bgm');
         if (!bgm) return;
         bgm.loop = true;
         bgm.volume = 0.2;
-        const events = ['pointerdown', 'keydown'];
-        const start = () => {
-            bgm.play().then(() => {
-                events.forEach(ev => document.removeEventListener(ev, start));
-            }).catch(e => console.log("BGM waiting for user interaction:", e));
+        bgm.play().then(() => setBgmButton(true)).catch(() => setBgmButton(false));
+    }
+    function toggleBgm() {
+        const bgm = document.getElementById('game-bgm');
+        if (!bgm) return;
+        if (!bgm.paused) {
+            bgm.pause();
+            bgmPaused = true;
+            setBgmButton(false);
+        } else {
+            bgmPaused = false;
+            playBgm();
+        }
+    }
+    function initBgm() {
+        playBgm();
+        const onInteraction = (e) => {
+            if (e.target && e.target.id === 'bgm-toggle-btn') return;
+            const bgm = document.getElementById('game-bgm');
+            if (!bgmPaused && bgm && bgm.paused) playBgm();
         };
-        start();
-        events.forEach(ev => document.addEventListener(ev, start));
+        document.addEventListener('pointerdown', onInteraction);
+        document.addEventListener('keydown', onInteraction);
     }
 
     window.onload = function() {

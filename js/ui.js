@@ -15,6 +15,8 @@ const ZENY_SHOP_CONSUMABLES = [
 ];
 
 const DIAMOND_SHOP_ITEMS = [
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 150, type: 'vip' },
+    { id: 'pet_loyal_poring', name: "Loyal Poring Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
     { id: 'res_potion', name: "Resurrection Potion", price: 5, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
     { id: 'stat_reset', name: "Stat Reset Service", price: 10, type: 'service', desc: "Resets all attributes to 1 and refunds all spent stat points." },
@@ -139,6 +141,7 @@ function closeModal() {
 }
 
 function switchView(viewName) {
+    if (viewName !== 'combat') restoreAfterCombat();
     let views = ['view-town', 'view-expeditions', 'view-events', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
@@ -387,6 +390,10 @@ function buyDiamondItem(itemId) {
         }
         player.jobSp += refunded;
         showModal("Skill Reset Successful", `All skills reset and ${refunded} Job SP refunded!`);
+    } else if (item.type === 'vip') {
+        player.vipUntil = Math.max(Date.now(), player.vipUntil || 0) + 30 * 24 * 60 * 60 * 1000;
+        grantVipDailyMail();
+        showModal("VIP Activated", "VIP Pass active for 30 days. Check your mailbox for today's Resurrection Potion.");
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
         showModal("Purchase Successful", `You adopted a ${item.name}!`);
@@ -639,10 +646,10 @@ function unequipItem(slotName) {
     saveGame();
 }
 
-const STAT_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block', mdef: 'MDEF', armor: 'ARMOR' };
+const STAT_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block', mdef: 'MDEF', armor: 'ARMOR', atkPct: 'ATK%' };
 
 function formatStatLine(key, val) {
-    const pct = key === 'crit' || key === 'block';
+    const pct = key === 'crit' || key === 'block' || key === 'atkPct';
     return `${STAT_LABELS[key] || key.toUpperCase()} ${val >= 0 ? '+' : ''}${val}${pct ? '%' : ''}`;
 }
 
@@ -746,12 +753,12 @@ function showItemDetail(index) {
     const isPotion = item.type === 'potion';
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
-    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+    const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
 
     let body = '<div class="flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
         <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : kind}</span>
-        <span class="text-[10px] text-slate-400 capitalize">${kind}</span></div>`;
+        <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}${kind}</span></div>`;
     if (isEquip && item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
     if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (!isEquip && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
@@ -769,8 +776,9 @@ function showItemDetail(index) {
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
     if (isEquip) actions += `<button onclick="equipFromDetail(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Equip</button>`;
     if (isPotion) actions += `<button onclick="usePotionFromDetail(${index})" class="${btn} bg-emerald-600 hover:bg-emerald-500 text-slate-950">Equip</button>`;
-    if (isEquip && item.slot !== 'pet') actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
-    if (item.slot !== 'pet') actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Zeny</button>`;
+    if (isEquip) actions += `<button onclick="toggleFavorite(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-amber-300">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`;
+    if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
+    if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Zeny</button>`;
     actions += '</div>';
     actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
 
@@ -789,12 +797,12 @@ function showEquippedDetail(slot) {
     if (!item || !item.name) return;
     const isPotion = slot === 'potionSlot';
     const rarity = RARITY_INFO[item.rarity];
-    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+    const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
 
     let body = '<div class="flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
         <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : (isPotion ? 'Consumable' : 'Equipped')}</span>
-        <span class="text-[10px] text-slate-400 capitalize">Equipped · ${slot}</span></div>`;
+        <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}Equipped · ${slot}</span></div>`;
     if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
     if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
@@ -812,9 +820,10 @@ function showEquippedDetail(slot) {
     body += '</div>';
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    let actions = '<div class="flex flex-col gap-2 mt-2">';
+    let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
     if (!isPotion) actions += `<button onclick="unequipFromDetail('${slot}')" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
-    actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
+    if (!isPotion) actions += `<button onclick="toggleEquippedFavorite('${slot}')" class="${btn} bg-slate-800 hover:bg-slate-700 text-amber-300">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`;
+    actions += `</div><button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
 
     showModal(title, '', body + actions);
 }
@@ -880,6 +889,7 @@ function getSellPrice(item) {
 function sellInventoryItem(index) {
     const item = player.inventory[index];
     if (!item) return false;
+    if (item.favorite) { alert("Favorite items cannot be sold. Unmark it first."); return false; }
     const total = getSellPrice(item);
     const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
     if (!confirm(`Sell ${item.name}${qtyText} for ${total} Zeny?`)) return false;
@@ -910,6 +920,7 @@ function executeEquipItem(index) {
 function salvageEquipmentItem(index) {
     let item = player.inventory[index];
     if (!item || !item.slot) return;
+    if (item.favorite) { alert("Favorite items cannot be salvaged. Unmark it first."); return; }
     let scrapGain = Math.min(5, Math.max(1, Math.floor((item.levelReq || 1) / 5) + 1));
 
     player.inventory[index] = null;
@@ -1075,6 +1086,7 @@ function claimMail(mailId) {
     if (mail.rewards.gold) player.gold += mail.rewards.gold;
     if (mail.rewards.diamonds) player.diamonds += mail.rewards.diamonds;
     if (mail.rewards.refiningStones) player.refiningStones += mail.rewards.refiningStones;
+    if (mail.rewards.resurrection) player.resurrectionPotions = (player.resurrectionPotions || 0) + mail.rewards.resurrection;
     if (mail.rewards.chest) openChest(mail.rewards.chest);
 
     logMessage(`[Mail] Claimed rewards from "${mail.title}"`, 'drop');
@@ -1140,9 +1152,9 @@ function renderQuestsView() {
 
     if (!player.dailyQuests || player.dailyQuests.length === 0) {
         player.dailyQuests = [
-            { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 15 monsters during expeditions.", target: 15, current: 0, rewardChest: "copper", completed: false },
-            { id: 'q_crit', title: "Precision Striker", desc: "Land 25 Critical hits in combat.", target: 25, current: 0, rewardChest: "silver", completed: false },
-            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 2,000 Zeny from expeditions.", target: 2000, current: 0, rewardChest: "gold", completed: false }
+            { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
+            { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
+            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Zeny from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
         ];
     }
 
@@ -1253,6 +1265,7 @@ function updateUI() {
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="h-14 bg-slate-900/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:border-amber-500 transition relative group">
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
+                    ${item && item.favorite ? '<span class="absolute top-0.5 right-1 text-[11px] text-amber-300 leading-none">★</span>' : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
                 </div>
             `;
@@ -1437,4 +1450,24 @@ function renderEventsView() {
             </div>
             <div class="flex flex-col gap-2">${buttons}</div>`;
     });
+}
+
+
+// ---------- FAVORITES ----------
+function toggleFavorite(index) {
+    const item = player.inventory[index];
+    if (!item || !item.slot) return;
+    item.favorite = !item.favorite;
+    updateUI();
+    saveGame();
+    showItemDetail(index);
+}
+
+function toggleEquippedFavorite(slot) {
+    const gear = player.equipped[slot];
+    if (!gear || !gear.slot) return;
+    gear.favorite = !gear.favorite;
+    updateUI();
+    saveGame();
+    showEquippedDetail(slot);
 }
