@@ -14,8 +14,8 @@ let player = {
     jobExp: 0,
     jobMaxExp: 40,
     hp: 120,
-    gold: 1000,
-    diamonds: 1000, 
+    gold: 0,
+    diamonds: 0, 
     statPoints: 5,
     jobSp: 0,
     potions: 3,
@@ -162,7 +162,7 @@ function getSetBonuses() {
 
 function createWelcomeMail() {
     return [
-        { id: 1, title: "Welcome Adventurer!", sender: "High Council", message: "Welcome to Ragnatale! Test reward: 1 Gold Chest.", rewards: { chest: 'gold' }, claimed: false }
+        { id: 1, title: "Welcome Adventurer!", sender: "High Council", message: "Welcome to Ragnatale! Reward: 100,000 Gold and 1,000 Diamond.", rewards: { gold: 100000, diamonds: 1000 }, claimed: false }
     ];
 }
 
@@ -284,7 +284,7 @@ function loadGame() {
         if (savedData) {
             const parsed = JSON.parse(savedData);
             player = Object.assign(player, parsed);
-            if (!Array.isArray(player.mailBox) || !player.mailBox.some(m => m.rewards && m.rewards.chest)) {
+            if (!Array.isArray(player.mailBox)) {
                 player.mailBox = createWelcomeMail();
             }
             if (!player.dailyQuests) player.dailyQuests = [];

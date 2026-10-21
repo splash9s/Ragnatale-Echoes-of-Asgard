@@ -48,7 +48,7 @@ function runeN(key) {
 // Maps are ordered by level. Each map unlocks only after the previous one is cleared.
 function getMapOrder() {
     if (typeof GAME_DATA === 'undefined') return [];
-    return Object.keys(GAME_DATA.maps).sort((a, b) => GAME_DATA.maps[a].levelReq - GAME_DATA.maps[b].levelReq);
+    return typeof CAMPAIGN_MAP_KEYS !== 'undefined' ? [...CAMPAIGN_MAP_KEYS] : [];
 }
 
 function getPrereqMapKey(key) {
