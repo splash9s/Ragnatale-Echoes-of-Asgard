@@ -18,7 +18,9 @@ const GOLD_SHOP_CONSUMABLES = [
 ];
 
 const DIAMOND_SHOP_ITEMS = [
-    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 150, type: 'vip' },
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 150, type: 'vip', days: 30 },
+    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 50, type: 'vip', days: 7 },
+    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 10, type: 'vip', days: 1 },
     { id: 'pet_loyal_poring', name: "Loyal Poring Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
     { id: 'res_potion', name: "Resurrection Potion", price: 3, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
@@ -399,6 +401,10 @@ function renderDiamondShop() {
 function buyDiamondItem(itemId) {
     let item = DIAMOND_SHOP_ITEMS.find(i => i.id === itemId);
     if (!item) return;
+    if (item.type === 'vip' && isVipActive()) {
+        showModal("VIP Active", `You already have a VIP Pass until ${new Date(player.vipUntil).toLocaleDateString()}. You can buy another after it expires.`);
+        return;
+    }
 
     if (player.diamonds < item.price) {
         showModal("Purchase Failed", "Insufficient Diamonds!");
@@ -433,9 +439,9 @@ function buyDiamondItem(itemId) {
         placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
         showModal("Purchase Successful", `You bought a ${item.name}! Open it from your inventory.`);
     } else if (item.type === 'vip') {
-        player.vipUntil = Math.max(Date.now(), player.vipUntil || 0) + 30 * 24 * 60 * 60 * 1000;
+        player.vipUntil = Date.now() + item.days * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
-        showModal("VIP Activated", "VIP Pass active for 30 days. Check your mailbox for today's Resurrection Potion.");
+        showModal("VIP Activated", `${item.name} active. Check your mailbox for today's Resurrection Potion.`);
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
         showModal("Purchase Successful", `You adopted a ${item.name}!`);
@@ -640,7 +646,7 @@ function normalizeInventoryStacks() {
 }
 
 // Sort the bag by item type. Empty slots stay at the end.
-const TYPE_RANK = { weapon: 1, shield: 2, armor: 3, garment: 4, footgear: 5, pet: 6 };
+const TYPE_RANK = { weapon: 1, shield: 2, armor: 3, garment: 4, footgear: 5, ring: 6, pet: 7 };
 function itemTypeRank(item) {
     if (item.slot) return TYPE_RANK[item.slot] || 50;
     if (item.type === 'potion' || /Potion/.test(item.name || '')) return 60;
@@ -808,7 +814,7 @@ function showItemDetail(index) {
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
     if (item.setName) body += setInfoHTML(item.setName);
     if (isEquip && item.slot !== 'pet') {
-        body += compareHTML(item, player.equipped[item.slot]);
+        body += compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]);
     } else if (isEquip && item.stats) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
             Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
@@ -952,8 +958,9 @@ function executeEquipItem(index) {
         alert(`Requires Base Level ${item.levelReq || 1}!`);
         return false;
     }
-    let currentEquipped = player.equipped[item.slot];
-    player.equipped[item.slot] = item;
+    const slotKey = item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot;
+    let currentEquipped = player.equipped[slotKey];
+    player.equipped[slotKey] = item;
     player.inventory[index] = currentEquipped ? { ...currentEquipped } : null;
     logMessage(`[Equipment] Equipped ${item.name}`, 'drop');
     updateUI();
@@ -1262,6 +1269,17 @@ function updateUI() {
     if (el) el.innerText = player.name;
     el = document.getElementById('combat-player-name');
     if (el) el.innerText = player.name;
+    const vipBadge = document.getElementById('header-vip-badge');
+    if (vipBadge) {
+        if (isVipActive()) {
+            const daysLeft = Math.ceil((player.vipUntil - Date.now()) / (24 * 60 * 60 * 1000));
+            vipBadge.innerText = `VIP · ${daysLeft}d`;
+            vipBadge.classList.remove('hidden');
+        } else {
+            vipBadge.innerText = '';
+            vipBadge.classList.add('hidden');
+        }
+    }
     updateAvatarDisplay();
 
     el = document.getElementById('header-base-lv');
@@ -1291,7 +1309,7 @@ function updateUI() {
         for (let [slot, gear] of Object.entries(player.equipped)) {
             let refText = gear && gear.refineLevel > 0 ? ` +${gear.refineLevel}` : '';
             let qtyText = gear && gear.qty > 0 ? ` (x${gear.qty})` : '';
-            let slotDisplayName = slot === 'potionSlot' ? 'Potion Slot' : slot;
+            let slotDisplayName = slot === 'potionSlot' ? 'Potion Slot' : (slot === 'ringLeft' ? 'Left Ring' : (slot === 'ringRight' ? 'Right Ring' : slot));
             eqContainer.innerHTML += `
                 <div ${gear && gear.name ? `onclick="showEquippedDetail('${slot}')"` : ''} class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded border border-slate-800 ${gear && gear.name ? 'cursor-pointer hover:border-amber-500 transition' : ''}">
                     <div>
@@ -1545,7 +1563,7 @@ function renderLibraryView() {
         runesEl.innerHTML = Object.keys(RUNE_DEFS).map(id => {
             const r = RUNE_DEFS[id];
             const rar = RARITY_INFO[r.rarity] || RARITY_INFO[1];
-            const kind = r.flag ? 'One-time per run' : 'Stackable (picks add up)';
+            const kind = (r.flag || r.once ? 'One-time per run' : 'Stackable (picks add up)') + (r.disabled ? ' · Not active yet' : '');
             return `<div class="p-3 rounded-xl bg-slate-950 border ${rar.border} flex flex-col gap-1">
                 <div class="flex justify-between items-center"><span class="font-bold text-xs ${rar.text}">✨ ${r.name}</span><span class="text-[9px] uppercase ${rar.text}">${rar.name} · R${r.rarity}</span></div>
                 <span class="text-[10px] text-slate-300">${r.desc}</span>

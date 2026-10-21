@@ -45,6 +45,8 @@ let player = {
         armor: { name: "Iron Cuirass", slot: "armor", levelReq: 1, refineLevel: 0, rarity: 1, stats: { hp: 50, def: 5 }, buffs: [], setName: null, desc: "HP +50, DEF +5" },
         garment: { name: "Cotton Cloak", slot: "garment", levelReq: 1, refineLevel: 0, rarity: 1, stats: { flee: 2 }, buffs: [], setName: null, desc: "FLEE +2" },
         footgear: { name: "Leather Boots", slot: "footgear", levelReq: 1, refineLevel: 0, rarity: 1, stats: { hp: 20 }, buffs: [], setName: null, desc: "HP +20" },
+        ringLeft: null,
+        ringRight: null,
         pet: null,
         potionSlot: { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" }
     },
@@ -219,14 +221,14 @@ function getDerivedStats() {
     const ST = daily ? { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 } : player.stats;
     const skl = name => daily ? 0 : (player.skills[name]?.level || 0);
 
-    let maxHp = 100 + (ST.vit * 15) + (lvl * 10) + rn('maxHpBonus');
+    let maxHp = Math.floor((100 + (ST.vit * 15) + (lvl * 10)) * (1 + (rn('maxHpBonus') + rn('fortitudeStacks')) / 100) * (1 + (rn('runeScholar') > 0 ? 0.05 * (player.currentRunRunes || []).length : 0))) + rn('bloodlust') * rn('killCount');
     let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3) + (skl('swordsmanship') * 3);
     let def = 2 + (ST.vit * 1) + (skl('ironDefense') * 2);
     let hit = 100 + lvl + ST.dex;
-    let flee = 100 + lvl + ST.agi;
-    let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + (skl('vitalStrike') * 1.5);
+    let flee = 100 + lvl + ST.agi + rn('shadowStep') * rn('killCount');
+    let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + rn('glassCannon') + (skl('vitalStrike') * 1.5);
     let aspd = 130 + Math.floor(ST.agi * 0.8) + Math.floor(ST.dex * 0.2);
-    let movementSpeed = (player.baseMovementSpeed || 3) + rn('swiftRun');
+    let movementSpeed = (player.baseMovementSpeed || 3);
 
     const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0, armor: 0, atkPct: 0 };
     let goldMultiplier = 1;
@@ -267,7 +269,7 @@ function getDerivedStats() {
         if (item) currentWeight += 10;
     }
 
-    return { maxHp, maxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier };
+    return { maxHp, maxArmor: rn('glassCannon') > 0 ? 0 : maxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier };
 }
 
 function saveGame() {
@@ -301,6 +303,8 @@ function loadGame() {
                     });
                 }
             }
+            if (!('ringLeft' in player.equipped)) player.equipped.ringLeft = null;
+            if (!('ringRight' in player.equipped)) player.equipped.ringRight = null;
             if (!player.equipped.potionSlot) {
                 player.equipped.potionSlot = { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" };
             }

@@ -1,3 +1,12 @@
+const RING_ITEMS = [
+    { id: "ring_1", name: "Novice Ring", slot: "ring", levelReq: 1, price: 60, stats: { atk: 2 }, desc: "ATK +2" },
+    { id: "ring_10", name: "Iron Ring", slot: "ring", levelReq: 10, price: 200, stats: { def: 2, hp: 20 }, desc: "DEF +2, HP +20" },
+    { id: "ring_20", name: "Ring of Swiftness", slot: "ring", levelReq: 20, price: 500, stats: { aspd: 3 }, desc: "ASPD +3" },
+    { id: "ring_30", name: "Eagle Ring", slot: "ring", levelReq: 30, price: 1200, stats: { hit: 5, crit: 2 }, desc: "HIT +5, CRIT +2" },
+    { id: "ring_40", name: "Titan Ring", slot: "ring", levelReq: 40, price: 2500, stats: { hp: 150, atk: 10 }, desc: "HP +150, ATK +10" },
+    { id: "ring_50", name: "Ring of Odin", slot: "ring", levelReq: 50, price: 5000, stats: { atk: 20, def: 8, crit: 4 }, desc: "ATK +20, DEF +8, CRIT +4" }
+];
+
 const SHOP_ITEMS = [
     { id: "w1", name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, price: 50, stats: { atk: 10 }, desc: "Atk +10" },
     { id: "s1", name: "Wooden Buckler", slot: "shield", levelReq: 1, price: 40, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
@@ -60,6 +69,8 @@ const SHOP_ITEMS = [
     { id: "th50", name: "Ragnarok World-Ender (2H)", slot: "weapon", levelReq: 50, price: 9500, stats: { atk: 330, crit: 15 }, desc: "Atk +330, CRIT +15% (Takes Shield slot)" }
 ];
 
+SHOP_ITEMS.push(...RING_ITEMS);
+
 const GEAR_POOL = {
     map1: [
         { name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
@@ -104,6 +115,8 @@ const GEAR_POOL = {
         { name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
     ]
 };
+
+Object.keys(GEAR_POOL).forEach(k => GEAR_POOL[k].push(...RING_ITEMS));
 
 // ---------- ITEM SETS ----------
 const SET_DATA = {
