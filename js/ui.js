@@ -5,23 +5,28 @@
 const AVATARS = ["⚔️", "🛡️", "🔮", "🗡️", "🏹"];
 let selectedAvatarChoice = "⚔️";
 let currentLanguage = 'en';
-let currentForgeSubTab = 'zeny';
+let currentForgeSubTab = 'gold';
 const SHOP_ARMORY_ITEMS = typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : [];
 
-const ZENY_SHOP_CONSUMABLES = [
+const GOLD_SHOP_CONSUMABLES = [
     { id: 'potion_minor', name: "Minor Healing Potion", price: 50, type: 'potion', heal: 50, desc: "Restores 50 HP" },
     { id: 'potion_med', name: "Medium Healing Potion", price: 150, type: 'potion', heal: 150, desc: "Restores 150 HP" },
-    { id: 'potion_large', name: "Large Healing Potion", price: 400, type: 'potion', heal: 400, desc: "Restores 400 HP" }
+    { id: 'potion_large', name: "Large Healing Potion", price: 400, type: 'potion', heal: 400, desc: "Restores 400 HP" },
+    { id: 'gchest_copper', name: "Copper Chest", price: 1000, type: 'chest', chestType: 'copper', desc: "Opens for 1-500 Gold and 1 armory item (Rarity 1)." },
+    { id: 'gchest_silver', name: "Silver Chest", price: 4000, type: 'chest', chestType: 'silver', desc: "Opens for 501-1000 Gold and 1 armory item (Rarity 2-3)." },
+    { id: 'gchest_gold', name: "Gold Chest", price: 8000, type: 'chest', chestType: 'gold', desc: "Opens for 1501-2000 Gold and 2 armory items (Rarity 3-4)." }
 ];
 
 const DIAMOND_SHOP_ITEMS = [
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 150, type: 'vip' },
     { id: 'pet_loyal_poring', name: "Loyal Poring Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
-    { id: 'res_potion', name: "Resurrection Potion", price: 5, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
+    { id: 'res_potion', name: "Resurrection Potion", price: 3, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
     { id: 'stat_reset', name: "Stat Reset Service", price: 10, type: 'service', desc: "Resets all attributes to 1 and refunds all spent stat points." },
     { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "Resets all skill levels and refunds all spent Job SP." },
-    { id: 'pet_companion', name: "Loyal Poring Pet", price: 15, type: 'pet', slot: 'pet', levelReq: 1, stats: { atk: 5, hp: 50 }, desc: "Companion: ATK +5, HP +50" }
+    { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "Opens for 1-500 Gold and 1 armory item (Rarity 1)." },
+    { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "Opens for 501-1000 Gold and 1 armory item (Rarity 2-3)." },
+    { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "Opens for 1501-2000 Gold and 2 armory items (Rarity 3-4)." }
 ];
 
 
@@ -142,7 +147,7 @@ function closeModal() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-library', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -154,6 +159,10 @@ function switchView(viewName) {
         renderMapGateUI();
     }
     if (viewName === 'character') document.getElementById('view-character')?.classList.remove('hidden');
+    if (viewName === 'library') {
+        document.getElementById('view-library')?.classList.remove('hidden');
+        renderLibraryView();
+    }
     if (viewName === 'events') {
         document.getElementById('view-events')?.classList.remove('hidden');
         renderEventsView();
@@ -178,22 +187,22 @@ function switchView(viewName) {
 }
 
 function switchForgeSubTab(tabName) {
-    if (tabName !== 'zeny' && tabName !== 'refine') tabName = 'zeny';
+    if (tabName !== 'gold' && tabName !== 'refine') tabName = 'gold';
     currentForgeSubTab = tabName;
-    let zenySection = document.getElementById('forge-zeny-section');
+    let goldSection = document.getElementById('forge-gold-section');
     let refineSection = document.getElementById('forge-refine-section');
-    let btnZeny = document.getElementById('forge-tab-btn-zeny');
+    let btnGold = document.getElementById('forge-tab-btn-gold');
     let btnRefine = document.getElementById('forge-tab-btn-refine');
 
-    if (zenySection) zenySection.classList.add('hidden');
+    if (goldSection) goldSection.classList.add('hidden');
     if (refineSection) refineSection.classList.add('hidden');
     const inactive = "px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer";
-    if (btnZeny) btnZeny.className = inactive;
+    if (btnGold) btnGold.className = inactive;
     if (btnRefine) btnRefine.className = inactive;
 
-    if (tabName === 'zeny') {
-        if (zenySection) zenySection.classList.remove('hidden');
-        if (btnZeny) btnZeny.className = "px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer";
+    if (tabName === 'gold') {
+        if (goldSection) goldSection.classList.remove('hidden');
+        if (btnGold) btnGold.className = "px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer";
         renderShop();
     } else {
         if (refineSection) refineSection.classList.remove('hidden');
@@ -202,52 +211,78 @@ function switchForgeSubTab(tabName) {
     }
 }
 
-function getMapPrereqTitle(key) {
-    const prereq = getPrereqMapKey(key);
+function getMapPrereqTitle(mapKey) {
+    const prereq = getPrereqMapKey(mapKey);
     return prereq ? GAME_DATA.maps[prereq].title : '';
 }
+
+let campaignPathChoice = 'fire';
 
 function renderMapGateUI() {
     const selectEl = document.getElementById('campaign-map-select');
     const listEl = document.getElementById('campaign-map-list');
+    const pathEl = document.getElementById('campaign-path-list');
     if (!selectEl) return;
-    const listEl0 = document.getElementById('campaign-map-list');
-    if (typeof GAME_DATA === 'undefined') {
-        if (listEl0) listEl0.innerHTML = '<span class="col-span-2 text-xs text-red-400">Map data not loaded. Check that monsters.js and maps.js are included in index.html.</span>';
+    if (typeof GAME_DATA === 'undefined' || !GAME_DATA.paths) {
+        if (listEl) listEl.innerHTML = '<span class="col-span-2 text-xs text-red-400">Map data not loaded. Check that monsters.js and maps.js are included in index.html.</span>';
         return;
     }
 
+    const prev = selectEl.value || '';
+    let [pk, mk] = prev.split(':');
+    if (!GAME_DATA.paths[pk]) pk = campaignPathChoice;
+    campaignPathChoice = pk;
     const order = getMapOrder();
-    const prev = selectEl.value;
-    const unlockedKeys = order.filter(k => isMapUnlocked(k));
-    const current = (prev && isMapUnlocked(prev)) ? prev : unlockedKeys[unlockedKeys.length - 1];
-    selectEl.value = current;
 
-    // Hidden select keeps the selected value for startExpedition()
-    selectEl.innerHTML = order.map(k => `<option value="${k}">${GAME_DATA.maps[k].title}</option>`).join('');
-    selectEl.value = current;
+    if (pathEl) {
+        pathEl.innerHTML = Object.keys(GAME_DATA.paths).map(k => {
+            const p = GAME_DATA.paths[k];
+            const on = k === pk;
+            return `<button onclick="selectCampaignPath('${k}')" class="p-2 rounded-xl border text-xs font-bold transition cursor-pointer ${on ? 'bg-amber-500/20 border-amber-400 text-amber-300' : 'bg-slate-950 border-slate-700 text-slate-300 hover:border-amber-400'}">${p.icon} ${p.name}</button>`;
+        }).join('');
+    }
+
+    selectEl.innerHTML = order.map(m => `<option value="${pk}:${m}">${GAME_DATA.paths[pk].maps[m].title}</option>`).join('');
+    const unlockedKeys = order.filter(m => isMapUnlocked(`${pk}:${m}`));
+    const current = (mk && isMapUnlocked(`${pk}:${mk}`)) ? mk : unlockedKeys[unlockedKeys.length - 1];
+    selectEl.value = `${pk}:${current}`;
 
     if (!listEl) return;
-    listEl.innerHTML = order.map(key => {
-        const m = GAME_DATA.maps[key];
+    listEl.innerHTML = order.map(m => {
+        const key = `${pk}:${m}`;
         const unlocked = isMapUnlocked(key);
-        const selected = key === current;
+        const cleared = !!(player.clearedMaps && player.clearedMaps[key]);
+        const selected = m === current;
         let cls, sub;
         if (!unlocked) {
             cls = 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed';
-            sub = `🔒 Clear ${getMapPrereqTitle(key)} first`;
+            sub = `🔒 Clear ${getMapPrereqTitle(m)} first`;
         } else if (selected) {
             cls = 'bg-amber-500/20 border-amber-400 text-amber-300 cursor-pointer';
-            sub = 'Selected';
+            sub = cleared ? '✔ Cleared · Selected' : 'Selected';
         } else {
             cls = 'bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400 cursor-pointer';
-            sub = 'Available';
+            sub = cleared ? '✔ Cleared' : 'Available';
         }
         return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="p-3 rounded-xl border text-left text-xs transition ${cls}">
-            <span class="block font-bold">${m.title}</span>
+            <span class="block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
             <span class="block text-[10px] mt-0.5">${sub}</span>
         </button>`;
     }).join('');
+}
+
+function selectCampaignPath(pathKey) {
+    campaignPathChoice = pathKey;
+    const selectEl = document.getElementById('campaign-map-select');
+    if (selectEl) selectEl.value = `${pathKey}:map1`;
+    renderMapGateUI();
+}
+
+function selectCampaignMap(key) {
+    if (!isMapUnlocked(key)) return;
+    const selectEl = document.getElementById('campaign-map-select');
+    if (selectEl) selectEl.value = key;
+    renderMapGateUI();
 }
 
 function selectCampaignMap(key) {
@@ -261,14 +296,14 @@ function renderShop() {
     let consumablesContainer = document.getElementById('shop-consumables-container');
     if (consumablesContainer) {
         consumablesContainer.innerHTML = '';
-        ZENY_SHOP_CONSUMABLES.forEach(item => {
+        GOLD_SHOP_CONSUMABLES.forEach(item => {
             consumablesContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
                     <div>
                         <span class="font-bold text-amber-300 block text-xs">${item.name}</span>
-                        <span class="text-[10px] text-slate-400">${item.desc} — Price: ${item.price} Zeny</span>
+                        <span class="text-[10px] text-slate-400">${item.desc} — Price: ${item.price} Gold</span>
                     </div>
-                    <button onclick="buyZenyConsumable('${item.id}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
+                    <button onclick="buyGoldConsumable('${item.id}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
                 </div>
             `;
         });
@@ -284,7 +319,7 @@ function renderShop() {
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
                     <div>
                         <span class="font-bold text-amber-300 block text-xs">${item.name} (Req. Lv ${item.levelReq || 1})</span>
-                        <span class="text-[10px] text-slate-400">${item.desc} — Price: ${price} Zeny</span>
+                        <span class="text-[10px] text-slate-400">${item.desc} — Price: ${price} Gold</span>
                     </div>
                     <button onclick="buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
                 </div>
@@ -293,12 +328,12 @@ function renderShop() {
     }
 }
 
-function buyZenyConsumable(itemId) {
-    let item = ZENY_SHOP_CONSUMABLES.find(i => i.id === itemId);
+function buyGoldConsumable(itemId) {
+    let item = GOLD_SHOP_CONSUMABLES.find(i => i.id === itemId);
     if (!item) return;
 
     if (player.gold < item.price) {
-        showModal("Purchase Failed", "Insufficient Zeny!");
+        showModal("Purchase Failed", "Insufficient Gold!");
         return;
     }
     if (!placeItemInInventory({ ...item, qty: 1 })) {
@@ -319,7 +354,7 @@ function buyArmoryItem(itemIndex) {
     let price = template.price || 300;
 
     if (player.gold < price) {
-        showModal("Purchase Failed", "Insufficient Zeny!");
+        showModal("Purchase Failed", "Insufficient Gold!");
         return;
     }
     if (!Array.isArray(player.inventory)) player.inventory = new Array(40).fill(null);
@@ -369,6 +404,10 @@ function buyDiamondItem(itemId) {
         showModal("Purchase Failed", "Insufficient Diamonds!");
         return;
     }
+    if (item.type === 'chest' && countFreeCapacity({ name: item.name, type: 'chest', qty: 1 }) < 1) {
+        showModal("Purchase Failed", "Inventory is full!");
+        return;
+    }
 
     player.diamonds -= item.price;
     if (item.type === 'resurrection') {
@@ -390,6 +429,9 @@ function buyDiamondItem(itemId) {
         }
         player.jobSp += refunded;
         showModal("Skill Reset Successful", `All skills reset and ${refunded} Job SP refunded!`);
+    } else if (item.type === 'chest') {
+        placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
+        showModal("Purchase Successful", `You bought a ${item.name}! Open it from your inventory.`);
     } else if (item.type === 'vip') {
         player.vipUntil = Math.max(Date.now(), player.vipUntil || 0) + 30 * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
@@ -438,7 +480,7 @@ function renderRefiningUI() {
                     </div>
                     ${!isMax ? `
                         <button onclick="refineEquipment('${slot}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer text-xs transition whitespace-nowrap">
-                            Refine: ${costGold} Zeny + 1 Stone
+                            Refine: ${costGold} Gold + 1 Stone
                         </button>
                     ` : '<span class="text-xs text-emerald-400 font-bold">MAX LEVEL</span>'}
                 </div>
@@ -453,7 +495,7 @@ function refineEquipment(slot) {
 
     let costGold = (gear.refineLevel + 1) * 100;
     if (player.gold < costGold || (player.refiningStones || 0) < 1) {
-        alert(`Refining needs ${costGold} Zeny and 1 Refining Stone.`);
+        alert(`Refining needs ${costGold} Gold and 1 Refining Stone.`);
         return;
     }
 
@@ -500,11 +542,12 @@ function stackLimit(item) {
     if (!isStackable(item)) return 1;
     if (item.type === 'potion' || /Potion/.test(item.name || '')) return 5;
     if (item.type === 'material') return 50;
+    if (item.type === 'chest') return 20;
     return MAX_STACK;
 }
 
 function isStackable(item) {
-    return !!item && (item.type === 'potion' || item.type === 'material' || item.stackable === true || /Potion/.test(item.name || ''));
+    return !!item && (item.type === 'potion' || item.type === 'material' || item.type === 'chest' || item.stackable === true || /Potion/.test(item.name || ''));
 }
 
 function countFreeCapacity(newItem) {
@@ -774,11 +817,12 @@ function showItemDetail(index) {
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
+    if (item.type === 'chest') actions += `<button onclick="openChestFromDetail(${index})" class="${btn} bg-purple-600 hover:bg-purple-500 text-slate-100">Open</button>`;
     if (isEquip) actions += `<button onclick="equipFromDetail(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Equip</button>`;
     if (isPotion) actions += `<button onclick="usePotionFromDetail(${index})" class="${btn} bg-emerald-600 hover:bg-emerald-500 text-slate-950">Equip</button>`;
     if (isEquip) actions += `<button onclick="toggleFavorite(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-amber-300">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`;
     if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
-    if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Zeny</button>`;
+    if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Gold</button>`;
     actions += '</div>';
     actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
 
@@ -873,7 +917,7 @@ function getItemBasePrice(item) {
     if (item.price) return item.price;
     const pools = [
         ...(typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []),
-        ...(typeof ZENY_SHOP_CONSUMABLES !== 'undefined' ? ZENY_SHOP_CONSUMABLES : [])
+        ...(typeof GOLD_SHOP_CONSUMABLES !== 'undefined' ? GOLD_SHOP_CONSUMABLES : [])
     ];
     const found = pools.find(p => p.name === item.name);
     if (found) return found.price;
@@ -892,10 +936,10 @@ function sellInventoryItem(index) {
     if (item.favorite) { alert("Favorite items cannot be sold. Unmark it first."); return false; }
     const total = getSellPrice(item);
     const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
-    if (!confirm(`Sell ${item.name}${qtyText} for ${total} Zeny?`)) return false;
+    if (!confirm(`Sell ${item.name}${qtyText} for ${total} Gold?`)) return false;
     player.gold += total;
     player.inventory[index] = null;
-    logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Zeny`, 'drop');
+    logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Gold`, 'drop');
     updateUI();
     saveGame();
     return true;
@@ -1126,18 +1170,28 @@ function claimQuestMilestone(count) {
     renderQuestsView();
 }
 
-function openChest(chestType) {
-    let goldReward = chestType === 'copper' ? 500 : (chestType === 'silver' ? 1000 : 1500);
-    let rarityTier = chestType === 'copper' ? 1 : (chestType === 'silver' ? 2 : 3);
-    player.gold += goldReward;
-    let rewardNames = [`${goldReward} Zeny`];
+// Chest rewards: gold range (inclusive), rarity roll per item, and item count
+const CHEST_REWARDS = {
+    copper: { goldMin: 1, goldMax: 500, rarities: [1], items: 1 },
+    silver: { goldMin: 501, goldMax: 1000, rarities: [2, 3], items: 1 },
+    gold:   { goldMin: 1501, goldMax: 2000, rarities: [3, 4], items: 2 }
+};
 
-    let pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
+function openChest(chestType) {
+    const cfg = CHEST_REWARDS[chestType] || CHEST_REWARDS.copper;
+    const goldReward = cfg.goldMin + Math.floor(Math.random() * (cfg.goldMax - cfg.goldMin + 1));
+    player.gold += goldReward;
+    const rewardNames = [`${goldReward} Gold`];
+
+    const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
     if (pool.length > 0) {
-        let template = pool[Math.floor(Math.random() * pool.length)];
-        let gear = generatePoEItem(template, rarityTier, 1);
-        addItemToInventory(gear);
-        rewardNames.push(`${gear.name} (Rarity ${gear.rarity})`);
+        for (let i = 0; i < cfg.items; i++) {
+            const rarity = cfg.rarities[Math.floor(Math.random() * cfg.rarities.length)];
+            const template = pool[Math.floor(Math.random() * pool.length)];
+            const gear = generatePoEItem(template, rarity, 1);
+            addItemToInventory(gear);
+            rewardNames.push(`${gear.name} (Rarity ${gear.rarity})`);
+        }
     }
 
     showModal("Chest Opened!", `You received:\n• ` + rewardNames.join('\n• '));
@@ -1154,7 +1208,7 @@ function renderQuestsView() {
         player.dailyQuests = [
             { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
             { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
-            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Zeny from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
+            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Gold from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
         ];
     }
 
@@ -1215,7 +1269,7 @@ function updateUI() {
     el = document.getElementById('header-job-lv');
     if (el) el.innerText = player.jobLv;
     el = document.getElementById('header-gold');
-    if (el) el.innerText = `${player.gold} Zeny`;
+    if (el) el.innerText = `${player.gold} Gold`;
     el = document.getElementById('header-diamonds');
     if (el) el.innerText = player.diamonds;
 
@@ -1439,7 +1493,7 @@ function renderEventsView() {
         const buttons = EVENT_MAPS[kind].map(m => `
             <button ${can ? '' : 'disabled'} onclick="startEvent('${kind}','${m.mapKey}')" class="p-3 rounded-xl border text-left text-xs transition ${can ? `bg-slate-950 border-slate-700 hover:border-${tone}-400 text-slate-200 cursor-pointer` : 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed'}">
                 <span class="block font-bold">${m.label}</span>
-                <span class="block text-[10px] mt-0.5">${m.sub} · HP & damage x1.5 · ${kind === 'gold' ? 'Zeny' : 'EXP'} x2 · No item drops</span>
+                <span class="block text-[10px] mt-0.5">${m.sub} · HP & damage x1.5 · ${kind === 'gold' ? 'Gold' : 'EXP'} x2 · No item drops</span>
             </button>`).join('');
         el.innerHTML = `
             <div>
@@ -1470,4 +1524,89 @@ function toggleEquippedFavorite(slot) {
     updateUI();
     saveGame();
     showEquippedDetail(slot);
+}
+
+
+function openChestFromDetail(index) {
+    const item = player.inventory[index];
+    if (!item || item.type !== 'chest') return;
+    if ((item.qty || 1) > 1) item.qty--;
+    else player.inventory[index] = null;
+    openChest(item.chestType);
+}
+
+
+// ---------- LIBRARY ----------
+function renderLibraryView() {
+    renderLibraryRules();
+    const runesEl = document.getElementById('library-runes');
+    const monstersEl = document.getElementById('library-monsters');
+    if (runesEl && typeof RUNE_DEFS !== 'undefined') {
+        runesEl.innerHTML = Object.keys(RUNE_DEFS).map(id => {
+            const r = RUNE_DEFS[id];
+            const rar = RARITY_INFO[r.rarity] || RARITY_INFO[1];
+            const kind = r.flag ? 'One-time per run' : 'Stackable (picks add up)';
+            return `<div class="p-3 rounded-xl bg-slate-950 border ${rar.border} flex flex-col gap-1">
+                <div class="flex justify-between items-center"><span class="font-bold text-xs ${rar.text}">✨ ${r.name}</span><span class="text-[9px] uppercase ${rar.text}">${rar.name} · R${r.rarity}</span></div>
+                <span class="text-[10px] text-slate-300">${r.desc}</span>
+                <span class="text-[9px] text-slate-500">${kind}</span></div>`;
+        }).join('');
+    }
+    if (monstersEl && typeof MONSTERS_DATA !== 'undefined') {
+        const rows = Object.values(MONSTERS_DATA).map(m => {
+            const el = m.element && ELEMENTS[m.element] ? `${ELEMENTS[m.element].icon} ${ELEMENTS[m.element].name}` : 'None';
+            const type = m.isBoss ? 'Boss' : (m.isRanged ? 'Ranged' : 'Melee');
+            return `<tr class="border-t border-slate-800 ${m.isBoss ? 'text-amber-300' : 'text-slate-200'}">
+                <td class="py-1.5 pr-2">${m.name}</td><td class="pr-2">${type}</td><td class="pr-2">${el}</td>
+                <td class="pr-2 font-mono">${m.maxHp}</td><td class="pr-2 font-mono">${m.atkMin}-${m.atkMax}</td>
+                <td class="pr-2 font-mono">${m.hit}</td><td class="font-mono">${m.flee}</td></tr>`;
+        }).join('');
+        monstersEl.innerHTML = `<div class="overflow-x-auto"><table class="w-full text-[10px] text-left">
+            <thead><tr class="text-slate-400 uppercase"><th class="pb-1 pr-2">Name</th><th class="pr-2">Type</th><th class="pr-2">Element</th><th class="pr-2">HP</th><th class="pr-2">ATK</th><th class="pr-2">HIT</th><th>FLEE</th></tr></thead>
+            <tbody>${rows}</tbody></table></div>
+            <p class="text-[10px] text-slate-500 mt-2">Campaign monsters take the element of their path. Bosses are about 25% stronger and mini bosses have 3x HP.</p>`;
+    }
+}
+
+// ---------- LIBRARY: RULES, ELEMENTS, DROPS, CHESTS ----------
+function renderLibraryRules() {
+    const el = document.getElementById('library-rules');
+    if (!el || typeof ELEMENTS === 'undefined') return;
+    const elementRows = ELEMENT_KEYS.map(k => {
+        const e = ELEMENTS[k];
+        const b = ELEMENTS[e.beats];
+        return `<li><span class="${e.color}">${e.icon} ${e.name}</span> beats <span class="${b.color}">${b.icon} ${b.name}</span> (x${ELEMENT_ADVANTAGE} damage). Hitting it with ${b.name} deals x${ELEMENT_DISADVANTAGE}.</li>`;
+    }).join('');
+    el.innerHTML = `
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <h3 class="font-bold text-xs text-amber-400 mb-2">Element System</h3>
+            <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">${elementRows}</ul>
+            <p class="text-[10px] text-slate-500 mt-2">Weapons can roll one element. Campaign monsters take the element of their path (Fire, Water, Earth or Wind). Event and daily monsters keep their own base element.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Status</h3>
+            <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">
+                <li><span class="text-sky-300">Frozen</span>: 50% chance to skip its attack.</li>
+                <li><span class="text-orange-400">Ignite</span> and <span class="text-lime-400">Poison</span>: damage over time while afflicted.</li>
+                <li><span class="text-amber-300">Boss</span>: about 25% stronger, uses special skills, enrages in later turns.</li>
+                <li><span class="text-amber-200">Mini Boss</span>: appears on stage 9 of campaign and event maps, has 3x HP.</li>
+            </ul>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Drop Rates</h3>
+            <table class="w-full text-[10px] text-left text-slate-300">
+                <tr class="border-b border-slate-800"><td class="py-1">Normal monster</td><td class="font-mono text-right">5%</td></tr>
+                <tr class="border-b border-slate-800"><td class="py-1">Mini Boss</td><td class="font-mono text-right">50%</td></tr>
+                <tr><td class="py-1">Boss (MVP)</td><td class="font-mono text-right">100%</td></tr>
+            </table>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <h3 class="font-bold text-xs text-amber-400 mb-2">Chests</h3>
+            <table class="w-full text-[10px] text-left text-slate-300">
+                <tr class="border-b border-slate-800"><td class="py-1">Copper Chest</td><td>500 Gold + armory item (Rarity 1)</td></tr>
+                <tr class="border-b border-slate-800"><td class="py-1">Silver Chest</td><td>1000 Gold + armory item (Rarity 2)</td></tr>
+                <tr><td class="py-1">Gold Chest</td><td>1500 Gold + armory item (Rarity 3)</td></tr>
+            </table>
+            <p class="text-[10px] text-slate-500 mt-2">Gold shop: Copper 1000, Silver 4000, Gold 8000 Gold. Diamond shop: Copper 1, Silver 3, Gold 5 Diamond.</p>
+        </div>`;
 }

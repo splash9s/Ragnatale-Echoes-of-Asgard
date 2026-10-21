@@ -30,7 +30,7 @@ let player = {
     dailyQuests: [
         { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
         { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
-        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Zeny from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
+        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Gold from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
     ],
     questMilestoneClaimed: { 1: false, 2: false, 3: false },
     skills: {
@@ -297,7 +297,7 @@ function loadGame() {
                 player.clearedMaps = {};
                 if (typeof GAME_DATA !== 'undefined') {
                     Object.entries(GAME_DATA.maps).forEach(([k, m]) => {
-                        if (m.levelReq + 10 <= (player.unlockedMaxMapLevel || 1)) player.clearedMaps[k] = true;
+                        if (m.levelReq + 10 <= (player.unlockedMaxMapLevel || 1)) Object.keys(GAME_DATA.paths || {}).forEach(pk => { player.clearedMaps[`${pk}:${k}`] = true; });
                     });
                 }
             }

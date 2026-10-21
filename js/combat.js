@@ -16,6 +16,7 @@ let attackCount = 0;
 let critStreak = 0;
 let stageClearing = false;
 let currentEvent = null; // 'gold' | 'xp' while in an event
+let currentPath = null; // campaign path key while in campaign
 
 // Skills have no effect in the Daily Challenge
 function skillLvl(name) {
@@ -56,12 +57,15 @@ function getPrereqMapKey(key) {
     return idx > 0 ? order[idx - 1] : null;
 }
 
+// key = "path:map". Map 1 of every path is open. Other maps unlock after the previous map of that path is cleared.
 function isMapUnlocked(key) {
+    const [pk, mk] = String(key).split(':');
+    if (!GAME_DATA.paths || !GAME_DATA.paths[pk]) return false;
     const order = getMapOrder();
-    const idx = order.indexOf(key);
+    const idx = order.indexOf(mk);
     if (idx === -1) return false;
-    if (idx === 0) return true; // first campaign map: no condition
-    return !!(player.clearedMaps && player.clearedMaps[order[idx - 1]]);
+    if (idx === 0) return true;
+    return !!(player.clearedMaps && player.clearedMaps[`${pk}:${order[idx - 1]}`]);
 }
 
 // ---------- RUNES ----------
@@ -173,8 +177,9 @@ function selectRuneChoice(runeId, callback) {
 function startExpedition(mode, opts = {}) {
     if (mode === 'campaign') {
         const selectEl = document.getElementById('campaign-map-select');
-        const mapKey = selectEl ? selectEl.value : 'map1';
-        const mapObj = typeof GAME_DATA !== 'undefined' ? GAME_DATA.maps[mapKey] : null;
+        const mapKey = selectEl ? selectEl.value : 'fire:map1';
+        const [cpk, cmk] = mapKey.split(':');
+        const mapObj = (typeof GAME_DATA !== 'undefined' && GAME_DATA.paths && GAME_DATA.paths[cpk]) ? GAME_DATA.paths[cpk].maps[cmk] : null;
         if (!mapObj) {
             showModal("Map Error", "Map data is not loaded. Check that monsters.js and maps.js are included in index.html.");
             return;
@@ -194,6 +199,7 @@ function startExpedition(mode, opts = {}) {
     player.angelUsedThisRun = false;
     currentMode = mode;
     currentEvent = mode === 'event' ? opts.kind : null;
+    currentPath = null;
     attackCount = 0;
     stageClearing = false;
     const derived = getDerivedStats();
@@ -206,8 +212,9 @@ function startExpedition(mode, opts = {}) {
     const titleEl = document.getElementById('node-title');
 
     if (mode === 'campaign') {
-        const mapKey = document.getElementById('campaign-map-select').value;
-        activeMap = GAME_DATA.maps[mapKey];
+        const [cpk2, cmk2] = document.getElementById('campaign-map-select').value.split(':');
+        currentPath = cpk2;
+        activeMap = GAME_DATA.paths[cpk2].maps[cmk2];
         currentStage = 1;
         maxStages = activeMap.maxStages || 11;
         if (tagEl) tagEl.innerText = "Campaign Mode";
@@ -252,6 +259,10 @@ function startExpedition(mode, opts = {}) {
 }
 
 // ---------- STAGE / BOSS ----------
+function isMiniBossStage() {
+    return (currentMode === 'campaign' || currentMode === 'event') && !!(activeMap && activeMap.miniBoss) && currentStage === 9 && currentStage !== maxStages;
+}
+
 function isBossStage() {
     if (currentMode === 'campaign' || currentMode === 'event') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
     if (currentMode === 'daily') return DAILY_BOSS_STAGES.includes(currentStage);
@@ -301,7 +312,11 @@ function spawnStageMonsters() {
         flee: Math.floor(m.flee * dailyScale)
     });
 
-    if (isBossStage()) {
+    if (isMiniBossStage()) {
+        const mini = { ...activeMap.miniBoss, rewarded: false, ailments: {}, isMiniBoss: true };
+        monstersList.push(mini);
+        logMessage(`[Mini Boss] ${mini.name} appears!`, 'winlose');
+    } else if (isBossStage()) {
         const boss = makeBoss(getBossTemplate());
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
         logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), Heavy Strike (every 4th attack, x2 damage), Regeneration (1.5% HP per turn).`, 'winlose');
@@ -362,7 +377,7 @@ function awardKill(m) {
     if (isEvent && currentEvent === 'gold') { finalGold *= 2; baseExpGain = 0; jobExpGain = 0; }
     if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; finalGold = 0; }
 
-    logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Job EXP and <span style="color: yellow;">${finalGold} Zeny</span>`, 'winlose');
+    logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Job EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
     player.baseExp += baseExpGain;
     player.jobExp += jobExpGain;
@@ -391,10 +406,16 @@ function awardKill(m) {
     if (isEvent) return;
 
     const pool = typeof GEAR_POOL !== 'undefined' ? (GEAR_POOL[activeMap.dropKey || 'map1'] || GEAR_POOL.map1) : [];
-    if (!m.isBoss && pool.length > 0 && Math.random() < 0.05) {
+    if (!m.isBoss && !m.isMiniBoss && pool.length > 0 && Math.random() < 0.05) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template);
         logMessage(`[Monster Drop] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
+        addItemToInventory(droppedItem);
+    }
+    if (m.isMiniBoss && pool.length > 0 && Math.random() < 0.5) {
+        const template = pool[Math.floor(Math.random() * pool.length)];
+        const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
+        logMessage(`[Mini Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(droppedItem);
     }
     if (m.isBoss && pool.length > 0) {
@@ -565,10 +586,6 @@ function runCombatTick() {
             updateQuestProgress('crit', 1);
             playSound('sound/critical.wav');
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
-            if (Math.random() < 0.3) {
-                targetEnemy.ailments.ignite = true;
-                logMessage(`[Ignite] Your critical strike set ${targetEnemy.name} ablaze!`, 'drop');
-            }
             critStreak++;
             if (runeN('critHeal') > 0) healPlayer(runeN('critHeal'), 'Critical Heal');
             if (critStreak >= 2) {
@@ -579,10 +596,6 @@ function runCombatTick() {
             critStreak = 0;
             playSound('sound/hit.wav');
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
-            if (Math.random() < 0.15) {
-                targetEnemy.ailments.poison = true;
-                logMessage(`[Poison] You poisoned ${targetEnemy.name}!`, 'drop');
-            }
         }
         targetEnemy.hp -= pDmg;
         battlePlayerHits++;
@@ -679,7 +692,14 @@ function onStageCleared() {
             if (currentMode === 'campaign' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 if (!player.clearedMaps) player.clearedMaps = {};
-                player.clearedMaps[activeMap.dropKey] = true;
+                const clearKey = `${currentPath}:${activeMap.dropKey}`;
+                const firstClear = !player.clearedMaps[clearKey];
+                player.clearedMaps[clearKey] = true;
+                if (firstClear) {
+                    const diamondBonus = 1 + Math.floor(Math.random() * 5);
+                    player.diamonds += diamondBonus;
+                    logMessage(`[First Clear] ${activeMap.title} cleared for the first time: +${diamondBonus} Diamond!`, 'levelup');
+                }
                 const pool = typeof GEAR_POOL !== 'undefined' ? (GEAR_POOL[activeMap.dropKey || 'map1'] || GEAR_POOL.map1) : [];
                 const template = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : { name: "Explorer's Blade", slot: "weapon", levelReq: 1, stats: { atk: 15 } };
                 const reward = generatePoEItem(template, 3, 1);
@@ -712,7 +732,7 @@ function onStageCleared() {
             spawnStageMonsters();
         };
 
-        if ((currentMode === 'campaign' || currentMode === 'daily' || currentMode === 'event') && currentStage % 5 === 0 && currentStage < maxStages) {
+        if ((currentMode === 'campaign' || currentMode === 'daily' || currentMode === 'event') && currentStage % (currentMode === 'daily' ? 5 : 4) === 0 && currentStage < maxStages) {
             checkRuneSelectionPrompt(proceedNext);
         } else {
             window.pendingStageProceed = proceedNext;
@@ -747,8 +767,8 @@ function returnToTown() {
 // Each event allows 3 plays per day (per event). Daily Challenge also locks once cleared that day.
 const EVENT_LIMIT = 3;
 const EVENT_CONFIG = {
-    gold: { name: "Zeny Frenzy", desc: "Monsters at x1.5 HP and damage. Zeny x2, but no EXP. No item drops." },
-    xp: { name: "Wisdom Trial", desc: "Monsters at x1.5 HP and damage. Base and Job EXP x2, but no Zeny. No item drops." }
+    gold: { name: "Gold Frenzy", desc: "Monsters at x1.5 HP and damage. Gold x2, but no EXP. No item drops." },
+    xp: { name: "Wisdom Trial", desc: "Monsters at x1.5 HP and damage. Base and Job EXP x2, but no Gold. No item drops." }
 };
 const EVENT_MAPS = {
     gold: [
@@ -797,7 +817,8 @@ function buildEventMap(kind, mapKey) {
         dropKey: base.dropKey,
         maxStages: base.maxStages,
         enemies: base.enemies.map(scale),
-        boss: base.boss ? scale(base.boss) : null
+        boss: base.boss ? scale(base.boss) : null,
+        miniBoss: base.miniBoss ? scale(base.miniBoss) : null
     };
 }
 
