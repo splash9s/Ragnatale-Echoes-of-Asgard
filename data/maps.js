@@ -61,6 +61,9 @@ const GAME_DATA = {
     paths: {}
 };
 
+// Stage growth: one curve for every map (enemy HP/ATK per stage = 1 + (stage-1) * STAGE_GROWTH)
+const STAGE_GROWTH = 0.10;
+
 // Campaign paths: each path has its own element and its own progress through the 6 maps
 // Campaign maps per path: Lv 1 to Lv 50, 13 stages each (mini boss stage 9, MVP stage 13)
 const CAMPAIGN_MAP_KEYS = ['map1', 'map10', 'map20', 'map30', 'map40', 'map50'];

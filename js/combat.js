@@ -366,7 +366,7 @@ function spawnStageMonsters() {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
             const count = Math.floor(Math.random() * 5) + 2;
-            const mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || 0.12));
+            const mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
                 const base = {
@@ -585,7 +585,7 @@ function monsterAct(m, derived) {
             onPlayerDodged(m, 'Dodge Rune');
             return;
         }
-        let eDmg = Math.max(1, Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin - derived.def);
+        let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
         if (m.isBoss && m.attackCount % 4 === 0) {
             eDmg = Math.floor(eDmg * 2);
@@ -730,8 +730,8 @@ function runCombatTick() {
         return;
     }
 
-    // ---- Monster turn (front three attack) ----
-    alive.slice(0, 3).forEach(m => monsterAct(m, derived));
+    // ---- Monster turn (every living monster attacks) ----
+    alive.forEach(m => monsterAct(m, derived));
 
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
     if (getAliveMonsters().length === 0) {
