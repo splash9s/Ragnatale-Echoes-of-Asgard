@@ -620,46 +620,6 @@ function sellFromDetail(index) { if (sellInventoryItem(index)) closeModal(); }
 
 function useOrEquipItem(index) { showItemDetail(index); }
 
-function showEquippedDetail(slot) {
-    const item = player.equipped[slot];
-    if (!item || !item.name) return;
-    const isPotion = slot === 'potionSlot';
-    const rarity = RARITY_INFO[item.rarity];
-    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-
-    let body = '<div class="flex flex-col gap-2 text-left text-xs">';
-    body += `<div class="flex justify-between items-center">
-        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : (isPotion ? 'Consumable' : 'Equipped')}</span>
-        <span class="text-[10px] text-slate-400 capitalize">Equipped · ${slot}</span></div>`;
-    if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
-    if (item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
-    if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
-    if (item.stats && Object.keys(item.stats).length) {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-            Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') +
-            `</div>`;
-    }
-    if (!isPotion && slot !== 'pet') {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-purple-500/30 flex flex-col gap-1">
-            <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>${buffsDetailHTML(item.buffs)}</div>`;
-    }
-    if (item.setName) body += setInfoHTML(item.setName);
-    if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
-    body += '</div>';
-
-    const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    let actions = '<div class="flex flex-col gap-2 mt-2">';
-    if (!isPotion) actions += `<button onclick="unequipFromDetail('${slot}')" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
-    actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
-
-    showModal(title, '', body + actions);
-}
-
-function unequipFromDetail(slot) {
-    unequipItem(slot);
-    if (!player.equipped[slot]) closeModal();
-}
-
 function useInventoryPotion(index) {
     const item = player.inventory[index];
     if (!item || item.type !== 'potion') return false;
@@ -964,12 +924,12 @@ function updateUI() {
             let qtyText = gear && gear.qty > 0 ? ` (x${gear.qty})` : '';
             let slotDisplayName = slot === 'potionSlot' ? 'Potion Slot' : slot;
             eqContainer.innerHTML += `
-                <div ${gear && gear.name ? `onclick="showEquippedDetail('${slot}')"` : ''} class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded border border-slate-800 ${gear && gear.name ? 'cursor-pointer hover:border-amber-500 transition' : ''}">
+                <div class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded border border-slate-800">
                     <div>
                         <span class="text-slate-400 capitalize block text-[10px]">${slotDisplayName}</span>
                         <span class="font-semibold text-slate-200 text-xs">${gear && gear.name ? gear.name + refText + qtyText + elemIconText(gear) : 'Empty'}</span>
                     </div>
-                    ${gear && slot !== 'potionSlot' ? `<button onclick="event.stopPropagation(); unequipItem('${slot}')" class="px-2.5 py-1 bg-red-600/40 hover:bg-red-600 text-[10px] text-red-200 font-bold rounded transition cursor-pointer">Unequip</button>` : ''}
+                    ${gear && slot !== 'potionSlot' ? `<button onclick="unequipItem('${slot}')" class="px-2.5 py-1 bg-red-600/40 hover:bg-red-600 text-[10px] text-red-200 font-bold rounded transition cursor-pointer">Unequip</button>` : ''}
                 </div>
             `;
         }
@@ -990,6 +950,7 @@ function updateUI() {
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="h-14 bg-slate-900/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:border-amber-500 transition relative group">
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
+                    <span class="text-[8px] text-slate-500 absolute bottom-1 right-1">${index + 1}</span>
                 </div>
             `;
         });
@@ -1005,20 +966,18 @@ function updateUI() {
         if (statEl) statEl.innerText = player.stats[s];
     });
 
-    const derivedValues = {
-        'atk': derived.atk,
-        'def': derived.def,
-        'hit': derived.hit,
-        'flee': derived.flee,
-        'crit': `${Math.round(derived.crit * 10) / 10}%`,
-        'aspd': derived.aspd,
-        'movement-speed': `${derived.movementSpeed} m/s`
+    let derivedMappings = {
+        'derived-atk': derived.atk,
+        'derived-def': derived.def,
+        'derived-hit': derived.hit,
+        'derived-flee': derived.flee,
+        'derived-crit': `${derived.crit}%`,
+        'derived-aspd': derived.aspd,
+        'derived-movement-speed': `${derived.movementSpeed} m/s`
     };
-    for (const k in derivedValues) {
-        ['derived-', 'combat-derived-'].forEach(prefix => {
-            const mapEl = document.getElementById(prefix + k);
-            if (mapEl) mapEl.innerText = derivedValues[k];
-        });
+    for (let id in derivedMappings) {
+        let mapEl = document.getElementById(id);
+        if (mapEl) mapEl.innerText = derivedMappings[id];
     }
 
     el = document.getElementById('weight-text');
@@ -1057,23 +1016,6 @@ function updateUI() {
     }
     el = document.getElementById('player-resurrection');
     if (el) el.innerText = `${player.resurrectionPotions || 0} left`;
-
-    el = document.getElementById('combat-rune-list');
-    if (el) {
-        const runes = player.currentRunRunes || [];
-        if (runes.length === 0) {
-            el.innerHTML = '<span class="text-slate-500">No runes acquired yet this run.</span>';
-        } else {
-            const grouped = {};
-            runes.forEach(r => {
-                if (!grouped[r.id]) grouped[r.id] = { ...r, count: 0 };
-                grouped[r.id].count++;
-            });
-            el.innerHTML = Object.values(grouped).map(r =>
-                `<div class="text-purple-300">✦ ${r.name}${r.count > 1 ? ' x' + r.count : ''} <span class="text-slate-400">— ${r.desc}</span></div>`
-            ).join('');
-        }
-    }
 
     // Render Monsters Lineup during Combat
     let lineupContainer = document.getElementById('monsters-lineup-container');

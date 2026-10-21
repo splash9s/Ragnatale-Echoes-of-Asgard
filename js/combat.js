@@ -61,7 +61,6 @@ function startExpedition(mode) {
     }
 
     if (typeof resetMapRunes === 'function') resetMapRunes();
-    player.currentRunRunes = [];
     currentMode = mode;
     let derived = getDerivedStats();
     player.hp = derived.maxHp;
@@ -361,14 +360,6 @@ function onStageCleared() {
     }, 2000);
 }
 
-const RUNE_INFO = {
-    critBonus: { name: "Berserk Rune", desc: "+15% Critical Rate" },
-    maxHpBonus: { name: "Vitality Rune", desc: "+200 Max HP" },
-    firstHitBonus: { name: "Stunning Strike Rune", desc: "+50 Bonus Damage on First Hit" },
-    alwaysCritFirst: { name: "Assassination Rune", desc: "First hit of every battle is always a Critical Hit" },
-    randomHitCount: { name: "Chaos Rune", desc: "Attacks have a 50% chance to strike random targets" }
-};
-
 function checkRuneSelectionPrompt(onCompleteCallback) {
     const availableRunes = [
         { id: 'critBonus', name: "Berserk Rune", desc: "+15% Critical Rate", apply: () => { player.runes.critBonus += 15; } },
@@ -408,10 +399,7 @@ function selectRuneChoice(runeId, callback) {
     let r = availableRunes.find(item => item.id === runeId);
     if (r) r.apply();
 
-    const info = RUNE_INFO[runeId] || { name: runeId, desc: '' };
-    if (!player.currentRunRunes) player.currentRunRunes = [];
-    player.currentRunRunes.push({ id: runeId, name: info.name, desc: info.desc });
-    logMessage(`[Rune Blessing] Acquired ${info.name}: ${info.desc}`, 'levelup');
+    logMessage(`[Rune Blessing] Acquired powerful rune buff!`, 'levelup');
     closeModal();
     if (callback) callback();
 }
