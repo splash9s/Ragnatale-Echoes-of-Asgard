@@ -57,15 +57,9 @@
     <div onclick="switchView('diamond')" class="px-3 py-1 bg-slate-900/90 rounded-xl border border-purple-500/30 flex items-center gap-1.5 text-xs font-bold text-purple-300 shadow-inner cursor-pointer hover:border-purple-400 transition" title="Open Diamond Shop">
         <span>💎</span> <span id="header-diamonds">1000</span>
     </div>
-    <!-- ADD BGM BUTTON HERE -->
-    <button id="bgm-toggle-btn" onclick="toggleBGM()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer" title="Toggle Music">🎵 Off</button>
     <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer">🌐 EN/TH</button>
 </div>
 
-<!-- AUDIO ELEMENT -->
-<audio id="game-bgm" loop>
-    <source src="sound/bgm.wav" type="audio/wav">
-</audio>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
@@ -195,6 +189,7 @@
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Attributes</h3>
                             <span class="text-xs text-amber-400">Pts: <strong id="stat-points">5</strong></span>
                         </div>
+                        <div id="stat-pending-bar" class="flex flex-col gap-2"></div>
                         <div class="grid grid-cols-2 gap-2">
                             <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
                                 <span>STR: <strong id="stat-str" class="text-amber-400">1</strong></span>
@@ -223,17 +218,34 @@
                         </div>
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Combat Stats</h3>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ATK</span><strong id="derived-atk" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">DEF</span><strong id="derived-def" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">HIT</span><strong id="derived-hit" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">FLEE</span><strong id="derived-flee" class="text-slate-100">0</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">CRIT Rate</span><strong id="derived-crit" class="text-slate-100">0%</strong></div>
+                            <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ASPD</span><strong id="derived-aspd" class="text-slate-100">0</strong></div>
+                            <div class="col-span-2 flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">Move Speed</span><strong id="derived-movement-speed" class="text-slate-100">0 m/s</strong></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Skill Tree</h3>
                             <span class="text-xs text-purple-400">SP: <strong id="sp-count">0</strong></span>
                         </div>
+                        <div id="skill-pending-bar" class="flex flex-col gap-2"></div>
                         <div id="skill-tree-container" class="flex flex-col gap-2"></div>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inventory Bag</h3>
-                        <span id="inventory-count" class="text-xs font-mono text-slate-400">0 / 40</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="sortInventory('asc')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold rounded cursor-pointer transition">Sort by Type ↑</button>
+                            <button onclick="sortInventory('desc')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold rounded cursor-pointer transition">Sort by Type ↓</button>
+                            <span id="inventory-count" class="text-xs font-mono text-slate-400">0 / 40</span>
+                        </div>
                     </div>
                     <div id="inventory-grid" class="grid grid-cols-4 gap-2"></div>
                 </div>
@@ -317,16 +329,17 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-xl">⚔️</div>
+                    <div class="flex items-center justify-between gap-2">
                         <div>
                             <h3 id="combat-player-name" class="font-bold text-sm text-slate-100">Hero</h3>
                             <span class="text-[10px] text-slate-400 font-mono" id="player-hp-text">120 / 120 HP</span>
                         </div>
+                        <button id="combat-player-toggle" onclick="toggleCombatPlayerPanel()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded cursor-pointer transition">▾ Minimize</button>
                     </div>
                     <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
                         <div id="player-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div>
                     </div>
+                    <div id="combat-player-body" class="flex flex-col gap-4">
                     <button onclick="manualDrinkPotion()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 font-bold rounded-xl text-xs transition cursor-pointer flex justify-between px-3 items-center">
                         <span>Drink Potion</span>
                         <span id="player-potions" class="font-mono text-[10px]">None</span>
@@ -334,6 +347,19 @@
                     <div class="flex justify-between text-[10px] text-slate-400 px-1">
                         <span>Resurrection Potion</span>
                         <span id="player-resurrection" class="font-mono">0 left</span>
+                    </div>
+                    <div class="flex flex-col gap-1 border-t border-slate-800 pt-3">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Runes This Run</h4>
+                        <div id="combat-rune-list" class="flex flex-col gap-1 text-[10px]"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5 text-[10px] border-t border-slate-800 pt-3">
+                        <div class="flex justify-between px-1"><span class="text-slate-400">ATK</span><strong id="combat-derived-atk" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">DEF</span><strong id="combat-derived-def" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">HIT</span><strong id="combat-derived-hit" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">FLEE</span><strong id="combat-derived-flee" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">CRIT</span><strong id="combat-derived-crit" class="text-slate-100">0%</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">ASPD</span><strong id="combat-derived-aspd" class="text-slate-100">0</strong></div>
+                    </div>
                     </div>
                 </div>
 
@@ -355,7 +381,7 @@
 
     <!-- UNIVERSAL GAME MODAL -->
     <div id="game-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full flex flex-col gap-4 shadow-2xl text-center">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-lg w-full flex flex-col gap-4 shadow-2xl text-center">
             <h3 id="modal-title" class="font-bold text-sm text-amber-400">Notification</h3>
             <p id="modal-message" class="text-xs text-slate-300 whitespace-pre-line"></p>
             <div id="modal-content-area"></div>
@@ -370,35 +396,28 @@
     <script src="js/player.js"></script>
     <script src="js/combat.js"></script>
     <script src="js/ui.js"></script>
-	<audio id="game-bgm" loop>
-    <source src="bgm.wav" type="audio/wav">
-</audio>
+    <audio id="game-bgm" src="sound/bgm.wav" loop preload="auto"></audio>
 
 <script>
-    let isBgmPlaying = false;
-
-    function toggleBGM() {
+    // BGM: loops at low volume. Browsers only allow autoplay after a user gesture,
+    // so if the first attempt is blocked, it starts on the player's first click or key press.
+    function initBgm() {
         const bgm = document.getElementById('game-bgm');
-        const btn = document.getElementById('bgm-toggle-btn');
         if (!bgm) return;
-
-        if (isBgmPlaying) {
-            bgm.pause();
-            isBgmPlaying = false;
-            if (btn) btn.innerText = "🎵 Off";
-        } else {
-            bgm.volume = 0.4;
+        bgm.loop = true;
+        bgm.volume = 0.2;
+        const events = ['pointerdown', 'keydown'];
+        const start = () => {
             bgm.play().then(() => {
-                isBgmPlaying = true;
-                if (btn) btn.innerText = "🎵 On";
-            }).catch(e => {
-                console.log("Audio play failed:", e);
-                alert("Make sure bgm.wav is in the correct folder.");
-            });
-        }
+                events.forEach(ev => document.removeEventListener(ev, start));
+            }).catch(e => console.log("BGM waiting for user interaction:", e));
+        };
+        start();
+        events.forEach(ev => document.addEventListener(ev, start));
     }
 
     window.onload = function() {
+        initBgm();
         renderAvatarSelection();
         if (loadGame()) {
             let nameSelectModal = document.getElementById('view-name-select');

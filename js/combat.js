@@ -9,6 +9,7 @@ let maxStages = 11;
 let combatInterval = null;
 let monstersList = [];
 let isFirstHitOfBattle = true;
+let battlePlayerHits = 0;
 let lastPotionDrinkTime = 0;
 
 // Helper to play audio effects safely
@@ -61,6 +62,7 @@ function startExpedition(mode) {
     }
 
     if (typeof resetMapRunes === 'function') resetMapRunes();
+    player.currentRunRunes = [];
     currentMode = mode;
     let derived = getDerivedStats();
     player.hp = derived.maxHp;
@@ -108,6 +110,7 @@ function startExpedition(mode) {
 
 function spawnStageMonsters() {
     isFirstHitOfBattle = true;
+    battlePlayerHits = 0;
     monstersList = [];
 
     if (currentMode === 'campaign' && currentStage === maxStages && activeMap.boss) {
@@ -254,6 +257,7 @@ function runCombatTick() {
             }
         }
         targetEnemy.hp -= pDmg;
+        battlePlayerHits++;
     } else {
         logMessage(`[Miss] Attack on ${targetEnemy.name} missed!`, 'combat');
     }
@@ -360,47 +364,66 @@ function onStageCleared() {
     }, 2000);
 }
 
-function checkRuneSelectionPrompt(onCompleteCallback) {
-    const availableRunes = [
-        { id: 'critBonus', name: "Berserk Rune", desc: "+15% Critical Rate", apply: () => { player.runes.critBonus += 15; } },
-        { id: 'maxHpBonus', name: "Vitality Rune", desc: "+200 Max HP", apply: () => { player.runes.maxHpBonus += 200; player.hp = Math.min(getDerivedStats().maxHp, player.hp + 200); } },
-        { id: 'firstHitBonus', name: "Stunning Strike Rune", desc: "+50 Bonus Damage on First Hit", apply: () => { player.runes.firstHitBonus += 50; } },
-        { id: 'alwaysCritFirst', name: "Assassination Rune", desc: "First hit of every battle is always a Critical Hit", apply: () => { player.runes.alwaysCritFirst = true; } },
-        { id: 'randomHitCount', name: "Chaos Rune", desc: "Attacks have a 50% chance to strike random targets", apply: () => { player.runes.randomHitCount += 1; } }
-    ];
+// Rune table. Non-stackable runes are not offered again once owned in the current run.
+const RUNE_DEFS = {
+    critBonus: { name: "Berserk Rune", desc: "+15% Critical Rate", stackable: true,
+        apply: () => { player.runes.critBonus += 15; },
+        total: n => `+${15 * n}% Critical Rate` },
+    maxHpBonus: { name: "Vitality Rune", desc: "+200 Max HP", stackable: true,
+        apply: () => { player.runes.maxHpBonus += 200; player.hp = Math.min(getDerivedStats().maxHp, player.hp + 200); },
+        total: n => `+${200 * n} Max HP` },
+    firstHitBonus: { name: "Stunning Strike Rune", desc: "+50 Bonus Damage on First Hit", stackable: true,
+        apply: () => { player.runes.firstHitBonus += 50; },
+        total: n => `+${50 * n} Bonus Damage on First Hit` },
+    alwaysCritFirst: { name: "Assassination Rune", desc: "First hit of every battle is always a Critical Hit", stackable: false,
+        apply: () => { player.runes.alwaysCritFirst = true; },
+        total: () => `First hit of every battle is Critical` },
+    randomHitCount: { name: "Chaos Rune", desc: "Attacks have a 50% chance to strike random targets", stackable: true,
+        apply: () => { player.runes.randomHitCount += 1; },
+        total: n => `50% chance to strike random targets (x${n})` }
+};
 
-    let shuffled = [...availableRunes].sort(() => 0.5 - Math.random());
-    let choices = shuffled.slice(0, 3);
+function getRuneOwnedCount(id) {
+    return (player.currentRunRunes || []).filter(r => r.id === id).length;
+}
+
+function checkRuneSelectionPrompt(onCompleteCallback) {
+    const pool = Object.keys(RUNE_DEFS).filter(id => RUNE_DEFS[id].stackable || getRuneOwnedCount(id) === 0);
+    if (pool.length === 0) {
+        if (onCompleteCallback) onCompleteCallback();
+        return;
+    }
+    const choices = [...pool].sort(() => 0.5 - Math.random()).slice(0, 3);
 
     let html = `<p class="text-xs text-slate-300 mb-2">Stage ${currentStage} cleared! Select a mystical Rune blessing for this expedition:</p><div class="flex flex-col gap-2">`;
-    choices.forEach((r) => {
+    choices.forEach(id => {
+        const r = RUNE_DEFS[id];
+        const n = getRuneOwnedCount(id);
+        const owned = n > 0 ? ` <span class="text-amber-400 font-bold">(owned x${n})</span>` : '';
         html += `
-            <button onclick="selectRuneChoice('${r.id}', window.runeCallback)" class="p-3 bg-slate-950 hover:bg-slate-800 border border-amber-500/40 rounded-xl text-left transition cursor-pointer flex flex-col gap-0.5">
-                <span class="font-bold text-amber-400 text-xs">✨ ${r.name}</span>
+            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="p-3 bg-slate-950 hover:bg-slate-800 border border-amber-500/40 rounded-xl text-left transition cursor-pointer flex flex-col gap-1">
+                <span class="font-bold text-amber-400 text-xs">✨ ${r.name}${owned}</span>
                 <span class="text-[10px] text-slate-300">${r.desc}</span>
-            </button>
-        `;
+            </button>`;
     });
     html += `</div>`;
-
     window.runeCallback = onCompleteCallback;
     showModal("Choose a Rune Blessing", "", html);
 }
 
 function selectRuneChoice(runeId, callback) {
-    const availableRunes = [
-        { id: 'critBonus', apply: () => { player.runes.critBonus += 15; } },
-        { id: 'maxHpBonus', apply: () => { player.runes.maxHpBonus += 200; player.hp = Math.min(getDerivedStats().maxHp, player.hp + 200); } },
-        { id: 'firstHitBonus', apply: () => { player.runes.firstHitBonus += 50; } },
-        { id: 'alwaysCritFirst', apply: () => { player.runes.alwaysCritFirst = true; } },
-        { id: 'randomHitCount', apply: () => { player.runes.randomHitCount += 1; } }
-    ];
+    const def = RUNE_DEFS[runeId];
+    if (!def) return;
+    if (!def.stackable && getRuneOwnedCount(runeId) > 0) return;
 
-    let r = availableRunes.find(item => item.id === runeId);
-    if (r) r.apply();
+    def.apply();
+    if (!player.currentRunRunes) player.currentRunRunes = [];
+    player.currentRunRunes.push({ id: runeId, name: def.name, desc: def.desc });
+    logMessage(`[Rune Blessing] Acquired ${def.name}: ${def.desc}`, 'levelup');
 
-    logMessage(`[Rune Blessing] Acquired powerful rune buff!`, 'levelup');
     closeModal();
+    updateUI();
+    saveGame();
     if (callback) callback();
 }
 

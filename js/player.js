@@ -262,6 +262,13 @@ function loadGame() {
                 player.inventory = new Array(40).fill(null);
                 oldInv.forEach((it, idx) => { if (idx < 40) player.inventory[idx] = it; });
             }
+            // Old saves kept scraps as a counter: move them into the bag as stacks
+            if (player.materials && player.materials.ironScraps > 0 && typeof addScraps === 'function') {
+                let left = player.materials.ironScraps;
+                while (left > 0 && addScraps(Math.min(left, 50))) left -= Math.min(left, 50);
+                player.materials.ironScraps = left;
+            }
+            if (typeof normalizeInventoryStacks === 'function') normalizeInventoryStacks();
             return true;
         }
     } catch (e) {
