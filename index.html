@@ -116,6 +116,11 @@
                     <span class="font-bold text-purple-300 text-xs">Diamond Shop</span>
                     <span class="text-[10px] text-slate-400">Premium items & pets.</span>
                 </button>
+                <button onclick="switchView('events')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
+                    <span class="text-xl">🎁</span>
+                    <span class="font-bold text-cyan-300 text-xs">Events</span>
+                    <span class="text-[10px] text-slate-400">Daily Challenge, Gold Rush, XP Farm.</span>
+                </button>
                 <button onclick="switchView('expeditions')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
                     <span class="text-xl">⚔️</span>
                     <span class="font-bold text-amber-300 text-xs">Expeditions</span>
@@ -170,10 +175,32 @@
         </div>
 
         <!-- VIEW: CHARACTER -->
+        <!-- VIEW: EVENTS -->
+        <div id="view-events" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-base font-bold text-cyan-300">Events</h2>
+                    <p class="text-xs text-slate-400">Each event can be played 3 times per day.</p>
+                </div>
+                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+                <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+                <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+            </div>
+        </div>
+
         <div id="view-character" class="hidden flex flex-col gap-4 flex-1">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <h2 class="text-base font-bold text-amber-400">Character & Equipment</h2>
                 <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
+                <div class="flex justify-between text-[10px] font-mono text-slate-400"><span>Health</span><span id="char-hp-text">0 / 0 HP</span></div>
+                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800"><div id="char-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div></div>
+                <div class="flex justify-between text-[10px] font-mono text-slate-400"><span>Armor</span><span id="char-armor-text">0 / 0</span></div>
+                <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="char-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 0%"></div></div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="flex flex-col gap-4">
@@ -226,6 +253,7 @@
                             <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">FLEE</span><strong id="derived-flee" class="text-slate-100">0</strong></div>
                             <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">CRIT Rate</span><strong id="derived-crit" class="text-slate-100">0%</strong></div>
                             <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ASPD</span><strong id="derived-aspd" class="text-slate-100">0</strong></div>
+                            <div class="col-span-2 flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">Armor</span><strong id="derived-armor" class="text-slate-100">0</strong></div>
                             <div class="col-span-2 flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">Move Speed</span><strong id="derived-movement-speed" class="text-slate-100">0 m/s</strong></div>
                         </div>
                     </div>
@@ -339,6 +367,8 @@
                     <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
                         <div id="player-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div>
                     </div>
+                    <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Armor</span><span id="player-armor-text">0 / 0</span></div>
+                    <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="player-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 100%"></div></div>
                     <div id="combat-player-body" class="flex flex-col gap-4">
                     <button onclick="manualDrinkPotion()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 font-bold rounded-xl text-xs transition cursor-pointer flex justify-between px-3 items-center">
                         <span>Drink Potion</span>

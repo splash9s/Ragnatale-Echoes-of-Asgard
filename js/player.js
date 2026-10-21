@@ -81,7 +81,19 @@ const BUFF_POOL = [
     { key: 'crit', name: "Sharpened",  min: 1,  max: 5 },
     { key: 'flee', name: "Agile",      min: 1,  max: 6 },
     { key: 'hit',  name: "Keen",       min: 1,  max: 6 },
-    { key: 'aspd', name: "Swift",      min: 1,  max: 4 }
+    { key: 'aspd', name: "Swift", min: 1, max: 4 },
+    { key: 'armor', name: "Guarded", min: 10, max: 60 }
+];
+// Debuffs: 0..2 per item, always negative
+const DEBUFF_POOL = [
+    { key: 'atk',  name: "Brittle",   min: 2,  max: 8 },
+    { key: 'def',  name: "Cursed",    min: 1,  max: 5 },
+    { key: 'hp',   name: "Frail",     min: 15, max: 60 },
+    { key: 'flee', name: "Clumsy",    min: 1,  max: 5 },
+    { key: 'hit',  name: "Blurred",   min: 1,  max: 5 },
+    { key: 'aspd', name: "Heavy",     min: 1,  max: 4 },
+    { key: 'crit', name: "Dull",      min: 1,  max: 3 },
+    { key: 'armor', name: "Corroded", min: 5,  max: 30 }
 ];
 // Buff count (0..4) weights per item rarity 1..5
 const BUFF_COUNT_WEIGHTS = {
@@ -154,8 +166,18 @@ function createWelcomeMail() {
     ];
 }
 
+function defaultRunes() {
+    return {
+        critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0,
+        randomHitCount: 0, resurrectionUsed: false,
+        dodge: 0, swiftRun: 0, focus: 0, thorn: 0, critHeal: 0, lifeline: 0, fortify: 0, evasion: 0,
+        vampire: 0, divineLight: 0, momentum: 0, retribution: 0, backlineBreaker: false,
+        killBlast: 0, elementIgnore: false, bulwark: 0, lastStand: 0, angelOfDeath: false
+    };
+}
+
 function resetMapRunes() {
-    player.runes = { critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0, randomHitCount: 0, resurrectionUsed: false };
+    player.runes = defaultRunes();
 }
 
 function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
@@ -172,42 +194,61 @@ function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
         buffs.push({ stat: b.key, value, tier, desc: `${b.name}: +${value} ${b.key.toUpperCase()}` });
     }
 
+    const debuffCount = weightedPick([60, 30, 10]); // 0..2
+    const dShuffled = [...DEBUFF_POOL].sort(() => 0.5 - Math.random());
+    const debuffs = [];
+    for (let i = 0; i < debuffCount; i++) {
+        const d = dShuffled[i];
+        const roll = Math.floor(d.min + Math.random() * (d.max - d.min + 1));
+        debuffs.push({ stat: d.key, value: -roll, desc: `${d.name}: -${roll} ${d.key.toUpperCase()}` });
+    }
+
     let element = baseTemplate.element || null;
     if (!element && baseTemplate.slot === 'weapon' && Math.random() < 0.4) {
         element = ELEMENT_KEYS[Math.floor(Math.random() * ELEMENT_KEYS.length)];
     }
 
-    return { ...baseTemplate, element, rarity, refineLevel: 0, buffs, qty: 1 };
+    return { ...baseTemplate, element, rarity, refineLevel: 0, buffs, debuffs, qty: 1 };
 }
 
 function getDerivedStats() {
-    let maxHp = 100 + (player.stats.vit * 15) + (player.baseLv * 10) + player.runes.maxHpBonus;
-    let atk = 10 + (player.stats.str * 2) + Math.floor(player.stats.luk / 3) + (player.skills.swordsmanship?.level * 3 || 0);
-    let def = 2 + (player.stats.vit * 1) + (player.skills.ironDefense?.level * 2 || 0);
-    let hit = 100 + player.baseLv + player.stats.dex;
-    let flee = 100 + player.baseLv + player.stats.agi;
-    let crit = 1 + Math.floor(player.stats.luk / 3) + player.runes.critBonus + (player.skills.vitalStrike?.level * 1.5 || 0);
-    let aspd = 130 + Math.floor(player.stats.agi * 0.8) + Math.floor(player.stats.dex * 0.2);
-    let movementSpeed = player.baseMovementSpeed || 3;
+    // Daily Challenge: an empty run. Level, base stats, skills and gear have no effect; runes picked in the run still apply.
+    const daily = typeof currentMode !== 'undefined' && currentMode === 'daily';
+    const rn = k => player.runes[k] || 0;
+    const lvl = daily ? 1 : player.baseLv;
+    const ST = daily ? { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 } : player.stats;
+    const skl = name => daily ? 0 : (player.skills[name]?.level || 0);
 
-    // Equipment: base stats, refine, rolled buffs
-    const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0 };
-    for (let slot in player.equipped) {
-        const item = player.equipped[slot];
-        if (!item) continue;
-        const refBonus = item.refineLevel || 0;
-        if (item.stats) {
-            for (const k in item.stats) if (k in extra) extra[k] += item.stats[k];
-            if (item.stats.atk) extra.atk += refBonus * 3;
-            if (item.stats.def) extra.def += refBonus;
-            if (item.stats.hp) extra.hp += refBonus * 10;
+    let maxHp = 100 + (ST.vit * 15) + (lvl * 10) + rn('maxHpBonus');
+    let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3) + (skl('swordsmanship') * 3);
+    let def = 2 + (ST.vit * 1) + (skl('ironDefense') * 2);
+    let hit = 100 + lvl + ST.dex;
+    let flee = 100 + lvl + ST.agi;
+    let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + (skl('vitalStrike') * 1.5);
+    let aspd = 130 + Math.floor(ST.agi * 0.8) + Math.floor(ST.dex * 0.2);
+    let movementSpeed = (player.baseMovementSpeed || 3) + rn('swiftRun');
+
+    const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0, armor: 0 };
+    let goldMultiplier = 1;
+
+    if (!daily) {
+        for (let slot in player.equipped) {
+            const item = player.equipped[slot];
+            if (!item) continue;
+            const refBonus = item.refineLevel || 0;
+            if (item.stats) {
+                for (const k in item.stats) if (k in extra) extra[k] += item.stats[k];
+                if (item.stats.atk) extra.atk += refBonus * 3;
+                if (item.stats.def) extra.def += refBonus;
+                if (item.stats.hp) extra.hp += refBonus * 10;
+            }
+            (item.buffs || []).forEach(b => { if (b.stat in extra) extra[b.stat] += b.value; });
+            (item.debuffs || []).forEach(d => { if (d.stat in extra) extra[d.stat] += d.value; });
         }
-        (item.buffs || []).forEach(b => { if (b.stat in extra) extra[b.stat] += b.value; });
+        const setBonus = getSetBonuses();
+        for (const k in setBonus.stats) if (k in extra) extra[k] += setBonus.stats[k];
+        goldMultiplier = 1 + setBonus.goldBonus;
     }
-
-    // Set bonuses
-    const setBonus = getSetBonuses();
-    for (const k in setBonus.stats) if (k in extra) extra[k] += setBonus.stats[k];
 
     atk += extra.atk;
     def += extra.def;
@@ -216,14 +257,16 @@ function getDerivedStats() {
     hit += extra.hit;
     crit += extra.crit;
     aspd += extra.aspd;
+    // Armor comes only from items (default 0)
+    const maxArmor = Math.max(0, extra.armor);
 
-    let maxWeight = 2000 + (player.stats.str * 30);
+    let maxWeight = 2000 + (ST.str * 30);
     let currentWeight = 120 + ((player.equipped.potionSlot?.qty || 0) * 15) + ((player.resurrectionPotions || 0) * 10) + ((player.refiningStones || 0) * 2);
     for (let item of player.inventory) {
         if (item) currentWeight += 10;
     }
 
-    return { maxHp, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier: 1 + setBonus.goldBonus };
+    return { maxHp, maxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier };
 }
 
 function saveGame() {
@@ -246,6 +289,7 @@ function loadGame() {
             if (!player.dailyQuests) player.dailyQuests = [];
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (!player.materials) player.materials = { ironScraps: 0 };
+            player.runes = { ...defaultRunes(), ...(player.runes || {}) };
             if (!player.clearedMaps) {
                 player.clearedMaps = {};
                 if (typeof GAME_DATA !== 'undefined') {

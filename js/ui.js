@@ -139,7 +139,7 @@ function closeModal() {
 }
 
 function switchView(viewName) {
-    let views = ['view-town', 'view-expeditions', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -151,6 +151,10 @@ function switchView(viewName) {
         renderMapGateUI();
     }
     if (viewName === 'character') document.getElementById('view-character')?.classList.remove('hidden');
+    if (viewName === 'events') {
+        document.getElementById('view-events')?.classList.remove('hidden');
+        renderEventsView();
+    }
     if (viewName === 'forge') {
         document.getElementById('view-forge')?.classList.remove('hidden');
         switchForgeSubTab(currentForgeSubTab);
@@ -325,6 +329,7 @@ function buyArmoryItem(itemIndex) {
     player.gold -= price;
     let gearItem = generatePoEItem(template, 1, 0);
     gearItem.buffs = [];
+    gearItem.debuffs = [];
     addItemToInventory(gearItem);
     logMessage(`[Shop] Purchased ${gearItem.name}!`, 'drop');
     showModal("Purchase Successful", `You purchased ${gearItem.name}!`);
@@ -634,11 +639,11 @@ function unequipItem(slotName) {
     saveGame();
 }
 
-const STAT_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block', mdef: 'MDEF' };
+const STAT_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block', mdef: 'MDEF', armor: 'ARMOR' };
 
 function formatStatLine(key, val) {
     const pct = key === 'crit' || key === 'block';
-    return `${STAT_LABELS[key] || key.toUpperCase()} +${val}${pct ? '%' : ''}`;
+    return `${STAT_LABELS[key] || key.toUpperCase()} ${val >= 0 ? '+' : ''}${val}${pct ? '%' : ''}`;
 }
 
 function elemTagHTML(m) {
@@ -658,12 +663,14 @@ function elementDetailHTML(el) {
     return `<span class="text-cyan-300">${e.icon} ${e.name} element: strong vs ${ELEMENTS[e.beats].name}, weak vs ${ELEMENTS[weakKey].name}</span>`;
 }
 
-function buffsDetailHTML(buffs) {
-    if (!buffs || buffs.length === 0) return '<span class="text-slate-500">No buffs</span>';
-    return buffs.map(b => {
+function buffsDetailHTML(buffs, debuffs) {
+    const up = (buffs || []).map(b => {
         const tier = RARITY_INFO[b.tier] || RARITY_INFO[1];
         return `<div class="${tier.text}">• ${b.desc} <span class="text-[9px] opacity-70">[Tier ${b.tier} ${tier.name}]</span></div>`;
     }).join('');
+    const down = (debuffs || []).map(d => `<div class="text-red-400">▾ ${d.desc}</div>`).join('');
+    if (!up && !down) return '<span class="text-slate-500">No buffs</span>';
+    return up + down;
 }
 
 function setInfoHTML(setKey) {
@@ -687,39 +694,51 @@ function renderSetBonusPanel() {
     c.innerHTML = html || '<span class="text-[10px] text-slate-500">No set bonus active.</span>';
 }
 
+// Total value per stat for an item: base + buffs + debuffs
+function effectiveStats(item) {
+    const m = {};
+    if (!item) return m;
+    for (const k in (item.stats || {})) m[k] = (m[k] || 0) + item.stats[k];
+    (item.buffs || []).forEach(b => { m[b.stat] = (m[b.stat] || 0) + b.value; });
+    (item.debuffs || []).forEach(d => { m[d.stat] = (m[d.stat] || 0) + d.value; });
+    return m;
+}
+
 function gearCardHTML(item, label) {
     if (!item || !item.name) {
-        return `<div class="flex-1 min-w-0 p-2 rounded-lg border border-dashed border-slate-700 text-slate-500 text-[10px] text-center flex flex-col justify-center">
+        return `<div class="flex-1 min-w-0 p-2 rounded-lg border border-dashed border-slate-700 text-slate-500 text-[10px] text-center flex flex-col justify-center gap-1">
             <span class="uppercase tracking-wider">${label}</span><span>Nothing equipped</span></div>`;
     }
     const r = RARITY_INFO[item.rarity] || RARITY_INFO[1];
     const stats = Object.entries(item.stats || {}).map(([k, v]) => `<div class="text-slate-200">${formatStatLine(k, v)}</div>`).join('') || '<div class="text-slate-500">No base stats</div>';
-    const buffs = (item.buffs || []).map(b => `<div class="${(RARITY_INFO[b.tier] || RARITY_INFO[1]).text}">• ${b.desc}</div>`).join('') || '<div class="text-slate-500">No buffs</div>';
+    const buffs = (item.buffs || []).map(b => `<div class="${(RARITY_INFO[b.tier] || RARITY_INFO[1]).text}">• ${b.desc}</div>`).join('');
+    const debuffs = (item.debuffs || []).map(d => `<div class="text-red-400">▾ ${d.desc}</div>`).join('');
     return `<div class="flex-1 min-w-0 p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-1 text-[10px]">
         <span class="text-[9px] uppercase tracking-wider text-slate-500">${label}</span>
         <span class="font-bold ${r.text} break-words">${item.name}${item.refineLevel > 0 ? ' +' + item.refineLevel : ''}</span>
         <span class="${r.text}">${r.name} · R${item.rarity}</span>
         ${item.element && ELEMENTS[item.element] ? `<span class="text-cyan-300">${ELEMENTS[item.element].icon} ${ELEMENTS[item.element].name}</span>` : ''}
-        ${stats}${buffs}
+        ${stats}${buffs}${debuffs}
     </div>`;
 }
 
 function compareHTML(selected, equipped) {
-    const sStats = selected.stats || {};
-    const eStats = (equipped && equipped.stats) || {};
-    const keys = new Set([...Object.keys(sStats), ...Object.keys(eStats)]);
+    const s = effectiveStats(selected);
+    const e = effectiveStats(equipped);
+    const keys = new Set([...Object.keys(s), ...Object.keys(e)]);
     const rows = [...keys].map(k => {
-        const d = (sStats[k] || 0) - (eStats[k] || 0);
+        const d = (s[k] || 0) - (e[k] || 0);
         if (!d) return '';
         return `<div class="${d > 0 ? 'text-emerald-300' : 'text-red-300'}">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
     }).join('');
     return `<div class="flex flex-col gap-2">
         <span class="text-[10px] font-bold text-amber-300 uppercase">Compare with equipped</span>
         <div class="flex gap-2 items-stretch">${gearCardHTML(selected, 'Selected')}${gearCardHTML(equipped, 'Equipped')}</div>
-        ${rows ? `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change (selected − equipped):</span>${rows}</div>` : ''}
+        ${rows ? `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change if you equip it (total stats):</span>${rows}</div>` : ''}
     </div>`;
 }
 
+// Equipment: only the header, requirements, set info and the comparison window (no duplicate stat list)
 function showItemDetail(index) {
     const item = player.inventory[index];
     if (!item) return;
@@ -733,24 +752,20 @@ function showItemDetail(index) {
     body += `<div class="flex justify-between items-center">
         <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : kind}</span>
         <span class="text-[10px] text-slate-400 capitalize">${kind}</span></div>`;
-    if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
-    if (item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
-    if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
-    if (item.stats && Object.keys(item.stats).length) {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-            Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') +
-            `</div>`;
-    }
-    if (isEquip && item.slot !== 'pet') {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-purple-500/30 flex flex-col gap-1">
-            <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>${buffsDetailHTML(item.buffs)}</div>`;
-    }
-    if (item.setName) body += setInfoHTML(item.setName);
+    if (isEquip && item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
+    if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
+    if (!isEquip && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
+    if (item.setName) body += setInfoHTML(item.setName);
+    if (isEquip && item.slot !== 'pet') {
+        body += compareHTML(item, player.equipped[item.slot]);
+    } else if (isEquip && item.stats) {
+        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
+            Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
+    }
     body += '</div>';
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    if (isEquip && item.slot !== 'pet') body += compareHTML(item, player.equipped[item.slot]);
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
     if (isEquip) actions += `<button onclick="equipFromDetail(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Equip</button>`;
     if (isPotion) actions += `<button onclick="usePotionFromDetail(${index})" class="${btn} bg-emerald-600 hover:bg-emerald-500 text-slate-950">Equip</button>`;
@@ -790,7 +805,7 @@ function showEquippedDetail(slot) {
     }
     if (!isPotion && slot !== 'pet') {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-purple-500/30 flex flex-col gap-1">
-            <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>${buffsDetailHTML(item.buffs)}</div>`;
+            <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>${buffsDetailHTML(item.buffs, item.debuffs)}</div>`;
     }
     if (item.setName) body += setInfoHTML(item.setName);
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
@@ -909,6 +924,10 @@ function salvageEquipmentItem(index) {
 }
 
 function manualDrinkPotion() {
+    if (currentMode === 'daily') {
+        alert("Health potions are disabled in the Daily Challenge.");
+        return;
+    }
     let derived = getDerivedStats();
     let potionSlot = player.equipped.potionSlot;
     if (!potionSlot || (potionSlot.qty || 0) <= 0) {
@@ -916,8 +935,9 @@ function manualDrinkPotion() {
         return;
     }
     let healAmt = potionSlot.heal || 50;
-    player.hp = Math.min(derived.maxHp, player.hp + healAmt);
     potionSlot.qty--;
+    healPlayer(healAmt, 'Potion');
+    checkStageClearAfterHeal();
     updateUI();
     saveGame();
 }
@@ -1252,6 +1272,7 @@ function updateUI() {
     renderPendingBars();
 
     const derivedValues = {
+        'armor': derived.maxArmor,
         'atk': derived.atk,
         'def': derived.def,
         'hit': derived.hit,
@@ -1291,6 +1312,21 @@ function updateUI() {
 
     el = document.getElementById('player-hp-text');
     if (el) el.innerText = `${player.hp} / ${derived.maxHp} HP`;
+    const armorNow = Math.max(0, player.armor || 0);
+    el = document.getElementById('player-armor-text');
+    if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
+    el = document.getElementById('player-armor-bar');
+    if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
+
+    // Character page bars
+    el = document.getElementById('char-hp-text');
+    if (el) el.innerText = `${player.hp} / ${derived.maxHp} HP`;
+    el = document.getElementById('char-hp-bar');
+    if (el) el.style.width = `${Math.max(0, Math.min(100, (player.hp / derived.maxHp) * 100))}%`;
+    el = document.getElementById('char-armor-text');
+    if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
+    el = document.getElementById('char-armor-bar');
+    if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
     el = document.getElementById('player-hp-bar');
     if (el) el.style.width = `${(player.hp / derived.maxHp) * 100}%`;
 
@@ -1316,7 +1352,7 @@ function updateUI() {
                 grouped[r.id].count++;
             });
             el.innerHTML = Object.values(grouped).map(r =>
-                `<div class="text-purple-300">✦ ${r.name}${r.count > 1 ? ' <span class="text-amber-300 font-bold">x' + r.count + '</span>' : ''} <span class="text-slate-400">— ${RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].total(r.count) : r.desc}</span></div>`
+                `<div class="text-purple-300">✦ ${r.name}${r.count > 1 ? ' <span class="text-amber-300 font-bold">x' + r.count + '</span>' : ''} <span class="text-slate-400">— ${RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].text(runeN(r.id)) : r.desc}</span></div>`
             ).join('');
         }
     }
@@ -1358,5 +1394,47 @@ function logMessage(msg, type = 'combat') {
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
+    });
+}
+
+// ---------- EVENTS VIEW ----------
+function renderEventsView() {
+    const st = getEventState();
+
+    const dEl = document.getElementById('event-daily');
+    if (dEl) {
+        const can = eventCanPlay('daily');
+        const left = Math.max(0, EVENT_LIMIT - st.plays.daily);
+        const status = st.dailyCleared ? 'Cleared today: locked until tomorrow' : `${left} / ${EVENT_LIMIT} plays left today`;
+        dEl.innerHTML = `
+            <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 bg-cyan-500/20 text-cyan-300 rounded border border-cyan-500/40 uppercase">Daily</span>
+                <h3 class="text-sm font-bold text-slate-200 mt-2">Daily Challenge</h3>
+                <p class="text-[10px] text-slate-400 mt-1">31 stages with bosses on 11, 21 and 31. Level, skills and gear have no effect. Health potions are disabled and only one resurrection can be used per run.</p>
+                <span class="text-[10px] font-mono text-cyan-300 mt-2 block">${status}</span>
+            </div>
+            <button ${can ? '' : 'disabled'} onclick="startEvent('daily')" class="py-3 font-bold rounded-xl text-xs transition mt-auto ${can ? 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 cursor-pointer shadow' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">${can ? 'Start Daily Challenge' : 'Locked'}</button>`;
+    }
+
+    ['gold', 'xp'].forEach(kind => {
+        const el = document.getElementById(`event-${kind}`);
+        if (!el) return;
+        const cfg = EVENT_CONFIG[kind];
+        const can = eventCanPlay(kind);
+        const left = Math.max(0, EVENT_LIMIT - st.plays[kind]);
+        const tone = kind === 'gold' ? 'amber' : 'emerald';
+        const buttons = EVENT_MAPS[kind].map(m => `
+            <button ${can ? '' : 'disabled'} onclick="startEvent('${kind}','${m.mapKey}')" class="p-3 rounded-xl border text-left text-xs transition ${can ? `bg-slate-950 border-slate-700 hover:border-${tone}-400 text-slate-200 cursor-pointer` : 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed'}">
+                <span class="block font-bold">${m.label}</span>
+                <span class="block text-[10px] mt-0.5">${m.sub} · HP & damage x1.5 · ${kind === 'gold' ? 'Zeny' : 'EXP'} x2 · No item drops</span>
+            </button>`).join('');
+        el.innerHTML = `
+            <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 bg-${tone}-500/20 text-${tone}-300 rounded border border-${tone}-500/40 uppercase">Event</span>
+                <h3 class="text-sm font-bold text-slate-200 mt-2">${cfg.name}</h3>
+                <p class="text-[10px] text-slate-400 mt-1">${cfg.desc}</p>
+                <span class="text-[10px] font-mono text-${tone}-300 mt-2 block">${left} / ${EVENT_LIMIT} plays left today</span>
+            </div>
+            <div class="flex flex-col gap-2">${buttons}</div>`;
     });
 }
