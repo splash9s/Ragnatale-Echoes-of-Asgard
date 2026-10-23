@@ -169,11 +169,11 @@ const HAT_BY_LEVEL = {
     30: { name: "Winged Helm", stats: { hp: 250, def: 12, flee: 5 }, price: 750 },
     40: { name: "Solar Crown", stats: { hp: 420, def: 18, flee: 8 }, price: 1700 },
     50: { name: "Helm of Odin", stats: { hp: 700, def: 25, flee: 10 }, price: 3500 },
-    60: { name: "Jotun Helm", stats: { hp: 1000, def: 35, flee: 15 } },
-    70: { name: "Valkyrie Helm", stats: { hp: 1300, def: 45, flee: 20 } },
-    80: { name: "Muspel Crown", stats: { hp: 1600, def: 55, flee: 25 } },
-    90: { name: "Hel Helm", stats: { hp: 2000, def: 65, flee: 30 } },
-    99: { name: "Dusk Crown", stats: { hp: 2500, def: 80, flee: 40 } }
+    60: { name: "Jotun Helm", stats: { hp: 1000, def: 35, flee: 15 }, price: 7000 },
+    70: { name: "Valkyrie Helm", stats: { hp: 1300, def: 45, flee: 20 }, price: 14000 },
+    80: { name: "Muspel Crown", stats: { hp: 1600, def: 55, flee: 25 }, price: 28000 },
+    90: { name: "Hel Helm", stats: { hp: 2000, def: 65, flee: 30 }, price: 55000 },
+    99: { name: "Dusk Crown", stats: { hp: 2500, def: 80, flee: 40 }, price: 110000 }
 };
 
 // Only these slots can carry a set piece

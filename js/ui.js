@@ -6,7 +6,7 @@ const AVATARS = ["⚔️", "🛡️", "🔮", "🗡️", "🏹"];
 let selectedAvatarChoice = "⚔️";
 let currentLanguage = 'en';
 let currentForgeSubTab = 'gold';
-const SHOP_ARMORY_ITEMS = typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : [];
+const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
 const GOLD_SHOP_CONSUMABLES = [
     { id: 'potion_minor', name: "Minor Healing Potion", price: 50, type: 'potion', heal: 50, desc: "Restores 50 HP" },
@@ -225,6 +225,7 @@ function getMapPrereqTitle(mapKey) {
 let campaignPathChoice = 'fire';
 
 function renderMapGateUI() {
+    updateFinalMapButton();
     const selectEl = document.getElementById('campaign-map-select');
     const listEl = document.getElementById('campaign-map-list');
     const pathEl = document.getElementById('campaign-path-list');
@@ -300,6 +301,22 @@ function selectCampaignMap(key) {
     renderMapGateUI();
 }
 
+function slotLabel(slot) {
+    const f = INVENTORY_FILTERS.find(x => x.key === slot);
+    return f ? f.label : (slot || 'Gear');
+}
+
+function updateFinalMapButton() {
+    const b = document.getElementById('final-map-btn');
+    if (!b) return;
+    const ok = isFinalMapUnlocked();
+    b.disabled = !ok;
+    b.innerText = ok ? 'World-Eater' : '🔒 World-Eater';
+    b.className = ok
+        ? 'py-3 bg-rose-600 hover:bg-rose-500 text-slate-100 font-bold rounded-xl text-xs transition cursor-pointer shadow'
+        : 'py-3 bg-slate-800 text-slate-500 font-bold rounded-xl text-xs border border-slate-700 cursor-not-allowed';
+}
+
 function renderShop() {
     let consumablesContainer = document.getElementById('shop-consumables-container');
     if (consumablesContainer) {
@@ -326,7 +343,7 @@ function renderShop() {
             armoryContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
                     <div>
-                        <span class="font-bold text-amber-300 block text-xs">${item.name} (Req. Lv ${item.levelReq || 1})</span>
+                        <span class="font-bold text-amber-300 block text-xs">${item.name} <span class="text-slate-400 font-normal">[${slotLabel(item.slot)}]</span> (Req. Lv ${item.levelReq || 1})</span>
                         <span class="text-[10px] text-slate-400">${item.desc} — Price: ${price} Gold</span>
                     </div>
                     <button onclick="buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
@@ -1687,6 +1704,8 @@ function updateUI() {
     const armorNow = Math.max(0, player.armor || 0);
     el = document.getElementById('player-armor-text');
     if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
+    el = document.getElementById('player-resurrection-state');
+    if (el) el.innerText = player.resurrectionOn !== false ? 'ON' : 'OFF';
     el = document.getElementById('player-armor-bar');
     if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
 

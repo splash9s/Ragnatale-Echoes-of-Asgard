@@ -169,7 +169,7 @@
                         <option value="map10">Ashmere Forest (Lv. 10)</option>
                         <option value="map20">Runeholt Academy (Lv. 20)</option>
                     </select>
-                    <button onclick="startExpedition('campaign', {final: true})" class="py-3 bg-rose-600 hover:bg-rose-500 text-slate-100 font-bold rounded-xl text-xs transition cursor-pointer shadow">World-Eater</button>
+                    <button id="final-map-btn" onclick="startExpedition('campaign', {final: true})" class="py-3 bg-rose-600 hover:bg-rose-500 text-slate-100 font-bold rounded-xl text-xs transition cursor-pointer shadow">World-Eater</button>
                     <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
@@ -491,10 +491,10 @@
                         <span>Drink Potion</span>
                         <span id="player-potions" class="font-mono text-[10px]">None</span>
                     </button>
-                    <div class="flex justify-between text-[10px] text-slate-400 px-1">
-                        <span>Resurrection Potion</span>
+                    <button onclick="toggleResurrectionUse()" title="Click to turn auto-revive on or off" class="flex justify-between text-[10px] text-slate-400 px-1 w-full cursor-pointer hover:text-slate-200">
+                        <span>Resurrection Potion <span id="player-resurrection-state" class="font-bold text-emerald-300">ON</span></span>
                         <span id="player-resurrection" class="font-mono">0 left</span>
-                    </div>
+                    </button>
                     <div class="flex flex-col gap-1 border-t border-slate-800 pt-3">
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Runes This Run</h4>
                         <div id="combat-rune-list" class="flex flex-col gap-1 text-[10px]"></div>

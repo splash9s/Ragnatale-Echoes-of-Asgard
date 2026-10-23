@@ -98,7 +98,7 @@ const RUNE_DEFS = {
     divineLight: { name: "Divine Light Rune", rarity: 3, add: 100, once: true, desc: "Every 3rd attack deals +100% ATK bonus damage", text: v => `Every 3rd attack deals +${v}% ATK bonus damage` },
     momentum: { name: "Momentum Rune", rarity: 3, add: 10, once: true, desc: "3 critical hits in a row restore 10% HP", text: v => `3 critical hits in a row restore ${v}% HP` },
     retribution: { name: "Retribution Rune", rarity: 3, add: 5, once: true, desc: "Healing deals 5% of heal damage to a random monster", text: v => `Healing deals ${v}% of heal damage to a random monster` },
-    killBlast: { name: "Shockwave Rune", rarity: 4, add: 10, once: true, desc: "Killing an enemy deals 10% ATK to all other enemies", text: v => `Killing an enemy deals ${v}% ATK to all other enemies` },
+    killBlast: { name: "Shockwave Rune", rarity: 4, add: 20, once: true, desc: "Killing an enemy deals 20% ATK to all other enemies", text: v => `Killing an enemy deals ${v}% ATK to all other enemies` },
     elementIgnore: { name: "Void Rune", rarity: 5, flag: true, desc: "Ignore monster elements", text: () => "Ignore monster elements" },
     bulwark: { name: "Bulwark Rune", rarity: 3, add: 1, desc: "Instantly fully restore armor when picked", text: v => `Instantly fully restore armor when picked (x${v})`, onApply: () => { player.armor = getDerivedStats().maxArmor; } },
     lastStand: { name: "Last Stand Rune", rarity: 3, add: 1, desc: "Instantly fully restore HP when picked", text: v => `Instantly fully restore HP when picked (x${v})`, onApply: () => { player.hp = getDerivedStats().maxHp; } },
@@ -117,7 +117,7 @@ const RUNE_DEFS = {
     powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "Damage +50%", text: v => `Damage +${v}%` },
     giantSlayer: { name: "Giant Slayer Rune", rarity: 3, add: 25, once: true, desc: "Damage to boss and mini boss +25%", text: v => `Damage to boss and mini boss +${v}%` },
     monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 50, once: true, desc: "Damage to normal monsters +50%", text: v => `Damage to normal monsters +${v}%` },
-    ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0, damage +50%", text: () => "While armor is above 0, damage +50%" },
+    ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0, damage +200%", text: () => "While armor is above 0, damage +200%" },
     patientStrike: { name: "Patient Strike Rune", rarity: 1, flag: true, desc: "After a miss, your next attack deals 300% more damage", text: () => "After a miss, your next attack deals 300% more damage" },
     twinEvasion: { name: "Twin Evasion Rune", rarity: 1, add: 5, once: true, desc: "Dodging twice in a row restores 5% HP", text: v => `Dodging twice in a row restores ${v}% HP` },
     tripleDodge: { name: "Triple Dodge Rune", rarity: 5, flag: true, desc: "Dodging 3 times in a row fully heals you", text: () => "Dodging 3 times in a row fully heals you" },
@@ -135,7 +135,7 @@ const RUNE_DEFS = {
     autoPotion: { name: "Auto Potion Rune", rarity: 1, flag: true, disabled: true, desc: "Automatically drinks a health potion below 25% HP", text: () => "Automatically drinks a health potion below 25% HP" },
     potionDamage: { name: "Alchemist's Fury Rune", rarity: 2, add: 50, once: true, disabled: true, desc: "Using a potion gives +50% damage for 5 seconds", text: () => "Using a potion gives +50% damage for 5 seconds" },
     potionStun: { name: "Stun Brew Rune", rarity: 2, flag: true, disabled: true, desc: "Using a potion stuns the nearest enemy for 5 seconds", text: () => "Using a potion stuns the nearest enemy for 5 seconds" },
-    killStun: { name: "Stun Burst Rune", rarity: 3, flag: true, disabled: true, desc: "Killing an enemy stuns all enemies for 3 seconds", text: () => "Killing an enemy stuns all enemies for 3 seconds" },
+    killStun: { name: "Stun Burst Rune", rarity: 3, flag: true, desc: "Killing an enemy stuns all enemies for 2 seconds", text: () => "Killing an enemy stuns all enemies for 2 seconds" },
     freezeTouch: { name: "Freeze Touch Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to freeze the enemy for 2 seconds (it cannot attack or dodge, and becomes water element)", text: () => "Hits have a 10% chance to freeze the enemy for 2 seconds (it cannot attack or dodge, and becomes water element)" },
     rockCurse: { name: "Rock Curse Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to turn the enemy to rock for 2 seconds (it cannot attack or dodge, and becomes earth element)", text: () => "Hits have a 10% chance to turn the enemy to rock for 2 seconds (it cannot attack or dodge, and becomes earth element)" },
     splash: { name: "Splash Rune", rarity: 3, flag: true, desc: "Hits have a 20% chance to deal 20% damage to the enemy behind", text: () => "Hits have a 20% chance to deal 20% damage to the enemy behind" },
@@ -385,6 +385,12 @@ function runeProgressInfo() {
     return { remaining, pct: Math.max(0, Math.min(100, Math.round((1 - remaining / gap) * 100))) };
 }
 
+// Resurrection Potion auto-use on/off (default on)
+function toggleResurrectionUse() {
+    player.resurrectionOn = player.resurrectionOn === false;
+    updateUI();
+}
+
 // ---------- FINAL MAP (Lv 110) ----------
 // Unlocked after Map Lv. 99 is cleared on all four paths. 25 stages: odd stages are monsters, even stages are bosses, stage 25 is the final boss.
 const FINAL_PATH_KEYS = ['fire', 'water', 'earth', 'wind'];
@@ -507,7 +513,7 @@ function spawnStageMonsters() {
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
-            const count = Math.floor(Math.random() * 5) + 2;
+            const count = Math.min(Math.floor(Math.random() * 5) + 2, mapMonsterCap());
             const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
@@ -587,9 +593,19 @@ function makeUnit(t, mult) {
     return unit;
 }
 
+// Max monsters on one stage by map level: Lv 1-10 = 4, Lv 20-40 = 5, no cap above
+function mapMonsterCap() {
+    if (!activeMap || activeMap.finalMap || (currentMode !== 'campaign' && currentMode !== 'event')) return Infinity;
+    const lv = activeMap.levelReq || 1;
+    if (lv <= 10) return 4;
+    if (lv <= 40) return 5;
+    return Infinity;
+}
+
 // Normal stage: pick one wave set at random and fill each slot with a monster of that role
 function spawnWaveFromSet(dailyScale, scaled) {
-    const set = WAVE_SETS[Math.floor(Math.random() * WAVE_SETS.length)];
+    const cap = mapMonsterCap();
+    const set = WAVE_SETS[Math.floor(Math.random() * WAVE_SETS.length)].slice(0, cap);
     const pool = activeMap.enemies;
     const mult = stageMultiplier();
     set.forEach(role => {
@@ -603,7 +619,9 @@ function spawnWaveFromSet(dailyScale, scaled) {
 function addBossSupport(boss) {
     const lineup = [boss];
     const mult = stageMultiplier();
+    const cap = mapMonsterCap();
     ((activeMap && activeMap.bossSupport) || []).forEach(s => {
+        if (s.pos > cap - 1) return;
         lineup[s.pos - 1] = makeUnit(pickUnit(activeMap.enemies, s.role), mult);
     });
     monstersList = lineup.filter(Boolean);
@@ -624,7 +642,8 @@ const MAX_CLASS_LV = 50;
 const VOID_TEST_MULT = 100; // Void Tower is a test mode: 100x EXP, gold, and item chance
 const STATUS_DEFS = {
     freeze: { label: "Freeze", element: 'water' },
-    rock:   { label: "Rock",   element: 'earth' }
+    rock:   { label: "Rock",   element: 'earth' },
+    stun:   { label: "Stun",   element: null }
 };
 // Freeze or rock: the enemy cannot attack or dodge, and takes the status element, for 2 seconds
 function applyEnemyStatus(m, kind) {
@@ -967,7 +986,7 @@ function runCombatTick() {
         if (targetEnemy.hp > 0 && targetEnemy.hp <= targetEnemy.maxHp * 0.5) pDmg = Math.floor(pDmg * (1 + skillBonus('lowHpDmgPct') / 100));
         if (runeN('giantSlayer') > 0 && (targetEnemy.isBoss || targetEnemy.isMiniBoss)) pDmg = Math.floor(pDmg * (1 + runeN('giantSlayer') / 100));
         if (runeN('monsterHunter') > 0 && !targetEnemy.isBoss && !targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + runeN('monsterHunter') / 100));
-        if (runeN('ironFortress') > 0 && player.armor > 0) pDmg = Math.floor(pDmg * 1.5);
+        if (runeN('ironFortress') > 0 && player.armor > 0) pDmg = Math.floor(pDmg * 3);
         if (player.runes.patientReady) { pDmg = pDmg * 4; player.runes.patientReady = false; }
         if (attackCount % 3 === 0 && runeN('divineLight') > 0) {
             const extra = Math.floor(derived.atk * runeN('divineLight') / 100);
@@ -1046,6 +1065,10 @@ function runCombatTick() {
         getAliveMonsters().forEach(m => { m.hp -= blast; });
         logMessage(`[Shockwave] ${blast} damage to all monsters`, 'drop');
     }
+    if (runeN('killStun') > 0 && newlyDead.length > 0) {
+        getAliveMonsters().forEach(m => { if (!m.status) m.status = { kind: 'stun', ms: STATUS_MS }; });
+        logMessage(`[Stun Burst] All enemies are stunned for 2 seconds!`, 'drop');
+    }
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
     updateUI();
 
@@ -1073,7 +1096,7 @@ function runCombatTick() {
             updateUI();
             return;
         }
-        if ((player.resurrectionPotions || 0) > 0 && !player.runes.resurrectionUsed) {
+        if ((player.resurrectionPotions || 0) > 0 && !player.runes.resurrectionUsed && player.resurrectionOn !== false) {
             player.resurrectionPotions--;
             player.runes.resurrectionUsed = true;
             player.hp = derived.maxHp;
