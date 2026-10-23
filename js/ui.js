@@ -1485,7 +1485,7 @@ function petDoll(gear) {
 }
 
 function renderPaperDoll() {
-    const targets = ['paperdoll-character', 'combat-paperdoll'];
+    const targets = ['paperdoll-character'];
     const avatar = player.avatar || '⚔️';
     const avatarHtml = avatar.startsWith('data:image')
         ? `<img src="${avatar}" class="w-full h-full object-cover rounded-full" />`

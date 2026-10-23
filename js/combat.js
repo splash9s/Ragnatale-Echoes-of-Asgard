@@ -8,6 +8,7 @@ let currentStage = 1;
 let maxStages = 11;
 let combatInterval = null;
 let combatPaused = false;
+let runeRefreshLeft = 0;
 let stageSummary = null;
 let lastHitBy = null;
 let monstersList = [];
@@ -160,8 +161,6 @@ function applyRune(id) {
     else player.runes[id] = (player.runes[id] || 0) + def.add;
     if (stageSummary) {
         stageSummary.runes.push(`${def.name}: ${typeof def.text === 'function' ? def.text(def.add) : def.desc}`);
-        const rp = document.getElementById('stage-result');
-        if (rp && !rp.classList.contains('hidden')) renderStageResult('win');
     }
     if (def.onApply) def.onApply();
 }
@@ -190,8 +189,14 @@ function checkRuneSelectionPrompt(onCompleteCallback) {
         if (onCompleteCallback) onCompleteCallback();
         return;
     }
-    const choices = pickWeightedRunes(pool, 3);
+    window.runeCallback = onCompleteCallback;
+    showRuneChoices(true);
+}
 
+// Shows three random runes. Each map allows 2 refreshes of the offer.
+function showRuneChoices(isNew) {
+    const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
+    const choices = pickWeightedRunes(pool, 3);
     let html = `<p class="text-xs text-slate-300 mb-2">Stage ${currentStage} cleared! Select a mystical Rune blessing for this expedition:</p><div class="flex flex-col gap-2">`;
     choices.forEach(id => {
         const r = RUNE_DEFS[id];
@@ -205,9 +210,20 @@ function checkRuneSelectionPrompt(onCompleteCallback) {
                 <span class="text-[10px] text-slate-300">${r.desc}</span>
             </button>`;
     });
-    html += `</div>`;
-    window.runeCallback = onCompleteCallback;
-    showModal("Choose a Rune Blessing", "", html);
+    const canRefresh = runeRefreshLeft > 0;
+    html += `</div><button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mt-3 w-full py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">Refresh Runes (${runeRefreshLeft} left this map)</button>`;
+    if (isNew) {
+        showModal("Choose a Rune Blessing", "", html);
+    } else {
+        const area = document.getElementById('modal-content-area');
+        if (area) area.innerHTML = html;
+    }
+}
+
+function refreshRuneChoices() {
+    if (runeRefreshLeft <= 0) return;
+    runeRefreshLeft--;
+    showRuneChoices(false);
 }
 
 function selectRuneChoice(runeId, callback) {
@@ -303,6 +319,8 @@ function startExpedition(mode, opts = {}) {
 
     switchView('combat');
     player.inCombat = true;
+    stageSummary = newStageSummary(currentStage);
+    runeRefreshLeft = 2;
     combatPaused = false;
     updatePauseButton();
     spawnStageMonsters();
@@ -352,9 +370,6 @@ function makeBoss(t) {
 }
 
 function spawnStageMonsters() {
-    stageSummary = newStageSummary(currentStage);
-    const rp = document.getElementById('stage-result');
-    if (rp) rp.classList.add('hidden');
     isFirstHitOfBattle = true;
     battlePlayerHits = 0;
     battleFirstDamageTaken = false;
@@ -790,7 +805,11 @@ function monsterAct(m, derived, position = 0) {
 
 // ---------- MAIN LOOP ----------
 function runCombatTick() {
-    if (combatPaused) return;
+    if (combatPaused) {
+        if (isVipActive()) return;
+        combatPaused = false;
+        updatePauseButton();
+    }
     const derived = getDerivedStats();
     let alive = getAliveMonsters();
     if (alive.length === 0) {
@@ -963,7 +982,7 @@ function runCombatTick() {
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.hp = derived.maxHp;
-        showModal("Expedition Failed", '', buildStageResultHTML('lose'), () => switchView('town'));
+        showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('town'));
     }
     updateUI();
 }
@@ -982,7 +1001,6 @@ function onStageCleared() {
     stageClearing = true;
     clearInterval(combatInterval);
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
-    renderStageResult('win');
 
     setTimeout(() => {
         const proceedNext = () => {
@@ -994,7 +1012,7 @@ function onStageCleared() {
             if (currentMode === 'event' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
-                showModal("Event Cleared!", `${activeMap.title} cleared!`, '', () => switchView('events'));
+                showModal("Event Cleared!", '', buildMapSummaryHTML('win'), () => switchView('events'));
                 playSound('mvp.wav');
                 updateUI();
                 saveGame();
@@ -1017,7 +1035,7 @@ function onStageCleared() {
                 const reward = generatePoEItem(template, 3, 1);
                 addItemToInventory(reward);
 
-                showModal("Map Cleared!", `Conquered ${activeMap.title}!\n\nReward: ${reward.name}`, '', () => switchView('town'));
+                showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('town'));
                 playSound('mvp.wav');
                 return;
             }
@@ -1073,8 +1091,6 @@ function returnToTown() {
     clearInterval(combatInterval);
     combatPaused = false;
     updatePauseButton();
-    const rp = document.getElementById('stage-result');
-    if (rp) rp.classList.add('hidden');
     if (typeof resetMapRunes === 'function') resetMapRunes();
     const nextBtn = document.getElementById('next-stage-btn');
     if (nextBtn) nextBtn.classList.add('hidden');
@@ -1099,9 +1115,9 @@ function logClassFor(type) {
     return type === 'combat' ? "text-red-400" : (type === 'winlose' ? "text-blue-400 font-bold" : (type === 'drop' ? "text-yellow-400 font-bold" : (type === 'levelup' ? "text-purple-400 font-bold" : "text-slate-300")));
 }
 
-function buildStageResultHTML(kind) {
+function buildMapSummaryHTML(kind) {
     const s = stageSummary || newStageSummary(currentStage);
-    const label = escapeHtml(document.getElementById('node-title')?.innerText || `Stage ${s.stage}`);
+    const label = escapeHtml(kind === 'win' && activeMap ? activeMap.title : (document.getElementById('node-title')?.innerText || `Stage ${s.stage}`));
     const fmt = n => Number(n).toLocaleString();
     const card = (title, value, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-center min-w-0"><div class="text-[10px] text-slate-500 uppercase">${title}</div><div class="text-sm font-bold font-mono truncate ${cls}">${value}</div></div>`;
     const section = (title, count, body) => `<details open class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
@@ -1112,23 +1128,17 @@ function buildStageResultHTML(kind) {
         ? card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300') + card('Items', s.items.length, 'text-amber-300') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300')
         : card('Killed by', escapeHtml(lastHitBy || 'Unknown'), 'text-red-300') + card('Stage Died', label, 'text-slate-200') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300') + card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300');
     const title = kind === 'win'
-        ? `<h3 class="font-bold text-sm text-emerald-300">Stage ${s.stage} Cleared</h3>`
+        ? `<h3 class="font-bold text-sm text-emerald-300">Map Cleared</h3>`
         : `<h3 class="font-bold text-sm text-red-300">Defeated</h3>`;
     const sections = kind === 'win'
         ? section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody) + section('Fight Log', s.log.length, logBody)
         : section('Fight Log', s.log.length, logBody) + section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody);
-    const footer = kind === 'lose' ? '<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Return to Town</button>' : '';
+    const footer = '<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Return to Town</button>';
     return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div>${footer}</div>`;
 }
 
-function renderStageResult(kind) {
-    const el = document.getElementById('stage-result');
-    if (!el) return;
-    el.innerHTML = buildStageResultHTML(kind);
-    el.classList.remove('hidden');
-}
-
 function toggleCombatPause() {
+    if (!isVipActive()) return;
     combatPaused = !combatPaused;
     updatePauseButton();
     logMessage(combatPaused ? '[System] Combat paused' : '[System] Combat resumed', 'winlose');
@@ -1137,6 +1147,7 @@ function toggleCombatPause() {
 function updatePauseButton() {
     const btn = document.getElementById('combat-pause-btn');
     if (!btn) return;
+    btn.classList.toggle('hidden', !isVipActive());
     btn.innerText = combatPaused ? 'Resume' : 'Pause';
     btn.classList.toggle('bg-amber-600', combatPaused);
     btn.classList.toggle('text-slate-950', combatPaused);
