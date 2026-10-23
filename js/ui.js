@@ -1464,54 +1464,7 @@ function renderQuestsView() {
     });
 }
 
-// ---------- PAPER DOLL (shows equipped gear and pet on the character) ----------
-// Positions are percentages of the doll box; z sets which badges sit on top.
-const PAPERDOLL_SLOTS = [
-    { slot: 'garment',   label: 'Garment',    icon: '🧣', x: 50, y: 56, z: 1 },
-    { slot: 'hat',       label: 'Hat',        icon: '🎩', x: 50, y: 6,  z: 3 },
-    { slot: 'midHead',   label: 'Mid Head',   icon: '🧢', x: 80, y: 14, z: 3 },
-    { slot: 'mouth',     label: 'Mouth',      icon: '😷', x: 50, y: 30, z: 3 },
-    { slot: 'armor',     label: 'Armor',      icon: '🦺', x: 50, y: 52, z: 2 },
-    { slot: 'shield',    label: 'Shield',     icon: '🛡️', x: 14, y: 50, z: 2 },
-    { slot: 'weapon',    label: 'Weapon',     icon: '⚔️', x: 86, y: 50, z: 2 },
-    { slot: 'ringLeft',  label: 'L Ring',     icon: '💍', x: 14, y: 68, z: 2 },
-    { slot: 'ringRight', label: 'R Ring',     icon: '💍', x: 86, y: 68, z: 2 },
-    { slot: 'footgear',  label: 'Footgear',   icon: '🥾', x: 50, y: 92, z: 2 },
-    { slot: 'pet',       label: 'Pet',        icon: '🐾', x: 84, y: 90, z: 4 }
-];
-
-function petDoll(gear) {
-    return /slime/i.test(gear.name) ? '🟢' : '🐾';
-}
-
-function renderPaperDoll() {
-    const targets = ['paperdoll-character'];
-    const avatar = player.avatar || '⚔️';
-    const avatarHtml = avatar.startsWith('data:image')
-        ? `<img src="${avatar}" class="w-full h-full object-cover rounded-full" />`
-        : `<span>${avatar}</span>`;
-    const badges = PAPERDOLL_SLOTS.map(d => {
-        const gear = player.equipped ? player.equipped[d.slot] : null;
-        const has = !!(gear && gear.name);
-        const rInfo = has && gear.rarity ? RARITY_INFO[gear.rarity] : null;
-        const color = rInfo ? rInfo.text : 'text-slate-300';
-        const icon = has && d.slot === 'pet' ? petDoll(gear) : d.icon;
-        const title = has ? `${d.label}: ${escapeHtml(gear.name)}` : `${d.label}: Empty`;
-        const cls = has ? `${color} border-current bg-slate-950 shadow-lg` : 'border-dashed border-slate-700 bg-slate-950/60 opacity-40';
-        return `<div title="${title}" class="absolute w-9 h-9 rounded-lg border-2 flex items-center justify-center text-base ${cls}" style="left:${d.x}%;top:${d.y}%;transform:translate(-50%,-50%);z-index:${d.z}">${icon}</div>`;
-    }).join('');
-    const html = `<div class="relative mx-auto w-56 h-72">
-        <div class="absolute rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-3xl overflow-hidden" style="left:50%;top:36%;width:4.5rem;height:4.5rem;transform:translate(-50%,-50%);z-index:0">${avatarHtml}</div>
-        ${badges}
-    </div>`;
-    targets.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = html;
-    });
-}
-
 function updateUI() {
-    renderPaperDoll();
     let derived = getDerivedStats();
     player.hp = Math.min(player.hp, derived.maxHp);
 
@@ -1713,7 +1666,7 @@ function updateUI() {
                 grouped[r.id].count++;
             });
             el.innerHTML = Object.values(grouped).map(r =>
-                `<div class="text-purple-300">✦ ${r.name}${r.count > 1 ? ' <span class="text-amber-300 font-bold">x' + r.count + '</span>' : ''} <span class="text-slate-400">— ${RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].text(runeN(r.id)) : r.desc}</span></div>`
+                `<div class="${runeRarityClass(r.id)}">✦ ${r.name}${r.count > 1 ? ' <span class="text-amber-300 font-bold">x' + r.count + '</span>' : ''} <span class="text-slate-400">— ${RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].text(runeN(r.id)) : r.desc}</span></div>`
             ).join('');
         }
     }
@@ -1865,6 +1818,12 @@ function renderLibraryView() {
 }
 
 // ---------- LIBRARY: RULES, ELEMENTS, DROPS, CHESTS ----------
+// Rune name color follows the rune's rarity
+function runeRarityClass(id) {
+    const d = RUNE_DEFS[id];
+    return d ? (RARITY_INFO[d.rarity] || RARITY_INFO[1]).text : 'text-purple-300';
+}
+
 function renderLibraryRules() {
     const el = document.getElementById('library-rules');
     if (!el || typeof ELEMENTS === 'undefined') return;
@@ -1873,7 +1832,19 @@ function renderLibraryRules() {
         const b = ELEMENTS[e.beats];
         return `<li><span class="${e.color}">${e.icon} ${e.name}</span> beats <span class="${b.color}">${b.icon} ${b.name}</span> (x${ELEMENT_ADVANTAGE} damage). Hitting it with ${b.name} deals x${ELEMENT_DISADVANTAGE}.</li>`;
     }).join('');
+    const rarityRows = [1, 2, 3, 4, 5].map(r => {
+        const info = RARITY_INFO[r];
+        const w = BUFF_COUNT_WEIGHTS[r];
+        const total = w.reduce((a, b) => a + b, 0);
+        const chances = w.map((x, n) => `${n}: ${Math.round(x / total * 100)}%`).join(' · ');
+        return `<li><span class="${info.text} font-bold">${info.name}</span> (Rarity ${r}): ${chances}</li>`;
+    }).join('');
     el.innerHTML = `
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <h3 class="font-bold text-xs text-amber-400 mb-2">Gear Rarity</h3>
+            <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">${rarityRows}</ul>
+            <p class="text-[10px] text-slate-500 mt-2">Chance of each number of bonus stats (0 to 4) an item rolls. Debuffs (element resistance penalties, 0 to 2) are rolled separately and are not counted here.</p>
+        </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Element System</h3>
             <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">${elementRows}</ul>

@@ -1126,7 +1126,7 @@ function buildMapSummaryHTML(kind) {
     const logBody = s.log.length ? `<div class="max-h-48 overflow-y-auto font-mono text-[10px] flex flex-col gap-0.5">${s.log.map(l => `<div class="${logClassFor(l.type)}">${l.msg}</div>`).join('')}</div>` : '<div class="text-slate-500">No log</div>';
     const statCards = (kind === 'win')
         ? card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300') + card('Items', s.items.length, 'text-amber-300') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300')
-        : card('Killed by', escapeHtml(lastHitBy || 'Unknown'), 'text-red-300') + card('Stage Died', label, 'text-slate-200') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300') + card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300');
+        : card('Killed by', escapeHtml(lastHitBy || 'Unknown'), 'text-red-300') + card('Stage Died', `Stage ${currentStage}${currentMode !== 'endless' && maxStages < 999 ? ' / ' + maxStages : ''}`, 'text-slate-200') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300') + card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300');
     const title = kind === 'win'
         ? `<h3 class="font-bold text-sm text-emerald-300">Map Cleared</h3>`
         : `<h3 class="font-bold text-sm text-red-300">Defeated</h3>`;
