@@ -55,7 +55,7 @@ const GAME_DATA = {
             miniBoss: makeMiniBoss(MONSTERS_DATA.farbo)
         },
         map10: {
-            title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, dropKey: 'map10',
+            title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, stageGrowth: 0.08, dropKey: 'map10',
             enemies: [MONSTERS_DATA.caveBat, MONSTERS_DATA.rockGolem, MONSTERS_DATA.sniperKobold],
             boss: MONSTERS_DATA.bossCavernBehemoth,
             miniBoss: makeMiniBoss(MONSTERS_DATA.rockGolem)
