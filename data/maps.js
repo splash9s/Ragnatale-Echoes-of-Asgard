@@ -82,7 +82,7 @@ const GAME_DATA = {
         },
         map50: {
             title: "Map Lv. 50", levelReq: 50, campaignStages: 21, miniStage: 7, dropKey: 'map50',
-            enemies: [MONSTERS_DATA.worldEnderMinion, MONSTERS_DATA.astralHorror, MONSTERS_DATA.voidSniper, MONSTERS_DATA.starlightMender],
+            enemies: [MONSTERS_DATA.astralHorror, MONSTERS_DATA.voidSniper, MONSTERS_DATA.starlightMender],
             boss: MONSTERS_DATA.voidColossus,
             miniBoss: makeMiniBoss(MONSTERS_DATA.astralHorror),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }]
@@ -128,9 +128,13 @@ const GAME_DATA = {
             enemies: [MONSTERS_DATA.duskWolf, MONSTERS_DATA.duskWarrior, MONSTERS_DATA.brokenThrall, MONSTERS_DATA.duskTitan,
                       MONSTERS_DATA.duskArcher, MONSTERS_DATA.duskGunner, MONSTERS_DATA.duskPriest,
                       MONSTERS_DATA.duskFlameMage, MONSTERS_DATA.duskStoneMage, MONSTERS_DATA.duskFrostMage, MONSTERS_DATA.duskStormMage],
-            boss: MONSTERS_DATA.bossWorldEater,
+            boss: MONSTERS_DATA.brynhildValkyrieQueen,
             miniBoss: makeMiniBoss(MONSTERS_DATA.brokenEinherjar),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }, { pos: 4, role: 'healer' }]
+        },
+        finalMap: {
+            title: "Final Map Lv. 110", levelReq: 110, campaignStages: 25, miniStage: 0, dropKey: 'map99', finalMap: true, stageGrowth: 0,
+            enemies: [], boss: MONSTERS_DATA.bossWorldEater, miniBoss: null, bossSupport: []
         }
     },
     paths: {}

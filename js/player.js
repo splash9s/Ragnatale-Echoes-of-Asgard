@@ -56,34 +56,34 @@ let player = {
 };
 
 
-// ---------- SKILLS: 4 passive builds (Gold, EXP, Attack, Defense), 6 skills each, 5 levels per skill ----------
+// ---------- SKILLS: 4 passive builds (Freyr Gold, Odin EXP, Thor Attack, Tyr Defense), 6 skills each, 5 levels per skill ----------
 // Each skill unlocks when the one before it reaches reqLv (1, 3, or 5).
 function defaultSkills() {
     return {
-        coinSense: { name: "Coin Sense", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
-        treasureEye: { name: "Treasure Eye", build: "gold", desc: "Gold from boss and mini boss +1% per level.", effect: "bossGoldPct", perLv: 1, maxLv: 5, level: 0, req: "coinSense", reqLv: 1 },
-        luckyFind: { name: "Lucky Find", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: "treasureEye", reqLv: 3 },
-        hoarder: { name: "Hoarder", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: "luckyFind", reqLv: 1 },
-        scrapper: { name: "Scrapper", build: "gold", desc: "Sell price +5% per level.", effect: "sellPct", perLv: 5, maxLv: 5, level: 0, req: "hoarder", reqLv: 5 },
-        midasTouch: { name: "Midas Touch", build: "gold", desc: "Gold from all kills +2% per level.", effect: "goldPct", perLv: 2, maxLv: 5, level: 0, req: "scrapper", reqLv: 3 },
-        studious: { name: "Studious", build: "exp", desc: "Base EXP +1% per level.", effect: "baseExpPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
-        disciple: { name: "Disciple", build: "exp", desc: "Class EXP +1% per level.", effect: "classExpPct", perLv: 1, maxLv: 5, level: 0, req: "studious", reqLv: 3 },
-        bossScholar: { name: "Boss Scholar", build: "exp", desc: "Boss and mini boss EXP +2% per level.", effect: "bossExpPct", perLv: 2, maxLv: 5, level: 0, req: "disciple", reqLv: 1 },
-        focus: { name: "Focus", build: "exp", desc: "Base EXP +2% per level.", effect: "baseExpPct", perLv: 2, maxLv: 5, level: 0, req: "bossScholar", reqLv: 5 },
-        quickStudy: { name: "Quick Study", build: "exp", desc: "Class EXP +2% per level.", effect: "classExpPct", perLv: 2, maxLv: 5, level: 0, req: "focus", reqLv: 3 },
-        ascension: { name: "Ascension", build: "exp", desc: "Base and Class EXP +2% per level.", effect: "allExpPct", perLv: 2, maxLv: 5, level: 0, req: "quickStudy", reqLv: 1 },
-        sharpEdge: { name: "Sharp Edge", build: "attack", desc: "ATK +1% per level.", effect: "atkPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
-        precision: { name: "Precision", build: "attack", desc: "CRIT rate +2 per level.", effect: "critPct", perLv: 2, maxLv: 5, level: 0, req: "sharpEdge", reqLv: 1 },
-        crushingBlow: { name: "Crushing Blow", build: "attack", desc: "Critical damage +2% per level.", effect: "critDmgPct", perLv: 2, maxLv: 5, level: 0, req: "precision", reqLv: 5 },
-        slayerEye: { name: "Slayer Eye", build: "attack", desc: "Damage to boss and mini boss +2% per level.", effect: "bossDmgPct", perLv: 2, maxLv: 5, level: 0, req: "crushingBlow", reqLv: 3 },
-        swiftHands: { name: "Swift Hands", build: "attack", desc: "ASPD +2 per level.", effect: "aspd", perLv: 2, maxLv: 5, level: 0, req: "slayerEye", reqLv: 1 },
-        executioner: { name: "Executioner", build: "attack", desc: "Damage to enemies below 50% HP +2% per level.", effect: "lowHpDmgPct", perLv: 2, maxLv: 5, level: 0, req: "swiftHands", reqLv: 3 },
-        ironSkin: { name: "Iron Skin", build: "defense", desc: "Max HP +1% per level.", effect: "hpPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
-        hardened: { name: "Hardened", build: "defense", desc: "DEF +1% per level.", effect: "defPct", perLv: 1, maxLv: 5, level: 0, req: "ironSkin", reqLv: 3 },
-        evasion: { name: "Evasion", build: "defense", desc: "FLEE +1 per level.", effect: "fleePct", perLv: 1, maxLv: 5, level: 0, req: "hardened", reqLv: 1 },
-        secondWind: { name: "Second Wind", build: "defense", desc: "Max armor +1% per level.", effect: "armorPct", perLv: 1, maxLv: 5, level: 0, req: "evasion", reqLv: 3 },
-        thickHide: { name: "Thick Hide", build: "defense", desc: "Max HP +2% per level.", effect: "hpPct", perLv: 2, maxLv: 5, level: 0, req: "secondWind", reqLv: 5 },
-        fortress: { name: "Fortress", build: "defense", desc: "Damage taken -2% per level.", effect: "dmgReducePct", perLv: 2, maxLv: 5, level: 0, req: "thickHide", reqLv: 1 },
+        coinSense: { name: "Freyr's Gold", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        treasureEye: { name: "Golden Boar Sight", build: "gold", desc: "Gold from boss and mini boss +1% per level.", effect: "bossGoldPct", perLv: 1, maxLv: 5, level: 0, req: "coinSense", reqLv: 1 },
+        luckyFind: { name: "Bounty of the Vanir", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: "treasureEye", reqLv: 3 },
+        hoarder: { name: "Fafnir's Hoard", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: "luckyFind", reqLv: 1 },
+        scrapper: { name: "Forge of Sindri", build: "gold", desc: "Sell price +5% per level.", effect: "sellPct", perLv: 5, maxLv: 5, level: 0, req: "hoarder", reqLv: 5 },
+        midasTouch: { name: "Brisingamen's Touch", build: "gold", desc: "Gold from all kills +2% per level.", effect: "goldPct", perLv: 2, maxLv: 5, level: 0, req: "scrapper", reqLv: 3 },
+        studious: { name: "Ravens' Wisdom", build: "exp", desc: "Base EXP +1% per level.", effect: "baseExpPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        disciple: { name: "Mimir's Disciple", build: "exp", desc: "Class EXP +1% per level.", effect: "classExpPct", perLv: 1, maxLv: 5, level: 0, req: "studious", reqLv: 3 },
+        bossScholar: { name: "Mimir's Lesson", build: "exp", desc: "Boss and mini boss EXP +2% per level.", effect: "bossExpPct", perLv: 2, maxLv: 5, level: 0, req: "disciple", reqLv: 1 },
+        focus: { name: "All-Seeing Eye", build: "exp", desc: "Base EXP +2% per level.", effect: "baseExpPct", perLv: 2, maxLv: 5, level: 0, req: "bossScholar", reqLv: 5 },
+        quickStudy: { name: "Runic Insight", build: "exp", desc: "Class EXP +2% per level.", effect: "classExpPct", perLv: 2, maxLv: 5, level: 0, req: "focus", reqLv: 3 },
+        ascension: { name: "Ascent to Valhalla", build: "exp", desc: "Base and Class EXP +2% per level.", effect: "allExpPct", perLv: 2, maxLv: 5, level: 0, req: "quickStudy", reqLv: 1 },
+        sharpEdge: { name: "Mjolnir's Edge", build: "attack", desc: "ATK +1% per level.", effect: "atkPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        precision: { name: "Thunder Aim", build: "attack", desc: "CRIT rate +2 per level.", effect: "critPct", perLv: 2, maxLv: 5, level: 0, req: "sharpEdge", reqLv: 1 },
+        crushingBlow: { name: "Hammer Blow", build: "attack", desc: "Critical damage +2% per level.", effect: "critDmgPct", perLv: 2, maxLv: 5, level: 0, req: "precision", reqLv: 5 },
+        slayerEye: { name: "Giant's Bane", build: "attack", desc: "Damage to boss and mini boss +2% per level.", effect: "bossDmgPct", perLv: 2, maxLv: 5, level: 0, req: "crushingBlow", reqLv: 3 },
+        swiftHands: { name: "Storm Gauntlets", build: "attack", desc: "ASPD +2 per level.", effect: "aspd", perLv: 2, maxLv: 5, level: 0, req: "slayerEye", reqLv: 1 },
+        executioner: { name: "Ragnarok Strike", build: "attack", desc: "Damage to enemies below 50% HP +2% per level.", effect: "lowHpDmgPct", perLv: 2, maxLv: 5, level: 0, req: "swiftHands", reqLv: 3 },
+        ironSkin: { name: "Shieldwall", build: "defense", desc: "Max HP +1% per level.", effect: "hpPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        hardened: { name: "Tyr's Resolve", build: "defense", desc: "DEF +1% per level.", effect: "defPct", perLv: 1, maxLv: 5, level: 0, req: "ironSkin", reqLv: 3 },
+        evasion: { name: "Valkyrie's Swiftness", build: "defense", desc: "FLEE +1 per level.", effect: "fleePct", perLv: 1, maxLv: 5, level: 0, req: "hardened", reqLv: 1 },
+        secondWind: { name: "Breath of Ymir", build: "defense", desc: "Max armor +1% per level.", effect: "armorPct", perLv: 1, maxLv: 5, level: 0, req: "evasion", reqLv: 3 },
+        thickHide: { name: "Fenrir's Hide", build: "defense", desc: "Max HP +2% per level.", effect: "hpPct", perLv: 2, maxLv: 5, level: 0, req: "secondWind", reqLv: 5 },
+        fortress: { name: "Asgard's Bulwark", build: "defense", desc: "Damage taken -2% per level.", effect: "dmgReducePct", perLv: 2, maxLv: 5, level: 0, req: "thickHide", reqLv: 1 },
     };
 }
 

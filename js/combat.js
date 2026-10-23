@@ -9,6 +9,7 @@ let maxStages = 11;
 let combatInterval = null;
 let combatPaused = false;
 let runeRefreshLeft = 0;
+const RUNE_REFRESH_MAX = 3;
 let stageSummary = null;
 let lastHitBy = null;
 let monstersList = [];
@@ -193,10 +194,19 @@ function checkRuneSelectionPrompt(onCompleteCallback) {
     showRuneChoices(true);
 }
 
-// Shows three random runes. Each map allows 2 refreshes of the offer.
+// Shows three random runes. Each map allows 3 refreshes of the offer.
+// Each offered rune is one tier higher than the rolled one, when a rune of that tier is available
+function upgradeRuneChoice(id, pool, taken) {
+    const r = RUNE_DEFS[id].rarity;
+    if (r >= 5) return id;
+    const cands = pool.filter(x => RUNE_DEFS[x].rarity === r + 1 && !taken.includes(x));
+    if (cands.length === 0) return id;
+    return cands[Math.floor(Math.random() * cands.length)];
+}
+
 function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
-    const choices = pickWeightedRunes(pool, 3);
+    const choices = pickWeightedRunes(pool, 3).reduce((acc, id) => { acc.push(upgradeRuneChoice(id, pool, acc)); return acc; }, []);
     let html = `<p class="text-xs text-slate-300 mb-2">Stage ${currentStage} cleared! Select a mystical Rune blessing for this expedition:</p><div class="flex flex-col gap-2">`;
     choices.forEach(id => {
         const r = RUNE_DEFS[id];
@@ -211,7 +221,7 @@ function showRuneChoices(isNew) {
             </button>`;
     });
     const canRefresh = runeRefreshLeft > 0;
-    html += `</div><button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mt-3 w-full py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">Refresh Runes (${runeRefreshLeft} left this map)</button>`;
+    html += `</div><button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mt-3 w-full py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button>`;
     if (isNew) {
         showModal("Choose a Rune Blessing", "", html);
     } else {
@@ -242,7 +252,11 @@ function selectRuneChoice(runeId, callback) {
 
 // ---------- EXPEDITION SETUP ----------
 function startExpedition(mode, opts = {}) {
-    if (mode === 'campaign') {
+    if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
+        showModal("World-Eater", "Locked.");
+        return;
+    }
+    if (mode === 'campaign' && !opts.final) {
         const selectEl = document.getElementById('campaign-map-select');
         const mapKey = selectEl ? selectEl.value : 'fire:map1';
         const [cpk, cmk] = mapKey.split(':');
@@ -278,7 +292,15 @@ function startExpedition(mode, opts = {}) {
     const tagEl = document.getElementById('node-mode-tag');
     const titleEl = document.getElementById('node-title');
 
-    if (mode === 'campaign') {
+    if (mode === 'campaign' && opts.final) {
+        currentPath = 'final';
+        activeMap = GAME_DATA.maps.finalMap;
+        currentStage = 1;
+        maxStages = activeMap.campaignStages;
+        if (tagEl) tagEl.innerText = "Final Map";
+        if (titleEl) titleEl.innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages}`;
+        logMessage(`[Expedition] Entering ${activeMap.title}. The World-Eater awaits.`, 'winlose');
+    } else if (mode === 'campaign') {
         const [cpk2, cmk2] = document.getElementById('campaign-map-select').value.split(':');
         currentPath = cpk2;
         activeMap = GAME_DATA.paths[cpk2].maps[cmk2];
@@ -320,7 +342,7 @@ function startExpedition(mode, opts = {}) {
     switchView('combat');
     player.inCombat = true;
     stageSummary = newStageSummary(currentStage);
-    runeRefreshLeft = 2;
+    runeRefreshLeft = RUNE_REFRESH_MAX;
     combatPaused = false;
     updatePauseButton();
     spawnStageMonsters();
@@ -340,7 +362,86 @@ function isRuneStage(stage) {
     return CAMPAIGN_RUNE_STAGES.includes(stage) || (stage > 30 && stage % 5 === 0);
 }
 
+// True when clearing this stage opens a rune pick in the current mode
+function isRuneDueAfter(stage) {
+    if (currentMode === 'daily') return stage % 5 === 0;
+    if (currentMode === 'endless') return stage % 4 === 0;
+    return (currentMode === 'campaign' || currentMode === 'event') && isRuneStage(stage);
+}
+
+// Progress toward the next rune pick. Computed from the current stage, so it resets every map.
+function runeProgressInfo() {
+    let next = null;
+    for (let s = currentStage; s < maxStages && s <= currentStage + 500; s++) {
+        if (isRuneDueAfter(s)) { next = s; break; }
+    }
+    if (next === null) return null;
+    let prev = 0;
+    for (let s = currentStage - 1; s >= 1; s--) {
+        if (isRuneDueAfter(s)) { prev = s; break; }
+    }
+    const gap = next - prev;
+    const remaining = next - currentStage + 1;
+    return { remaining, pct: Math.max(0, Math.min(100, Math.round((1 - remaining / gap) * 100))) };
+}
+
+// ---------- FINAL MAP (Lv 110) ----------
+// Unlocked after Map Lv. 99 is cleared on all four paths. 25 stages: odd stages are monsters, even stages are bosses, stage 25 is the final boss.
+const FINAL_PATH_KEYS = ['fire', 'water', 'earth', 'wind'];
+const FINAL_BOSS_MULT = 1.2;
+const FINAL_STAGE_LEVELS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 100];
+const FINAL_LEVEL_MAPS = { 1: 'map1', 10: 'map10', 20: 'map20', 30: 'map30', 40: 'map40', 50: 'map50', 60: 'map60', 70: 'map70', 80: 'map80', 90: 'map90', 100: 'map99' };
+
+function isFinalMapUnlocked() {
+    return FINAL_PATH_KEYS.every(pk => !!(player.clearedMaps && player.clearedMaps[`${pk}:map99`]));
+}
+
+function finalStageLevel(stage) {
+    const idx = Math.min(Math.floor((stage - 1) / 2), FINAL_STAGE_LEVELS.length - 1);
+    return FINAL_STAGE_LEVELS[idx];
+}
+
+function finalMonsterPool(level) {
+    const m = GAME_DATA.maps[FINAL_LEVEL_MAPS[level]];
+    return level === 100 ? [...m.enemies, MONSTERS_DATA.worldEnderMinion] : m.enemies;
+}
+
+// Monster strength across the 25 final stages: grows by 4% per stage (stage 25 = x1.96)
+function finalStageMult(stage) {
+    return 1 + (stage - 1) * 0.04;
+}
+
+function spawnFinalStage() {
+    const mult = finalStageMult(currentStage);
+    if (currentStage === maxStages) {
+        const boss = makeBoss(MONSTERS_DATA.bossWorldEater);
+        const up = v => Math.floor(v * FINAL_BOSS_MULT);
+        const finalBoss = { ...boss, hp: up(boss.hp), maxHp: up(boss.maxHp), atkMin: up(boss.atkMin), atkMax: up(boss.atkMax), isFinalBoss: true };
+        const escorts = [
+            makeUnit(MONSTERS_DATA.starlightMender, mult),
+            makeUnit(MONSTERS_DATA.voidSniper, mult),
+            { ...makeUnit(MONSTERS_DATA.duskFrostMage, mult), element: 'water' },
+            { ...makeUnit(MONSTERS_DATA.duskStoneMage, mult), element: 'earth' }
+        ];
+        monstersList = [finalBoss, ...escorts];
+        logMessage(`[Final Boss] ${finalBoss.name} appears with its escort!`, 'winlose');
+        return;
+    }
+    const level = finalStageLevel(currentStage);
+    if (currentStage % 2 === 0) {
+        const boss = makeBoss(GAME_DATA.maps[FINAL_LEVEL_MAPS[level]].boss);
+        monstersList = [boss];
+        logMessage(`[Boss] ${boss.name} (Lv ${level}) appears!`, 'winlose');
+        return;
+    }
+    const pool = finalMonsterPool(level);
+    const count = Math.floor(Math.random() * 5) + 2;
+    monstersList = [];
+    for (let i = 0; i < count; i++) monstersList.push(makeUnit(pool[Math.floor(Math.random() * pool.length)], mult));
+}
+
 function isBossStage() {
+    if (activeMap && activeMap.finalMap) return currentStage % 2 === 0 || currentStage === maxStages;
     if (currentMode === 'campaign' || currentMode === 'event') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
     if (currentMode === 'daily') return DAILY_BOSS_STAGES.includes(currentStage);
     return false;
@@ -390,7 +491,9 @@ function spawnStageMonsters() {
         flee: Math.floor(m.flee * dailyScale)
     });
 
-    if (isMiniBossStage()) {
+    if (activeMap && activeMap.finalMap) {
+        spawnFinalStage();
+    } else if (isMiniBossStage()) {
         const mini = { ...activeMap.miniBoss, rewarded: false, ailments: {}, isMiniBoss: true };
         monstersList.push(mini);
         logMessage(`[Mini Boss] ${mini.name} appears!`, 'winlose');
@@ -591,6 +694,7 @@ function awardKill(m) {
     if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
+    if (m.isFinalBoss) { player.diamonds += 100; logMessage(`[Final Boss] Defeated! Reward: 100 Diamond`, 'drop'); }
     player.baseExp += baseExpGain;
     player.jobExp += jobExpGain;
 
@@ -631,7 +735,7 @@ function awardKill(m) {
         logMessage(`[Mini Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(droppedItem);
     }
-    if (m.isBoss && pool.length > 0) {
+    for (let bd = 0; bd < (m.isFinalBoss ? 2 : 1); bd++) if (m.isBoss && pool.length > 0) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
         logMessage(`[Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
@@ -1062,10 +1166,7 @@ function onStageCleared() {
             spawnStageMonsters();
         };
 
-        const runeDue = currentMode === 'daily' ? currentStage % 5 === 0
-            : currentMode === 'endless' ? currentStage % 4 === 0
-            : (currentMode === 'campaign' || currentMode === 'event') && isRuneStage(currentStage);
-        if (runeDue && currentStage < maxStages) {
+        if (isRuneDueAfter(currentStage) && currentStage < maxStages) {
             checkRuneSelectionPrompt(proceedNext);
         } else {
             window.pendingStageProceed = proceedNext;

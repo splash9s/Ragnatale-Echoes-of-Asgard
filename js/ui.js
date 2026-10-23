@@ -1159,10 +1159,10 @@ function pendingStatTotal() { return Object.values(pendingAlloc.stats).reduce((a
 function pendingSkillTotal() { return Object.values(pendingAlloc.skills).reduce((a, b) => a + b, 0); }
 
 const SKILL_BUILDS = [
-    { key: 'gold', name: 'Gold Build', color: 'text-amber-300', border: 'border-amber-500/40', desc: 'Coins, loot and selling' },
-    { key: 'exp', name: 'EXP Build', color: 'text-sky-300', border: 'border-sky-500/40', desc: 'Faster Base and Class levels' },
-    { key: 'attack', name: 'Attack Build', color: 'text-rose-300', border: 'border-rose-500/40', desc: 'Damage and critical hits' },
-    { key: 'defense', name: 'Defense Build', color: 'text-emerald-300', border: 'border-emerald-500/40', desc: 'Survive longer' }
+    { key: 'gold', name: 'Freyr (Gold Build)', color: 'text-amber-300', border: 'border-amber-500/40', desc: 'Coins, loot and selling' },
+    { key: 'exp', name: 'Odin (EXP Build)', color: 'text-sky-300', border: 'border-sky-500/40', desc: 'Faster Base and Class levels' },
+    { key: 'attack', name: 'Thor (Attack Build)', color: 'text-rose-300', border: 'border-rose-500/40', desc: 'Damage and critical hits' },
+    { key: 'defense', name: 'Tyr (Defense Build)', color: 'text-emerald-300', border: 'border-emerald-500/40', desc: 'Survive longer' }
 ];
 const SKILL_BUILD_MAX_SP = 30;
 
@@ -1464,7 +1464,64 @@ function renderQuestsView() {
     });
 }
 
+// ---------- INVENTORY FILTER + ELEMENT STATS ----------
+const INVENTORY_FILTERS = [
+    { key: 'all', label: 'All' }, { key: 'weapon', label: 'Weapon' }, { key: 'shield', label: 'Shield' },
+    { key: 'hat', label: 'Hat' }, { key: 'midHead', label: 'Mid Head' }, { key: 'mouth', label: 'Mouth' },
+    { key: 'armor', label: 'Armor' }, { key: 'garment', label: 'Garment' }, { key: 'footgear', label: 'Boots' },
+    { key: 'ring', label: 'Ring' }, { key: 'pet', label: 'Pet' }, { key: 'potion', label: 'Potion' }
+];
+let inventoryFilter = 'all';
+
+function itemMatchesFilter(item) {
+    if (inventoryFilter === 'all') return true;
+    if (!item) return false;
+    if (inventoryFilter === 'potion') return item.type === 'potion';
+    return item.slot === inventoryFilter;
+}
+
+function setInventoryFilter(key) {
+    inventoryFilter = key;
+    updateUI();
+}
+
+function renderInventoryFilters() {
+    const el = document.getElementById('inventory-filter');
+    if (!el) return;
+    el.innerHTML = INVENTORY_FILTERS.map(f => {
+        const active = f.key === inventoryFilter;
+        return `<button onclick="setInventoryFilter('${f.key}')" class="px-2 py-1 text-[10px] font-bold rounded border transition cursor-pointer ${active ? 'bg-amber-600 border-amber-500 text-slate-950' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}">${f.label}</button>`;
+    }).join('');
+}
+
+// Element resistance: positive = takes less damage from that element, negative = weakness
+function elementResText(v) {
+    const val = Math.round(v || 0);
+    const cls = val > 0 ? 'text-emerald-300' : (val < 0 ? 'text-red-300' : 'text-slate-400');
+    return { text: `${val > 0 ? '+' : ''}${val}%`, cls };
+}
+
+function renderElementStats() {
+    const derived = getDerivedStats();
+    const res = derived.elemRes || {};
+    ELEMENT_KEYS.forEach(k => {
+        const r = elementResText(res[k]);
+        const combatEl = document.getElementById(`combat-res-${k}`);
+        if (combatEl) { combatEl.innerText = r.text; combatEl.className = `font-bold ${r.cls}`; }
+    });
+    const el = document.getElementById('char-element-stats');
+    if (!el) return;
+    el.innerHTML = `<h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Element Resistance</h4>` +
+        ELEMENT_KEYS.map(k => {
+            const e = ELEMENTS[k];
+            const r = elementResText(res[k]);
+            return `<div class="flex justify-between items-center px-2 py-1.5 bg-slate-950/80 rounded-lg border border-slate-800 text-xs"><span class="${e.color}">${e.icon} ${e.name}</span><strong class="font-mono ${r.cls}">${r.text}</strong></div>`;
+        }).join('');
+}
+
 function updateUI() {
+    renderInventoryFilters();
+    renderElementStats();
     let derived = getDerivedStats();
     player.hp = Math.min(player.hp, derived.maxHp);
 
@@ -1538,6 +1595,7 @@ function updateUI() {
         let filledSlots = 0;
         player.inventory.forEach((item, index) => {
             if (item) filledSlots++;
+            if (!itemMatchesFilter(item)) return;
             let itemName = item ? item.name : '';
             let refText = item && item.refineLevel > 0 ? ` +${item.refineLevel}` : '';
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
@@ -1631,6 +1689,19 @@ function updateUI() {
     if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
     el = document.getElementById('player-armor-bar');
     if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
+
+    // Rune progress: stages left until the next rune pick (combat only)
+    const runeWrap = document.getElementById('combat-rune-progress');
+    if (runeWrap) {
+        const info = (document.getElementById('view-combat') && !document.getElementById('view-combat').classList.contains('hidden') && currentStage >= 1) ? runeProgressInfo() : null;
+        runeWrap.style.display = info ? '' : 'none';
+        if (info) {
+            const t = document.getElementById('combat-rune-progress-text');
+            if (t) t.innerText = info.remaining === 1 ? 'Rune after this stage' : `Rune in ${info.remaining} stages`;
+            const b = document.getElementById('combat-rune-progress-bar');
+            if (b) b.style.width = `${info.pct}%`;
+        }
+    }
 
     // Character page bars
     el = document.getElementById('char-hp-text');

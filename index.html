@@ -169,6 +169,7 @@
                         <option value="map10">Ashmere Forest (Lv. 10)</option>
                         <option value="map20">Runeholt Academy (Lv. 20)</option>
                     </select>
+                    <button onclick="startExpedition('campaign', {final: true})" class="py-3 bg-rose-600 hover:bg-rose-500 text-slate-100 font-bold rounded-xl text-xs transition cursor-pointer shadow">World-Eater</button>
                     <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
@@ -301,6 +302,7 @@
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Equipped Gear</h3>
                         <div id="equipment-slots-container" class="grid grid-cols-2 gap-3 items-start"></div>
                         <div id="set-bonus-panel" class="flex flex-col gap-2"></div>
+                        <div id="char-element-stats" class="flex flex-col gap-2"></div>
                     </div>
                 </div>
                 <div class="flex flex-col gap-4">
@@ -377,6 +379,7 @@
                         <button onclick="salvageAllEquipment()" class="px-2 py-1 bg-red-600/60 hover:bg-red-600 text-red-100 text-[10px] font-bold rounded cursor-pointer transition">Salvage All</button>
                         <button onclick="sellAllEquipment()" class="px-2 py-1 bg-amber-700 hover:bg-amber-600 text-amber-100 text-[10px] font-bold rounded cursor-pointer transition">Sell All</button>
                     </div>
+                    <div id="inventory-filter" class="flex flex-wrap gap-1"></div>
                     <div id="inventory-grid" class="grid grid-cols-5 gap-2"></div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
@@ -479,6 +482,10 @@
                     </div>
                     <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Armor</span><span id="player-armor-text">0 / 0</span></div>
                     <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="player-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 100%"></div></div>
+                    <div id="combat-rune-progress" class="flex flex-col gap-1" style="display:none">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Next Rune</span><span id="combat-rune-progress-text">-</span></div>
+                        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="combat-rune-progress-bar" class="bg-violet-400 h-full transition-all duration-200" style="width: 0%"></div></div>
+                    </div>
                     <div id="combat-player-body" class="flex flex-col gap-4">
                     <button onclick="manualDrinkPotion()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 font-bold rounded-xl text-xs transition cursor-pointer flex justify-between px-3 items-center">
                         <span>Drink Potion</span>
@@ -499,6 +506,10 @@
                         <div class="flex justify-between px-1"><span class="text-slate-400">FLEE</span><strong id="combat-derived-flee" class="text-slate-100">0</strong></div>
                         <div class="flex justify-between px-1"><span class="text-slate-400">CRIT</span><strong id="combat-derived-crit" class="text-slate-100">0%</strong></div>
                         <div class="flex justify-between px-1"><span class="text-slate-400">ASPD</span><strong id="combat-derived-aspd" class="text-slate-100">0</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">FIRE</span><strong id="combat-res-fire" class="text-slate-100">0%</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">WATER</span><strong id="combat-res-water" class="text-slate-100">0%</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">EARTH</span><strong id="combat-res-earth" class="text-slate-100">0%</strong></div>
+                        <div class="flex justify-between px-1"><span class="text-slate-400">WIND</span><strong id="combat-res-wind" class="text-slate-100">0%</strong></div>
                     </div>
                     </div>
                 </div>
