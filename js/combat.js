@@ -7,6 +7,9 @@ let activeMap = null;
 let currentStage = 1;
 let maxStages = 11;
 let combatInterval = null;
+let combatPaused = false;
+let stageSummary = null;
+let lastHitBy = null;
 let monstersList = [];
 let isFirstHitOfBattle = true;
 let battlePlayerHits = 0;
@@ -77,6 +80,7 @@ const RUNE_RARITY_WEIGHT = { 1: 33, 2: 27, 3: 20, 4: 13, 5: 7 };
 const RUNE_DEFS = {
     critBonus: { name: "Berserk Rune", rarity: 1, add: 10, desc: "+10% Critical Rate", text: v => `+${v}% Critical Rate` },
     dodge: { name: "Dodge Rune", rarity: 1, add: 10, desc: "+10 FLEE (raises dodge chance)", text: v => `+${v} FLEE (raises dodge chance)` },
+    zeroArmor: { name: "Zero Armor Rune", rarity: 2, flag: true, desc: "No armor equipped: +10 FLEE. Armor equipped: incoming damage reduced 40%", text: () => "No armor: +10 FLEE | With armor: incoming damage -40%" },
     swiftRun: { name: "Swift Feet Rune", rarity: 1, add: 10, desc: "Stage walk time reduced to 1 second", text: () => "Stage walk time reduced to 1 second" },
     focus: { name: "Focus Rune", rarity: 1, add: 10, desc: "Missed attacks restore 10% HP", text: v => `Missed attacks restore ${v}% HP` },
     maxHpBonus: { name: "Vitality Rune", rarity: 3, add: 50, desc: "+50% Max HP", text: v => `+${v}% Max HP` },
@@ -154,6 +158,11 @@ function applyRune(id) {
     const def = RUNE_DEFS[id];
     if (def.flag) player.runes[id] = true;
     else player.runes[id] = (player.runes[id] || 0) + def.add;
+    if (stageSummary) {
+        stageSummary.runes.push(`${def.name}: ${typeof def.text === 'function' ? def.text(def.add) : def.desc}`);
+        const rp = document.getElementById('stage-result');
+        if (rp && !rp.classList.contains('hidden')) renderStageResult('win');
+    }
     if (def.onApply) def.onApply();
 }
 
@@ -294,6 +303,8 @@ function startExpedition(mode, opts = {}) {
 
     switchView('combat');
     player.inCombat = true;
+    combatPaused = false;
+    updatePauseButton();
     spawnStageMonsters();
 
     if (combatInterval) clearInterval(combatInterval);
@@ -341,6 +352,9 @@ function makeBoss(t) {
 }
 
 function spawnStageMonsters() {
+    stageSummary = newStageSummary(currentStage);
+    const rp = document.getElementById('stage-result');
+    if (rp) rp.classList.add('hidden');
     isFirstHitOfBattle = true;
     battlePlayerHits = 0;
     battleFirstDamageTaken = false;
@@ -547,8 +561,8 @@ function awardKill(m) {
     const isVoidTest = currentMode === 'endless';
     const derived = getDerivedStats();
     let finalGold = Math.floor(((m.gold / 4) * (1 + (skillBonus('goldPct') + ((m.isBoss || m.isMiniBoss) ? skillBonus('bossGoldPct') : 0)) / 100)) * derived.goldMultiplier);
-    let baseExpGain = m.baseExp;
-    let jobExpGain = m.jobExp;
+    let baseExpGain = Math.max(1, Math.floor(m.baseExp / 3));
+    let jobExpGain = Math.max(1, Math.floor(m.jobExp / 3));
     if (isEvent && currentEvent === 'gold') { finalGold *= 2; baseExpGain = 0; jobExpGain = 0; }
     if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; finalGold = 0; }
     const bossKill = !!(m.isBoss || m.isMiniBoss);
@@ -559,6 +573,7 @@ function awardKill(m) {
     if (player.baseLv >= MAX_BASE_LV) baseExpGain = 0;
     if (player.jobLv >= MAX_CLASS_LV) jobExpGain = 0;
 
+    if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
     player.baseExp += baseExpGain;
@@ -679,6 +694,7 @@ function onPlayerDodged(m, source) {
 // Armor absorbs damage first, the rest goes to HP
 // Armor absorbs damage first, the rest goes to HP
 function takePlayerDamage(dmg, m) {
+    lastHitBy = m.name;
     dmg = Math.floor(dmg * (1 - skillBonus('dmgReducePct') / 100));
     // Element resistance from gear: a negative value means extra damage from that element
     const incomingRes = m && m.element ? (getDerivedStats().elemRes[m.element] || 0) : 0;
@@ -732,8 +748,8 @@ function monsterAct(m, derived, position = 0) {
             return;
         }
     }
-    // Melee and tank units only strike from the front three positions
-    if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 3) return;
+    // Melee and tank units only strike when they are the first monster facing the player
+    if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
     const hitChance = Math.min(0.95, Math.max(0.2, (m.hit - derived.flee + 80) / 100));
     if (Math.random() <= hitChance) {
@@ -751,6 +767,7 @@ function monsterAct(m, derived, position = 0) {
             if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); }
             if (m.spell === 'thunderBolt' && Math.random() < 0.25) { playerDebuffs.stun = 1; logMessage('[Stun] You are stunned for 1 turn', 'winlose'); }
         }
+        if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.6);
         takePlayerDamage(eDmg, m);
         dodgeStreak = 0;
         monsterHitStreak++;
@@ -773,6 +790,7 @@ function monsterAct(m, derived, position = 0) {
 
 // ---------- MAIN LOOP ----------
 function runCombatTick() {
+    if (combatPaused) return;
     const derived = getDerivedStats();
     let alive = getAliveMonsters();
     if (alive.length === 0) {
@@ -945,7 +963,7 @@ function runCombatTick() {
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.hp = derived.maxHp;
-        showModal("Expedition Failed", "Consciousness fades... Returning to town.", '', () => switchView('town'));
+        showModal("Expedition Failed", '', buildStageResultHTML('lose'), () => switchView('town'));
     }
     updateUI();
 }
@@ -964,6 +982,7 @@ function onStageCleared() {
     stageClearing = true;
     clearInterval(combatInterval);
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
+    renderStageResult('win');
 
     setTimeout(() => {
         const proceedNext = () => {
@@ -1052,11 +1071,75 @@ function proceedToNextStage() {
 
 function returnToTown() {
     clearInterval(combatInterval);
+    combatPaused = false;
+    updatePauseButton();
+    const rp = document.getElementById('stage-result');
+    if (rp) rp.classList.add('hidden');
     if (typeof resetMapRunes === 'function') resetMapRunes();
     const nextBtn = document.getElementById('next-stage-btn');
     if (nextBtn) nextBtn.classList.add('hidden');
     switchView('town');
     logMessage(`[System] Safely returned to Haven of Dawn`, 'winlose');
+}
+
+// ---------- STAGE RESULT / PAUSE ----------
+function newStageSummary(stage) {
+    return { stage, gold: 0, baseExp: 0, jobExp: 0, items: [], runes: [], log: [] };
+}
+
+function recordStageLog(msg, type) {
+    if (stageSummary) stageSummary.log.push({ msg, type });
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function logClassFor(type) {
+    return type === 'combat' ? "text-red-400" : (type === 'winlose' ? "text-blue-400 font-bold" : (type === 'drop' ? "text-yellow-400 font-bold" : (type === 'levelup' ? "text-purple-400 font-bold" : "text-slate-300")));
+}
+
+function buildStageResultHTML(kind) {
+    const s = stageSummary || newStageSummary(currentStage);
+    const label = escapeHtml(document.getElementById('node-title')?.innerText || `Stage ${s.stage}`);
+    const fmt = n => Number(n).toLocaleString();
+    const card = (title, value, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-center min-w-0"><div class="text-[10px] text-slate-500 uppercase">${title}</div><div class="text-sm font-bold font-mono truncate ${cls}">${value}</div></div>`;
+    const section = (title, count, body) => `<details open class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
+    const itemBody = s.items.length ? s.items.map(i => `<div><span class="text-yellow-300">${escapeHtml(i.name)}</span> <span class="text-slate-500">(Rarity ${i.rarity})</span></div>`).join('') : '<div class="text-slate-500">No item dropped</div>';
+    const runeBody = s.runes.length ? s.runes.map(r => `<div class="text-purple-300">${escapeHtml(r)}</div>`).join('') : '<div class="text-slate-500">No rune picked</div>';
+    const logBody = s.log.length ? `<div class="max-h-48 overflow-y-auto font-mono text-[10px] flex flex-col gap-0.5">${s.log.map(l => `<div class="${logClassFor(l.type)}">${l.msg}</div>`).join('')}</div>` : '<div class="text-slate-500">No log</div>';
+    const statCards = (kind === 'win')
+        ? card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300') + card('Items', s.items.length, 'text-amber-300') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300')
+        : card('Killed by', escapeHtml(lastHitBy || 'Unknown'), 'text-red-300') + card('Stage Died', label, 'text-slate-200') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300') + card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300');
+    const title = kind === 'win'
+        ? `<h3 class="font-bold text-sm text-emerald-300">Stage ${s.stage} Cleared</h3>`
+        : `<h3 class="font-bold text-sm text-red-300">Defeated</h3>`;
+    const sections = kind === 'win'
+        ? section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody) + section('Fight Log', s.log.length, logBody)
+        : section('Fight Log', s.log.length, logBody) + section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody);
+    const footer = kind === 'lose' ? '<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Return to Town</button>' : '';
+    return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div>${footer}</div>`;
+}
+
+function renderStageResult(kind) {
+    const el = document.getElementById('stage-result');
+    if (!el) return;
+    el.innerHTML = buildStageResultHTML(kind);
+    el.classList.remove('hidden');
+}
+
+function toggleCombatPause() {
+    combatPaused = !combatPaused;
+    updatePauseButton();
+    logMessage(combatPaused ? '[System] Combat paused' : '[System] Combat resumed', 'winlose');
+}
+
+function updatePauseButton() {
+    const btn = document.getElementById('combat-pause-btn');
+    if (!btn) return;
+    btn.innerText = combatPaused ? 'Resume' : 'Pause';
+    btn.classList.toggle('bg-amber-600', combatPaused);
+    btn.classList.toggle('text-slate-950', combatPaused);
 }
 
 // ---------- EVENTS ----------

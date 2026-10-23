@@ -306,7 +306,7 @@ function getDerivedStats() {
     let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3);
     let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;
-    let flee = 100 + lvl + ST.agi + rn('shadowStep') * rn('killCount');
+    let flee = 40 + lvl + ST.agi + rn('shadowStep') * rn('killCount');
     let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + rn('glassCannon') + skillBonus('critPct');
     let aspd = 130 + Math.floor(ST.agi * 0.8) + Math.floor(ST.dex * 0.2);
     let movementSpeed = (player.baseMovementSpeed || 3);
@@ -354,7 +354,9 @@ function getDerivedStats() {
     }
 
     const elemRes = { fire: extra.res_fire, wind: extra.res_wind, earth: extra.res_earth, water: extra.res_water };
-    return { maxHp, maxArmor: rn('glassCannon') > 0 ? 0 : maxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier, elemRes };
+    const finalMaxArmor = rn('glassCannon') > 0 ? 0 : maxArmor;
+    if (player.runes.zeroArmor && finalMaxArmor === 0) flee += 10;
+    return { maxHp, maxArmor: finalMaxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier, elemRes };
 }
 
 function saveGame() {

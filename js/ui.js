@@ -601,6 +601,7 @@ function placeItemInInventory(newItem) {
 }
 
 function addItemToInventory(newItem) {
+    if (stageSummary) stageSummary.items.push({ name: newItem.name, rarity: newItem.rarity });
     if (!placeItemInInventory(newItem)) {
         logMessage(`[Inventory Full] ${newItem.name} was discarded.`, 'combat');
         return false;
@@ -1463,7 +1464,54 @@ function renderQuestsView() {
     });
 }
 
+// ---------- PAPER DOLL (shows equipped gear and pet on the character) ----------
+// Positions are percentages of the doll box; z sets which badges sit on top.
+const PAPERDOLL_SLOTS = [
+    { slot: 'garment',   label: 'Garment',    icon: '🧣', x: 50, y: 56, z: 1 },
+    { slot: 'hat',       label: 'Hat',        icon: '🎩', x: 50, y: 6,  z: 3 },
+    { slot: 'midHead',   label: 'Mid Head',   icon: '🧢', x: 80, y: 14, z: 3 },
+    { slot: 'mouth',     label: 'Mouth',      icon: '😷', x: 50, y: 30, z: 3 },
+    { slot: 'armor',     label: 'Armor',      icon: '🦺', x: 50, y: 52, z: 2 },
+    { slot: 'shield',    label: 'Shield',     icon: '🛡️', x: 14, y: 50, z: 2 },
+    { slot: 'weapon',    label: 'Weapon',     icon: '⚔️', x: 86, y: 50, z: 2 },
+    { slot: 'ringLeft',  label: 'L Ring',     icon: '💍', x: 14, y: 68, z: 2 },
+    { slot: 'ringRight', label: 'R Ring',     icon: '💍', x: 86, y: 68, z: 2 },
+    { slot: 'footgear',  label: 'Footgear',   icon: '🥾', x: 50, y: 92, z: 2 },
+    { slot: 'pet',       label: 'Pet',        icon: '🐾', x: 84, y: 90, z: 4 }
+];
+
+function petDoll(gear) {
+    return /slime/i.test(gear.name) ? '🟢' : '🐾';
+}
+
+function renderPaperDoll() {
+    const targets = ['paperdoll-character', 'combat-paperdoll'];
+    const avatar = player.avatar || '⚔️';
+    const avatarHtml = avatar.startsWith('data:image')
+        ? `<img src="${avatar}" class="w-full h-full object-cover rounded-full" />`
+        : `<span>${avatar}</span>`;
+    const badges = PAPERDOLL_SLOTS.map(d => {
+        const gear = player.equipped ? player.equipped[d.slot] : null;
+        const has = !!(gear && gear.name);
+        const rInfo = has && gear.rarity ? RARITY_INFO[gear.rarity] : null;
+        const color = rInfo ? rInfo.text : 'text-slate-300';
+        const icon = has && d.slot === 'pet' ? petDoll(gear) : d.icon;
+        const title = has ? `${d.label}: ${escapeHtml(gear.name)}` : `${d.label}: Empty`;
+        const cls = has ? `${color} border-current bg-slate-950 shadow-lg` : 'border-dashed border-slate-700 bg-slate-950/60 opacity-40';
+        return `<div title="${title}" class="absolute w-9 h-9 rounded-lg border-2 flex items-center justify-center text-base ${cls}" style="left:${d.x}%;top:${d.y}%;transform:translate(-50%,-50%);z-index:${d.z}">${icon}</div>`;
+    }).join('');
+    const html = `<div class="relative mx-auto w-56 h-72">
+        <div class="absolute rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-3xl overflow-hidden" style="left:50%;top:36%;width:4.5rem;height:4.5rem;transform:translate(-50%,-50%);z-index:0">${avatarHtml}</div>
+        ${badges}
+    </div>`;
+    targets.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    });
+}
+
 function updateUI() {
+    renderPaperDoll();
     let derived = getDerivedStats();
     player.hp = Math.min(player.hp, derived.maxHp);
 
@@ -1698,6 +1746,7 @@ function updateUI() {
 }
 
 function logMessage(msg, type = 'combat') {
+    recordStageLog(msg, type);
     ['town-activity-log', 'combat-activity-log'].forEach(id => {
         const box = document.getElementById(id);
         if (box) {

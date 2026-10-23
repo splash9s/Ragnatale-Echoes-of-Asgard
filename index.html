@@ -299,6 +299,7 @@
                 <div class="flex flex-col gap-4">
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Equipped Gear</h3>
+                        <div id="paperdoll-character"></div>
                         <div id="equipment-slots-container" class="grid grid-cols-2 gap-3 items-start"></div>
                         <div id="set-bonus-panel" class="flex flex-col gap-2"></div>
                     </div>
@@ -460,9 +461,12 @@
                 </div>
                 <div class="flex gap-2">
                     <button id="next-stage-btn" onclick="proceedToNextStage()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Next Stage</button>
+                    <button id="combat-pause-btn" onclick="toggleCombatPause()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Pause</button>
                     <button onclick="returnToTown()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900 text-red-300 font-bold rounded-xl text-xs transition cursor-pointer">Retreat to Town</button>
                 </div>
             </div>
+
+            <div id="stage-result" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4"></div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-4">
@@ -479,6 +483,7 @@
                     <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Armor</span><span id="player-armor-text">0 / 0</span></div>
                     <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="player-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 100%"></div></div>
                     <div id="combat-player-body" class="flex flex-col gap-4">
+                    <div id="combat-paperdoll"></div>
                     <button onclick="manualDrinkPotion()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 font-bold rounded-xl text-xs transition cursor-pointer flex justify-between px-3 items-center">
                         <span>Drink Potion</span>
                         <span id="player-potions" class="font-mono text-[10px]">None</span>
