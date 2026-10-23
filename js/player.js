@@ -3,6 +3,8 @@
 // ==========================================
 
 const MAX_POTION_SLOT = 5;
+const BAG_SLOTS = 30;
+const STASH_SLOTS = 30;
 
 let player = {
     name: "Hero",
@@ -28,19 +30,17 @@ let player = {
     materials: { ironScraps: 0 },
     mailBox: createWelcomeMail(),
     dailyQuests: [
-        { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
+        { id: 'q_slimes', title: "Slime Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
         { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
         { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Gold from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
     ],
     questMilestoneClaimed: { 1: false, 2: false, 3: false },
-    skills: {
-        swordsmanship: { name: "Swordsmanship", maxLv: 10, desc: "Increases physical Attack power.", level: 0, req: null },
-        ironDefense: { name: "Iron Defense", maxLv: 10, desc: "Increases physical Defense.", level: 0, req: "swordsmanship" },
-        vitalStrike: { name: "Vital Strike", maxLv: 10, desc: "Grants critical hit rate and heavy impact.", level: 0, req: "swordsmanship" },
-        parry: { name: "Parry Master", maxLv: 10, desc: "Grants chance to completely block enemy attacks.", level: 0, req: "ironDefense" }
-    },
+    skills: defaultSkills(),
     equipped: {
         weapon: { name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, refineLevel: 0, rarity: 1, stats: { atk: 10 }, buffs: [], setName: null, desc: "Atk +10" },
+        hat: null,
+        midHead: null,
+        mouth: null,
         shield: { name: "Wooden Buckler", slot: "shield", levelReq: 1, refineLevel: 0, rarity: 1, stats: { def: 2, block: 5 }, buffs: [], setName: null, desc: "DEF +2, Block +5%" },
         armor: { name: "Iron Cuirass", slot: "armor", levelReq: 1, refineLevel: 0, rarity: 1, stats: { hp: 50, def: 5 }, buffs: [], setName: null, desc: "HP +50, DEF +5" },
         garment: { name: "Cotton Cloak", slot: "garment", levelReq: 1, refineLevel: 0, rarity: 1, stats: { flee: 2 }, buffs: [], setName: null, desc: "FLEE +2" },
@@ -50,9 +50,61 @@ let player = {
         pet: null,
         potionSlot: { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" }
     },
-    inventory: new Array(40).fill(null),
+    inventory: new Array(BAG_SLOTS).fill(null),
+    stash: new Array(STASH_SLOTS).fill(null),
     runes: { critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0, randomHitCount: 0, resurrectionUsed: false }
 };
+
+
+// ---------- SKILLS: 4 passive builds (Gold, EXP, Attack, Defense), 6 skills each, 5 levels per skill ----------
+// Each skill unlocks when the one before it reaches reqLv (1, 3, or 5).
+function defaultSkills() {
+    return {
+        coinSense: { name: "Coin Sense", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        treasureEye: { name: "Treasure Eye", build: "gold", desc: "Gold from boss and mini boss +1% per level.", effect: "bossGoldPct", perLv: 1, maxLv: 5, level: 0, req: "coinSense", reqLv: 1 },
+        luckyFind: { name: "Lucky Find", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: "treasureEye", reqLv: 3 },
+        hoarder: { name: "Hoarder", build: "gold", desc: "Gold from all kills +1% per level.", effect: "goldPct", perLv: 1, maxLv: 5, level: 0, req: "luckyFind", reqLv: 1 },
+        scrapper: { name: "Scrapper", build: "gold", desc: "Sell price +5% per level.", effect: "sellPct", perLv: 5, maxLv: 5, level: 0, req: "hoarder", reqLv: 5 },
+        midasTouch: { name: "Midas Touch", build: "gold", desc: "Gold from all kills +2% per level.", effect: "goldPct", perLv: 2, maxLv: 5, level: 0, req: "scrapper", reqLv: 3 },
+        studious: { name: "Studious", build: "exp", desc: "Base EXP +1% per level.", effect: "baseExpPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        disciple: { name: "Disciple", build: "exp", desc: "Class EXP +1% per level.", effect: "classExpPct", perLv: 1, maxLv: 5, level: 0, req: "studious", reqLv: 3 },
+        bossScholar: { name: "Boss Scholar", build: "exp", desc: "Boss and mini boss EXP +2% per level.", effect: "bossExpPct", perLv: 2, maxLv: 5, level: 0, req: "disciple", reqLv: 1 },
+        focus: { name: "Focus", build: "exp", desc: "Base EXP +2% per level.", effect: "baseExpPct", perLv: 2, maxLv: 5, level: 0, req: "bossScholar", reqLv: 5 },
+        quickStudy: { name: "Quick Study", build: "exp", desc: "Class EXP +2% per level.", effect: "classExpPct", perLv: 2, maxLv: 5, level: 0, req: "focus", reqLv: 3 },
+        ascension: { name: "Ascension", build: "exp", desc: "Base and Class EXP +2% per level.", effect: "allExpPct", perLv: 2, maxLv: 5, level: 0, req: "quickStudy", reqLv: 1 },
+        sharpEdge: { name: "Sharp Edge", build: "attack", desc: "ATK +1% per level.", effect: "atkPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        precision: { name: "Precision", build: "attack", desc: "CRIT rate +2 per level.", effect: "critPct", perLv: 2, maxLv: 5, level: 0, req: "sharpEdge", reqLv: 1 },
+        crushingBlow: { name: "Crushing Blow", build: "attack", desc: "Critical damage +2% per level.", effect: "critDmgPct", perLv: 2, maxLv: 5, level: 0, req: "precision", reqLv: 5 },
+        slayerEye: { name: "Slayer Eye", build: "attack", desc: "Damage to boss and mini boss +2% per level.", effect: "bossDmgPct", perLv: 2, maxLv: 5, level: 0, req: "crushingBlow", reqLv: 3 },
+        swiftHands: { name: "Swift Hands", build: "attack", desc: "ASPD +2 per level.", effect: "aspd", perLv: 2, maxLv: 5, level: 0, req: "slayerEye", reqLv: 1 },
+        executioner: { name: "Executioner", build: "attack", desc: "Damage to enemies below 50% HP +2% per level.", effect: "lowHpDmgPct", perLv: 2, maxLv: 5, level: 0, req: "swiftHands", reqLv: 3 },
+        ironSkin: { name: "Iron Skin", build: "defense", desc: "Max HP +1% per level.", effect: "hpPct", perLv: 1, maxLv: 5, level: 0, req: null, reqLv: 0 },
+        hardened: { name: "Hardened", build: "defense", desc: "DEF +1% per level.", effect: "defPct", perLv: 1, maxLv: 5, level: 0, req: "ironSkin", reqLv: 3 },
+        evasion: { name: "Evasion", build: "defense", desc: "FLEE +1 per level.", effect: "fleePct", perLv: 1, maxLv: 5, level: 0, req: "hardened", reqLv: 1 },
+        secondWind: { name: "Second Wind", build: "defense", desc: "Max armor +1% per level.", effect: "armorPct", perLv: 1, maxLv: 5, level: 0, req: "evasion", reqLv: 3 },
+        thickHide: { name: "Thick Hide", build: "defense", desc: "Max HP +2% per level.", effect: "hpPct", perLv: 2, maxLv: 5, level: 0, req: "secondWind", reqLv: 5 },
+        fortress: { name: "Fortress", build: "defense", desc: "Damage taken -2% per level.", effect: "dmgReducePct", perLv: 2, maxLv: 5, level: 0, req: "thickHide", reqLv: 1 },
+    };
+}
+
+// Sum of all skill levels x per-level value for one effect (0 in Daily Challenge)
+function skillBonus(effect) {
+    if (typeof currentMode !== 'undefined' && currentMode === 'daily') return 0;
+    let total = 0;
+    Object.values(player.skills || {}).forEach(s => { if (s.effect === effect) total += (s.level || 0) * s.perLv; });
+    return total;
+}
+
+// Keeps levels of skills that still exist; older skills are refunded as SP
+function migrateSkills() {
+    const defs = defaultSkills();
+    const old = player.skills || {};
+    let refund = 0;
+    Object.keys(old).forEach(k => { if (!defs[k]) refund += old[k].level || 0; });
+    Object.keys(defs).forEach(k => { if (old[k]) defs[k].level = Math.min(defs[k].maxLv, old[k].level || 0); });
+    player.skills = defs;
+    if (refund > 0) player.jobSp = (player.jobSp || 0) + refund;
+}
 
 // ---------- ELEMENTS ----------
 // Fire > Wind > Earth > Water > Fire  (key beats value)
@@ -84,19 +136,12 @@ const BUFF_POOL = [
     { key: 'flee', name: "Agile",      min: 1,  max: 6 },
     { key: 'hit',  name: "Keen",       min: 1,  max: 6 },
     { key: 'aspd', name: "Swift", min: 1, max: 4 },
-    { key: 'armor', name: "Guarded", min: 10, max: 60 }
+    { key: 'armor', name: "Guarded", min: 10, max: 60 },
+    // Element resistance buffs (the positive side of the element debuffs)
+    ...Object.keys(ELEMENTS).map(el => ({ key: 'res_' + el, element: el, name: ELEMENTS[el].name + " Ward", min: 1, max: 5 }))
 ];
-// Debuffs: 0..2 per item, always negative
-const DEBUFF_POOL = [
-    { key: 'atk',  name: "Brittle",   min: 2,  max: 8 },
-    { key: 'def',  name: "Cursed",    min: 1,  max: 5 },
-    { key: 'hp',   name: "Frail",     min: 15, max: 60 },
-    { key: 'flee', name: "Clumsy",    min: 1,  max: 5 },
-    { key: 'hit',  name: "Blurred",   min: 1,  max: 5 },
-    { key: 'aspd', name: "Heavy",     min: 1,  max: 4 },
-    { key: 'crit', name: "Dull",      min: 1,  max: 3 },
-    { key: 'armor', name: "Corroded", min: 5,  max: 30 }
-];
+// Debuffs: 0..2 per item, always negative. Each one is an element resistance penalty (e.g. -5% Fire Resistance).
+const DEBUFF_POOL = Object.keys(ELEMENTS).map(el => ({ key: 'res_' + el, element: el, name: ELEMENTS[el].name, min: 1, max: 5 }));
 // Buff count (0..4) weights per item rarity 1..5
 const BUFF_COUNT_WEIGHTS = {
     1: [50, 35, 12, 3, 0],
@@ -115,15 +160,30 @@ function weightedPick(weights) {
     return weights.length - 1;
 }
 
+// Gear rarity weights R1..R5 by drop source (each row sums to 100)
+const NORMAL_RARITY_WEIGHTS = [50, 30, 15, 4, 1];
+const MINI_BOSS_RARITY_WEIGHTS = [15, 25, 30, 20, 10];
+const BOSS_RARITY_WEIGHTS = [5, 20, 25, 30, 20];
+function rollWeightedRarity(weights) {
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < weights.length; i++) {
+        if (r < weights[i]) return i + 1;
+        r -= weights[i];
+    }
+    return weights.length;
+}
+
 function rollItemRarity(minRarity = 1) {
-    let r = Math.random();
-    let base = r < 0.6 ? 1 : r < 0.85 ? 2 : r < 0.95 ? 3 : r < 0.99 ? 4 : 5;
-    return Math.max(minRarity, base);
+    return Math.max(minRarity, rollWeightedRarity(NORMAL_RARITY_WEIGHTS));
+}
+
+function rollMiniBossDropRarity() {
+    return rollWeightedRarity(MINI_BOSS_RARITY_WEIGHTS);
 }
 
 function rollBossDropRarity() {
-    let r = Math.random();
-    return r < 0.6 ? 3 : r < 0.9 ? 4 : 5;
+    return rollWeightedRarity(BOSS_RARITY_WEIGHTS);
 }
 
 // Generates an equipment item with PoE-style rolls:
@@ -151,15 +211,35 @@ function getSetBonuses() {
     for (const setKey in counts) {
         const def = (typeof SET_DATA !== 'undefined') ? SET_DATA[setKey] : null;
         if (!def) continue;
-        def.bonuses.forEach(bn => {
-            if (counts[setKey] >= bn.pieces) {
-                total.active.push({ setKey, setName: def.name, pieces: bn.pieces, desc: bn.desc });
-                if (bn.stats) for (const k in bn.stats) total.stats[k] = (total.stats[k] || 0) + bn.stats[k];
-                total.goldBonus += bn.goldBonus || 0;
-            }
-        });
+        // Only the highest reached tier applies; a 4-piece bonus replaces the 2-piece bonus
+        let best = null;
+        def.bonuses.forEach(bn => { if (counts[setKey] >= bn.pieces) best = bn; });
+        if (!best) continue;
+        total.active.push({ setKey, setName: def.name, pieces: best.pieces, desc: best.desc });
+        if (best.stats) for (const k in best.stats) total.stats[k] = (total.stats[k] || 0) + best.stats[k];
+        total.goldBonus += best.goldBonus || 0;
     }
     return total;
+}
+
+// Set bonus value for a stat key (flat or percent), used outside derived stats
+function setStat(key) {
+    return getSetBonuses().stats[key] || 0;
+}
+
+// Older saves: add the hat slot, move Beach set to Merchant set, and clear set tags on slots that cannot carry one
+function migrateGear() {
+    if (!player.equipped) return;
+    if (!('hat' in player.equipped)) player.equipped.hat = null;
+    if (!('midHead' in player.equipped)) player.equipped.midHead = null;
+    if (!('mouth' in player.equipped)) player.equipped.mouth = null;
+    const fix = it => {
+        if (!it || !it.setName) return;
+        if (it.setName === 'beach') it.setName = 'merchant';
+        if (!SET_SLOTS.includes(it.slot)) it.setName = null;
+    };
+    for (const k in player.equipped) fix(player.equipped[k]);
+    if (Array.isArray(player.inventory)) player.inventory.forEach(fix);
 }
 
 function createWelcomeMail() {
@@ -193,7 +273,8 @@ function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
         const tier = weightedPick([50, 30, 12, 6, 2]) + 1;
         const roll = Math.floor(b.min + Math.random() * (b.max - b.min + 1));
         const value = Math.max(1, Math.round(roll * (0.8 + 0.1 * tier)));
-        buffs.push({ stat: b.key, value, tier, desc: `${b.name}: +${value} ${b.key.toUpperCase()}` });
+        const desc = b.element ? `+${value}% ${ELEMENTS[b.element].name} Resistance` : `${b.name}: +${value} ${b.key.toUpperCase()}`;
+        buffs.push({ stat: b.key, value, tier, desc });
     }
 
     const debuffCount = weightedPick([60, 30, 10]); // 0..2
@@ -202,7 +283,7 @@ function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
     for (let i = 0; i < debuffCount; i++) {
         const d = dShuffled[i];
         const roll = Math.floor(d.min + Math.random() * (d.max - d.min + 1));
-        debuffs.push({ stat: d.key, value: -roll, desc: `${d.name}: -${roll} ${d.key.toUpperCase()}` });
+        debuffs.push({ stat: d.key, value: -roll, desc: `-${roll}% ${d.name} Resistance` });
     }
 
     let element = baseTemplate.element || null;
@@ -222,15 +303,15 @@ function getDerivedStats() {
     const skl = name => daily ? 0 : (player.skills[name]?.level || 0);
 
     let maxHp = Math.floor((100 + (ST.vit * 15) + (lvl * 10)) * (1 + (rn('maxHpBonus') + rn('fortitudeStacks')) / 100) * (1 + (rn('runeScholar') > 0 ? 0.05 * (player.currentRunRunes || []).length : 0))) + rn('bloodlust') * rn('killCount');
-    let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3) + (skl('swordsmanship') * 3);
-    let def = 2 + (ST.vit * 1) + (skl('ironDefense') * 2);
+    let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3);
+    let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;
     let flee = 100 + lvl + ST.agi + rn('shadowStep') * rn('killCount');
-    let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + rn('glassCannon') + (skl('vitalStrike') * 1.5);
+    let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + rn('glassCannon') + skillBonus('critPct');
     let aspd = 130 + Math.floor(ST.agi * 0.8) + Math.floor(ST.dex * 0.2);
     let movementSpeed = (player.baseMovementSpeed || 3);
 
-    const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0, armor: 0, atkPct: 0 };
+    const extra = { atk: 0, def: 0, hp: 0, flee: 0, hit: 0, crit: 0, aspd: 0, armor: 0, atkPct: 0, hpPct: 0, defPct: 0, res_fire: 0, res_wind: 0, res_earth: 0, res_water: 0 };
     let goldMultiplier = 1;
 
     if (!daily) {
@@ -253,15 +334,18 @@ function getDerivedStats() {
     }
 
     atk += extra.atk;
+    extra.atkPct += skillBonus('atkPct');
     atk = Math.floor(atk * (1 + extra.atkPct / 100));
+    def = Math.floor(def * (1 + (skillBonus('defPct') + extra.defPct) / 100));
     def += extra.def;
+    maxHp = Math.floor(maxHp * (1 + (skillBonus('hpPct') + extra.hpPct) / 100));
     maxHp += extra.hp;
-    flee += extra.flee;
+    flee += skillBonus('fleePct') + extra.flee + rn('dodge');
     hit += extra.hit;
     crit += extra.crit;
-    aspd += extra.aspd;
+    aspd += skillBonus('aspd') + extra.aspd;
     // Armor comes only from items (default 0)
-    const maxArmor = Math.max(0, extra.armor);
+    const maxArmor = Math.max(0, Math.floor(extra.armor * (1 + skillBonus('armorPct') / 100)));
 
     let maxWeight = 2000 + (ST.str * 30);
     let currentWeight = 120 + ((player.equipped.potionSlot?.qty || 0) * 15) + ((player.resurrectionPotions || 0) * 10) + ((player.refiningStones || 0) * 2);
@@ -269,7 +353,8 @@ function getDerivedStats() {
         if (item) currentWeight += 10;
     }
 
-    return { maxHp, maxArmor: rn('glassCannon') > 0 ? 0 : maxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier };
+    const elemRes = { fire: extra.res_fire, wind: extra.res_wind, earth: extra.res_earth, water: extra.res_water };
+    return { maxHp, maxArmor: rn('glassCannon') > 0 ? 0 : maxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier, elemRes };
 }
 
 function saveGame() {
@@ -286,11 +371,13 @@ function loadGame() {
         if (savedData) {
             const parsed = JSON.parse(savedData);
             player = Object.assign(player, parsed);
+            migrateSkills();
+            migrateGear();
             if (!Array.isArray(player.mailBox)) {
                 player.mailBox = createWelcomeMail();
             }
             if (!player.dailyQuests) player.dailyQuests = [];
-            const QUEST_TARGETS = { q_porings: 45, q_crit: 175, q_gold: 30000 };
+            const QUEST_TARGETS = { q_slimes: 45, q_crit: 175, q_gold: 30000 };
             player.dailyQuests.forEach(q => { if (QUEST_TARGETS[q.id]) q.target = QUEST_TARGETS[q.id]; });
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (!player.materials) player.materials = { ironScraps: 0 };
@@ -308,11 +395,17 @@ function loadGame() {
             if (!player.equipped.potionSlot) {
                 player.equipped.potionSlot = { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" };
             }
-            if (!Array.isArray(player.inventory) || player.inventory.length < 40) {
-                let oldInv = Array.isArray(player.inventory) ? player.inventory : [];
-                player.inventory = new Array(40).fill(null);
-                oldInv.forEach((it, idx) => { if (idx < 40) player.inventory[idx] = it; });
-            }
+            // Bag and stash are 30 slots each. Older bags past 30 slots move into the stash.
+            const oldBag = Array.isArray(player.inventory) ? player.inventory : [];
+            const oldStash = Array.isArray(player.stash) ? player.stash : [];
+            player.inventory = new Array(BAG_SLOTS).fill(null);
+            oldBag.slice(0, BAG_SLOTS).forEach((it, i) => { player.inventory[i] = it || null; });
+            player.stash = new Array(STASH_SLOTS).fill(null);
+            oldStash.slice(0, STASH_SLOTS).forEach((it, i) => { player.stash[i] = it || null; });
+            oldBag.slice(BAG_SLOTS).filter(Boolean).forEach(it => {
+                const idx = player.stash.findIndex(s => s === null);
+                if (idx !== -1) player.stash[idx] = it;
+            });
             // Old saves kept scraps as a counter: move them into the bag as stacks
             if (player.materials && player.materials.ironScraps > 0 && typeof addScraps === 'function') {
                 let left = player.materials.ironScraps;

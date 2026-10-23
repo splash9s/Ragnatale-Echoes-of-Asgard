@@ -1,5 +1,5 @@
 const RING_ITEMS = [
-    { id: "ring_1", name: "Novice Ring", slot: "ring", levelReq: 1, price: 60, stats: { atk: 2 }, desc: "ATK +2" },
+    { id: "ring_1", name: "Apprentice Ring", slot: "ring", levelReq: 1, price: 60, stats: { atk: 2 }, desc: "ATK +2" },
     { id: "ring_10", name: "Iron Ring", slot: "ring", levelReq: 10, price: 200, stats: { def: 2, hp: 20 }, desc: "DEF +2, HP +20" },
     { id: "ring_20", name: "Ring of Swiftness", slot: "ring", levelReq: 20, price: 500, stats: { aspd: 3 }, desc: "ASPD +3" },
     { id: "ring_30", name: "Eagle Ring", slot: "ring", levelReq: 30, price: 1200, stats: { hit: 5, crit: 1 }, desc: "HIT +5, CRIT +1" },
@@ -15,7 +15,7 @@ const SHOP_ITEMS = [
     { id: "f1", name: "Leather Boots", slot: "footgear", levelReq: 1, price: 30, stats: { hp: 20 }, desc: "HP +20" },
     { id: "d1", name: "Rookie Dagger", slot: "weapon", levelReq: 1, price: 45, stats: { atk: 8, crit: 1 }, desc: "Atk +8, CRIT +1%" },
     { id: "sp1", name: "Training Spear", slot: "weapon", levelReq: 1, price: 50, stats: { atk: 11, hit: 5 }, desc: "Atk +11, HIT +5" },
-    { id: "m1", name: "Acolyte Mace", slot: "weapon", levelReq: 1, price: 45, stats: { atk: 9, def: 2 }, desc: "Atk +9, DEF +2" },
+    { id: "m1", name: "Initiate Mace", slot: "weapon", levelReq: 1, price: 45, stats: { atk: 9, def: 2 }, desc: "Atk +9, DEF +2" },
     { id: "th1", name: "Two-Handed Claymore (2H)", slot: "weapon", levelReq: 1, price: 90, stats: { atk: 16 }, desc: "Atk +16 (Takes Shield slot)" },
 
     { id: "w10", name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, price: 150, stats: { atk: 25 }, desc: "Atk +25" },
@@ -46,7 +46,7 @@ const SHOP_ITEMS = [
     { id: "d30", name: "Main Gauche of Shadows", slot: "weapon", levelReq: 30, price: 950, stats: { atk: 82, crit: 7 }, desc: "Atk +82, CRIT +7%" },
     { id: "sp30", name: "Gungnir Vanguard", slot: "weapon", levelReq: 30, price: 1050, stats: { atk: 98, hit: 25 }, desc: "Atk +98, HIT +25" },
     { id: "m30", name: "Mjolnir Prototype", slot: "weapon", levelReq: 30, price: 1000, stats: { atk: 95, def: 20 }, desc: "Atk +95, DEF +20" },
-    { id: "th30", name: "Ragnarok Greatsword (2H)", slot: "weapon", levelReq: 30, price: 2000, stats: { atk: 140, crit: 2 }, desc: "Atk +140, CRIT +2% (Takes Shield slot)" },
+    { id: "th30", name: "Dusk Greatsword (2H)", slot: "weapon", levelReq: 30, price: 2000, stats: { atk: 140, crit: 2 }, desc: "Atk +140, CRIT +2% (Takes Shield slot)" },
 
     { id: "w40", name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, price: 2500, stats: { atk: 140, crit: 6 }, desc: "Atk +140, CRIT +6%" },
     { id: "s40", name: "Aegis of Light", slot: "shield", levelReq: 40, price: 2200, stats: { def: 32, block: 30 }, desc: "DEF +32, Block +30%" },
@@ -66,7 +66,7 @@ const SHOP_ITEMS = [
     { id: "d50", name: "Katar of Destruction", slot: "weapon", levelReq: 50, price: 4800, stats: { atk: 195, crit: 13 }, desc: "Atk +195, CRIT +13%" },
     { id: "sp50", name: "Gungnir Prime", slot: "weapon", levelReq: 50, price: 5200, stats: { atk: 225, hit: 50 }, desc: "Atk +225, HIT +50" },
     { id: "m50", name: "Mjolnir Awakened", slot: "weapon", levelReq: 50, price: 5000, stats: { atk: 220, def: 45 }, desc: "Atk +220, DEF +45" },
-    { id: "th50", name: "Ragnarok World-Ender (2H)", slot: "weapon", levelReq: 50, price: 9500, stats: { atk: 330, crit: 6 }, desc: "Atk +330, CRIT +6% (Takes Shield slot)" }
+    { id: "th50", name: "Dusk World-Ender (2H)", slot: "weapon", levelReq: 50, price: 9500, stats: { atk: 330, crit: 6 }, desc: "Atk +330, CRIT +6% (Takes Shield slot)" }
 ];
 
 SHOP_ITEMS.push(...RING_ITEMS);
@@ -113,39 +113,162 @@ const GEAR_POOL = {
         { name: "Armor of the Gods", slot: "armor", levelReq: 50, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
         { name: "Shroud of Eternity", slot: "garment", levelReq: 50, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
         { name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
+    ],
+    map60: [
+        { name: "Jotun Ice Axe (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
+        { name: "Jotun Rime Shield", slot: "shield", levelReq: 60, stats: { def: 65, block: 45 }, desc: "DEF +65, Block +45%" },
+        { name: "Jotun Fur Armor", slot: "armor", levelReq: 60, stats: { hp: 1900, def: 115 }, desc: "HP +1900, DEF +115" },
+        { name: "Jotun Snow Cloak", slot: "garment", levelReq: 60, stats: { flee: 65, def: 30 }, desc: "FLEE +65, DEF +30" },
+        { name: "Jotun Ice Striders", slot: "footgear", levelReq: 60, stats: { hp: 800, aspd: 30 }, desc: "HP +800, ASPD +30" }
+    ],
+    map70: [
+        { name: "Einherjar Blade (1H)", slot: "weapon", levelReq: 70, stats: { atk: 340, crit: 9 }, desc: "Atk +340, CRIT +9%" },
+        { name: "Valkyrie Bulwark", slot: "shield", levelReq: 70, stats: { def: 80, block: 50 }, desc: "DEF +80, Block +50%" },
+        { name: "Valkyrie Plate", slot: "armor", levelReq: 70, stats: { hp: 2400, def: 140 }, desc: "HP +2400, DEF +140" },
+        { name: "Valkyrie Wing Mantle", slot: "garment", levelReq: 70, stats: { flee: 80, def: 38 }, desc: "FLEE +80, DEF +38" },
+        { name: "Valkyrie Greaves", slot: "footgear", levelReq: 70, stats: { hp: 1000, aspd: 35 }, desc: "HP +1000, ASPD +35" }
+    ],
+    map80: [
+        { name: "Muspel Flame Blade (1H)", slot: "weapon", levelReq: 80, stats: { atk: 420, crit: 10 }, desc: "Atk +420, CRIT +10%" },
+        { name: "Muspel Ember Shield", slot: "shield", levelReq: 80, stats: { def: 100, block: 55 }, desc: "DEF +100, Block +55%" },
+        { name: "Muspel Forged Plate", slot: "armor", levelReq: 80, stats: { hp: 3000, def: 170 }, desc: "HP +3000, DEF +170" },
+        { name: "Muspel Ash Cloak", slot: "garment", levelReq: 80, stats: { flee: 95, def: 45 }, desc: "FLEE +95, DEF +45" },
+        { name: "Muspel Ember Boots", slot: "footgear", levelReq: 80, stats: { hp: 1250, aspd: 40 }, desc: "HP +1250, ASPD +40" }
+    ],
+    map90: [
+        { name: "Hel Bone Blade (1H)", slot: "weapon", levelReq: 90, stats: { atk: 520, crit: 12 }, desc: "Atk +520, CRIT +12%" },
+        { name: "Hel Grave Shield", slot: "shield", levelReq: 90, stats: { def: 125, block: 60 }, desc: "DEF +125, Block +60%" },
+        { name: "Hel Death Plate", slot: "armor", levelReq: 90, stats: { hp: 3800, def: 210 }, desc: "HP +3800, DEF +210" },
+        { name: "Hel Shroud", slot: "garment", levelReq: 90, stats: { flee: 115, def: 55 }, desc: "FLEE +115, DEF +55" },
+        { name: "Hel Walkers", slot: "footgear", levelReq: 90, stats: { hp: 1550, aspd: 45 }, desc: "HP +1550, ASPD +45" }
+    ],
+    map99: [
+        { name: "Dusk Reaper Blade (1H)", slot: "weapon", levelReq: 99, stats: { atk: 680, crit: 14 }, desc: "Atk +680, CRIT +14%" },
+        { name: "Dusk Ward Shield", slot: "shield", levelReq: 99, stats: { def: 160, block: 65 }, desc: "DEF +160, Block +65%" },
+        { name: "Dusk Titan Plate", slot: "armor", levelReq: 99, stats: { hp: 5000, def: 260 }, desc: "HP +5000, DEF +260" },
+        { name: "Dusk Veil Cloak", slot: "garment", levelReq: 99, stats: { flee: 140, def: 65 }, desc: "FLEE +140, DEF +65" },
+        { name: "Dusk Walkers", slot: "footgear", levelReq: 99, stats: { hp: 1900, aspd: 50 }, desc: "HP +1900, ASPD +50" }
     ]
 };
 
-Object.keys(GEAR_POOL).forEach(k => GEAR_POOL[k].push(...RING_ITEMS));
+// High-level rings (Lv 60-99). Drop only, not sold in the shop.
+const HIGH_RING_ITEMS = [
+    { id: "ring_60", name: "Ring of Jotun Frost", slot: "ring", levelReq: 60, stats: { atk: 40, def: 15, crit: 3 }, desc: "ATK +40, DEF +15, CRIT +3" },
+    { id: "ring_70", name: "Ring of the Valkyrie", slot: "ring", levelReq: 70, stats: { hp: 800, atk: 50, aspd: 10 }, desc: "HP +800, ATK +50, ASPD +10" },
+    { id: "ring_80", name: "Ring of Muspel Ember", slot: "ring", levelReq: 80, stats: { atk: 60, def: 25, crit: 4, hit: 10 }, desc: "ATK +60, DEF +25, CRIT +4, HIT +10" },
+    { id: "ring_90", name: "Ring of Hel", slot: "ring", levelReq: 90, stats: { hp: 1200, def: 35, flee: 15, aspd: 10 }, desc: "HP +1200, DEF +35, FLEE +15, ASPD +10" },
+    { id: "ring_99", name: "Dusk Oath Ring", slot: "ring", levelReq: 99, stats: { hp: 1500, atk: 90, def: 45, crit: 6, aspd: 15 }, desc: "HP +1500, ATK +90, DEF +45, CRIT +6, ASPD +15" }
+];
+
+// ---------- HATS (new gear slot) ----------
+// One hat per gear tier. Tiers 1-50 are also sold in the shop.
+const HAT_BY_LEVEL = {
+    1:  { name: "Cloth Cap", stats: { hp: 15, def: 1 }, price: 25 },
+    10: { name: "Iron Helm", stats: { hp: 60, def: 4 }, price: 90 },
+    20: { name: "Knight Helm", stats: { hp: 120, def: 8 }, price: 280 },
+    30: { name: "Winged Helm", stats: { hp: 250, def: 12, flee: 5 }, price: 750 },
+    40: { name: "Solar Crown", stats: { hp: 420, def: 18, flee: 8 }, price: 1700 },
+    50: { name: "Helm of Odin", stats: { hp: 700, def: 25, flee: 10 }, price: 3500 },
+    60: { name: "Jotun Helm", stats: { hp: 1000, def: 35, flee: 15 } },
+    70: { name: "Valkyrie Helm", stats: { hp: 1300, def: 45, flee: 20 } },
+    80: { name: "Muspel Crown", stats: { hp: 1600, def: 55, flee: 25 } },
+    90: { name: "Hel Helm", stats: { hp: 2000, def: 65, flee: 30 } },
+    99: { name: "Dusk Crown", stats: { hp: 2500, def: 80, flee: 40 } }
+};
+
+// Only these slots can carry a set piece
+const SET_SLOTS = ['armor', 'garment', 'footgear', 'hat'];
 
 // ---------- ITEM SETS ----------
+// Set buffs are percentages or flat values. Only the highest reached tier applies (4 pieces replaces 2 pieces).
 const SET_DATA = {
     warrior: {
-        name: "Warrior Set", pieces: 5,
+        name: "Warrior Set", pieces: 4,
         bonuses: [
-            { pieces: 2, desc: "ATK +10", stats: { atk: 10 } },
-            { pieces: 4, desc: "ATK +40, DEF +10, Max HP +200", stats: { atk: 40, def: 10, hp: 200 } }
+            { pieces: 2, desc: "ATK +3%", stats: { atkPct: 3 } },
+            { pieces: 4, desc: "ATK +10%", stats: { atkPct: 10 } }
         ]
     },
-    beach: {
-        name: "Beach Adventurer Set", pieces: 3,
+    merchant: {
+        name: "Merchant Set", pieces: 4,
         bonuses: [
             { pieces: 2, desc: "+5% Gold", goldBonus: 0.05 },
-            { pieces: 3, desc: "+5% more Gold, FLEE +3", goldBonus: 0.05, stats: { flee: 3 } }
+            { pieces: 4, desc: "+10% Gold", goldBonus: 0.10 }
+        ]
+    },
+    ember: {
+        name: "Ember Warden Set", pieces: 4,
+        bonuses: [
+            { pieces: 2, desc: "ASPD +2", stats: { aspd: 2 } },
+            { pieces: 4, desc: "ASPD +4", stats: { aspd: 4 } }
+        ]
+    },
+    tide: {
+        name: "Tide Walker Set", pieces: 4,
+        bonuses: [
+            { pieces: 2, desc: "Max HP +5%", stats: { hpPct: 5 } },
+            { pieces: 4, desc: "Max HP +15%", stats: { hpPct: 15 } }
+        ]
+    },
+    stoneheart: {
+        name: "Stoneheart Set", pieces: 4,
+        bonuses: [
+            { pieces: 2, desc: "DEF +5%", stats: { defPct: 5 } },
+            { pieces: 4, desc: "DEF +10%, Max HP +5%", stats: { defPct: 10, hpPct: 5 } }
+        ]
+    },
+    windrunner: {
+        name: "Windrunner Set", pieces: 4,
+        bonuses: [
+            { pieces: 2, desc: "CRIT +3", stats: { crit: 3 } },
+            { pieces: 4, desc: "CRIT +5, Crit damage +10%", stats: { crit: 5, critDmgPct: 10 } }
         ]
     }
 };
 
-// Set pieces dropped from expeditions / chests
-GEAR_POOL.map1.push(
-    { name: "Beach Shirt", slot: "armor", levelReq: 1, setName: "beach", stats: { hp: 40 }, desc: "HP +40" },
-    { name: "Beach Sandals", slot: "footgear", levelReq: 1, setName: "beach", stats: { flee: 2 }, desc: "FLEE +2" },
-    { name: "Beach Sarong", slot: "garment", levelReq: 1, setName: "beach", stats: { def: 1 }, desc: "DEF +1" }
-);
+// Piece names per set, one per set slot. Set pieces appear at every gear tier.
+const SET_PIECE_NAMES = {
+    warrior:    { armor: "Warrior Plate", garment: "Warrior Mantle", footgear: "Warrior Greaves", hat: "Warrior Helm" },
+    merchant:   { armor: "Merchant Vest", garment: "Merchant Cloak", footgear: "Merchant Sandals", hat: "Merchant Hat" },
+    ember:      { armor: "Ember Warden Plate", garment: "Ember Warden Cloak", footgear: "Ember Warden Boots", hat: "Ember Warden Hood" },
+    tide:       { armor: "Tide Walker Coat", garment: "Tide Walker Cloak", footgear: "Tide Walker Boots", hat: "Tide Walker Cap" },
+    stoneheart: { armor: "Stoneheart Mail", garment: "Stoneheart Cape", footgear: "Stoneheart Greaves", hat: "Stoneheart Helm" },
+    windrunner: { armor: "Windrunner Harness", garment: "Windrunner Cloak", footgear: "Windrunner Boots", hat: "Windrunner Hood" },
+};
+
+const STAT_TEXT = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block' };
+function statText(stats) {
+    return Object.keys(stats).map(k => `${STAT_TEXT[k] || k} +${stats[k]}`).join(', ');
+}
+
+// Shop: hats for tiers 1-50
+Object.keys(HAT_BY_LEVEL).forEach(lv => {
+    const h = HAT_BY_LEVEL[lv];
+    if (!h.price) return;
+    SHOP_ITEMS.push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: Number(lv), price: h.price, stats: h.stats, desc: statText(h.stats) });
+});
+
+// Warrior weapon and shield stay as plain gear (only SET_SLOTS carry set buffs)
 GEAR_POOL.map10.push(
-    { name: "Warrior Blade (1H)", slot: "weapon", levelReq: 10, setName: "warrior", stats: { atk: 22 }, desc: "Atk +22" },
-    { name: "Warrior Bulwark", slot: "shield", levelReq: 10, setName: "warrior", stats: { def: 5, block: 8 }, desc: "DEF +5, Block +8%" },
-    { name: "Warrior Plate", slot: "armor", levelReq: 10, setName: "warrior", stats: { hp: 100, def: 8 }, desc: "HP +100, DEF +8" },
-    { name: "Warrior Mantle", slot: "garment", levelReq: 10, setName: "warrior", stats: { flee: 4, def: 2 }, desc: "FLEE +4, DEF +2" },
-    { name: "Warrior Greaves", slot: "footgear", levelReq: 10, setName: "warrior", stats: { hp: 40, def: 2 }, desc: "HP +40, DEF +2" }
+    { name: "Warrior Blade (1H)", slot: "weapon", levelReq: 10, stats: { atk: 22 }, desc: "Atk +22" },
+    { name: "Warrior Bulwark", slot: "shield", levelReq: 10, stats: { def: 5, block: 8 }, desc: "DEF +5, Block +8%" }
 );
+
+// Each map drops gear of its own level only.
+// Every pool gets: its level's ring, its level's hat, and one set piece per set per set slot.
+Object.keys(GEAR_POOL).forEach(k => {
+    const lv = parseInt(k.replace('map', ''), 10);
+    GEAR_POOL[k].push(...RING_ITEMS.filter(r => r.levelReq === lv));
+    GEAR_POOL[k].push(...HIGH_RING_ITEMS.filter(r => r.levelReq === lv));
+    if (HAT_BY_LEVEL[lv]) {
+        const h = HAT_BY_LEVEL[lv];
+        GEAR_POOL[k].push({ name: h.name, slot: "hat", levelReq: lv, stats: h.stats, desc: statText(h.stats) });
+    }
+    Object.keys(SET_PIECE_NAMES).forEach(setKey => {
+        SET_SLOTS.forEach(slot => {
+            const base = GEAR_POOL[k].find(i => i.slot === slot && !i.setName);
+            if (!base) return;
+            GEAR_POOL[k].push({ name: `${SET_PIECE_NAMES[setKey][slot]} (Lv ${lv})`, slot, levelReq: lv, setName: setKey, stats: { ...base.stats }, desc: statText(base.stats) });
+        });
+    });
+});

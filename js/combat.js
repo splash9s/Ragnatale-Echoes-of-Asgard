@@ -76,21 +76,21 @@ const RUNE_RARITY_WEIGHT = { 1: 33, 2: 27, 3: 20, 4: 13, 5: 7 };
 
 const RUNE_DEFS = {
     critBonus: { name: "Berserk Rune", rarity: 1, add: 10, desc: "+10% Critical Rate", text: v => `+${v}% Critical Rate` },
-    dodge: { name: "Dodge Rune", rarity: 1, add: 10, desc: "+10% Dodge chance", text: v => `+${v}% Dodge chance` },
+    dodge: { name: "Dodge Rune", rarity: 1, add: 10, desc: "+10 FLEE (raises dodge chance)", text: v => `+${v} FLEE (raises dodge chance)` },
     swiftRun: { name: "Swift Feet Rune", rarity: 1, add: 10, desc: "Stage walk time reduced to 1 second", text: () => "Stage walk time reduced to 1 second" },
-    focus: { name: "Focus Rune", rarity: 1, add: 5, desc: "Missed attacks restore 5% HP", text: v => `Missed attacks restore ${v}% HP` },
+    focus: { name: "Focus Rune", rarity: 1, add: 10, desc: "Missed attacks restore 10% HP", text: v => `Missed attacks restore ${v}% HP` },
     maxHpBonus: { name: "Vitality Rune", rarity: 3, add: 50, desc: "+50% Max HP", text: v => `+${v}% Max HP` },
     firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "+50% Bonus Damage on First Hit", text: v => `+${v}% Bonus Damage on First Hit` },
     randomHitCount: { name: "Chaos Rune", rarity: 2, add: 1, once: true, desc: "Attacks have a 50% chance to strike random targets", text: () => "Attacks have a 50% chance to strike random targets" },
     thorn: { name: "Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage taken", text: v => `Reflect ${v}% of melee damage taken` },
     critHeal: { name: "Critical Heal Rune", rarity: 2, add: 5, desc: "Critical hits restore 5% HP", text: v => `Critical hits restore ${v}% HP` },
-    lifeline: { name: "Lifeline Rune", rarity: 2, add: 20, once: true, desc: "First damage each battle restores 20% max HP", text: v => `First damage each battle restores ${v}% max HP` },
+    lifeline: { name: "Lifeline Rune", rarity: 4, add: 20, once: true, desc: "First damage each battle restores 20% max HP", text: v => `First damage each battle restores ${v}% max HP` },
     fortify: { name: "Fortify Rune", rarity: 2, add: 5, once: true, desc: "Every 3rd attack restores 5% armor", text: v => `Every 3rd attack restores ${v}% armor` },
     evasion: { name: "Evasion Rune", rarity: 2, add: 5, desc: "Dodging restores 5% HP", text: v => `Dodging restores ${v}% HP` },
     alwaysCritFirst: { name: "Assassination Rune", rarity: 3, flag: true, desc: "First hit of every battle is always a Critical Hit", text: () => "First hit of every battle is always a Critical Hit" },
-    vampire: { name: "Vampire Rune", rarity: 4, add: 5, desc: "Heal 5% of damage dealt", text: v => `Heal ${v}% of damage dealt` },
+    vampire: { name: "Vampire Rune", rarity: 4, add: 20, desc: "Heal 20% of damage dealt", text: v => `Heal ${v}% of damage dealt` },
     divineLight: { name: "Divine Light Rune", rarity: 3, add: 100, once: true, desc: "Every 3rd attack deals +100% ATK bonus damage", text: v => `Every 3rd attack deals +${v}% ATK bonus damage` },
-    momentum: { name: "Momentum Rune", rarity: 3, add: 20, once: true, desc: "2 critical hits in a row restore 20% HP", text: v => `2 critical hits in a row restore ${v}% HP` },
+    momentum: { name: "Momentum Rune", rarity: 3, add: 10, once: true, desc: "3 critical hits in a row restore 10% HP", text: v => `3 critical hits in a row restore ${v}% HP` },
     retribution: { name: "Retribution Rune", rarity: 3, add: 5, once: true, desc: "Healing deals 5% of heal damage to a random monster", text: v => `Healing deals ${v}% of heal damage to a random monster` },
     killBlast: { name: "Shockwave Rune", rarity: 4, add: 10, once: true, desc: "Killing an enemy deals 10% ATK to all other enemies", text: v => `Killing an enemy deals ${v}% ATK to all other enemies` },
     elementIgnore: { name: "Void Rune", rarity: 5, flag: true, desc: "Ignore monster elements", text: () => "Ignore monster elements" },
@@ -102,15 +102,15 @@ const RUNE_DEFS = {
     overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "Overheal deals that amount to a random monster as damage", text: () => "Overheal deals that amount to a random monster as damage" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a Critical Hit", text: () => "Every attack is a Critical Hit" },
     bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 10, once: true, desc: "Every kill increases max HP by 10", text: v => `Every kill increases max HP by ${v}` },
-    shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Every kill increases FLEE by 0.5", text: v => `Every kill increases FLEE by ${v}` },
+    shadowStep: { name: "Shadow Step Rune", rarity: 4, add: 0.5, once: true, desc: "Every kill increases FLEE by 0.5", text: v => `Every kill increases FLEE by ${v}` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Killing an enemy restores 10% HP", text: v => `Killing an enemy restores ${v}% HP` },
     fortitude: { name: "Fortitude Rune", rarity: 2, add: 1, once: true, desc: "Critical hits have a 20% chance to increase max HP by 1%", text: v => `Critical hits have a 20% chance to increase max HP by ${v}%` },
     glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 20, once: true, desc: "Max armor becomes 0, +20% Critical Rate", text: v => `Max armor becomes 0, +${v}% Critical Rate` },
-    runeScholar: { name: "Scholar Rune", rarity: 2, flag: true, desc: "+5% max HP for each owned rune", text: () => "+5% max HP for each owned rune" },
+    runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% max HP for each owned rune", text: () => "+5% max HP for each owned rune" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each owned rune", text: () => "+20% damage for each owned rune" },
-    powerSurge: { name: "Power Surge Rune", rarity: 2, add: 50, once: true, desc: "Damage +50%", text: v => `Damage +${v}%` },
+    powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "Damage +50%", text: v => `Damage +${v}%` },
     giantSlayer: { name: "Giant Slayer Rune", rarity: 3, add: 25, once: true, desc: "Damage to boss and mini boss +25%", text: v => `Damage to boss and mini boss +${v}%` },
-    monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 25, once: true, desc: "Damage to normal monsters +25%", text: v => `Damage to normal monsters +${v}%` },
+    monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 50, once: true, desc: "Damage to normal monsters +50%", text: v => `Damage to normal monsters +${v}%` },
     ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0, damage +50%", text: () => "While armor is above 0, damage +50%" },
     patientStrike: { name: "Patient Strike Rune", rarity: 1, flag: true, desc: "After a miss, your next attack deals 300% more damage", text: () => "After a miss, your next attack deals 300% more damage" },
     twinEvasion: { name: "Twin Evasion Rune", rarity: 1, add: 5, once: true, desc: "Dodging twice in a row restores 5% HP", text: v => `Dodging twice in a row restores ${v}% HP` },
@@ -124,17 +124,17 @@ const RUNE_DEFS = {
     fireBolt: { name: "Fire Bolt Rune", rarity: 1, add: 10, desc: "Hits have a chance to fire a bolt 4 times in a row, 50% ATK each", text: v => `${v}% chance on hit to fire a bolt 4 times in a row, 50% ATK each` },
     coldBolt: { name: "Cold Bolt Rune", rarity: 1, add: 10, desc: "Hits have a chance to fire a cold bolt 4 times in a row, 50% ATK each", text: v => `${v}% chance on hit to fire a cold bolt 4 times in a row, 50% ATK each` },
     thunderBolt: { name: "Thunder Bolt Rune", rarity: 1, add: 10, desc: "Hits have a chance to call a thunder bolt 4 times in a row, 50% ATK each", text: v => `${v}% chance on hit to call a thunder bolt 4 times in a row, 50% ATK each` },
-    stoneBolt: { name: "Stone Bolt Rune", rarity: 1, add: 10, desc: "Hits have a chance to call a stone bolt 4 times in a row, 50% ATK each", text: v => `${v}% chance on hit to call a stone bolt 4 times in a row, 50% ATK each` },
+    rockBolt: { name: "Rock Bolt Rune", rarity: 1, add: 10, desc: "Hits have a chance to call a rock bolt 4 times in a row, 50% ATK each", text: v => `${v}% chance on hit to call a rock bolt 4 times in a row, 50% ATK each` },
     archerFriendlyFire: { name: "Friendly Fire Rune", rarity: 2, add: 50, once: true, disabled: true, desc: "Archers have a 50% chance to hit allies in front", text: () => "Archers have a 50% chance to hit allies in front" },
     autoPotion: { name: "Auto Potion Rune", rarity: 1, flag: true, disabled: true, desc: "Automatically drinks a health potion below 25% HP", text: () => "Automatically drinks a health potion below 25% HP" },
     potionDamage: { name: "Alchemist's Fury Rune", rarity: 2, add: 50, once: true, disabled: true, desc: "Using a potion gives +50% damage for 5 seconds", text: () => "Using a potion gives +50% damage for 5 seconds" },
     potionStun: { name: "Stun Brew Rune", rarity: 2, flag: true, disabled: true, desc: "Using a potion stuns the nearest enemy for 5 seconds", text: () => "Using a potion stuns the nearest enemy for 5 seconds" },
     killStun: { name: "Stun Burst Rune", rarity: 3, flag: true, disabled: true, desc: "Killing an enemy stuns all enemies for 3 seconds", text: () => "Killing an enemy stuns all enemies for 3 seconds" },
-    frostTouch: { name: "Frost Touch Rune", rarity: 1, flag: true, disabled: true, desc: "Hits have a 10% chance to freeze the enemy for 3 seconds", text: () => "Hits have a 10% chance to freeze the enemy for 3 seconds" },
-    stoneCurse: { name: "Stone Curse Rune", rarity: 1, flag: true, disabled: true, desc: "Hits have a 10% chance to turn the enemy to stone for 3 seconds", text: () => "Hits have a 10% chance to turn the enemy to stone for 3 seconds" },
-    splash: { name: "Splash Rune", rarity: 2, flag: true, disabled: true, desc: "Hits have a 20% chance to deal 20% damage to the enemy behind", text: () => "Hits have a 20% chance to deal 20% damage to the enemy behind" },
+    freezeTouch: { name: "Freeze Touch Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to freeze the enemy for 2 seconds (it cannot attack or dodge, and becomes water element)", text: () => "Hits have a 10% chance to freeze the enemy for 2 seconds (it cannot attack or dodge, and becomes water element)" },
+    rockCurse: { name: "Rock Curse Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to turn the enemy to rock for 2 seconds (it cannot attack or dodge, and becomes earth element)", text: () => "Hits have a 10% chance to turn the enemy to rock for 2 seconds (it cannot attack or dodge, and becomes earth element)" },
+    splash: { name: "Splash Rune", rarity: 3, flag: true, desc: "Hits have a 20% chance to deal 20% damage to the enemy behind", text: () => "Hits have a 20% chance to deal 20% damage to the enemy behind" },
     chainStrike: { name: "Chain Strike Rune", rarity: 2, add: 1, disabled: true, desc: "First attack also hits the next enemy", text: () => "First attack also hits the next enemy" },
-    sharedDamage: { name: "Shared Pain Rune", rarity: 5, add: 1, disabled: true, desc: "Each attack splits damage among all enemies", text: () => "Each attack splits damage among all enemies" },
+    sharedDamage: { name: "Shared Pain Rune", rarity: 3, flag: true, desc: "Each attack splits damage among all enemies", text: () => "Each attack splits damage among all enemies" },
     phantomVeil: { name: "Phantom Veil Rune", rarity: 2, flag: true, disabled: true, desc: "Always dodge the first attack from an enemy", text: () => "Always dodge the first attack from an enemy" }
 };
 
@@ -279,15 +279,15 @@ function startExpedition(mode, opts = {}) {
         logMessage(`[Daily] Daily Challenge started. Your level, skills and gear have no effect here.`, 'winlose');
     } else {
         activeMap = {
-            title: "Endless Void Tower",
+            title: "Endless Void Tower (Test)",
             dropKey: 'map50',
             maxStages: 999,
-            enemies: (typeof GAME_DATA !== 'undefined' && GAME_DATA.maps?.map1?.enemies) ? [...GAME_DATA.maps.map1.enemies] : [{ name: "Shadow Poring", hp: 80, maxHp: 80, atkMin: 12, atkMax: 18, hit: 110, flee: 100, baseExp: 50, jobExp: 35, gold: 80 }],
+            enemies: (typeof GAME_DATA !== 'undefined' && GAME_DATA.maps?.map1?.enemies) ? [...GAME_DATA.maps.map1.enemies] : [{ name: "Shadow Slime", hp: 80, maxHp: 80, atkMin: 12, atkMax: 18, hit: 110, flee: 100, baseExp: 50, jobExp: 35, gold: 80 }],
             boss: { name: "Void Lord", hp: 1500, maxHp: 1500, atkMin: 50, atkMax: 80, hit: 150, flee: 130, baseExp: 500, jobExp: 400, gold: 1000, isBoss: true }
         };
         currentStage = 1;
         maxStages = 999;
-        if (tagEl) tagEl.innerText = "Endless Mode";
+        if (tagEl) tagEl.innerText = "Endless Mode (Test: 100x rewards)";
         if (titleEl) titleEl.innerText = `Void Tower — Wave ${currentStage}`;
         logMessage(`[Expedition] Entering Endless Void Tower...`, 'winlose');
     }
@@ -302,7 +302,13 @@ function startExpedition(mode, opts = {}) {
 
 // ---------- STAGE / BOSS ----------
 function isMiniBossStage() {
-    return (currentMode === 'campaign' || currentMode === 'event') && !!(activeMap && activeMap.miniBoss) && currentStage === 9 && currentStage !== maxStages;
+    return (currentMode === 'campaign' || currentMode === 'event') && !!(activeMap && activeMap.miniBoss) && currentStage === ((activeMap && activeMap.miniStage) || 7) && currentStage !== maxStages;
+}
+
+// Rune offers on campaign and event maps: after stages 1, 3, 6, 10, 15, 20, 25, 30, then every 5th stage
+const CAMPAIGN_RUNE_STAGES = [1, 3, 6, 10, 15, 20, 25, 30];
+function isRuneStage(stage) {
+    return CAMPAIGN_RUNE_STAGES.includes(stage) || (stage > 30 && stage % 5 === 0);
 }
 
 function isBossStage() {
@@ -340,6 +346,7 @@ function spawnStageMonsters() {
     battleFirstDamageTaken = false;
     critStreak = 0;
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
+    playerDebuffs = { curse: 0, frost: 0, stun: 0 };
     const derived = getDerivedStats();
     player.armor = derived.maxArmor;
     monstersList = [];
@@ -361,12 +368,15 @@ function spawnStageMonsters() {
     } else if (isBossStage()) {
         const boss = makeBoss(getBossTemplate());
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
+        if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
         logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), Heavy Strike (every 4th attack, x2 damage), Regeneration (1.5% HP per turn).`, 'winlose');
+    } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
+        spawnWaveFromSet(dailyScale, scaled);
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
             const count = Math.floor(Math.random() * 5) + 2;
-            const mult = currentMode === 'endless' ? 1 + (currentStage * 0.08) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
+            const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
                 const base = {
@@ -388,6 +398,126 @@ function spawnStageMonsters() {
     updateUI();
 }
 
+// ---------- WAVES, ROLES AND SUPPORT ----------
+// Player debuffs caused by enemy spells (turns left)
+let playerDebuffs = { curse: 0, frost: 0, stun: 0 };
+
+const SPELL_DEFS = {
+    fireBolt:    { label: "Fire Bolt",    mult: 1.2 },
+    rockBolt:   { label: "Rock Bolt",   mult: 1.0 },
+    rockCurse:  { label: "Rock Curse",  mult: 0.6 },
+    iceBolt:     { label: "Ice Bolt",     mult: 1.0 },
+    freezeTouch:  { label: "Freeze Touch",  mult: 0.6 },
+    thunderBolt: { label: "Thunder Bolt", mult: 1.3 }
+};
+// Mage type -> spells it can use (one is picked when the mage spawns)
+const MAGE_SPELLS = {
+    fire:  ['fireBolt'],
+    earth: ['rockBolt', 'rockCurse'],
+    ice:   ['iceBolt', 'freezeTouch'],
+    wind:  ['thunderBolt']
+};
+
+function roleOf(m) {
+    return m.role || (m.isRanged ? 'range' : 'melee');
+}
+
+// Picks a monster of the wanted role. Falls back to a close role if the map has none of it.
+function pickUnit(pool, role) {
+    const fallback = { melee: ['melee', 'tank'], tank: ['tank', 'melee'], range: ['range'], healer: ['healer', 'range'], mage: ['mage', 'range', 'melee'] };
+    for (const r of (fallback[role] || [role])) {
+        const list = pool.filter(m => roleOf(m) === r);
+        if (list.length > 0) return list[Math.floor(Math.random() * list.length)];
+    }
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function stageMultiplier() {
+    return 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
+}
+
+// A fresh copy of a template for this stage
+function makeUnit(t, mult) {
+    const unit = {
+        ...t,
+        hp: Math.floor(t.hp * mult),
+        maxHp: Math.floor(t.maxHp * mult),
+        atkMin: Math.floor(t.atkMin * mult),
+        atkMax: Math.floor(t.atkMax * mult),
+        hit: Math.floor(t.hit * (1 + (currentStage * 0.02))),
+        flee: Math.floor(t.flee * (1 + (currentStage * 0.02))),
+        isBoss: false, rewarded: false, ailments: {}
+    };
+    if (roleOf(t) === 'mage') {
+        const options = MAGE_SPELLS[t.mageType] || ['fireBolt'];
+        unit.spell = options[Math.floor(Math.random() * options.length)];
+    }
+    return unit;
+}
+
+// Normal stage: pick one wave set at random and fill each slot with a monster of that role
+function spawnWaveFromSet(dailyScale, scaled) {
+    const set = WAVE_SETS[Math.floor(Math.random() * WAVE_SETS.length)];
+    const pool = activeMap.enemies;
+    const mult = stageMultiplier();
+    set.forEach(role => {
+        const unit = makeUnit(pickUnit(pool, role), mult);
+        monstersList.push(dailyScale === 1 ? unit : scaled(unit));
+    });
+    logMessage(`[Wave] ${monstersList.length} enemies come forward!`, 'combat');
+}
+
+// Boss stage: the boss stands in front, and support monsters fill their lineup positions
+function addBossSupport(boss) {
+    const lineup = [boss];
+    const mult = stageMultiplier();
+    ((activeMap && activeMap.bossSupport) || []).forEach(s => {
+        lineup[s.pos - 1] = makeUnit(pickUnit(activeMap.enemies, s.role), mult);
+    });
+    monstersList = lineup.filter(Boolean);
+    const names = monstersList.slice(1).map(m => m.name).join(', ');
+    if (names) logMessage(`[Support] ${names} stand behind ${boss.name}.`, 'winlose');
+}
+
+// Curse and frost wear off one turn at a time
+function tickPlayerDebuffs() {
+    if (playerDebuffs.curse > 0) playerDebuffs.curse--;
+    if (playerDebuffs.frost > 0) playerDebuffs.frost--;
+}
+
+// ---------- ENEMY STATUS: FREEZE (water) and ROCK (earth) ----------
+const STATUS_MS = 2000;
+const MAX_BASE_LV = 99;
+const MAX_CLASS_LV = 50;
+const VOID_TEST_MULT = 100; // Void Tower is a test mode: 100x EXP, gold, and item chance
+const STATUS_DEFS = {
+    freeze: { label: "Freeze", element: 'water' },
+    rock:   { label: "Rock",   element: 'earth' }
+};
+// Freeze or rock: the enemy cannot attack or dodge, and takes the status element, for 2 seconds
+function applyEnemyStatus(m, kind) {
+    if (!m || m.hp <= 0) return;
+    if (!m.status) m.baseElement = m.element;
+    m.status = { kind, ms: STATUS_MS };
+    m.element = STATUS_DEFS[kind].element;
+    const change = kind === 'freeze' ? 'is frozen' : 'turns to rock';
+    logMessage(`[${STATUS_DEFS[kind].label}] ${m.name} ${change}! It cannot attack or dodge for 2 seconds.`, 'drop');
+}
+function combatTickMs(derived) {
+    return Math.max(400, 2000 - (derived.aspd * 10));
+}
+function tickEnemyStatuses(tickMs) {
+    monstersList.forEach(m => {
+        if (!m.status || m.hp <= 0) return;
+        m.status.ms -= tickMs;
+        if (m.status.ms <= 0) {
+            m.element = m.baseElement || m.element;
+            m.status = null;
+            logMessage(`[Status] ${m.name} is no longer affected.`, 'combat');
+        }
+    });
+}
+
 function getAliveMonsters() {
     return monstersList.filter(m => m.hp > 0);
 }
@@ -396,7 +526,7 @@ function updateQuestProgress(type, amount) {
     if (!player.dailyQuests) return;
     player.dailyQuests.forEach(q => {
         if (!q.completed) {
-            if ((type === 'porings' && q.id === 'q_porings') ||
+            if ((type === 'slimes' && q.id === 'q_slimes') ||
                 (type === 'crit' && q.id === 'q_crit') ||
                 (type === 'gold' && q.id === 'q_gold')) {
                 q.current = Math.min(q.target, q.current + amount);
@@ -414,22 +544,30 @@ function awardKill(m) {
     player.runes.killCount = (player.runes.killCount || 0) + 1;
     if (runeN('reaper') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('reaper') / 100), 'Reaper');
     const isEvent = currentMode === 'event';
+    const isVoidTest = currentMode === 'endless';
     const derived = getDerivedStats();
-    let finalGold = Math.floor(((m.gold / 4) * (1 + (skillLvl('moneyDrop') * 0.01))) * derived.goldMultiplier);
+    let finalGold = Math.floor(((m.gold / 4) * (1 + (skillBonus('goldPct') + ((m.isBoss || m.isMiniBoss) ? skillBonus('bossGoldPct') : 0)) / 100)) * derived.goldMultiplier);
     let baseExpGain = m.baseExp;
     let jobExpGain = m.jobExp;
     if (isEvent && currentEvent === 'gold') { finalGold *= 2; baseExpGain = 0; jobExpGain = 0; }
     if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; finalGold = 0; }
+    const bossKill = !!(m.isBoss || m.isMiniBoss);
+    const bossExp = bossKill ? skillBonus('bossExpPct') : 0;
+    baseExpGain = Math.floor(baseExpGain * (1 + (skillBonus('baseExpPct') + skillBonus('allExpPct') + bossExp) / 100));
+    jobExpGain = Math.floor(jobExpGain * (1 + (skillBonus('classExpPct') + skillBonus('allExpPct') + bossExp) / 100));
+    if (isVoidTest) { baseExpGain *= VOID_TEST_MULT; jobExpGain *= VOID_TEST_MULT; finalGold *= VOID_TEST_MULT; }
+    if (player.baseLv >= MAX_BASE_LV) baseExpGain = 0;
+    if (player.jobLv >= MAX_CLASS_LV) jobExpGain = 0;
 
-    logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Job EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
+    logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
     player.baseExp += baseExpGain;
     player.jobExp += jobExpGain;
 
-    updateQuestProgress('porings', 1);
+    updateQuestProgress('slimes', 1);
     updateQuestProgress('gold', finalGold);
 
-    if (player.baseExp >= player.baseMaxExp) {
+    if (player.baseLv < MAX_BASE_LV && player.baseExp >= player.baseMaxExp) {
         player.baseLv++;
         player.baseExp -= player.baseMaxExp;
         player.baseMaxExp = Math.floor(player.baseMaxExp * 1.35);
@@ -438,27 +576,28 @@ function awardKill(m) {
         playSound('sound/lvup.wav');
     }
 
-    if (player.jobExp >= player.jobMaxExp) {
+    if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
         player.jobLv++;
         player.jobExp -= player.jobMaxExp;
         player.jobMaxExp = Math.floor(player.jobMaxExp * 1.3);
         player.jobSp += 1;
-        logMessage(`[JOB LEVEL UP!] Reached Job Level ${player.jobLv}! Gained 1 SP`, 'levelup');
+        logMessage(`[CLASS LEVEL UP!] Reached Class Level ${player.jobLv}! Gained 1 SP`, 'levelup');
     }
 
     // Events give no item drops
     if (isEvent) return;
 
     const pool = typeof GEAR_POOL !== 'undefined' ? (GEAR_POOL[activeMap.dropKey || 'map1'] || GEAR_POOL.map1) : [];
-    if (!m.isBoss && !m.isMiniBoss && pool.length > 0 && Math.random() < 0.05) {
+    const itemChance = isVoidTest ? 1 : 0.01;
+    if (!m.isBoss && !m.isMiniBoss && pool.length > 0 && Math.random() < itemChance) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template);
         logMessage(`[Monster Drop] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(droppedItem);
     }
-    if (m.isMiniBoss && pool.length > 0 && Math.random() < 0.5) {
+    if (m.isMiniBoss && pool.length > 0 && Math.random() < (isVoidTest ? 1 : 0.5)) {
         const template = pool[Math.floor(Math.random() * pool.length)];
-        const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
+        const droppedItem = generatePoEItem(template, rollMiniBossDropRarity(), 1);
         logMessage(`[Mini Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(droppedItem);
     }
@@ -540,6 +679,10 @@ function onPlayerDodged(m, source) {
 // Armor absorbs damage first, the rest goes to HP
 // Armor absorbs damage first, the rest goes to HP
 function takePlayerDamage(dmg, m) {
+    dmg = Math.floor(dmg * (1 - skillBonus('dmgReducePct') / 100));
+    // Element resistance from gear: a negative value means extra damage from that element
+    const incomingRes = m && m.element ? (getDerivedStats().elemRes[m.element] || 0) : 0;
+    dmg = Math.floor(dmg * (1 - incomingRes / 100));
     let remaining = dmg;
     let absorbed = 0;
     if (player.armor > 0) {
@@ -570,26 +713,43 @@ function bossTurnStart(m) {
     }
 }
 
-function monsterAct(m, derived) {
+function monsterAct(m, derived, position = 0) {
     if (player.hp <= 0 || m.hp <= 0) return;
     if (m.isBoss) bossTurnStart(m);
-    if (m.ailments?.frozen && Math.random() < 0.5) {
-        logMessage(`[Freeze] ${m.name} is frozen and cannot attack!`, 'winlose');
+    if (m.status) {
+        logMessage(`[${STATUS_DEFS[m.status.kind].label}] ${m.name} cannot attack!`, 'winlose');
         return;
     }
     if (m.isBoss) m.attackCount = (m.attackCount || 0) + 1;
 
-    const hitChance = Math.min(0.95, Math.max(0.2, (m.hit - derived.flee + 80) / 100));
-    if (Math.random() <= hitChance) {
-        if (runeN('dodge') > 0 && Math.random() * 100 < runeN('dodge')) {
-            onPlayerDodged(m, 'Dodge Rune');
+    // Healers restore the most wounded ally by a flat amount instead of attacking
+    if (roleOf(m) === 'healer' && m.heal) {
+        const wounded = getAliveMonsters().filter(x => x.hp < x.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
+        if (wounded) {
+            const amount = Math.min(m.heal, wounded.maxHp - wounded.hp);
+            wounded.hp += amount;
+            logMessage(`[Heal] ${m.name} heals ${wounded.name} for ${amount} HP`, 'combat');
             return;
         }
+    }
+    // Melee and tank units only strike from the front three positions
+    if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 3) return;
+
+    const hitChance = Math.min(0.95, Math.max(0.2, (m.hit - derived.flee + 80) / 100));
+    if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
         if (m.isBoss && m.attackCount % 4 === 0) {
             eDmg = Math.floor(eDmg * 2);
             logMessage(`[Boss Skill] ${m.name} uses Heavy Strike!`, 'winlose');
+        }
+        if (m.spell) {
+            const def = SPELL_DEFS[m.spell];
+            eDmg = Math.floor(eDmg * def.mult);
+            logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
+            if (m.spell === 'rockCurse') { playerDebuffs.curse = 3; logMessage('[Curse] Your attacks are weaker for 3 turns', 'winlose'); }
+            if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); }
+            if (m.spell === 'thunderBolt' && Math.random() < 0.25) { playerDebuffs.stun = 1; logMessage('[Stun] You are stunned for 1 turn', 'winlose'); }
         }
         takePlayerDamage(eDmg, m);
         dodgeStreak = 0;
@@ -623,6 +783,7 @@ function runCombatTick() {
     if (player.hp <= 0) return;
 
     attackCount++;
+    tickEnemyStatuses(combatTickMs(derived));
 
     // ---- Player attack ----
     let targetEnemy = alive[0];
@@ -647,16 +808,22 @@ function runCombatTick() {
         logMessage(`[Ignite] ${targetEnemy.name} burns for ${iDmg} fire damage.`, 'combat');
     }
 
-    const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - targetEnemy.flee + 80) / 100));
-    if (runeN('hawkEye') > 0 || Math.random() <= hitChance) {
-        const bonusDmg = skillLvl('crushing') * 3 + (isFirstHitOfBattle ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
+    const stunned = playerDebuffs.stun > 0;
+    if (stunned) { playerDebuffs.stun--; logMessage('[Stun] You are stunned and cannot attack this turn!', 'winlose'); }
+    const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - (playerDebuffs.frost > 0 ? 20 : 0) - targetEnemy.flee + 80) / 100));
+    if (!stunned && (runeN('hawkEye') > 0 || !!targetEnemy.status || Math.random() <= hitChance)) {
+        const bonusDmg = (isFirstHitOfBattle ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
         const elemMult = player.runes.elementIgnore ? 1 : getElementMultiplier(player.equipped.weapon?.element, targetEnemy.element);
         if (elemMult !== 1 && !player.runes.elementIgnore) {
             logMessage(`[Element] ${elemMult > 1 ? 'Advantage' : 'Resisted'} x${elemMult} vs ${targetEnemy.name}`, elemMult > 1 ? 'drop' : 'combat');
         }
         let pDmg = Math.floor((derived.atk + bonusDmg) * elemMult);
+        if (playerDebuffs.curse > 0) pDmg = Math.floor(pDmg * 0.8);
+        if (targetEnemy.armor) pDmg = Math.floor(pDmg * (1 - targetEnemy.armor / 100));
         if (runeN('powerSurge') > 0) pDmg = Math.floor(pDmg * (1 + runeN('powerSurge') / 100));
         if (runeN('runeMastery') > 0) pDmg = Math.floor(pDmg * (1 + 0.2 * (player.currentRunRunes || []).length));
+        if (targetEnemy.isBoss || targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + skillBonus('bossDmgPct') / 100));
+        if (targetEnemy.hp > 0 && targetEnemy.hp <= targetEnemy.maxHp * 0.5) pDmg = Math.floor(pDmg * (1 + skillBonus('lowHpDmgPct') / 100));
         if (runeN('giantSlayer') > 0 && (targetEnemy.isBoss || targetEnemy.isMiniBoss)) pDmg = Math.floor(pDmg * (1 + runeN('giantSlayer') / 100));
         if (runeN('monsterHunter') > 0 && !targetEnemy.isBoss && !targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + runeN('monsterHunter') / 100));
         if (runeN('ironFortress') > 0 && player.armor > 0) pDmg = Math.floor(pDmg * 1.5);
@@ -673,7 +840,7 @@ function runCombatTick() {
         player.runes.surgeReady = false;
         const isCrit = (isFirstHitOfBattle && player.runes.alwaysCritFirst) || runeN('relentless') > 0 || riposteCrit || (Math.random() * 100 < derived.crit + surgeBonus);
         if (isCrit) {
-            pDmg = Math.floor(pDmg * 1.5);
+            pDmg = Math.floor(pDmg * (1.5 + (skillBonus('critDmgPct') + setStat('critDmgPct')) / 100));
             updateQuestProgress('crit', 1);
             playSound('sound/critical.wav');
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
@@ -682,7 +849,7 @@ function runCombatTick() {
             if (runeN('fortitude') > 0 && Math.random() < 0.2) player.runes.fortitudeStacks = (player.runes.fortitudeStacks || 0) + 1;
             player.runes.surgeReady = runeN('surgeFocus') > 0;
             if (runeN('critHeal') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('critHeal') / 100), 'Critical Heal');
-            if (critStreak >= 2) {
+            if (critStreak >= 3) {
                 critStreak = 0;
                 if (runeN('momentum') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('momentum') / 100), 'Momentum');
             }
@@ -691,9 +858,26 @@ function runCombatTick() {
             playSound('sound/hit.wav');
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
         }
-        targetEnemy.hp -= pDmg;
+        if (runeN('sharedDamage') > 0 && alive.length > 1) {
+            const share = Math.max(1, Math.floor(pDmg / alive.length));
+            alive.forEach(e => { e.hp -= share; });
+            logMessage(`[Shared Pain] Damage split: ${share} to each of ${alive.length} enemies`, 'drop');
+        } else {
+            targetEnemy.hp -= pDmg;
+        }
+        if (runeN('splash') > 0 && Math.random() < 0.2) {
+            const idx = monstersList.indexOf(targetEnemy);
+            const behind = monstersList.slice(idx + 1).find(e => e.hp > 0);
+            if (behind) {
+                const splashDmg = Math.max(1, Math.floor(pDmg * 0.2));
+                behind.hp -= splashDmg;
+                logMessage(`[Splash] ${splashDmg} damage to ${behind.name} behind ${targetEnemy.name}`, 'drop');
+            }
+        }
         battlePlayerHits++;
-        ['fireBolt', 'coldBolt', 'thunderBolt', 'stoneBolt'].forEach(id => {
+        if (targetEnemy.hp > 0 && runeN('freezeTouch') > 0 && Math.random() < 0.10) applyEnemyStatus(targetEnemy, 'freeze');
+        if (targetEnemy.hp > 0 && runeN('rockCurse') > 0 && Math.random() < 0.10) applyEnemyStatus(targetEnemy, 'rock');
+        ['fireBolt', 'coldBolt', 'thunderBolt', 'rockBolt'].forEach(id => {
             const ch = runeN(id);
             if (ch > 0 && Math.random() * 100 < ch) {
                 for (let b = 0; b < 4; b++) {
@@ -731,7 +915,8 @@ function runCombatTick() {
     }
 
     // ---- Monster turn (every living monster attacks) ----
-    alive.forEach(m => monsterAct(m, derived));
+    tickPlayerDebuffs();
+    alive.forEach((m, i) => monsterAct(m, derived, i));
 
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
     if (getAliveMonsters().length === 0) {
@@ -804,7 +989,7 @@ function onStageCleared() {
                 const firstClear = !player.clearedMaps[clearKey];
                 player.clearedMaps[clearKey] = true;
                 if (firstClear) {
-                    const diamondBonus = 1 + Math.floor(Math.random() * 5);
+                    const diamondBonus = 1;
                     player.diamonds += diamondBonus;
                     logMessage(`[First Clear] ${activeMap.title} cleared for the first time: +${diamondBonus} Diamond!`, 'levelup');
                 }
@@ -840,7 +1025,10 @@ function onStageCleared() {
             spawnStageMonsters();
         };
 
-        if ((currentMode === 'campaign' || currentMode === 'daily' || currentMode === 'event') && currentStage % (currentMode === 'daily' ? 5 : 4) === 0 && currentStage < maxStages) {
+        const runeDue = currentMode === 'daily' ? currentStage % 5 === 0
+            : currentMode === 'endless' ? currentStage % 4 === 0
+            : (currentMode === 'campaign' || currentMode === 'event') && isRuneStage(currentStage);
+        if (runeDue && currentStage < maxStages) {
             checkRuneSelectionPrompt(proceedNext);
         } else {
             window.pendingStageProceed = proceedNext;
@@ -876,7 +1064,7 @@ function returnToTown() {
 const EVENT_LIMIT = 3;
 const EVENT_CONFIG = {
     gold: { name: "Gold Frenzy", desc: "Monsters at x1.5 HP and damage. Gold x2, but no EXP. No item drops." },
-    xp: { name: "Wisdom Trial", desc: "Monsters at x1.5 HP and damage. Base and Job EXP x2, but no Gold. No item drops." }
+    xp: { name: "Wisdom Trial", desc: "Monsters at x1.5 HP and damage. Base and Class EXP x2, but no Gold. No item drops." }
 };
 const EVENT_MAPS = {
     gold: [
@@ -923,7 +1111,9 @@ function buildEventMap(kind, mapKey) {
     return {
         title: `${EVENT_CONFIG[kind].name} — ${base.title}`,
         dropKey: base.dropKey,
-        maxStages: base.maxStages,
+        maxStages: base.campaignStages || 11,
+        miniStage: base.miniStage,
+        bossSupport: base.bossSupport,
         enemies: base.enemies.map(scale),
         boss: base.boss ? scale(base.boss) : null,
         miniBoss: base.miniBoss ? scale(base.miniBoss) : null

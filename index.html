@@ -29,7 +29,7 @@
                 <div class="flex items-center gap-2 text-[10px] text-slate-400">
                     <span>Base Lv. <strong id="header-base-lv" class="text-slate-200">1</strong></span>
                     <span>•</span>
-                    <span>Job Lv. <strong id="header-job-lv" class="text-slate-200">1</strong></span>
+                    <span>Class Lv. <strong id="header-job-lv" class="text-slate-200">1</strong></span>
                 </div>
                 <div class="flex flex-col gap-1 w-44 mt-1">
             <div class="flex justify-between text-[9px] text-slate-400 font-mono">
@@ -40,7 +40,7 @@
                 <div id="top-base-exp-bar" class="bg-amber-500 h-full transition-all duration-300" style="width: 0%"></div>
             </div>
             <div class="flex justify-between text-[9px] text-slate-400 font-mono">
-                <span>Job EXP</span>
+                <span>Class EXP</span>
                 <span id="top-job-exp-text">0 / 40 (0%)</span>
             </div>
             <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
@@ -165,16 +165,16 @@
                     <div id="campaign-path-list" class="grid grid-cols-2 gap-2 mb-2"></div>
                     <div id="campaign-map-list" class="grid grid-cols-2 gap-2"></div>
                     <select id="campaign-map-select" class="hidden w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-amber-400">
-                        <option value="map1">Prontera Outskirts (Lv. 1)</option>
-                        <option value="map10">Payon Forest (Lv. 10)</option>
-                        <option value="map20">Geffen Magic Academy (Lv. 20)</option>
+                        <option value="map1">Valgrove Outskirts (Lv. 1)</option>
+                        <option value="map10">Ashmere Forest (Lv. 10)</option>
+                        <option value="map20">Runeholt Academy (Lv. 20)</option>
                     </select>
                     <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
                     <div>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless</span>
-                        <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower</h3>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
+                        <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower <span class="text-[10px] text-amber-300">(100x rewards, test only)</span></h3>
                     </div>
                     <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
                 </div>
@@ -212,10 +212,10 @@
 
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                 <h3 class="text-sm font-bold text-amber-300">Campaign Structure</h3>
-                <p class="text-[11px] text-slate-300">4 paths, each with 6 maps (Lv. 1, 10, 20, 30, 40, 50). Every map has 17 stages.</p>
+                <p class="text-[11px] text-slate-300">4 paths, each with 6 maps (Lv. 1, 10, 20, 30, 40, 50). Stage counts: Lv. 1 and 10 have 11, Lv. 20 has 15, Lv. 30 and 40 have 16, Lv. 50, 60 and 70 have 21, Lv. 80 and 90 have 26, Lv. 99 has 31.</p>
                 <ul class="text-[11px] text-slate-300 list-disc pl-5 flex flex-col gap-1">
-                    <li>Stage 9: Mini Boss. Stage 17: Boss (MVP).</li>
-                    <li>A rune offer appears after every 4th stage (4, 8, 12, 16).</li>
+                    <li>Stage 7: Mini Boss. Last stage: Boss (Champion).</li>
+                    <li>Rune offers after stages 1, 3, 6, 10, 15, 20, 25, 30, then every 5th stage.</li>
                     <li>The first clear of each map awards 1-5 Diamond.</li>
                     <li>Each path keeps its own progress. The next map unlocks after the previous one is cleared.</li>
                 </ul>
@@ -269,6 +269,21 @@
             </div>
         </div>
 
+        <div id="view-skills" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-purple-300">Skills</h2>
+                    <p class="text-xs text-slate-400">Four passive builds. Each skill unlocks when the one before reaches the level shown.</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="text-xs text-purple-400">SP: <strong id="skill-page-sp">0</strong></span>
+                    <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+                </div>
+            </div>
+            <div id="skill-pending-bar" class="flex flex-col gap-2"></div>
+            <div id="skill-build-columns" class="grid grid-cols-1 md:grid-cols-4 gap-3"></div>
+        </div>
+
         <div id="view-character" class="hidden flex flex-col gap-4 flex-1">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <h2 class="text-base font-bold text-amber-400">Character & Equipment</h2>
@@ -284,7 +299,7 @@
                 <div class="flex flex-col gap-4">
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Equipped Gear</h3>
-                        <div id="equipment-slots-container" class="flex flex-col gap-2"></div>
+                        <div id="equipment-slots-container" class="grid grid-cols-2 gap-3 items-start"></div>
                         <div id="set-bonus-panel" class="flex flex-col gap-2"></div>
                     </div>
                 </div>
@@ -337,23 +352,39 @@
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Skill Tree</h3>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Builds</h3>
                             <span class="text-xs text-purple-400">SP: <strong id="sp-count">0</strong></span>
                         </div>
                         <div id="skill-tree-container" class="flex flex-col gap-2"></div>
-                        <div id="skill-pending-bar" class="flex flex-col gap-2"></div>
+                        <button onclick="switchView('skills')" class="py-2 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Open Skills Page</button>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-2 flex-wrap">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inventory Bag</h3>
-                        <div class="flex items-center gap-2">
-                            <button onclick="sortInventory('asc')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold rounded cursor-pointer transition">Sort by Type ↑</button>
-                            <button onclick="sortInventory('desc')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold rounded cursor-pointer transition">Sort by Type ↓</button>
-                            <span id="inventory-count" class="text-xs font-mono text-slate-400">0 / 40</span>
-                        </div>
+                        <span id="inventory-count" class="text-xs font-mono text-slate-400">0 / 30 slots</span>
                     </div>
-                    <div id="inventory-grid" class="grid grid-cols-4 gap-2"></div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="inventory-sort" onchange="sortInventory(this.value); this.selectedIndex = 0;" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold rounded cursor-pointer transition border border-slate-700">
+                            <option value="">Sort by…</option>
+                            <option value="type_asc">Type ↑</option>
+                            <option value="type_desc">Type ↓</option>
+                            <option value="level_asc">Level ↑</option>
+                            <option value="level_desc">Level ↓</option>
+                            <option value="rarity_asc">Rarity ↑</option>
+                            <option value="rarity_desc">Rarity ↓</option>
+                        </select>
+                        <button onclick="salvageAllEquipment()" class="px-2 py-1 bg-red-600/60 hover:bg-red-600 text-red-100 text-[10px] font-bold rounded cursor-pointer transition">Salvage All</button>
+                        <button onclick="sellAllEquipment()" class="px-2 py-1 bg-amber-700 hover:bg-amber-600 text-amber-100 text-[10px] font-bold rounded cursor-pointer transition">Sell All</button>
+                    </div>
+                    <div id="inventory-grid" class="grid grid-cols-5 gap-2"></div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stash</h3>
+                        <span id="stash-count" class="text-xs font-mono text-slate-400">0 / 30 slots</span>
+                    </div>
+                    <div id="stash-grid" class="grid grid-cols-5 gap-2"></div>
                 </div>
             </div>
         </div>
@@ -425,7 +456,7 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
                     <span id="node-mode-tag" class="text-[10px] font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/40 uppercase">Campaign Mode</span>
-                    <h2 id="node-title" class="text-sm font-bold text-slate-200 mt-1">Prontera Outskirts — Stage 1 / 11</h2>
+                    <h2 id="node-title" class="text-sm font-bold text-slate-200 mt-1">Valgrove Outskirts — Stage 1 / 11</h2>
                 </div>
                 <div class="flex gap-2">
                     <button id="next-stage-btn" onclick="proceedToNextStage()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Next Stage</button>

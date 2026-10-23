@@ -18,14 +18,14 @@ const GOLD_SHOP_CONSUMABLES = [
 ];
 
 const DIAMOND_SHOP_ITEMS = [
-    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 150, type: 'vip', days: 30 },
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 200, type: 'vip', days: 30 },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 50, type: 'vip', days: 7 },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 10, type: 'vip', days: 1 },
-    { id: 'pet_loyal_poring', name: "Loyal Poring Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
+    { id: 'pet_loyal_slime', name: "Loyal Slime Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
     { id: 'res_potion', name: "Resurrection Potion", price: 3, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
     { id: 'stat_reset', name: "Stat Reset Service", price: 10, type: 'service', desc: "Resets all attributes to 1 and refunds all spent stat points." },
-    { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "Resets all skill levels and refunds all spent Job SP." },
+    { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "Resets all skill levels and refunds all spent Class SP." },
     { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "Opens for 1-500 Gold and 1 armory item (Rarity 1)." },
     { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "Opens for 501-1000 Gold and 1 armory item (Rarity 2-3)." },
     { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "Opens for 1501-2000 Gold and 2 armory items (Rarity 3-4)." }
@@ -149,7 +149,7 @@ function closeModal() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-library', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -161,6 +161,10 @@ function switchView(viewName) {
         renderMapGateUI();
     }
     if (viewName === 'character') document.getElementById('view-character')?.classList.remove('hidden');
+    if (viewName === 'skills') {
+        document.getElementById('view-skills')?.classList.remove('hidden');
+        renderSkillPage();
+    }
     if (viewName === 'library') {
         document.getElementById('view-library')?.classList.remove('hidden');
         renderLibraryView();
@@ -255,10 +259,11 @@ function renderMapGateUI() {
         const unlocked = isMapUnlocked(key);
         const cleared = !!(player.clearedMaps && player.clearedMaps[key]);
         const selected = m === current;
-        let cls, sub;
+        let cls, sub, diamond = false;
         if (!unlocked) {
             cls = 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed';
             sub = `🔒 Clear ${getMapPrereqTitle(m)} first`;
+            diamond = true;
         } else if (selected) {
             cls = 'bg-amber-500/20 border-amber-400 text-amber-300 cursor-pointer';
             sub = cleared ? '✔ Cleared · Selected' : 'Selected';
@@ -266,9 +271,10 @@ function renderMapGateUI() {
             cls = 'bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400 cursor-pointer';
             sub = cleared ? '✔ Cleared' : 'Available';
         }
-        return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="p-3 rounded-xl border text-left text-xs transition ${cls}">
-            <span class="block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
-            <span class="block text-[10px] mt-0.5">${sub}</span>
+        const bg = diamond ? '<span aria-hidden="true" class="absolute -right-2 -bottom-4 text-6xl text-slate-700/40 pointer-events-none select-none">◆</span>' : '';
+        return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="relative overflow-hidden p-3 rounded-xl border text-left text-xs transition ${cls}">
+            ${bg}<span class="relative block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
+            <span class="relative block text-[10px] mt-0.5">${sub}</span>
         </button>`;
     }).join('');
 }
@@ -359,7 +365,7 @@ function buyArmoryItem(itemIndex) {
         showModal("Purchase Failed", "Insufficient Gold!");
         return;
     }
-    if (!Array.isArray(player.inventory)) player.inventory = new Array(40).fill(null);
+    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
     let emptyIdx = player.inventory.findIndex(s => s === null);
     if (emptyIdx === -1) {
         showModal("Purchase Failed", "Inventory is full!");
@@ -434,7 +440,7 @@ function buyDiamondItem(itemId) {
             player.skills[key].level = 0;
         }
         player.jobSp += refunded;
-        showModal("Skill Reset Successful", `All skills reset and ${refunded} Job SP refunded!`);
+        showModal("Skill Reset Successful", `All skills reset and ${refunded} Class SP refunded!`);
     } else if (item.type === 'chest') {
         placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
         showModal("Purchase Successful", `You bought a ${item.name}! Open it from your inventory.`);
@@ -569,7 +575,7 @@ function countFreeCapacity(newItem) {
 
 // Places an item into the bag, merging into existing stacks first. All-or-nothing.
 function placeItemInInventory(newItem) {
-    if (!Array.isArray(player.inventory)) player.inventory = new Array(40).fill(null);
+    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
     let qty = newItem.qty || 1;
     if (countFreeCapacity(newItem) < qty) return false;
 
@@ -596,13 +602,43 @@ function placeItemInInventory(newItem) {
 
 function addItemToInventory(newItem) {
     if (!placeItemInInventory(newItem)) {
-        logMessage(`[Inventory Full] Could not obtain ${newItem.name}!`, 'combat');
+        logMessage(`[Inventory Full] ${newItem.name} was discarded.`, 'combat');
         return false;
     }
     const q = newItem.qty || 1;
     logMessage(`[Inventory] Obtained ${newItem.name}${q > 1 ? ' x' + q : ''}!`, 'drop');
     updateUI();
     saveGame();
+    return true;
+}
+
+// Places an item into any slot list (used by the stash). All-or-nothing, merges stacks first.
+function placeIntoList(list, newItem) {
+    let qty = newItem.qty || 1;
+    const stackable = isStackable(newItem);
+    const limit = stackLimit(newItem);
+    let cap = 0;
+    for (const s of list) {
+        if (s === null) cap += limit;
+        else if (stackable && s.name === newItem.name && isStackable(s)) cap += Math.max(0, stackLimit(s) - (s.qty || 1));
+    }
+    if (cap < qty) return false;
+    if (stackable) {
+        for (const s of list) {
+            if (qty <= 0) break;
+            if (s && s.name === newItem.name && isStackable(s)) {
+                const add = Math.min(stackLimit(s) - (s.qty || 1), qty);
+                if (add > 0) { s.qty = (s.qty || 1) + add; qty -= add; }
+            }
+        }
+    }
+    while (qty > 0) {
+        const idx = list.findIndex(x => x === null);
+        if (idx === -1) break;
+        const put = Math.min(limit, qty);
+        list[idx] = { ...newItem, qty: put };
+        qty -= put;
+    }
     return true;
 }
 
@@ -646,31 +682,42 @@ function normalizeInventoryStacks() {
 }
 
 // Sort the bag by item type. Empty slots stay at the end.
-const TYPE_RANK = { weapon: 1, shield: 2, armor: 3, garment: 4, footgear: 5, ring: 6, pet: 7 };
+const TYPE_RANK = { weapon: 1, shield: 2, hat: 3, armor: 4, garment: 5, footgear: 6, ring: 7, pet: 8 };
 function itemTypeRank(item) {
     if (item.slot) return TYPE_RANK[item.slot] || 50;
     if (item.type === 'potion' || /Potion/.test(item.name || '')) return 60;
     return 70;
 }
 
-function sortInventory(dir) {
+function sortInventory(key) {
+    const [field, dir] = String(key || 'type_asc').split('_');
     const sign = dir === 'desc' ? -1 : 1;
+    const valueOf = {
+        type: it => itemTypeRank(it),
+        level: it => it.levelReq || 0,
+        rarity: it => it.rarity || 0
+    }[field] || (() => 0);
     const items = player.inventory.filter(Boolean);
-    items.sort((a, b) => ((itemTypeRank(a) - itemTypeRank(b)) || a.name.localeCompare(b.name)) * sign);
-    player.inventory = [...items, ...new Array(player.inventory.length - items.length).fill(null)];
-    logMessage(`[Inventory] Sorted by type (${dir === 'desc' ? 'descending' : 'ascending'})`, 'drop');
+    items.sort((a, b) =>
+        ((b.favorite ? 1 : 0) - (a.favorite ? 1 : 0)) ||
+        ((valueOf(a) - valueOf(b)) * sign) ||
+        a.name.localeCompare(b.name));
+    player.inventory = [...items, ...new Array(BAG_SLOTS - items.length).fill(null)];
+    logMessage(`[Inventory] Sorted by ${field} (${dir === 'desc' ? 'high to low' : 'low to high'}). Favorites first.`, 'drop');
     updateUI();
     saveGame();
 }
 
 function unequipPotionSlot() {
     const ps = player.equipped.potionSlot;
-    if (!ps || !ps.name || (ps.qty || 0) <= 0) return;
-    if (!placeItemInInventory({ ...ps, qty: ps.qty })) {
-        alert("Inventory is full! Make room before unequipping potions.");
-        return;
+    if (!ps || !ps.name) return;
+    if ((ps.qty || 0) > 0) {
+        if (!placeItemInInventory({ ...ps, qty: ps.qty })) {
+            alert("Inventory is full! Make room before unequipping potions.");
+            return;
+        }
+        logMessage(`[Potion] Unequipped ${ps.name} x${ps.qty}`, 'drop');
     }
-    logMessage(`[Potion] Unequipped ${ps.name} x${ps.qty}`, 'drop');
     player.equipped.potionSlot = { name: "", type: "potion", heal: 0, qty: 0, desc: "" };
     updateUI();
     saveGame();
@@ -681,7 +728,7 @@ function unequipItem(slotName) {
     let item = player.equipped[slotName];
     if (!item) return;
 
-    if (!Array.isArray(player.inventory)) player.inventory = new Array(40).fill(null);
+    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
     let emptyIdx = player.inventory.findIndex(s => s === null);
     if (emptyIdx === -1) {
         alert("Inventory is full!");
@@ -698,14 +745,26 @@ function unequipItem(slotName) {
 const STAT_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block', mdef: 'MDEF', armor: 'ARMOR', atkPct: 'ATK%' };
 
 function formatStatLine(key, val) {
-    const pct = key === 'crit' || key === 'block' || key === 'atkPct';
-    return `${STAT_LABELS[key] || key.toUpperCase()} ${val >= 0 ? '+' : ''}${val}${pct ? '%' : ''}`;
+    const pct = key === 'crit' || key === 'block' || key === 'atkPct' || key.startsWith('res_');
+    const label = key.startsWith('res_') ? `${ELEMENTS[key.slice(4)] ? ELEMENTS[key.slice(4)].name : key} Res` : (STAT_LABELS[key] || key.toUpperCase());
+    return `${label} ${val >= 0 ? '+' : ''}${val}${pct ? '%' : ''}`;
+}
+
+// Class icon for a monster role (melee, tank, range, healer, mage)
+const ROLE_ICONS = { melee: '⚔️', tank: '🛡️', range: '🏹', healer: '💚', mage: '🔮' };
+function roleIconOf(m) {
+    if (!m) return '';
+    const r = typeof roleOf === 'function' ? roleOf(m) : (m.role || 'melee');
+    return ROLE_ICONS[r] || '';
 }
 
 function elemTagHTML(m) {
-    if (!m || !m.element || !ELEMENTS[m.element]) return '';
-    const e = ELEMENTS[m.element];
-    return `<span class="${e.color} text-[10px] font-bold">${e.icon} ${e.name}</span>`;
+    if (!m) return '';
+    const role = roleIconOf(m);
+    const e = m.element && ELEMENTS[m.element] ? ELEMENTS[m.element] : null;
+    if (!role && !e) return '';
+    const parts = [role, e ? e.icon : '', e ? e.name : ''].filter(Boolean).join(' ');
+    return `<span class="${e ? e.color : 'text-slate-300'} text-[10px] font-bold">${parts}</span>`;
 }
 
 function elemIconText(item) {
@@ -729,24 +788,26 @@ function buffsDetailHTML(buffs, debuffs) {
     return up + down;
 }
 
-function setInfoHTML(setKey) {
+function setInfoHTML(setKey, activeOnly = false) {
     const def = SET_DATA[setKey];
     if (!def) return '';
     const have = getSetBonuses().counts[setKey] || 0;
-    const rows = def.bonuses.map(bn => {
-        const on = have >= bn.pieces;
-        return `<div class="${on ? 'text-emerald-300' : 'text-slate-500'}">(${bn.pieces} pcs) ${bn.desc}</div>`;
+    const reached = def.bonuses.filter(bn => have >= bn.pieces);
+    const best = reached[reached.length - 1];
+    if (activeOnly && !best) return '';
+    const rows = def.bonuses.filter(bn => !activeOnly || bn === best).map(bn => {
+        const on = bn === best;
+        const sub = !on && have >= bn.pieces ? ' (replaced)' : '';
+        return `<div class="${on ? 'text-emerald-300 font-semibold' : 'text-slate-500'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
     }).join('');
-    return `<div class="p-2 rounded-lg border border-amber-500/30 bg-slate-950/60 flex flex-col gap-1 text-[10px]">
-        <span class="font-bold text-amber-300">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
+    return `<div class="p-2 rounded-lg border ${have > 0 ? 'border-amber-500/40' : 'border-slate-800'} bg-slate-950/60 flex flex-col gap-1 text-[10px]">
+        <span class="font-bold ${have > 0 ? 'text-amber-300' : 'text-slate-400'}">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
 }
 
 function renderSetBonusPanel() {
     const c = document.getElementById('set-bonus-panel');
     if (!c) return;
-    const counts = getSetBonuses().counts;
-    let html = '';
-    Object.keys(SET_DATA).forEach(k => { if (counts[k]) html += setInfoHTML(k); });
+    const html = Object.keys(SET_DATA).map(k => setInfoHTML(k, true)).filter(Boolean).join('');
     c.innerHTML = html || '<span class="text-[10px] text-slate-500">No set bonus active.</span>';
 }
 
@@ -829,6 +890,7 @@ function showItemDetail(index) {
     if (isEquip) actions += `<button onclick="toggleFavorite(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-amber-300">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`;
     if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
     if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Gold</button>`;
+    actions += `<button onclick="storeToStash(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-slate-200">Store in Stash</button>`;
     actions += '</div>';
     actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
 
@@ -932,7 +994,7 @@ function getItemBasePrice(item) {
 
 // Sell value = half of the item's shop price (per unit, times quantity for stacks)
 function getSellPrice(item) {
-    const unit = Math.floor(getItemBasePrice(item) / 2);
+    const unit = Math.floor(getItemBasePrice(item) / 2 * (1 + skillBonus('sellPct') / 100));
     return unit * (item.qty || 1);
 }
 
@@ -940,6 +1002,7 @@ function sellInventoryItem(index) {
     const item = player.inventory[index];
     if (!item) return false;
     if (item.favorite) { alert("Favorite items cannot be sold. Unmark it first."); return false; }
+    if (item.slot && (item.levelReq || 1) >= 99) { alert("Level 99 gear cannot be sold to the shop."); return false; }
     const total = getSellPrice(item);
     const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
     if (!confirm(`Sell ${item.name}${qtyText} for ${total} Gold?`)) return false;
@@ -968,11 +1031,15 @@ function executeEquipItem(index) {
     return true;
 }
 
+function salvageScrapGain(item) {
+    return Math.min(5, Math.max(1, Math.floor((item.levelReq || 1) / 5) + 1));
+}
+
 function salvageEquipmentItem(index) {
     let item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { alert("Favorite items cannot be salvaged. Unmark it first."); return; }
-    let scrapGain = Math.min(5, Math.max(1, Math.floor((item.levelReq || 1) / 5) + 1));
+    let scrapGain = salvageScrapGain(item);
 
     player.inventory[index] = null;
     if (!addScraps(scrapGain)) {
@@ -983,6 +1050,83 @@ function salvageEquipmentItem(index) {
     logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
     updateUI();
     saveGame();
+}
+
+// Bag equipment that Salvage All / Sell All may touch: not favorites, not pets
+function bulkEquipTargets() {
+    return player.inventory.map((it, i) => ({ it, i })).filter(({ it }) => it && it.slot && it.slot !== 'pet' && !it.favorite);
+}
+
+function salvageAllEquipment() {
+    const targets = bulkEquipTargets();
+    if (targets.length === 0) { alert("No equipment to salvage."); return; }
+    const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
+    if (!confirm(`Salvage ${targets.length} equipment item(s) for ${gain} Iron Scrap? Favorites are kept.`)) return;
+    targets.forEach(({ i }) => { player.inventory[i] = null; });
+    if (!addScraps(gain)) {
+        targets.forEach(({ it, i }) => { player.inventory[i] = it; });
+        alert("Inventory is full! Cannot salvage.");
+        return;
+    }
+    logMessage(`[Salvage] Salvaged ${targets.length} item(s) for ${gain} Iron Scrap(s)`, 'drop');
+    updateUI();
+    saveGame();
+}
+
+function sellAllEquipment() {
+    const targets = bulkEquipTargets().filter(({ it }) => (it.levelReq || 1) < 99);
+    if (targets.length === 0) { alert("No equipment to sell."); return; }
+    const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
+    if (!confirm(`Sell ${targets.length} equipment item(s) for ${total} Gold? Favorites and Lv 99 gear are kept.`)) return;
+    targets.forEach(({ i }) => { player.inventory[i] = null; });
+    player.gold += total;
+    logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
+    updateUI();
+    saveGame();
+}
+
+// Stash: move items between the bag and the stash
+function storeToStash(index) {
+    const item = player.inventory[index];
+    if (!item) return;
+    if (!placeIntoList(player.stash, { ...item })) { alert("Stash is full!"); return; }
+    player.inventory[index] = null;
+    logMessage(`[Stash] Stored ${item.name}${item.qty > 1 ? ' x' + item.qty : ''}`, 'drop');
+    closeModal();
+    updateUI();
+    saveGame();
+}
+
+function takeFromStash(index) {
+    const item = player.stash[index];
+    if (!item) return;
+    if (!placeItemInInventory({ ...item })) { alert("Inventory is full!"); return; }
+    player.stash[index] = null;
+    logMessage(`[Stash] Took out ${item.name}${item.qty > 1 ? ' x' + item.qty : ''}`, 'drop');
+    closeModal();
+    updateUI();
+    saveGame();
+}
+
+function showStashDetail(index) {
+    const item = player.stash[index];
+    if (!item) return;
+    const rarity = RARITY_INFO[item.rarity];
+    const kind = item.slot || (item.type === 'potion' ? 'Consumable' : 'Item');
+    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+    let body = '<div class="flex flex-col gap-2 text-left text-xs">';
+    body += `<span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : kind}</span>`;
+    body += `<span class="text-[10px] text-slate-400 capitalize">${kind}${item.qty > 1 ? ' · Qty ' + item.qty : ''}</span>`;
+    if (item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
+    if (item.stats) body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
+        Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
+    if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
+    body += '</div>';
+    const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
+    const actions = `<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">
+        <button onclick="takeFromStash(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Take to Bag</button></div>
+        <button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
+    showModal(title, '', body + actions);
 }
 
 function manualDrinkPotion() {
@@ -998,6 +1142,7 @@ function manualDrinkPotion() {
     }
     let healAmt = potionSlot.heal || 50;
     potionSlot.qty--;
+    if (potionSlot.qty <= 0) player.equipped.potionSlot = { name: "", type: "potion", heal: 0, qty: 0, desc: "" };
     healPlayer(healAmt, 'Potion');
     checkStageClearAfterHeal();
     updateUI();
@@ -1011,6 +1156,63 @@ let pendingAlloc = { stats: {}, skills: {} };
 
 function pendingStatTotal() { return Object.values(pendingAlloc.stats).reduce((a, b) => a + b, 0); }
 function pendingSkillTotal() { return Object.values(pendingAlloc.skills).reduce((a, b) => a + b, 0); }
+
+const SKILL_BUILDS = [
+    { key: 'gold', name: 'Gold Build', color: 'text-amber-300', border: 'border-amber-500/40', desc: 'Coins, loot and selling' },
+    { key: 'exp', name: 'EXP Build', color: 'text-sky-300', border: 'border-sky-500/40', desc: 'Faster Base and Class levels' },
+    { key: 'attack', name: 'Attack Build', color: 'text-rose-300', border: 'border-rose-500/40', desc: 'Damage and critical hits' },
+    { key: 'defense', name: 'Defense Build', color: 'text-emerald-300', border: 'border-emerald-500/40', desc: 'Survive longer' }
+];
+const SKILL_BUILD_MAX_SP = 30;
+
+// Character overview: the builds you have invested in
+function renderCharacterSkills() {
+    const root = document.getElementById('skill-tree-container');
+    if (!root) return;
+    const html = SKILL_BUILDS.map(b => {
+        const owned = Object.entries(player.skills).filter(([, s]) => s.build === b.key && s.level > 0);
+        const invested = owned.reduce((a, [, s]) => a + s.level, 0);
+        if (invested <= 0) return '';
+        const lines = owned.map(([, s]) => `<li>${s.name} Lv. ${s.level}/${s.maxLv}: ${s.desc}</li>`).join('');
+        return `<div class="p-2 rounded-lg border ${b.border} bg-slate-950/60">
+            <div class="flex justify-between text-xs"><span class="font-bold ${b.color}">${b.name}</span><span class="text-slate-400">${invested}/${SKILL_BUILD_MAX_SP} SP</span></div>
+            <ul class="text-[10px] text-slate-300 list-disc pl-4 mt-1 flex flex-col gap-0.5">${lines}</ul>
+        </div>`;
+    }).join('');
+    root.innerHTML = html || '<span class="text-[10px] text-slate-500">No skill points invested yet.</span>';
+}
+
+// Dedicated Skills page: four build chains, each skill gated by the one before it
+function renderSkillPage() {
+    const root = document.getElementById('skill-build-columns');
+    if (!root) return;
+    const spEl = document.getElementById('skill-page-sp');
+    const spLeft = player.jobSp - pendingSkillTotal();
+    if (spEl) spEl.innerText = spLeft;
+    root.innerHTML = SKILL_BUILDS.map(b => {
+        const skills = Object.entries(player.skills).filter(([, s]) => s.build === b.key);
+        const invested = skills.reduce((a, [k, s]) => a + s.level + (pendingAlloc.skills[k] || 0), 0);
+        const cards = skills.map(([k, s]) => {
+            const prev = s.req ? player.skills[s.req] : null;
+            const prevLevel = prev ? prev.level + (pendingAlloc.skills[s.req] || 0) : 0;
+            const locked = !!prev && prevLevel < s.reqLv;
+            const lvl = s.level + (pendingAlloc.skills[k] || 0);
+            const gate = prev
+                ? `<div class="text-[9px] text-slate-500 text-center">▼ needs ${prev.name} Lv. ${s.reqLv}</div>`
+                : '<div class="text-[9px] text-slate-500 text-center">▼ start</div>';
+            const disabled = locked || lvl >= s.maxLv || spLeft <= 0;
+            return `${gate}<div class="p-2 rounded-lg border ${locked ? 'border-slate-800 opacity-50' : b.border + ' bg-slate-950/60'} flex flex-col gap-1">
+                <div class="flex justify-between items-center gap-2"><span class="font-bold text-xs ${b.color}">${s.name}</span><span class="text-[10px] text-slate-300">Lv. ${lvl}/${s.maxLv}</span></div>
+                <p class="text-[10px] text-slate-400">${s.desc}</p>
+                <button onclick="upgradeSkill('${k}')" ${disabled ? 'disabled' : ''} class="self-end px-2 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded text-[10px] cursor-pointer disabled:opacity-40">+1 SP</button>
+            </div>`;
+        }).join('');
+        return `<div class="flex flex-col gap-2 min-w-0">
+            <div class="p-2 rounded-xl border ${b.border} bg-slate-950/60"><h3 class="font-bold text-sm ${b.color}">${b.name}</h3><p class="text-[10px] text-slate-400">${b.desc} · ${invested}/${SKILL_BUILD_MAX_SP} SP</p></div>
+            ${cards}
+        </div>`;
+    }).join('');
+}
 
 function addStat(statKey) {
     if (player.statPoints - pendingStatTotal() <= 0) return;
@@ -1040,8 +1242,8 @@ function upgradeSkill(skillKey) {
     if (!s) return;
     if (s.req) {
         const parent = player.skills[s.req];
-        if (parent.level + (pendingAlloc.skills[s.req] || 0) < 1) {
-            alert(`Requires unlocking prerequisite skill: ${parent.name}!`);
+        if (parent.level + (pendingAlloc.skills[s.req] || 0) < s.reqLv) {
+            alert(`Requires ${parent.name} Lv. ${s.reqLv}!`);
             return;
         }
     }
@@ -1213,7 +1415,7 @@ function renderQuestsView() {
 
     if (!player.dailyQuests || player.dailyQuests.length === 0) {
         player.dailyQuests = [
-            { id: 'q_porings', title: "Poring Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
+            { id: 'q_slimes', title: "Slime Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
             { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
             { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Gold from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
         ];
@@ -1305,27 +1507,33 @@ function updateUI() {
 
     let eqContainer = document.getElementById('equipment-slots-container');
     if (eqContainer) {
-        eqContainer.innerHTML = '';
-        for (let [slot, gear] of Object.entries(player.equipped)) {
-            let refText = gear && gear.refineLevel > 0 ? ` +${gear.refineLevel}` : '';
-            let qtyText = gear && gear.qty > 0 ? ` (x${gear.qty})` : '';
-            let slotDisplayName = slot === 'potionSlot' ? 'Potion Slot' : (slot === 'ringLeft' ? 'Left Ring' : (slot === 'ringRight' ? 'Right Ring' : slot));
-            eqContainer.innerHTML += `
-                <div ${gear && gear.name ? `onclick="showEquippedDetail('${slot}')"` : ''} class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded border border-slate-800 ${gear && gear.name ? 'cursor-pointer hover:border-amber-500 transition' : ''}">
-                    <div>
-                        <span class="text-slate-400 capitalize block text-[10px]">${slotDisplayName}</span>
-                        <span class="font-semibold text-slate-200 text-xs">${gear && gear.name ? gear.name + refText + qtyText + elemIconText(gear) : 'Empty'}</span>
-                    </div>
-                    ${gear && gear.name ? `<button onclick="event.stopPropagation(); unequipItem('${slot}')" class="px-2.5 py-1 bg-red-600/40 hover:bg-red-600 text-[10px] text-red-200 font-bold rounded transition cursor-pointer">Unequip</button>` : ''}
+        const EQUIP_LEFT = [['hat', 'Hat'], ['mouth', 'Mouth'], ['weapon', 'Weapon'], ['garment', 'Garment'], ['ringLeft', 'L Ring'], ['pet', 'Pet'], ['potionSlot', 'Potion']];
+        const EQUIP_RIGHT = [['midHead', 'Mid Head Gear'], ['armor', 'Armor'], ['shield', 'Shield'], ['footgear', 'Footgear'], ['ringRight', 'R Ring']];
+        const eqRow = (slot, label) => {
+            const gear = player.equipped[slot];
+            // Empty potion slot (0 left) shows as Empty; gear only shows a quantity when stacked
+            const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
+            const refText = has && gear.refineLevel > 0 ? ` +${gear.refineLevel}` : '';
+            const qtyText = has && (slot === 'potionSlot' || gear.qty > 1) ? ` (x${gear.qty})` : '';
+            const rInfo = has && gear.rarity ? RARITY_INFO[gear.rarity] : null;
+            const nameColor = rInfo ? rInfo.text : 'text-slate-200';
+            return `<div ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="flex justify-between items-center gap-2 p-2 bg-slate-900/60 rounded border border-slate-800 ${has ? 'cursor-pointer hover:border-amber-500 transition' : ''}">
+                <div class="min-w-0">
+                    <span class="text-slate-400 block text-[10px]">${label}</span>
+                    <span class="font-semibold ${nameColor} text-xs break-words">${has ? gear.name + refText + qtyText + elemIconText(gear) : 'Empty'}</span>
                 </div>
-            `;
-        }
+                ${has ? `<button onclick="event.stopPropagation(); unequipItem('${slot}')" class="px-2 py-1 bg-red-600/40 hover:bg-red-600 text-[10px] text-red-200 font-bold rounded transition cursor-pointer shrink-0">Unequip</button>` : ''}
+            </div>`;
+        };
+        eqContainer.innerHTML = `
+            <div class="flex flex-col gap-2 min-w-0">${EQUIP_LEFT.map(([s, l]) => eqRow(s, l)).join('')}</div>
+            <div class="flex flex-col gap-2 min-w-0">${EQUIP_RIGHT.map(([s, l]) => eqRow(s, l)).join('')}</div>`;
     }
 
     let invGrid = document.getElementById('inventory-grid');
     if (invGrid) {
         invGrid.innerHTML = '';
-        if (!Array.isArray(player.inventory)) player.inventory = new Array(40).fill(null);
+        if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
         let filledSlots = 0;
         player.inventory.forEach((item, index) => {
             if (item) filledSlots++;
@@ -1333,7 +1541,6 @@ function updateUI() {
             let refText = item && item.refineLevel > 0 ? ` +${item.refineLevel}` : '';
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
-            
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="h-14 bg-slate-900/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:border-amber-500 transition relative group">
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
@@ -1343,8 +1550,27 @@ function updateUI() {
             `;
         });
         let invCountEl = document.getElementById('inventory-count');
-        let scrapsCount = player.materials?.ironScraps || 0;
-        if (invCountEl) invCountEl.innerText = `${filledSlots} / 40 slots`;
+        if (invCountEl) invCountEl.innerText = `${filledSlots} / ${BAG_SLOTS} slots`;
+    }
+
+    let stashGrid = document.getElementById('stash-grid');
+    if (stashGrid) {
+        stashGrid.innerHTML = '';
+        if (!Array.isArray(player.stash)) player.stash = new Array(STASH_SLOTS).fill(null);
+        let usedSlots = 0;
+        player.stash.forEach((item, index) => {
+            if (item) usedSlots++;
+            let rInfo = item ? RARITY_INFO[item.rarity] : null;
+            let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-800 text-slate-500';
+            stashGrid.innerHTML += `
+                <div onclick="${item ? `showStashDetail(${index})` : ''}" class="h-14 bg-slate-950/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center ${item ? 'cursor-pointer hover:border-amber-500' : 'border-dashed'} transition relative">
+                    <span class="text-[9px] font-bold truncate w-full px-1">${item ? item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '') : ''}</span>
+                    ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
+                </div>
+            `;
+        });
+        let stashCountEl = document.getElementById('stash-count');
+        if (stashCountEl) stashCountEl.innerText = `${usedSlots} / ${STASH_SLOTS} slots`;
     }
 
     el = document.getElementById('stat-points');
@@ -1378,7 +1604,9 @@ function updateUI() {
     el = document.getElementById('sp-count');
     if (el) el.innerText = player.jobSp - pendingSkillTotal();
 
-    let skillContainer = document.getElementById('skill-tree-container');
+    renderCharacterSkills();
+    renderSkillPage();
+    let skillContainer = null;
     if (skillContainer) {
         skillContainer.innerHTML = '';
         for (let [sKey, skillObj] of Object.entries(player.skills)) {
@@ -1560,7 +1788,8 @@ function renderLibraryView() {
     const runesEl = document.getElementById('library-runes');
     const monstersEl = document.getElementById('library-monsters');
     if (runesEl && typeof RUNE_DEFS !== 'undefined') {
-        runesEl.innerHTML = Object.keys(RUNE_DEFS).map(id => {
+        const runeIds = Object.keys(RUNE_DEFS).sort((a, b) => (RUNE_DEFS[a].rarity - RUNE_DEFS[b].rarity) || RUNE_DEFS[a].name.localeCompare(RUNE_DEFS[b].name));
+        runesEl.innerHTML = runeIds.map(id => {
             const r = RUNE_DEFS[id];
             const rar = RARITY_INFO[r.rarity] || RARITY_INFO[1];
             const kind = (r.flag || r.once ? 'One-time per run' : 'Stackable (picks add up)') + (r.disabled ? ' · Not active yet' : '');
@@ -1572,7 +1801,7 @@ function renderLibraryView() {
     }
     if (monstersEl && typeof MONSTERS_DATA !== 'undefined') {
         const rows = Object.values(MONSTERS_DATA).map(m => {
-            const el = m.element && ELEMENTS[m.element] ? `${ELEMENTS[m.element].icon} ${ELEMENTS[m.element].name}` : 'None';
+            const el = (ROLE_ICONS[m.role || (m.isRanged ? 'range' : 'melee')] || '') + ' ' + (m.element && ELEMENTS[m.element] ? `${ELEMENTS[m.element].icon} ${ELEMENTS[m.element].name}` : 'None');
             const type = m.isBoss ? 'Boss' : (m.isRanged ? 'Ranged' : 'Melee');
             return `<tr class="border-t border-slate-800 ${m.isBoss ? 'text-amber-300' : 'text-slate-200'}">
                 <td class="py-1.5 pr-2">${m.name}</td><td class="pr-2">${type}</td><td class="pr-2">${el}</td>
@@ -1604,18 +1833,19 @@ function renderLibraryRules() {
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Status</h3>
             <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">
-                <li><span class="text-sky-300">Frozen</span>: 50% chance to skip its attack.</li>
+                <li><span class="text-sky-300">Freeze</span>: cannot attack or dodge for 2 seconds, and takes the water element.</li>
+                <li><span class="text-lime-300">Rock</span>: cannot attack or dodge for 2 seconds, and takes the earth element.</li>
                 <li><span class="text-orange-400">Ignite</span> and <span class="text-lime-400">Poison</span>: damage over time while afflicted.</li>
                 <li><span class="text-amber-300">Boss</span>: about 25% stronger, uses special skills, enrages in later turns.</li>
-                <li><span class="text-amber-200">Mini Boss</span>: appears on stage 9 of campaign and event maps, has 3x HP.</li>
+                <li><span class="text-amber-200">Mini Boss</span>: appears on stage 7 of campaign and event maps (after the 3rd rune), has 3x HP.</li>
             </ul>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Drop Rates</h3>
             <table class="w-full text-[10px] text-left text-slate-300">
-                <tr class="border-b border-slate-800"><td class="py-1">Normal monster</td><td class="font-mono text-right">5%</td></tr>
+                <tr class="border-b border-slate-800"><td class="py-1">Normal monster</td><td class="font-mono text-right">1%</td></tr>
                 <tr class="border-b border-slate-800"><td class="py-1">Mini Boss</td><td class="font-mono text-right">50%</td></tr>
-                <tr><td class="py-1">Boss (MVP)</td><td class="font-mono text-right">100%</td></tr>
+                <tr><td class="py-1">Boss (Champion)</td><td class="font-mono text-right">100%</td></tr>
             </table>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
