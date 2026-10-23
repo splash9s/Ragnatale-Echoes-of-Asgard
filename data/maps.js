@@ -140,6 +140,14 @@ const GAME_DATA = {
     paths: {}
 };
 
+// Tanks and mages for Lv 1-50 (added before path copies are built)
+GAME_DATA.maps.map1.enemies.push(MONSTERS_DATA.mossyBoulder, MONSTERS_DATA.leafSpriteMage);
+GAME_DATA.maps.map10.enemies.push(MONSTERS_DATA.caveStoneGuard, MONSTERS_DATA.batWitch);
+GAME_DATA.maps.map20.enemies.push(MONSTERS_DATA.sandColossus, MONSTERS_DATA.desertSorcerer);
+GAME_DATA.maps.map30.enemies.push(MONSTERS_DATA.abyssalBrute, MONSTERS_DATA.impSummoner);
+GAME_DATA.maps.map40.enemies.push(MONSTERS_DATA.haloWarden, MONSTERS_DATA.starlitOracle);
+GAME_DATA.maps.map50.enemies.push(MONSTERS_DATA.voidBulwark, MONSTERS_DATA.astralMage);
+
 // Stage growth: one curve for every map (enemy HP/ATK per stage = 1 + (stage-1) * STAGE_GROWTH)
 const STAGE_GROWTH = 0.10;
 
