@@ -33,8 +33,8 @@ function skillLvl(name) {
 
 const DAILY_TOTAL_STAGES = 31;
 const DAILY_BOSS_STAGES = [11, 21, 31];
-const BOSS_HP_MULT = 1.25;
-const BOSS_ATK_MULT = 1.2;
+const BOSS_HP_MULT = 2.5; // 2x the old 1.25
+const BOSS_ATK_MULT = 2.4; // 2x the old 1.2
 
 // Helper to play audio effects safely
 function playSound(path) {
@@ -161,7 +161,7 @@ function applyRune(id) {
     if (def.flag) player.runes[id] = true;
     else player.runes[id] = (player.runes[id] || 0) + def.add;
     if (stageSummary) {
-        stageSummary.runes.push(`${def.name}: ${typeof def.text === 'function' ? def.text(def.add) : def.desc}`);
+        stageSummary.runes.push({ rarity: def.rarity, text: `${def.name}: ${typeof def.text === 'function' ? def.text(def.add) : def.desc}` });
     }
     if (def.onApply) def.onApply();
 }
@@ -441,7 +441,8 @@ function spawnFinalStage() {
         return;
     }
     const pool = finalMonsterPool(level);
-    const count = Math.floor(Math.random() * 5) + 2;
+    const [lo, hi] = campaignCountRange();
+    const count = randomInRange(lo, hi);
     monstersList = [];
     for (let i = 0; i < count; i++) monstersList.push(makeUnit(pool[Math.floor(Math.random() * pool.length)], mult));
 }
@@ -513,7 +514,7 @@ function spawnStageMonsters() {
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
-            const count = Math.min(Math.floor(Math.random() * 5) + 2, mapMonsterCap());
+            const count = Math.floor(Math.random() * 5) + 2;
             const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : stageMultiplier();
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
@@ -521,8 +522,8 @@ function spawnStageMonsters() {
                     ...template,
                     hp: Math.floor(template.hp * mult),
                     maxHp: Math.floor(template.maxHp * mult),
-                    atkMin: Math.floor(template.atkMin * mult),
-                    atkMax: Math.floor(template.atkMax * mult),
+                    atkMin: Math.floor(template.atkMin * mult * tankDamageMult(template)),
+                    atkMax: Math.floor(template.atkMax * mult * tankDamageMult(template)),
                     hit: Math.floor(template.hit * hardHitFleeScale()),
                     flee: Math.floor(template.flee * hardHitFleeScale()),
                     isBoss: false,
@@ -595,13 +596,18 @@ function stageMultiplier() {
 }
 
 // A fresh copy of a template for this stage
+// Tank monsters deal 70% damage
+function tankDamageMult(t) {
+    return roleOf(t) === 'tank' ? 0.7 : 1;
+}
+
 function makeUnit(t, mult) {
     const unit = {
         ...t,
         hp: Math.floor(t.hp * mult),
         maxHp: Math.floor(t.maxHp * mult),
-        atkMin: Math.floor(t.atkMin * mult),
-        atkMax: Math.floor(t.atkMax * mult),
+        atkMin: Math.floor(t.atkMin * mult * tankDamageMult(t)),
+        atkMax: Math.floor(t.atkMax * mult * tankDamageMult(t)),
         hit: Math.floor(t.hit * hardHitFleeScale()),
         flee: Math.floor(t.flee * hardHitFleeScale()),
         isBoss: false, rewarded: false, ailments: {}
@@ -613,19 +619,30 @@ function makeUnit(t, mult) {
     return unit;
 }
 
-// Max monsters on one stage by map level: Lv 1-10 = 4, Lv 20-40 = 5, no cap above
-function mapMonsterCap() {
-    if (!activeMap || activeMap.finalMap || (currentMode !== 'campaign' && currentMode !== 'event')) return Infinity;
+// Monster count per campaign stage. First half of the map: by level band. Second half: 4-6.
+// Lv 1-20: 1-3 | Lv 30-40: 2-3 | Lv 50-80: 3 | Lv 90-110: 4. Boss and mini boss stages are not affected.
+function campaignCountRange() {
     const lv = activeMap.levelReq || 1;
-    if (lv <= 10) return 4;
-    if (lv <= 40) return 5;
-    return Infinity;
+    const firstHalf = currentStage <= Math.floor(maxStages / 2);
+    if (!firstHalf) return [4, 6];
+    if (lv <= 20) return [1, 3];
+    if (lv <= 40) return [2, 3];
+    if (lv <= 80) return [3, 3];
+    return [4, 4];
+}
+
+function randomInRange(lo, hi) {
+    return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 
 // Normal stage: pick one wave set at random and fill each slot with a monster of that role
 function spawnWaveFromSet(dailyScale, scaled) {
-    const cap = mapMonsterCap();
-    const set = WAVE_SETS[Math.floor(Math.random() * WAVE_SETS.length)].slice(0, cap);
+    const [lo, hi] = campaignCountRange();
+    const n = randomInRange(lo, hi);
+    const base = WAVE_SETS[Math.floor(Math.random() * WAVE_SETS.length)];
+    const set = [];
+    while (set.length < n) set.push(...base);
+    set.length = n;
     const pool = activeMap.enemies;
     const mult = stageMultiplier();
     set.forEach(role => {
@@ -639,9 +656,7 @@ function spawnWaveFromSet(dailyScale, scaled) {
 function addBossSupport(boss) {
     const lineup = [boss];
     const mult = stageMultiplier();
-    const cap = mapMonsterCap();
     ((activeMap && activeMap.bossSupport) || []).forEach(s => {
-        if (s.pos > cap - 1) return;
         lineup[s.pos - 1] = makeUnit(pickUnit(activeMap.enemies, s.role), mult);
     });
     monstersList = lineup.filter(Boolean);
@@ -923,7 +938,6 @@ function monsterAct(m, derived, position = 0) {
             logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
             if (m.spell === 'rockCurse') { playerDebuffs.curse = 3; logMessage('[Curse] Your attacks are weaker for 3 turns', 'winlose'); }
             if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); }
-            if (m.spell === 'thunderBolt' && Math.random() < 0.25) { playerDebuffs.stun = 1; logMessage('[Stun] You are stunned for 1 turn', 'winlose'); }
         }
         if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.6);
         takePlayerDamage(eDmg, m);
@@ -1265,8 +1279,8 @@ function buildMapSummaryHTML(kind) {
     const fmt = n => Number(n).toLocaleString();
     const card = (title, value, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-center min-w-0"><div class="text-[10px] text-slate-500 uppercase">${title}</div><div class="text-sm font-bold font-mono truncate ${cls}">${value}</div></div>`;
     const section = (title, count, body) => `<details open class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
-    const itemBody = s.items.length ? s.items.map(i => `<div><span class="text-yellow-300">${escapeHtml(i.name)}</span> <span class="text-slate-500">(Rarity ${i.rarity})</span></div>`).join('') : '<div class="text-slate-500">No item dropped</div>';
-    const runeBody = s.runes.length ? s.runes.map(r => `<div class="text-purple-300">${escapeHtml(r)}</div>`).join('') : '<div class="text-slate-500">No rune picked</div>';
+    const itemBody = s.items.length ? s.items.map(i => `<div><span class="${(RARITY_INFO[i.rarity] || RARITY_INFO[1]).text}">${escapeHtml(i.name)}</span> <span class="text-slate-500">(Rarity ${i.rarity})</span></div>`).join('') : '<div class="text-slate-500">No item dropped</div>';
+    const runeBody = s.runes.length ? s.runes.map(r => `<div class="${(RARITY_INFO[r.rarity] || RARITY_INFO[1]).text}">${escapeHtml(r.text)}</div>`).join('') : '<div class="text-slate-500">No rune picked</div>';
     const logBody = s.log.length ? `<div class="max-h-48 overflow-y-auto font-mono text-[10px] flex flex-col gap-0.5">${s.log.map(l => `<div class="${logClassFor(l.type)}">${l.msg}</div>`).join('')}</div>` : '<div class="text-slate-500">No log</div>';
     const statCards = (kind === 'win')
         ? card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300') + card('Items', s.items.length, 'text-amber-300') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300')
