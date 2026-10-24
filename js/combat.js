@@ -469,6 +469,7 @@ function getDailyEnemyPool() {
 function makeBoss(t) {
     return {
         ...t,
+        ...combatHitFlee(t),
         hp: Math.floor(t.hp * BOSS_HP_MULT),
         maxHp: Math.floor(t.maxHp * BOSS_HP_MULT),
         atkMin: Math.floor(t.atkMin * BOSS_ATK_MULT),
@@ -501,7 +502,7 @@ function spawnStageMonsters() {
     if (activeMap && activeMap.finalMap) {
         spawnFinalStage();
     } else if (isMiniBossStage()) {
-        const mini = { ...activeMap.miniBoss, rewarded: false, ailments: {}, isMiniBoss: true };
+        const mini = { ...activeMap.miniBoss, ...combatHitFlee(activeMap.miniBoss), rewarded: false, ailments: {}, isMiniBoss: true };
         monstersList.push(mini);
         logMessage(`[Mini Boss] ${mini.name} appears!`, 'winlose');
     } else if (isBossStage()) {
@@ -524,8 +525,8 @@ function spawnStageMonsters() {
                     maxHp: Math.floor(template.maxHp * mult),
                     atkMin: Math.floor(template.atkMin * mult * tankDamageMult(template)),
                     atkMax: Math.floor(template.atkMax * mult * tankDamageMult(template)),
-                    hit: Math.floor(template.hit * hardHitFleeScale()),
-                    flee: Math.floor(template.flee * hardHitFleeScale()),
+                    hit: combatHitFlee(template).hit,
+                    flee: combatHitFlee(template).flee,
                     isBoss: false,
                     rewarded: false,
                     ailments: {}
@@ -585,10 +586,22 @@ function mapPower() {
     return { hp: hpSum / n, hitFlee: hfSum / n };
 }
 
-// Void (endless) keeps its stage scaling for hit and flee. Campaign uses the flat map power.
-function hardHitFleeScale() {
-    if (currentMode === 'endless') return 1 + currentStage * 0.02;
-    return mapPower().hitFlee;
+// Monster hit and flee are based on the map level, like the player's (player hit = 100 + level + DEX, flee = 40 + level + AGI).
+// Monster hit = level + MON_HIT_BASE, monster flee = level + MON_FLEE_BASE.
+const MON_HIT_BASE = 40;
+const MON_FLEE_BASE = 60;
+
+// Campaign and event monsters use their level. Final map uses its stage level. Void keeps its stage scaling. Daily keeps hand-set values.
+function combatHitFlee(t) {
+    if (currentMode === 'endless') {
+        const f = 1 + currentStage * 0.02;
+        return { hit: Math.floor(t.hit * f), flee: Math.floor(t.flee * f) };
+    }
+    if (activeMap && (currentMode === 'campaign' || currentMode === 'event')) {
+        const lv = activeMap.finalMap ? finalStageLevel(currentStage) : (activeMap.levelReq || 1);
+        return { hit: lv + MON_HIT_BASE, flee: lv + MON_FLEE_BASE };
+    }
+    return { hit: t.hit, flee: t.flee };
 }
 
 function stageMultiplier() {
@@ -608,8 +621,8 @@ function makeUnit(t, mult) {
         maxHp: Math.floor(t.maxHp * mult),
         atkMin: Math.floor(t.atkMin * mult * tankDamageMult(t)),
         atkMax: Math.floor(t.atkMax * mult * tankDamageMult(t)),
-        hit: Math.floor(t.hit * hardHitFleeScale()),
-        flee: Math.floor(t.flee * hardHitFleeScale()),
+        hit: combatHitFlee(t).hit,
+        flee: combatHitFlee(t).flee,
         isBoss: false, rewarded: false, ailments: {}
     };
     if (roleOf(t) === 'mage') {
@@ -1143,7 +1156,7 @@ function runCombatTick() {
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.hp = derived.maxHp;
-        showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('town'));
+        showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
     }
     updateUI();
 }
@@ -1173,7 +1186,7 @@ function onStageCleared() {
             if (currentMode === 'event' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
-                showModal("Event Cleared!", '', buildMapSummaryHTML('win'), () => switchView('events'));
+                showModal("Event Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
                 playSound('mvp.wav');
                 updateUI();
                 saveGame();
@@ -1196,7 +1209,7 @@ function onStageCleared() {
                 const reward = generatePoEItem(template, 3, 1);
                 addItemToInventory(reward);
 
-                showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('town'));
+                showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
                 playSound('mvp.wav');
                 return;
             }
@@ -1273,7 +1286,7 @@ function logClassFor(type) {
     return type === 'combat' ? "text-red-400" : (type === 'winlose' ? "text-blue-400 font-bold" : (type === 'drop' ? "text-yellow-400 font-bold" : (type === 'levelup' ? "text-purple-400 font-bold" : "text-slate-300")));
 }
 
-function buildMapSummaryHTML(kind) {
+function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
     const s = stageSummary || newStageSummary(currentStage);
     const label = escapeHtml(kind === 'win' && activeMap ? activeMap.title : (document.getElementById('node-title')?.innerText || `Stage ${s.stage}`));
     const fmt = n => Number(n).toLocaleString();
@@ -1291,7 +1304,7 @@ function buildMapSummaryHTML(kind) {
     const sections = kind === 'win'
         ? section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody) + section('Fight Log', s.log.length, logBody)
         : section('Fight Log', s.log.length, logBody) + section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody);
-    const footer = '<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Return to Town</button>';
+    const footer = `<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
     return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div>${footer}</div>`;
 }
 
