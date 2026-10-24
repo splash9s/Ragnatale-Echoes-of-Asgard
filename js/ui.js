@@ -888,6 +888,7 @@ function showItemDetail(index) {
         <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : kind}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}${kind}</span></div>`;
     if (isEquip && item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
+    if (isGearItem(item) && item.slot !== 'pet') body += `<span class="text-[11px] text-amber-200">Gear Tier ${gearTier(item)} (Rarity ${item.rarity} + ${(item.buffs || []).length} buffs = ${gearTierScore(item)})</span>`;
     if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (!isEquip && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
@@ -905,7 +906,6 @@ function showItemDetail(index) {
     if (item.type === 'chest') actions += `<button onclick="openChestFromDetail(${index})" class="${btn} bg-purple-600 hover:bg-purple-500 text-slate-100">Open</button>`;
     if (isEquip) actions += `<button onclick="equipFromDetail(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Equip</button>`;
     if (isPotion) actions += `<button onclick="usePotionFromDetail(${index})" class="${btn} bg-emerald-600 hover:bg-emerald-500 text-slate-950">Equip</button>`;
-    if (isEquip) actions += `<button onclick="toggleFavorite(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-amber-300">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`;
     if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
     if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Gold</button>`;
     actions += `<button onclick="storeToStash(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-slate-200">Store in Stash</button>`;
@@ -1057,6 +1057,7 @@ function salvageEquipmentItem(index) {
     let item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { alert("Favorite items cannot be salvaged. Unmark it first."); return; }
+    if (item.rarity >= 3 && !confirm(`Salvage ${item.name} (R${item.rarity})? Iron Scraps are the only reward.`)) return;
     let scrapGain = salvageScrapGain(item);
 
     player.inventory[index] = null;
@@ -1620,7 +1621,8 @@ function updateUI() {
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="h-14 bg-slate-900/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:border-amber-500 transition relative group">
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
-                    ${item && item.favorite ? '<span class="absolute top-0.5 right-1 text-[11px] text-amber-300 leading-none">★</span>' : ''}
+                    ${isGearItem(item) ? `<button onclick="event.stopPropagation(); toggleFavorite(${index})" title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 ${item.favorite ? 'text-amber-300' : 'text-slate-600 hover:text-amber-300'}">${item.favorite ? '★' : '☆'}</button>` : ''}
+                    ${isGearItem(item) && item.slot !== 'pet' ? `<span class="absolute top-0 left-0.5 text-[9px] font-bold text-slate-300 leading-none">${gearTier(item)}</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
                 </div>
             `;
@@ -1676,7 +1678,6 @@ function updateUI() {
     }
 
     el = document.getElementById('weight-text');
-    if (el) el.innerText = `${derived.currentWeight} / ${derived.maxWeight}`;
     el = document.getElementById('sp-count');
     if (el) el.innerText = player.jobSp - pendingSkillTotal();
 
@@ -1846,6 +1847,22 @@ function renderEventsView() {
 
 
 // ---------- FAVORITES ----------
+// Gear tier: score = rarity + buff count (1..9). D 1-2, C 3-4, B 5-6, A 7, S 8-9.
+function gearTierScore(item) {
+    return (item.rarity || 1) + ((item.buffs || []).length);
+}
+function gearTier(item) {
+    const s = gearTierScore(item);
+    if (s <= 2) return 'D';
+    if (s <= 4) return 'C';
+    if (s <= 6) return 'B';
+    if (s === 7) return 'A';
+    return 'S';
+}
+function isGearItem(item) {
+    return !!(item && item.slot && item.slot !== 'potion' && item.type !== 'chest' && item.type !== 'material');
+}
+
 function toggleFavorite(index) {
     const item = player.inventory[index];
     if (!item || !item.slot) return;

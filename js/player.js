@@ -347,16 +347,11 @@ function getDerivedStats() {
     // Armor comes only from items (default 0)
     const maxArmor = Math.max(0, Math.floor(extra.armor * (1 + skillBonus('armorPct') / 100)));
 
-    let maxWeight = 2000 + (ST.str * 30);
-    let currentWeight = 120 + ((player.equipped.potionSlot?.qty || 0) * 15) + ((player.resurrectionPotions || 0) * 10) + ((player.refiningStones || 0) * 2);
-    for (let item of player.inventory) {
-        if (item) currentWeight += 10;
-    }
 
     const elemRes = { fire: extra.res_fire, wind: extra.res_wind, earth: extra.res_earth, water: extra.res_water };
     const finalMaxArmor = rn('glassCannon') > 0 ? 0 : maxArmor;
     if (player.runes.zeroArmor && finalMaxArmor === 0) flee += 10;
-    return { maxHp, maxArmor: finalMaxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, maxWeight, currentWeight, goldMultiplier, elemRes };
+    return { maxHp, maxArmor: finalMaxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, goldMultiplier, elemRes };
 }
 
 function saveGame() {

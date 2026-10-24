@@ -414,7 +414,7 @@ function finalMonsterPool(level) {
 
 // Monster strength across the 25 final stages: grows by 4% per stage (stage 25 = x1.96)
 function finalStageMult(stage) {
-    return 1 + (stage - 1) * 0.04;
+    return 1; // no stage scaling in campaign; the final map's level comes from its map pool
 }
 
 function spawnFinalStage() {
@@ -514,7 +514,7 @@ function spawnStageMonsters() {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
             const count = Math.min(Math.floor(Math.random() * 5) + 2, mapMonsterCap());
-            const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
+            const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : stageMultiplier();
             for (let i = 0; i < count; i++) {
                 const template = pool[Math.floor(Math.random() * pool.length)];
                 const base = {
@@ -523,8 +523,8 @@ function spawnStageMonsters() {
                     maxHp: Math.floor(template.maxHp * mult),
                     atkMin: Math.floor(template.atkMin * mult),
                     atkMax: Math.floor(template.atkMax * mult),
-                    hit: Math.floor(template.hit * (1 + (currentStage * 0.02))),
-                    flee: Math.floor(template.flee * (1 + (currentStage * 0.02))),
+                    hit: Math.floor(template.hit * hardHitFleeScale()),
+                    flee: Math.floor(template.flee * hardHitFleeScale()),
                     isBoss: false,
                     rewarded: false,
                     ailments: {}
@@ -570,8 +570,28 @@ function pickUnit(pool, role) {
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
+// Campaign monsters do not scale within a map. Each map gets one flat power multiplier:
+// the average of its old stage curve (HP/ATK) and hit/flee curve (2% per stage).
+function mapPower() {
+    if (!activeMap || activeMap.finalMap || !activeMap.campaignStages) return { hp: 1, hitFlee: 1 };
+    const n = activeMap.campaignStages;
+    const g = activeMap.stageGrowth || STAGE_GROWTH;
+    let hpSum = 0, hfSum = 0;
+    for (let s = 1; s <= n; s++) {
+        hpSum += 1 + (s - 1) * g;
+        hfSum += 1 + (s - 1) * 0.02;
+    }
+    return { hp: hpSum / n, hitFlee: hfSum / n };
+}
+
+// Void (endless) keeps its stage scaling for hit and flee. Campaign uses the flat map power.
+function hardHitFleeScale() {
+    if (currentMode === 'endless') return 1 + currentStage * 0.02;
+    return mapPower().hitFlee;
+}
+
 function stageMultiplier() {
-    return 1 + ((currentStage - 1) * ((activeMap && activeMap.stageGrowth) || STAGE_GROWTH));
+    return mapPower().hp;
 }
 
 // A fresh copy of a template for this stage
@@ -582,8 +602,8 @@ function makeUnit(t, mult) {
         maxHp: Math.floor(t.maxHp * mult),
         atkMin: Math.floor(t.atkMin * mult),
         atkMax: Math.floor(t.atkMax * mult),
-        hit: Math.floor(t.hit * (1 + (currentStage * 0.02))),
-        flee: Math.floor(t.flee * (1 + (currentStage * 0.02))),
+        hit: Math.floor(t.hit * hardHitFleeScale()),
+        flee: Math.floor(t.flee * hardHitFleeScale()),
         isBoss: false, rewarded: false, ailments: {}
     };
     if (roleOf(t) === 'mage') {
