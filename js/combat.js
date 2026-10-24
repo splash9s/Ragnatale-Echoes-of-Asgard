@@ -909,7 +909,7 @@ function monsterAct(m, derived, position = 0) {
     // Melee and tank units only strike when they are the first monster facing the player
     if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
-    const hitChance = Math.min(0.95, Math.max(0.2, (m.hit - derived.flee + 80) / 100));
+    const hitChance = Math.min(0.95, Math.max(0.2, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
@@ -990,7 +990,7 @@ function runCombatTick() {
 
     const stunned = playerDebuffs.stun > 0;
     if (stunned) { playerDebuffs.stun--; logMessage('[Stun] You are stunned and cannot attack this turn!', 'winlose'); }
-    const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - (playerDebuffs.frost > 0 ? 20 : 0) - targetEnemy.flee + 80) / 100));
+    const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - (playerDebuffs.frost > 0 ? 20 : 0) - targetEnemy.flee + 50) / 100));
     if (!stunned && (runeN('hawkEye') > 0 || !!targetEnemy.status || Math.random() <= hitChance)) {
         const bonusDmg = (isFirstHitOfBattle ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
         const elemMult = player.runes.elementIgnore ? 1 : getElementMultiplier(player.equipped.weapon?.element, targetEnemy.element);
