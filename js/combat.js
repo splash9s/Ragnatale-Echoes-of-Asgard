@@ -82,7 +82,7 @@ const RUNE_RARITY_WEIGHT = { 1: 33, 2: 27, 3: 20, 4: 13, 5: 7 };
 const RUNE_DEFS = {
     critBonus: { name: "Berserk Rune", rarity: 1, add: 10, desc: "+10% Critical Rate", text: v => `+${v}% Critical Rate` },
     dodge: { name: "Dodge Rune", rarity: 1, add: 10, desc: "+10 FLEE (raises dodge chance)", text: v => `+${v} FLEE (raises dodge chance)` },
-    zeroArmor: { name: "Zero Armor Rune", rarity: 2, flag: true, desc: "No armor equipped: +10 FLEE. Armor equipped: incoming damage reduced 40%", text: () => "No armor: +10 FLEE | With armor: incoming damage -40%" },
+    zeroArmor: { name: "Zero Armor Rune", rarity: 2, flag: true, desc: "No armor equipped: +10 FLEE. Armor equipped: incoming damage reduced 10%", text: () => "No armor: +10 FLEE | With armor: incoming damage -10%" },
     swiftRun: { name: "Swift Feet Rune", rarity: 1, add: 10, desc: "Stage walk time reduced to 1 second", text: () => "Stage walk time reduced to 1 second" },
     focus: { name: "Focus Rune", rarity: 1, add: 10, desc: "Missed attacks restore 10% HP", text: v => `Missed attacks restore ${v}% HP` },
     maxHpBonus: { name: "Vitality Rune", rarity: 3, add: 50, desc: "+50% Max HP", text: v => `+${v}% Max HP` },
@@ -486,7 +486,6 @@ function spawnStageMonsters() {
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
     playerDebuffs = { curse: 0, frost: 0, stun: 0 };
     const derived = getDerivedStats();
-    player.armor = derived.maxArmor;
     monstersList = [];
     const dailyScale = currentMode === 'daily' ? 0.7 : 1;
     const scaled = (m) => ({
@@ -952,7 +951,7 @@ function monsterAct(m, derived, position = 0) {
             if (m.spell === 'rockCurse') { playerDebuffs.curse = 3; logMessage('[Curse] Your attacks are weaker for 3 turns', 'winlose'); }
             if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); }
         }
-        if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.6);
+        if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.9);
         takePlayerDamage(eDmg, m);
         dodgeStreak = 0;
         monsterHitStreak++;

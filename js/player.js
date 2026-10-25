@@ -8,7 +8,7 @@ const STASH_SLOTS = 30;
 
 let player = {
     name: "Hero",
-    avatar: "⚔️",
+    avatar: "assets/avatars/slime.png",
     baseLv: 1,
     baseExp: 0,
     baseMaxExp: 50,

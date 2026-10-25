@@ -2,8 +2,13 @@
 // RAGNATALE - UI.JS
 // ==========================================
 
-const AVATARS = ["⚔️", "🛡️", "🔮", "🗡️", "🏹"];
-let selectedAvatarChoice = "⚔️";
+const AVATARS = ["assets/avatars/abyssalimp.png", "assets/avatars/cavebat.png", "assets/avatars/farbo.png", "assets/avatars/leafspritemage.png", "assets/avatars/mossyboulder.png", "assets/avatars/slime.png", "assets/avatars/snowwolf.png", "assets/avatars/starlightmender.png"];
+// Avatar value is either an emoji or an image path (assets/avatars/... or data:image...)
+function avatarMarkup(av, cls) {
+    if (av && (av.startsWith("assets/") || av.startsWith("data:image"))) return `<img src="${av}" class="${cls}" />`;
+    return `<img src="assets/avatars/slime.png" class="${cls}" />`;
+}
+let selectedAvatarChoice = "assets/avatars/slime.png";
 let currentLanguage = 'en';
 let currentForgeSubTab = 'gold';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
@@ -64,8 +69,8 @@ function renderAvatarSelection() {
         let isSelected = (av === selectedAvatarChoice);
         let borderClass = isSelected ? 'border-amber-400 bg-amber-500/20' : 'border-slate-700 bg-slate-900';
         grid.innerHTML += `
-            <div onclick="selectAvatar('${av}')" class="h-12 rounded-xl border ${borderClass} flex items-center justify-center text-xl cursor-pointer hover:border-amber-400 transition">
-                ${av}
+            <div onclick="selectAvatar('${av}')" class="aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-pointer hover:border-amber-400 transition">
+                ${avatarMarkup(av, 'w-full h-full object-contain')}
             </div>
         `;
     });
@@ -112,11 +117,23 @@ function startGameWithName() {
 function updateAvatarDisplay() {
     let container = document.getElementById('header-avatar-container');
     if (!container) return;
-    if (player.avatar && player.avatar.startsWith('data:image')) {
-        container.innerHTML = `<img src="${player.avatar}" class="w-full h-full object-cover" />`;
-    } else {
-        container.innerText = player.avatar || "⚔️";
-    }
+    container.innerHTML = avatarMarkup(player.avatar, 'w-full h-full object-cover');
+}
+
+// Player stat avatar: click to choose a monster avatar
+function openAvatarPicker() {
+    const options = AVATARS.map(av => `
+        <button onclick="pickPlayerAvatar('${av}')" class="h-16 w-16 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 cursor-pointer overflow-hidden">
+            ${avatarMarkup(av, 'w-full h-full object-cover')}
+        </button>`).join('');
+    showModal("Choose Avatar", "", `<div class="grid grid-cols-4 gap-3 justify-items-center">${options}</div>`);
+}
+function pickPlayerAvatar(av) {
+    player.avatar = av;
+    selectedAvatarChoice = av;
+    updateUI();
+    saveGame();
+    closeModal();
 }
 
 function showModal(title, message, customHTML = '', onCloseCallback = null) {
@@ -149,11 +166,18 @@ function closeModal() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
+    // Header (gold/diamond) only on non-town screens; town shows the full info panel.
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge'].includes(viewName));
+    if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
+    // Transparent html/body background on art screens (see .art-mode in index.html)
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge'];
+    document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
+    document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
     if (viewName === 'town') document.getElementById('view-town')?.classList.remove('hidden');
     if (viewName === 'expeditions') {
@@ -165,6 +189,7 @@ function switchView(viewName) {
         document.getElementById('view-skills')?.classList.remove('hidden');
         renderSkillPage();
     }
+    if (viewName === 'setting') document.getElementById('view-setting')?.classList.remove('hidden');
     if (viewName === 'library') {
         document.getElementById('view-library')?.classList.remove('hidden');
         renderLibraryView();
@@ -195,26 +220,19 @@ function switchView(viewName) {
 function switchForgeSubTab(tabName) {
     if (tabName !== 'gold' && tabName !== 'refine') tabName = 'gold';
     currentForgeSubTab = tabName;
-    let goldSection = document.getElementById('forge-gold-section');
-    let refineSection = document.getElementById('forge-refine-section');
-    let btnGold = document.getElementById('forge-tab-btn-gold');
-    let btnRefine = document.getElementById('forge-tab-btn-refine');
-
-    if (goldSection) goldSection.classList.add('hidden');
-    if (refineSection) refineSection.classList.add('hidden');
+    const goldSection = document.getElementById('forge-gold-section');
+    const refineSection = document.getElementById('forge-refine-section');
+    const btnGold = document.getElementById('forge-tab-btn-gold');
+    const btnRefine = document.getElementById('forge-tab-btn-refine');
+    const active = "px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer";
     const inactive = "px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer";
-    if (btnGold) btnGold.className = inactive;
-    if (btnRefine) btnRefine.className = inactive;
-
-    if (tabName === 'gold') {
-        if (goldSection) goldSection.classList.remove('hidden');
-        if (btnGold) btnGold.className = "px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer";
-        renderShop();
-    } else {
-        if (refineSection) refineSection.classList.remove('hidden');
-        if (btnRefine) btnRefine.className = "px-3 py-1.5 bg-amber-500 text-slate-950 rounded text-xs font-bold transition cursor-pointer";
-        renderRefiningUI();
-    }
+    if (goldSection) goldSection.classList.toggle('hidden', tabName !== 'gold');
+    if (refineSection) refineSection.classList.toggle('hidden', tabName !== 'refine');
+    if (btnGold) btnGold.className = tabName === 'gold' ? active : inactive;
+    if (btnRefine) btnRefine.className = tabName === 'refine' ? active : inactive;
+    // Armory (right window) is always visible; consumables and refining fill their left-window tab.
+    renderShop();
+    if (tabName === 'refine') renderRefiningUI();
 }
 
 function getMapPrereqTitle(mapKey) {
@@ -226,6 +244,7 @@ let campaignPathChoice = 'fire';
 
 function renderMapGateUI() {
     updateFinalMapButton();
+    if (window.updateExpoNodes) window.updateExpoNodes();
     const selectEl = document.getElementById('campaign-map-select');
     const listEl = document.getElementById('campaign-map-list');
     const pathEl = document.getElementById('campaign-path-list');
@@ -263,7 +282,7 @@ function renderMapGateUI() {
         let cls, sub, diamond = false;
         if (!unlocked) {
             cls = 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed';
-            sub = `🔒 Clear ${getMapPrereqTitle(m)} first`;
+            sub = `🔒 Clear ${getMapPrereqTitle(m)}`;
             diamond = true;
         } else if (selected) {
             cls = 'bg-amber-500/20 border-amber-400 text-amber-300 cursor-pointer';
@@ -272,7 +291,7 @@ function renderMapGateUI() {
             cls = 'bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400 cursor-pointer';
             sub = cleared ? '✔ Cleared' : 'Available';
         }
-        const bg = diamond ? '<span aria-hidden="true" class="absolute -right-2 -bottom-4 text-6xl text-slate-700/40 pointer-events-none select-none">◆</span>' : '';
+        const bg = '';
         return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="relative overflow-hidden p-3 rounded-xl border text-left text-xs transition ${cls}">
             ${bg}<span class="relative block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
             <span class="relative block text-[10px] mt-0.5">${sub}</span>
@@ -317,6 +336,31 @@ function updateFinalMapButton() {
         : 'py-3 bg-slate-800 text-slate-500 font-bold rounded-xl text-xs border border-slate-700 cursor-not-allowed';
 }
 
+// ---- Armory shop filters (gear type, level, sort) ----
+let armoryFilter = { slot: 'all', level: 'all', sort: 'level-asc' };
+function setArmoryFilter(key, val) {
+    armoryFilter[key] = val;
+    renderShop();
+}
+function renderArmoryFilterBar(slots, levels) {
+    const bar = document.getElementById('armory-filter-bar');
+    if (!bar) return;
+    const sel = 'px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-amber-400';
+    const sorts = [['level-asc', 'Level ↑'], ['level-desc', 'Level ↓'], ['price-asc', 'Price ↑'], ['price-desc', 'Price ↓']];
+    bar.innerHTML = `
+        <select class="${sel}" onchange="setArmoryFilter('slot', this.value)">
+            <option value="all">All gear types</option>
+            ${slots.map(s => `<option value="${s}" ${armoryFilter.slot === s ? 'selected' : ''}>${slotLabel(s)}</option>`).join('')}
+        </select>
+        <select class="${sel}" onchange="setArmoryFilter('level', this.value)">
+            <option value="all">All levels</option>
+            ${levels.map(l => `<option value="${l}" ${armoryFilter.level === String(l) ? 'selected' : ''}>Lv ${l}</option>`).join('')}
+        </select>
+        <select class="${sel}" onchange="setArmoryFilter('sort', this.value)">
+            ${sorts.map(([v, t]) => `<option value="${v}" ${armoryFilter.sort === v ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>`;
+}
+
 function renderShop() {
     let consumablesContainer = document.getElementById('shop-consumables-container');
     if (consumablesContainer) {
@@ -336,14 +380,33 @@ function renderShop() {
 
     let armoryContainer = document.getElementById('shop-items-container');
     if (armoryContainer) {
-        armoryContainer.innerHTML = '';
-        let shopPool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
-        shopPool.forEach((item, idx) => {
-            let price = item.price || 300;
+        const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
+        const slots = [...new Set(pool.map(i => i.slot).filter(Boolean))];
+        const levels = [...new Set(pool.map(i => i.levelReq || 1))].sort((a, b) => a - b);
+        renderArmoryFilterBar(slots, levels);
+
+        const lvOf = it => it.levelReq || 1;
+        const priceOf = it => it.price || 300;
+        let rows = pool.map((item, idx) => ({ item, idx }))
+            .filter(({ item }) => armoryFilter.slot === 'all' || item.slot === armoryFilter.slot)
+            .filter(({ item }) => armoryFilter.level === 'all' || String(lvOf(item)) === armoryFilter.level);
+        rows.sort((a, b) => {
+            switch (armoryFilter.sort) {
+                case 'level-desc': return lvOf(b.item) - lvOf(a.item);
+                case 'price-asc': return priceOf(a.item) - priceOf(b.item);
+                case 'price-desc': return priceOf(b.item) - priceOf(a.item);
+                default: return lvOf(a.item) - lvOf(b.item);
+            }
+        });
+
+        armoryContainer.innerHTML = rows.length ? '' : '<p class="text-xs" style="color:#3b2716">No items match these filters.</p>';
+        // idx is the item's index in SHOP_ARMORY_ITEMS, which buyArmoryItem() expects
+        rows.forEach(({ item, idx }) => {
+            const price = priceOf(item);
             armoryContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
                     <div>
-                        <span class="font-bold text-amber-300 block text-xs">${item.name} <span class="text-slate-400 font-normal">[${slotLabel(item.slot)}]</span> (Req. Lv ${item.levelReq || 1})</span>
+                        <span class="font-bold text-amber-300 block text-xs">${item.name} <span class="text-slate-400 font-normal">[${slotLabel(item.slot)}]</span> (Req. Lv ${lvOf(item)})</span>
                         <span class="text-[10px] text-slate-400">${item.desc} — Price: ${price} Gold</span>
                     </div>
                     <button onclick="buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
@@ -1016,6 +1079,23 @@ function getSellPrice(item) {
     return unit * (item.qty || 1);
 }
 
+// ---- Confirm dialog helpers ----
+// Stats the item carries (base + buffs + debuffs), as plain text for confirm()
+function confirmStatText(item) {
+    const entries = Object.entries(effectiveStats(item)).filter(([, v]) => v !== 0);
+    return entries.length ? entries.map(([k, v]) => formatStatLine(k, v)).join(', ') : 'no stats';
+}
+function confirmRarityText(item) {
+    const r = RARITY_INFO[item.rarity] || RARITY_INFO[1];
+    return `R${item.rarity} ${r.name}`;
+}
+// One line per item for bulk confirms (first 8, then a count of the rest)
+function confirmItemList(targets) {
+    const shown = targets.slice(0, 8).map(({ it }) => `• ${it.name} (${confirmRarityText(it)}) — ${confirmStatText(it)}`);
+    if (targets.length > 8) shown.push(`…and ${targets.length - 8} more`);
+    return shown.join('\n');
+}
+
 function sellInventoryItem(index) {
     const item = player.inventory[index];
     if (!item) return false;
@@ -1023,7 +1103,8 @@ function sellInventoryItem(index) {
     if (item.slot && (item.levelReq || 1) >= 99) { alert("Level 99 gear cannot be sold to the shop."); return false; }
     const total = getSellPrice(item);
     const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
-    if (!confirm(`Sell ${item.name}${qtyText} for ${total} Gold?`)) return false;
+    const sellMsg = `Sell ${item.name}${qtyText}?\n\nYou get: ${total} Gold\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
+    if (!confirm(sellMsg)) return false;
     player.gold += total;
     player.inventory[index] = null;
     logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Gold`, 'drop');
@@ -1057,8 +1138,9 @@ function salvageEquipmentItem(index) {
     let item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { alert("Favorite items cannot be salvaged. Unmark it first."); return; }
-    if (item.rarity >= 3 && !confirm(`Salvage ${item.name} (R${item.rarity})? Iron Scraps are the only reward.`)) return;
     let scrapGain = salvageScrapGain(item);
+    const salvageMsg = `Salvage ${item.name}?\n\nYou get: ${scrapGain} Iron Scrap\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
+    if (item.rarity >= 3 && !confirm(salvageMsg)) return;
 
     player.inventory[index] = null;
     if (!addScraps(scrapGain)) {
@@ -1080,7 +1162,7 @@ function salvageAllEquipment() {
     const targets = bulkEquipTargets();
     if (targets.length === 0) { alert("No equipment to salvage."); return; }
     const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
-    if (!confirm(`Salvage ${targets.length} equipment item(s) for ${gain} Iron Scrap? Favorites are kept.`)) return;
+    if (!confirm(`Salvage ${targets.length} equipment item(s)?\n\nYou get: ${gain} Iron Scrap\n\n${confirmItemList(targets)}\n\nFavorites are kept. This cannot be undone.`)) return;
     targets.forEach(({ i }) => { player.inventory[i] = null; });
     if (!addScraps(gain)) {
         targets.forEach(({ it, i }) => { player.inventory[i] = it; });
@@ -1096,7 +1178,7 @@ function sellAllEquipment() {
     const targets = bulkEquipTargets().filter(({ it }) => (it.levelReq || 1) < 99);
     if (targets.length === 0) { alert("No equipment to sell."); return; }
     const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
-    if (!confirm(`Sell ${targets.length} equipment item(s) for ${total} Gold? Favorites and Lv 99 gear are kept.`)) return;
+    if (!confirm(`Sell ${targets.length} equipment item(s)?\n\nYou get: ${total} Gold\n\n${confirmItemList(targets)}\n\nFavorites and Lv 99 gear are kept. This cannot be undone.`)) return;
     targets.forEach(({ i }) => { player.inventory[i] = null; });
     player.gold += total;
     logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
@@ -1302,7 +1384,7 @@ function renderPendingBars() {
                     <button onclick="confirmPendingStats()" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Confirm ${total} pt</button>
                 </div></div>`;
         } else {
-            sBar.innerHTML = '<span class="text-[10px] text-slate-500">Allocate with +, then confirm the batch.</span>';
+            sBar.innerHTML = '';
         }
     }
     const kBar = document.getElementById('skill-pending-bar');
@@ -1317,7 +1399,7 @@ function renderPendingBars() {
                     <button onclick="confirmPendingSkills()" class="flex-1 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-100 font-bold rounded-lg cursor-pointer">Confirm ${total} SP</button>
                 </div></div>`;
         } else {
-            kBar.innerHTML = '<span class="text-[10px] text-slate-500">Allocate with +1 SP, then confirm the batch.</span>';
+            kBar.innerHTML = '';
         }
     }
 }
@@ -1567,6 +1649,10 @@ function updateUI() {
     el = document.getElementById('header-gold');
     if (el) el.innerText = `${player.gold} Gold`;
     el = document.getElementById('header-diamonds');
+    if (el) el.innerText = player.diamonds;
+    el = document.getElementById('town-gold');
+    if (el) el.innerText = `${player.gold} Gold`;
+    el = document.getElementById('town-diamonds');
     if (el) el.innerText = player.diamonds;
 
     let baseExpPct = Math.min(100, Math.floor((player.baseExp / player.baseMaxExp) * 100));
@@ -1818,7 +1904,7 @@ function renderEventsView() {
                 <p class="text-[10px] text-slate-400 mt-1">31 stages with bosses on 11, 21 and 31. Level, skills and gear have no effect. Health potions are disabled and only one resurrection can be used per run.</p>
                 <span class="text-[10px] font-mono text-cyan-300 mt-2 block">${status}</span>
             </div>
-            <button ${can ? '' : 'disabled'} onclick="startEvent('daily')" class="py-3 font-bold rounded-xl text-xs transition mt-auto ${can ? 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 cursor-pointer shadow' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">${can ? 'Start Daily Challenge' : 'Locked'}</button>`;
+            <button ${can ? '' : 'disabled'} onclick="startEvent('daily')" class="py-3 font-bold rounded-xl text-xs transition mt-4 ${can ? 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 cursor-pointer shadow' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">${can ? 'Start Daily Challenge' : 'Locked'}</button>`;
     }
 
     ['gold', 'xp'].forEach(kind => {

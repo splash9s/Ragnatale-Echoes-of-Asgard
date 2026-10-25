@@ -13,54 +13,114 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
     </style>
+    <style>
+        .town-stage { position: relative; width: 100%; overflow: hidden; }
+        /* Town is a full-window screen; the art is centered and scaled to fit. */
+        #view-town:not(.hidden) { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: #050a14; overflow: hidden; }
+        #view-town .town-stage { flex: none; }
+        .ts-inner { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: #1a1410; }
+        .ts-inner .ts-bg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+        .ts-inner .ui { position: absolute; cursor: pointer; user-select: none; -webkit-user-select: none; }
+        .ts-inner .ui img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+        .ts-inner .ui.round { border-radius: 50%; }
+        .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
+        #town-shadow { position: absolute; left: 912px; top: 830px; width: 101px; height: 35px; border-radius: 50%; background: rgba(20,12,8,.45); z-index: 1; }
+        #town-hero-wrap { position: absolute; left: 832px; top: 636px; width: 256px; height: 256px; pointer-events: none; z-index: 2; }
+        #town-hero { position: absolute; left: 0; top: 0; width: 256px; height: 256px; image-rendering: pixelated; }
+        .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
+        .town-info > * { pointer-events: auto; }
+        .town-top { display: flex; gap: 10px; align-items: flex-start; }
+        .town-avatar { width: 60px; height: 60px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+        .town-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .town-id { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .town-name { display: flex; align-items: center; gap: 6px; font-size: 24px; line-height: 1.1; font-weight: 700; color: #f5c451; margin: 0; }
+        .town-lv { font-size: 17px; line-height: 1.2; color: #bfae85; }
+        .town-lv strong { color: #f5e6c0; }
+        .town-exp { display: flex; flex-direction: column; gap: 4px; width: 300px; }
+        .town-exp .row { display: flex; justify-content: space-between; font-size: 14px; line-height: 1.2; color: #bfae85; font-family: monospace; }
+        .town-exp .bar { height: 7px; background: #0f1a2b; border: 1px solid #2a3a55; border-radius: 999px; overflow: hidden; }
+        .town-exp .fill { height: 100%; transition: width .3s; }
+        .town-money { position: absolute; left: 10px; bottom: 6px; display: flex; flex-wrap: nowrap; gap: 6px; }
+        .town-money > div { padding: 3px 8px; border-radius: 8px; background: rgba(10,15,25,.85); border: 1px solid #c9a227; font-size: 13px; white-space: nowrap; font-weight: 700; color: #f5c451; display: flex; align-items: center; gap: 6px; }
+        #town-diamond-pill { border-color: #a77bff; color: #d9c2ff; cursor: pointer; }
+        #view-expeditions:not(.hidden) { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: #050a14; overflow: hidden; }
+        #view-expeditions .town-stage { flex: none; }
+        .expo-node { position: absolute; width: 48px; height: 48px; cursor: pointer; z-index: 3; }
+        .expo-node img { width: 100%; height: 100%; display: block; pointer-events: none; }
+        .expo-node:hover img { filter: brightness(1.3); }
+        .expo-node.locked img { filter: grayscale(1) brightness(.55); }
+        .expo-panel { position: absolute; left: 600px; top: 110px; width: 720px; height: 860px; overflow: hidden; box-sizing: border-box; padding: 0; background: transparent url('assets/pages/frame/c.png') center / 100% 100% no-repeat; border: 2px solid #c9a227; border-radius: 24px; color: #e2e8f0; z-index: 5; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+        .art-screen:not(.hidden) { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: transparent; overflow: hidden; }
+        .art-screen .town-stage { flex: none; }
+        .art-panel { position: absolute; box-sizing: border-box; padding: 20px; overflow-y: auto; background: transparent; border: 2px solid #c9a227; border-radius: 16px; color: #e2e8f0; z-index: 5; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+        html { background-color: #000 !important; }
+        body.art-mode { background: transparent !important; background-color: transparent !important; }
+        .art-frame { position: absolute; pointer-events: none; z-index: 2; display: block; }
+        /* Text sitting on the parchment (headings and labels, not the dark cards) uses a darker tone */
+        .art-panel h2, .art-panel h3, .art-panel > p { color: #3b2716 !important; }
+        /* Dark wrapper boxes that hold a page's content become transparent (item rows keep their own background) */
+        .art-panel > div { background-color: transparent !important; }
+        /* Artisan windows: left has no border, right border is transparent */
+        #forge-panel-left { border: none; }
+        #forge-panel-right { border-color: transparent; }
+        /* Dark font on the art pages (not Mail/Setting, which are .art-dark-off); cards and selects get a light parchment background so the text stays readable */
+        .art-dark .art-panel, .art-dark .art-panel * { color: #2a1a0e !important; }
+        /* Campaign Dungeons panel: parchment background (c.png), dark text; buttons and dropdown keep dark text */
+        .art-dark .expo-panel, .art-dark .expo-panel * { color: #2a1a0e !important; }
+        .art-dark .expo-panel button, .art-dark .expo-panel select { color: #1e1409 !important; }
+        .art-dark .art-panel [class*="bg-slate-"]:not(select), .art-dark .expo-panel [class*="bg-slate-"]:not(select) { background-color: transparent !important; border-color: transparent !important; }
+        .art-dark button.bg-cyan-600 { background-color: #8fb3a9 !important; }
+        .art-dark button.bg-cyan-600:hover { background-color: #a3c4bb !important; }
+        .art-dark .art-panel > div, .art-dark .expo-panel > div { background-color: transparent !important; }
+        #view-events .art-panel { border: none !important; }
+        .art-dark .art-panel, .art-dark .expo-panel { border-color: transparent !important; }
+        .art-dark .art-panel [class*="border"], .art-dark .expo-panel [class*="border"] { border-color: transparent !important; }
+        .art-dark .art-panel select, .art-dark .expo-panel select { background-color: #f5e8c8 !important; border-color: #b8945a !important; }
+        /* Events page: soft background on the Map 1/2/3 tiles */
+        #view-events #event-gold button, #view-events #event-xp button { background-color: rgba(143, 179, 169, .65) !important; }
+        /* Diamond page: softer lavender instead of bright purple, and a soft background on each item */
+        #view-diamond button.bg-purple-600 { background-color: #b7a6d6 !important; }
+        #view-diamond button.bg-purple-600:hover { background-color: #c8bbe2 !important; }
+        #view-diamond .bg-purple-950\/60 { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
+        #diamond-shop-items-container > div { background-color: rgba(190, 178, 214, .45) !important; border-color: #a593c4 !important; }
+        /* Artisan shop: soft background on each item (consumables and armory) */
+        #shop-consumables-container > div, #shop-items-container > div { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
+        /* Mail page: no background behind the Daily Quests and Mailbox columns */
+        #view-quests .grid > div { background-color: transparent !important; }
+        /* Mail page: remove all borders */
+        #view-quests, #view-quests * { border: 0 !important; }
+        /* Setting page: no yellow border, lighter title */
+        #view-setting .art-panel { border-color: transparent !important; }
+        #view-setting h2 { color: #fef3c7 !important; }
+        /* Setting page: remove all borders */
+        #view-setting, #view-setting * { border: 0 !important; }
+        /* Campaign Dungeons: all content sits inside the frame's inner window */
+        .expo-inner { position: absolute; left: 88px; top: 114px; width: 542px; height: 643px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 6px; }
+        /* Campaign Dungeons: each node shows only its own element's maps, so the element tabs are hidden */
+        #campaign-path-list { display: none !important; }
+        /* Campaign map tiles: soft background (selected tile keeps its amber highlight) */
+        #campaign-map-list > button:not([class*="bg-amber"]) { background-color: rgba(143, 179, 169, .65) !important; }
+        /* Campaign Dungeons: soft background on the Close button */
+        #campaign-panel button[onclick="closeCampaignPanel()"] { background-color: rgba(143, 179, 169, .65) !important; }
+        /* Events page: Daily / Event cards always in one row; softer Void Tower button */
+        #void-tower-card button { background-color: #b7a6d6 !important; }
+        #void-tower-card button:hover { background-color: #c8bbe2 !important; }
+    </style>
 </head>
 
 
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
 
     <!-- TOP HEADER / HUD -->
-    <header class="bg-slate-950/80 border-b border-slate-800/80 backdrop-blur sticky top-0 z-40 px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+    <header id="app-header" class="hidden bg-slate-950/80 border-b border-slate-800/80 backdrop-blur sticky top-0 z-40 px-4 py-2 flex justify-end items-center gap-3">
         <div class="flex items-center gap-3">
-            <div id="header-avatar-container" class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-lg shadow-lg border border-amber-400/40 overflow-hidden">
-                ⚔️
+            <div class="px-3 py-1 bg-slate-900/90 rounded-xl border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold text-amber-300 shadow-inner">
+                <span>💰</span> <span id="header-gold">1000 Gold</span>
             </div>
-            <div>
-                <h1 class="font-bold text-sm text-amber-400 tracking-wide flex items-center gap-2"><span id="header-player-name">Hero</span><span id="header-vip-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
-                <div class="flex items-center gap-2 text-[10px] text-slate-400">
-                    <span>Base Lv. <strong id="header-base-lv" class="text-slate-200">1</strong></span>
-                    <span>•</span>
-                    <span>Class Lv. <strong id="header-job-lv" class="text-slate-200">1</strong></span>
-                </div>
-                <div class="flex flex-col gap-1 w-44 mt-1">
-            <div class="flex justify-between text-[9px] text-slate-400 font-mono">
-                <span>Base EXP</span>
-                <span id="top-base-exp-text">0 / 50 (0%)</span>
-            </div>
-            <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
-                <div id="top-base-exp-bar" class="bg-amber-500 h-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <div class="flex justify-between text-[9px] text-slate-400 font-mono">
-                <span>Class EXP</span>
-                <span id="top-job-exp-text">0 / 40 (0%)</span>
-            </div>
-            <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800">
-                <div id="top-job-exp-bar" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%"></div>
+            <div onclick="switchView('diamond')" class="px-3 py-1 bg-slate-900/90 rounded-xl border border-purple-500/30 flex items-center gap-1.5 text-xs font-bold text-purple-300 shadow-inner cursor-pointer hover:border-purple-400 transition">
+                <span>💎</span> <span id="header-diamonds">1000</span>
             </div>
         </div>
-            </div>
-        </div>
-
-<div class="flex items-center gap-3">
-    <div class="px-3 py-1 bg-slate-900/90 rounded-xl border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold text-amber-300 shadow-inner">
-        <span>💰</span> <span id="header-gold">1000 Gold</span>
-    </div>
-    <div onclick="switchView('diamond')" class="px-3 py-1 bg-slate-900/90 rounded-xl border border-purple-500/30 flex items-center gap-1.5 text-xs font-bold text-purple-300 shadow-inner cursor-pointer hover:border-purple-400 transition" title="Open Diamond Shop">
-        <span>💎</span> <span id="header-diamonds">1000</span>
-    </div>
-    <button id="bgm-toggle-btn" onclick="toggleBgm()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer">🎵 BGM</button>
-    <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700 transition cursor-pointer">🌐 EN/TH</button>
-</div>
-
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
@@ -75,8 +135,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="text-xs font-bold text-slate-300">Avatar Icon</label>
                     <div id="avatar-selection-grid" class="grid grid-cols-5 gap-2"></div>
-                    <label class="text-[10px] text-slate-400 mt-1">Or upload custom image:</label>
-                    <input type="file" accept="image/*" onchange="handleCustomAvatarUpload(event)" class="text-xs text-slate-400 file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-slate-950 hover:file:bg-amber-500 cursor-pointer">
+                    
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold text-slate-300">Hero Name</label>
@@ -89,95 +148,120 @@
         </div>
 
         <!-- VIEW: TOWN -->
-        <div id="view-town" class="flex flex-col gap-4 flex-1">
-            <div class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
-                <div>
-                    <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">🏰 Haven of Dawn</h2>
-                    <p class="text-xs text-slate-400 mt-1">Prepare your gear, refine weapons, accept daily quests, and embark on expeditions.</p>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="manualSaveGame()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Save Game</button>
-                    <button onclick="resetSaveGame()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900 text-red-300 font-bold rounded-xl text-xs transition cursor-pointer">Reset Save</button>
-                </div>
+        <div id="view-town" class="flex flex-col flex-1">
+            <div id="town-stage" class="town-stage">
+                <div class="ts-inner">
+                    <img class="ts-bg" src="assets/page01/bgmain.png" alt="" onerror="townSwap(this,'bgmain.png')">
+                    <div class="ui" style="left:20px; top:8px; width:502px; height:254px; cursor:default;">
+                        <img src="assets/page01/characterinfo.png" alt="" onerror="townSwap(this,'characterinfo.png')">
+                        <div class="town-info">
+                            <div class="town-top">
+                                <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime.png" alt="" /></div>
+                                <div class="town-id">
+                                    <h1 class="town-name"><span id="header-player-name">Hero</span><span id="header-vip-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
+                                    <div class="town-lv">Base Lv. <strong id="header-base-lv">1</strong> • Class Lv. <strong id="header-job-lv">1</strong></div>
+                                    <div class="town-exp">
+                                        <div class="row"><span>Base EXP</span><span id="top-base-exp-text">0 / 50 (0%)</span></div>
+                                        <div class="bar"><div id="top-base-exp-bar" class="fill" style="width: 0%; background:#e0a526"></div></div>
+                                        <div class="row"><span>Class EXP</span><span id="top-job-exp-text">0 / 40 (0%)</span></div>
+                                        <div class="bar"><div id="top-job-exp-bar" class="fill" style="width: 0%; background:#a06bd6"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="town-money">
+                                <div>💰 <span id="town-gold">1000 Gold</span></div>
+                                <div id="town-diamond-pill" onclick="switchView('diamond')">💎 <span id="town-diamonds">1000</span></div>
+                            </div>
+                        </div>
+                    </div>
+            <div class="ui" data-action="events" style="left:1280px; top:8px; width:144px; height:145px;">
+                <img src="assets/page01/eventsbutton.png" alt="" onerror="townSwap(this,'eventsbutton.png')">
             </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <button onclick="switchView('character')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">🛡️</span>
-                    <span class="font-bold text-amber-300 text-xs">Character & Stats</span>
-                    <span class="text-[10px] text-slate-400">Inventory & skills.</span>
-                </button>
-                <button onclick="switchView('forge')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">🔨</span>
-                    <span class="font-bold text-amber-300 text-xs">Forge & Shop</span>
-                    <span class="text-[10px] text-slate-400">Armory & refining.</span>
-                </button>
-                <button onclick="switchView('diamond')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">💎</span>
-                    <span class="font-bold text-purple-300 text-xs">Diamond Shop</span>
-                    <span class="text-[10px] text-slate-400">Premium items & pets.</span>
-                </button>
-                <button onclick="switchView('library')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">📚</span>
-                    <span class="font-bold text-sky-300 text-xs">Library</span>
-                    <span class="text-[10px] text-slate-400">Runes, monsters, elements and drops.</span>
-                </button>
-                <button onclick="switchView('events')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">🎁</span>
-                    <span class="font-bold text-cyan-300 text-xs">Events</span>
-                    <span class="text-[10px] text-slate-400">Daily Challenge, Gold Rush, XP Farm.</span>
-                </button>
-                <button onclick="switchView('expeditions')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">⚔️</span>
-                    <span class="font-bold text-amber-300 text-xs">Expeditions</span>
-                    <span class="text-[10px] text-slate-400">Dungeons & towers.</span>
-                </button>
-                <button onclick="switchView('quests')" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition cursor-pointer flex flex-col gap-1.5 shadow-lg group">
-                    <span class="text-xl">📜</span>
-                    <span class="font-bold text-amber-300 text-xs">Quests & Mail</span>
-                    <span class="text-[10px] text-slate-400">Daily tasks & mail.</span>
-                </button>
+            <div class="ui" data-action="diamond" style="left:1442px; top:8px; width:144px; height:145px;">
+                <img src="assets/page01/diamondbutton.png" alt="" onerror="townSwap(this,'diamondbutton.png')">
             </div>
-
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Activity Log</h3>
-                <div id="town-activity-log" class="h-32 overflow-y-auto flex flex-col gap-1 font-mono text-[11px] text-slate-300 pr-2">
-                    <div>[System] Welcome back to Haven of Dawn. Ready for adventure?</div>
+            <div class="ui" data-action="mail" style="left:1604px; top:8px; width:144px; height:145px;">
+                <img src="assets/page01/mailbutton.png" alt="" onerror="townSwap(this,'mailbutton.png')">
+            </div>
+            <div class="ui" data-action="setting" style="left:1766px; top:8px; width:144px; height:145px;">
+                <img src="assets/page01/setting.png" alt="" onerror="townSwap(this,'setting.png')">
+            </div>
+            <div class="ui" data-action="character" style="left:20px; top:925px; width:145px; height:145px;">
+                <img src="assets/page01/characterbutton.png" alt="" onerror="townSwap(this,'characterbutton.png')">
+            </div>
+            <div class="ui" data-action="artisan" style="left:183px; top:925px; width:145px; height:145px;">
+                <img src="assets/page01/articanbutton.png" alt="" onerror="townSwap(this,'articanbutton.png')">
+            </div>
+            <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
+                <img src="assets/page01/expeditionbutton.png" alt="" onerror="townSwap(this,'expeditionbutton.png')">
+            </div>
+                    <div id="town-shadow"></div>
+                    <div id="town-hero-wrap">
+                        <img id="town-hero" alt="" src="assets/page01/idle_breathing_sheet.png_0001.png">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW: EXPEDITIONS -->
-        <div id="view-expeditions" class="hidden flex flex-col gap-4 flex-1">
+        <!-- VIEW: SETTING -->
+        <div id="view-setting" class="hidden art-screen">
+            <div id="setting-stage" class="town-stage" data-w="2752" data-h="1536">
+                <div class="ts-inner" style="width:2752px; height:1536px;">
+                    <img class="ts-bg" src="assets/pages/setting/bg.jpg" alt="" style="width:2752px; height:1536px;" onerror="townSwap(this,'setting bg')">
+                    <div class="ui" style="left:2562px; top:18px; width:163px; height:93px;" onclick="switchView('town')">
+                        <img src="assets/compaign/returnbutton.png" alt="">
+                    </div>
+                    <div class="art-panel" style="left:632px; top:261px; width:1488px; height:1014px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-base font-bold text-amber-400">Expedition Gates</h2>
-                    <p class="text-xs text-slate-400">Choose your battleground and conquer floors.</p>
+                    <h2 class="text-base font-bold text-amber-300">Setting</h2>
+                    
                 </div>
-                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-                    <div>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/40 uppercase">Campaign</span>
-                        <h3 class="text-sm font-bold text-slate-200 mt-2">Campaign Dungeons</h3>
-                    </div>
-                    <div id="campaign-path-list" class="grid grid-cols-2 gap-2 mb-2"></div>
-                    <div id="campaign-map-list" class="grid grid-cols-2 gap-2"></div>
-                    <select id="campaign-map-select" class="hidden w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button onclick="switchView('library')" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">📚 Library</button>
+                <button onclick="manualSaveGame()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">💾 Save Game</button>
+                <button id="bgm-toggle-btn" onclick="toggleBgm()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">🎵 BGM</button>
+                <button onclick="toggleLanguage()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
+                <button onclick="resetSaveGame()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left !text-red-300 hover:!bg-red-950/40">♻️ Reset Save Data</button>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: EXPEDITIONS (campaign map) -->
+        <div id="view-expeditions" class="hidden art-dark">
+            <div id="expo-stage" class="town-stage">
+                <div class="ts-inner">
+                    <img class="ts-bg" src="assets/compaign/compaign.png" alt="" onerror="townSwap(this,'compaign.png')">
+                    <div class="expo-node" id="expo-node-earth" style="left:399px; top:296px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <div class="expo-node" id="expo-node-final" style="left:937px; top:185px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <div class="expo-node" id="expo-node-fire" style="left:1535px; top:257px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <div class="expo-node" id="expo-node-water" style="left:216px; top:644px;" onclick="openCampaignPath('water')" title="Water Path (Teal Cave)"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <div class="expo-node" id="expo-node-wind" style="left:1484px; top:917px;" onclick="openCampaignPath('wind')" title="Wind Path (Storm)"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <div class="expo-node" id="expo-node-town" style="left:938px; top:549px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <div id="campaign-panel" class="expo-panel hidden">
+                        <div class="expo-inner">
+                        <div class="flex justify-between items-center mb-3">
+                            <div>
+                                <h2 class="text-base font-bold text-amber-400">Campaign Dungeons</h2>
+                            </div>
+                            <button onclick="closeCampaignPanel()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs cursor-pointer">Close</button>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <div id="campaign-path-list" class="grid grid-cols-2 gap-2 mb-2"></div>
+                            <div id="campaign-map-list" class="grid grid-cols-2 gap-2"></div>
+                            <select id="campaign-map-select" class="hidden w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-amber-400">
                         <option value="map1">Valgrove Outskirts (Lv. 1)</option>
                         <option value="map10">Ashmere Forest (Lv. 10)</option>
                         <option value="map20">Runeholt Academy (Lv. 20)</option>
                     </select>
-                    <button id="final-map-btn" onclick="startExpedition('campaign', {final: true})" class="py-3 bg-rose-600 hover:bg-rose-500 text-slate-100 font-bold rounded-xl text-xs transition cursor-pointer shadow">World-Eater</button>
-                    <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-                    <div>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
-                        <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower <span class="text-[10px] text-amber-300">(100x rewards, test only)</span></h3>
+                            <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
+                        </div>
+                        
                     </div>
-                    <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -255,18 +339,36 @@
         </div>
 
         <!-- VIEW: EVENTS -->
-        <div id="view-events" class="hidden flex flex-col gap-4 flex-1">
+        <div id="view-events" class="hidden art-screen art-dark">
+            <div id="events-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/events/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
+                    <img class="art-frame" src="assets/pages/frame/c.png" alt="" style="left:614px; top:78px; width:803px; height:953px;">
+                    <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
+                        <img src="assets/compaign/returnbutton.png" alt="">
+                    </div>
+                    <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
                     <h2 class="text-base font-bold text-cyan-300">Events</h2>
-                    <p class="text-xs text-slate-400">Each event can be played 3 times per day.</p>
                 </div>
-                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+            <div class="grid grid-cols-1 gap-3">
+                <div class="contents">
+                    <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+                    <div id="void-tower-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
+                            <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower <span class="text-[10px] text-amber-300">(100x rewards, test only)</span></h3>
+                        </div>
+                        <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
+                    </div>
+                </div>
                 <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
                 <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+            </div>
+        </div>
+                </div>
             </div>
         </div>
 
@@ -274,7 +376,6 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center gap-3">
                 <div>
                     <h2 class="text-base font-bold text-purple-300">Skills</h2>
-                    <p class="text-xs text-slate-400">Four passive builds. Each skill unlocks when the one before reaches the level shown.</p>
                 </div>
                 <div class="flex flex-col items-end gap-2">
                     <span class="text-xs text-purple-400">SP: <strong id="skill-page-sp">0</strong></span>
@@ -393,33 +494,51 @@
         </div>
 
         <!-- VIEW: FORGE & SHOP -->
-        <div id="view-forge" class="hidden flex flex-col gap-4 flex-1">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
-                <h2 class="text-base font-bold text-amber-400">Blacksmith Forge & Shop</h2>
-                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="switchForgeSubTab('gold')" id="forge-tab-btn-gold" class="px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer">Gold Shop</button>
-                <button onclick="switchForgeSubTab('refine')" id="forge-tab-btn-refine" class="px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Refining</button>
-            </div>
-            <div id="forge-gold-section" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Consumables</h3>
-                    <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
+        <div id="view-forge" class="hidden art-screen art-dark">
+            <div id="forge-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/artisan/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
+                    <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:109px; top:95px; width:803px; height:953px;">
+                    <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
+                    <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
+                        <img src="assets/compaign/returnbutton.png" alt="">
+                    </div>
+                    <div id="forge-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
+                        <h2 class="text-base font-bold text-amber-400 mb-3">Blacksmith Forge & Shop</h2>
+                        <div class="flex gap-2 mb-4">
+                            <button onclick="switchForgeSubTab('gold')" id="forge-tab-btn-gold" class="px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer">Gold Shop</button>
+                            <button onclick="switchForgeSubTab('refine')" id="forge-tab-btn-refine" class="px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Refinement</button>
+                        </div>
+                        <div id="forge-gold-section" class="flex flex-col gap-3">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Consumables</h3>
+                            <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
+                        </div>
+                        <div id="forge-refine-section" class="hidden flex flex-col gap-3">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Refinement Workshop</h3>
+                            <div id="refining-slots-container" class="flex flex-col gap-3"></div>
+                        </div>
+                    </div>
+                    <div id="forge-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
+                        <div id="forge-armory-section" class="flex flex-col gap-3">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Armory & Equipment Shop</h3>
+                            <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
+                            <div id="shop-items-container" class="flex flex-col gap-2"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Armory & Equipment Shop</h3>
-                    <div id="shop-items-container" class="flex flex-col gap-2"></div>
-                </div>
-            </div>
-            <div id="forge-refine-section" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Refinement Workshop</h3>
-                <div id="refining-slots-container" class="flex flex-col gap-3"></div>
             </div>
         </div>
 
         <!-- VIEW: DIAMOND SHOP -->
-        <div id="view-diamond" class="hidden flex flex-col gap-4 flex-1">
+        <div id="view-diamond" class="hidden art-screen art-dark">
+            <div id="diamond-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/diamond/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'diamond bg')">
+                    <img class="art-frame" src="assets/pages/frame/c.png" alt="" style="left:614px; top:78px; width:803px; height:953px;">
+                    <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
+                        <img src="assets/compaign/returnbutton.png" alt="">
+                    </div>
+                    <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
                     <h2 class="text-base font-bold text-purple-400">Diamond Cash Shop</h2>
@@ -427,20 +546,28 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-xs font-bold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-500/40">💎 Balance: <strong id="diamond-shop-balance">1000</strong></span>
-                    <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
                 </div>
             </div>
             <div id="diamond-shop-items-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
+                </div>
+            </div>
+        </div>
 
         <!-- VIEW: QUESTS & MAIL -->
-        <div id="view-quests" class="hidden flex flex-col gap-4 flex-1">
+        <div id="view-quests" class="hidden art-screen">
+            <div id="mail-stage" class="town-stage" data-w="2752" data-h="1536">
+                <div class="ts-inner" style="width:2752px; height:1536px;">
+                    <img class="ts-bg" src="assets/pages/mail/bg.jpg" alt="" style="width:2752px; height:1536px;" onerror="townSwap(this,'mail bg')">
+                    <div class="ui" style="left:2562px; top:18px; width:163px; height:93px;" onclick="switchView('town')">
+                        <img src="assets/compaign/returnbutton.png" alt="">
+                    </div>
+                    <div class="art-panel" style="left:513px; top:326px; width:1727px; height:658px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
                     <h2 class="text-base font-bold text-amber-400">Quests & Mailbox</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Complete daily objectives for chests and check developer messages.</p>
+                    
                 </div>
-                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
@@ -450,6 +577,9 @@
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mailbox</h3>
                     <div id="mailbox-container" class="flex flex-col gap-2"></div>
+                </div>
+            </div>
+        </div>
                 </div>
             </div>
         </div>
@@ -547,6 +677,7 @@
     <script src="js/player.js"></script>
     <script src="js/combat.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/town.js"></script>
     <audio id="game-bgm" src="sound/bgm.wav" loop preload="auto"></audio>
 
 <script>
