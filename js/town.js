@@ -64,8 +64,8 @@
         });
     });
 
-    // Hero idle loop: 8 frames at 4 fps
-    const frames = [1, 2, 3, 4, 5, 6, 7, 8].map(n => `assets/page01/idle_breathing_sheet.png_000${n}.png`);
+    // Hero idle: single new frame (idle2_breathing_sheet_0001)
+    const frames = ['assets/page01/idle2_breathing_sheet.png_0001.png'];
     const hero = document.getElementById('town-hero');
     let i = 0;
     if (hero) setInterval(() => {
@@ -93,9 +93,9 @@
         if (f && typeof isFinalMapUnlocked === 'function') f.classList.toggle('locked', !isFinalMapUnlocked());
     };
     // Return buttons: show the press image while the mouse is over them
-    document.querySelectorAll('img[src$="returnbutton.png"]').forEach(img => {
+    document.querySelectorAll('img[src$="returnbutton.png"], img[src$="smallretunbutton.png"]').forEach(img => {
         const normal = img.getAttribute('src');
-        const pressed = normal.replace(/returnbutton\.png$/, 'returnbuttonpress.png');
+        const pressed = normal.replace(/(returnbutton|smallretunbutton)\.png$/, '$1press.png');
         const host = img.parentElement;
         host.addEventListener('pointerenter', () => { img.src = pressed; });
         host.addEventListener('pointerleave', () => { img.src = normal; });

@@ -12,7 +12,12 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
-    </style>
+            /* Character page: hide scrollbars but keep scrolling */
+        #char-panel-left, #char-panel-mid, #char-panel-right { scrollbar-width: none; -ms-overflow-style: none; }
+        #char-panel-left::-webkit-scrollbar, #char-panel-mid::-webkit-scrollbar, #char-panel-right::-webkit-scrollbar { display: none; }
+        #char-hp-card, #char-hp-card * { color: #e2e8f0 !important; }
+        #char-hp-card { background-color: #1e3a5f !important; border: 2px solid #0f1f3d !important; }
+</style>
     <style>
         .town-stage { position: relative; width: 100%; overflow: hidden; }
         /* Town is a full-window screen; the art is centered and scaled to fit. */
@@ -24,9 +29,9 @@
         .ts-inner .ui img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
-        #town-shadow { position: absolute; left: 912px; top: 830px; width: 101px; height: 35px; border-radius: 50%; background: rgba(20,12,8,.45); z-index: 1; }
-        #town-hero-wrap { position: absolute; left: 832px; top: 636px; width: 256px; height: 256px; pointer-events: none; z-index: 2; }
-        #town-hero { position: absolute; left: 0; top: 0; width: 256px; height: 256px; image-rendering: pixelated; }
+        #town-shadow { position: absolute; left: 879px; top: 696px; width: 199px; height: 80px; object-fit: contain; pointer-events: none; z-index: 1; }
+        #town-hero-wrap { position: absolute; left: 893px; top: 425px; width: 170px; height: 339px; pointer-events: none; z-index: 2; }
+        #town-hero { position: absolute; left: 0; top: 0; width: 170px; height: 339px; image-rendering: pixelated; }
         .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
@@ -62,6 +67,8 @@
         .art-panel > div { background-color: transparent !important; }
         /* Artisan windows: left has no border, right border is transparent */
         #forge-panel-left { border: none; }
+        .page-title { display: inline-block; background-color: #dbc5a0 !important; border: 2px solid #c09e6a !important; padding: 2px 10px; border-radius: 4px; }
+        #view-setting .page-title, #view-quests .page-title { border: 2px solid #c09e6a !important; }
         #forge-panel-right { border-color: transparent; }
         /* Dark font on the art pages (not Mail/Setting, which are .art-dark-off); cards and selects get a light parchment background so the text stays readable */
         .art-dark .art-panel, .art-dark .art-panel * { color: #2a1a0e !important; }
@@ -195,9 +202,9 @@
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
                 <img src="assets/page01/expeditionbutton.png" alt="" onerror="townSwap(this,'expeditionbutton.png')">
             </div>
-                    <div id="town-shadow"></div>
+                    <img id="town-shadow" alt="" src="assets/page01/shadow2.png">
                     <div id="town-hero-wrap">
-                        <img id="town-hero" alt="" src="assets/page01/idle_breathing_sheet.png_0001.png">
+                        <img id="town-hero" alt="" src="assets/page01/idle2_breathing_sheet.png_0001.png">
                     </div>
                 </div>
             </div>
@@ -214,7 +221,7 @@
                     <div class="art-panel" style="left:632px; top:261px; width:1488px; height:1014px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-base font-bold text-amber-300">Setting</h2>
+                    <h2 class="page-title text-base font-bold text-amber-300">Setting</h2>
                     
                 </div>
             </div>
@@ -245,7 +252,7 @@
                         <div class="expo-inner">
                         <div class="flex justify-between items-center mb-3">
                             <div>
-                                <h2 class="text-base font-bold text-amber-400">Campaign Dungeons</h2>
+                                <h2 class="page-title text-base font-bold text-amber-400">Campaign Dungeons</h2>
                             </div>
                             <button onclick="closeCampaignPanel()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs cursor-pointer">Close</button>
                         </div>
@@ -271,7 +278,7 @@
         <div id="view-library" class="hidden flex flex-col gap-4 flex-1">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-base font-bold text-sky-300">Library</h2>
+                    <h2 class="page-title text-base font-bold text-sky-300">Library</h2>
                     <p class="text-xs text-slate-400">Reference for runes, monsters, elements and drops.</p>
                 </div>
                 <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
@@ -350,7 +357,7 @@
                     <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-base font-bold text-cyan-300">Events</h2>
+                    <h2 class="page-title text-base font-bold text-cyan-300">Events</h2>
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-3">
@@ -372,42 +379,42 @@
             </div>
         </div>
 
-        <div id="view-skills" class="hidden flex flex-col gap-4 flex-1">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-purple-300">Skills</h2>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <span class="text-xs text-purple-400">SP: <strong id="skill-page-sp">0</strong></span>
-                    <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+                <!-- VIEW: SKILLS (layout: 04_psd/pageskill) -->
+        <div id="view-skills" class="hidden art-screen art-dark">
+            <div id="skill-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/skill/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'skill bg')">
+                    <img class="art-frame" src="assets/pages/skill/window.png" alt="" style="left:36px; top:74px; width:1852px; height:988px;">
+                    <div class="ui" style="left:1806px; top:6px; width:106px; height:60px;" onclick="switchView('town')">
+                        <img src="assets/compaign/smallretunbutton.png" alt="">
+                    </div>
+                    <div class="art-panel" style="left:35px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;">
+                        <span class="text-xs font-bold">SP: <strong id="skill-page-sp">0</strong></span>
+                    </div>
+                    <div class="art-panel" style="left:180px; top:15px; width:420px; height:47px; display:flex; align-items:center;">
+                        <h2 class="page-title text-base font-bold text-purple-400">Skills</h2>
+                    </div>
+                    <div id="skill-pending-bar" class="art-panel" style="left:640px; top:15px; width:1100px; min-height:47px;"></div>
+                    <div id="skill-build-columns" class="art-panel" style="left:82px; top:120px; width:1758px; height:892px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); column-gap:141px;"></div>
                 </div>
             </div>
-            <div id="skill-pending-bar" class="flex flex-col gap-2"></div>
-            <div id="skill-build-columns" class="grid grid-cols-1 md:grid-cols-4 gap-3"></div>
         </div>
 
-        <div id="view-character" class="hidden flex flex-col gap-4 flex-1">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
-                <h2 class="text-base font-bold text-amber-400">Character & Equipment</h2>
-                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
-                <div class="flex justify-between text-[10px] font-mono text-slate-400"><span>Health</span><span id="char-hp-text">0 / 0 HP</span></div>
-                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800"><div id="char-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div></div>
-                <div class="flex justify-between text-[10px] font-mono text-slate-400"><span>Armor</span><span id="char-armor-text">0 / 0</span></div>
-                <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="char-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 0%"></div></div>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div class="flex flex-col gap-4">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Equipped Gear</h3>
-                        <div id="equipment-slots-container" class="grid grid-cols-2 gap-3 items-start"></div>
-                        <div id="set-bonus-panel" class="flex flex-col gap-2"></div>
-                        <div id="char-element-stats" class="flex flex-col gap-2"></div>
+
+                <!-- VIEW: CHARACTER & EQUIPMENT (layout: 04_psd/pagecharacter) -->
+        <div id="view-character" class="hidden art-screen art-dark">
+            <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/character/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
+                    <img class="art-frame" src="assets/pages/character/window.png" alt="" style="left:25px; top:70px; width:1870px; height:1003px;">
+                    <img class="art-frame pointer-events-none" src="assets/pages/character/shadow.png" alt="" style="left:871px; top:712px; width:178px; height:72px;">
+                    <img class="art-frame pointer-events-none" src="assets/pages/character/idle.png" alt="" style="left:755px; top:414px; width:409px; height:409px;">
+                    <div class="ui" style="left:1806px; top:6px; width:106px; height:60px;" onclick="switchView('town')">
+                        <img src="assets/compaign/smallretunbutton.png" alt="">
                     </div>
-                </div>
-                <div class="flex flex-col gap-4">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <div id="char-panel-left" class="art-panel" style="left:113px; top:158px; width:432px; height:819px; overflow-y:auto;">
+                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Character & Equipment</h2>
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Attributes</h3>
                             <span class="text-xs text-amber-400">Pts: <strong id="stat-points">5</strong></span>
@@ -440,7 +447,7 @@
                         </div>
                         <div id="stat-pending-bar" class="flex flex-col gap-2"></div>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Combat Stats</h3>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ATK</span><strong id="derived-atk" class="text-slate-100">0</strong></div>
@@ -450,20 +457,29 @@
                             <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">CRIT Rate</span><strong id="derived-crit" class="text-slate-100">0%</strong></div>
                             <div class="flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">ASPD</span><strong id="derived-aspd" class="text-slate-100">0</strong></div>
                             <div class="col-span-2 flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">Armor</span><strong id="derived-armor" class="text-slate-100">0</strong></div>
-                            <div class="col-span-2 flex justify-between p-2 bg-slate-950/80 rounded-lg border border-slate-800"><span class="text-slate-400">Move Speed</span><strong id="derived-movement-speed" class="text-slate-100">0 m/s</strong></div>
                         </div>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Builds</h3>
-                            <span class="text-xs text-purple-400">SP: <strong id="sp-count">0</strong></span>
-                        </div>
-                        <div id="skill-tree-container" class="flex flex-col gap-2"></div>
-                        <button onclick="switchView('skills')" class="py-2 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Open Skills Page</button>
+                        
+                    
+                        <div id="char-element-stats" class="flex flex-col gap-2"></div>
                     </div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <div class="flex justify-between items-center gap-2 flex-wrap">
+                    <div id="char-panel-mid" class="art-panel" style="left:735px; top:157px; width:450px; height:820px; overflow-y:auto;">
+                        <div id="char-hp-card" class="rounded-2xl flex flex-col gap-1.5" style="position:absolute; left:94px; top:129px; width:256px; height:75px; padding:6px 10px; box-sizing:border-box; background-color:#1e3a5f; border:2px solid #0f1f3d;">
+                <div class="flex justify-between text-[10px] font-mono text-slate-400"><span>Health</span><span id="char-hp-text">0 / 0 HP</span></div>
+                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800"><div id="char-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div></div>
+                <div class="flex justify-between text-[10px] font-mono text-slate-400"><span>Armor</span><span id="char-armor-text">0 / 0</span></div>
+                <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="char-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 0%"></div></div>
+            </div>
+                        <div id="equipment-slots-container" class="absolute" style="left:0; top:0; width:400px; height:700px;"></div>
+                        <div style="height:640px;"></div>
+                        <div id="set-bonus-panel" class="hidden"></div>
+                    
+                    
+                        <button onclick="switchView('skills')" style="position:absolute; left:112px; top:5px; width:213px; height:43px; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills</button>
+                    </div>
+                    <div id="char-panel-right" class="art-panel" style="left:1376px; top:158px; width:432px; height:819px; overflow-y:auto;">
+                        <div class="flex flex-col gap-3" style="position:absolute; left:8px; top:8px; width:416px;">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inventory Bag</h3>
                         <span id="inventory-count" class="text-xs font-mono text-slate-400">0 / 45 slots</span>
                     </div>
@@ -481,10 +497,13 @@
                         <button onclick="sellAllEquipment()" class="px-2 py-1 bg-amber-700 hover:bg-amber-600 text-amber-100 text-[10px] font-bold rounded cursor-pointer transition">Sell All</button>
                     </div>
                     <div id="inventory-filter" class="flex flex-wrap gap-1"></div>
-                    <div id="inventory-grid" class="grid grid-cols-5 gap-2"></div>
+                    <div id="inventory-grid" class="grid justify-start" style="grid-template-columns:repeat(5,77px); grid-auto-rows:79px; column-gap:7px; row-gap:5px;"></div>
                 </div>
-                            </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
 
         <!-- VIEW: FORGE & SHOP -->
         <div id="view-forge" class="hidden art-screen art-dark">
@@ -497,7 +516,7 @@
                         <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
                     <div id="forge-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
-                        <h2 class="text-base font-bold text-amber-400 mb-3">Blacksmith Forge & Shop</h2>
+                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Blacksmith Forge & Shop</h2>
                         <div class="flex gap-2 mb-4">
                             <button onclick="switchForgeSubTab('gold')" id="forge-tab-btn-gold" class="px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer">Gold Shop</button>
                             <button onclick="switchForgeSubTab('refine')" id="forge-tab-btn-refine" class="px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Refinement</button>
@@ -534,8 +553,7 @@
                     <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-base font-bold text-purple-400">Diamond Cash Shop</h2>
-                    <p class="text-xs text-slate-400">Purchase premium services and revival potions.</p>
+                    <h2 class="page-title text-base font-bold text-purple-400">Diamond Cash Shop</h2>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-xs font-bold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-500/40">💎 Balance: <strong id="diamond-shop-balance">1000</strong></span>
@@ -558,7 +576,7 @@
                     <div class="art-panel" style="left:513px; top:326px; width:1727px; height:658px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-base font-bold text-amber-400">Quests & Mailbox</h2>
+                    <h2 class="page-title text-base font-bold text-amber-400">Quests & Mailbox</h2>
                     
                 </div>
             </div>

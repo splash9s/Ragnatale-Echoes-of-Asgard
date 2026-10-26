@@ -172,10 +172,10 @@ function switchView(viewName) {
         if (el) el.classList.add('hidden');
     });
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -1594,27 +1594,31 @@ function updateUI() {
 
     let eqContainer = document.getElementById('equipment-slots-container');
     if (eqContainer) {
-        const EQUIP_LEFT = [['hat', 'Hat'], ['mouth', 'Mouth'], ['weapon', 'Weapon'], ['garment', 'Garment'], ['ringLeft', 'L Ring'], ['pet', 'Pet'], ['potionSlot', 'Potion']];
-        const EQUIP_RIGHT = [['midHead', 'Mid Head Gear'], ['armor', 'Armor'], ['shield', 'Shield'], ['footgear', 'Footgear'], ['ringRight', 'R Ring']];
-        const eqRow = (slot, label) => {
+        // One graphic per slot, no text. Equipped gear shows its own picture (item.img) when it has one.
+        const EQUIP_SLOTS = [
+            { slot: 'hat', img: 'headslot.png', x: 0, y: 126 },
+            { slot: 'midHead', img: 'middleheadslot.png', x: 370, y: 126 },
+            { slot: 'mouth', img: 'lowerheadslot.png', x: 0, y: 234 },
+            { slot: 'armor', img: 'armorslot.png', x: 370, y: 234 },
+            { slot: 'weapon', img: 'weaponslot.png', x: 0, y: 342 },
+            { slot: 'shield', img: 'shieldslot.png', x: 370, y: 342 },
+            { slot: 'garment', img: 'garmentslot.png', x: 0, y: 450 },
+            { slot: 'footgear', img: 'footslot.png', x: 370, y: 450 },
+            { slot: 'ringLeft', img: 'ring.png', x: 0, y: 558 },
+            { slot: 'ringRight', img: 'ring.png', x: 370, y: 558 },
+            { slot: 'pet', img: 'petslot.png', x: 78, y: 666 },
+            { slot: 'potionSlot', img: 'potionslot.png', x: 292, y: 666 },
+        ];
+        const eqSlot = ({ slot, img, x, y }) => {
             const gear = player.equipped[slot];
-            // Empty potion slot (0 left) shows as Empty; gear only shows a quantity when stacked
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
-            const refText = has && gear.refineLevel > 0 ? ` +${gear.refineLevel}` : '';
-            const qtyText = has && (slot === 'potionSlot' || gear.qty > 1) ? ` (x${gear.qty})` : '';
-            const rInfo = has && gear.rarity ? RARITY_INFO[gear.rarity] : null;
-            const nameColor = rInfo ? rInfo.text : 'text-slate-200';
-            return `<div ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="flex justify-between items-center gap-2 p-2 bg-slate-900/60 rounded border border-slate-800 ${has ? 'cursor-pointer hover:border-amber-500 transition' : ''}">
-                <div class="min-w-0">
-                    <span class="text-slate-400 block text-[10px]">${label}</span>
-                    <span class="font-semibold ${nameColor} text-xs break-words">${has ? gear.name + refText + qtyText + elemIconText(gear) : 'Empty'}</span>
-                </div>
-                ${has ? `<button onclick="event.stopPropagation(); unequipItem('${slot}')" class="px-2 py-1 bg-red-600/40 hover:bg-red-600 text-[10px] text-red-200 font-bold rounded transition cursor-pointer shrink-0">Unequip</button>` : ''}
+            const base = `assets/pages/character/slots/${img}`;
+            const src = has && gear.img ? gear.img : base;
+            return `<div ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
+                <img src="${src}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='${base}'">
             </div>`;
         };
-        eqContainer.innerHTML = `
-            <div class="flex flex-col gap-2 min-w-0">${EQUIP_LEFT.map(([s, l]) => eqRow(s, l)).join('')}</div>
-            <div class="flex flex-col gap-2 min-w-0">${EQUIP_RIGHT.map(([s, l]) => eqRow(s, l)).join('')}</div>`;
+        eqContainer.innerHTML = EQUIP_SLOTS.map(eqSlot).join('');
     }
 
     let invGrid = document.getElementById('inventory-grid');
@@ -1630,7 +1634,7 @@ function updateUI() {
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
-                <div onclick="showItemDetail(${index})" class="h-14 bg-slate-900/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:border-amber-500 transition relative group">
+                <div onclick="showItemDetail(${index})" class="w-[77px] h-[79px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot.png'); background-size:100% 100%;">
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
                     ${isGearItem(item) ? `<button onclick="event.stopPropagation(); toggleFavorite(${index})" title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 ${item.favorite ? 'text-amber-300' : 'text-slate-600 hover:text-amber-300'}">${item.favorite ? '★' : '☆'}</button>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
