@@ -693,36 +693,6 @@ function addItemToInventory(newItem) {
     return true;
 }
 
-// Places an item into any slot list (used by the stash). All-or-nothing, merges stacks first.
-function placeIntoList(list, newItem) {
-    let qty = newItem.qty || 1;
-    const stackable = isStackable(newItem);
-    const limit = stackLimit(newItem);
-    let cap = 0;
-    for (const s of list) {
-        if (s === null) cap += limit;
-        else if (stackable && s.name === newItem.name && isStackable(s)) cap += Math.max(0, stackLimit(s) - (s.qty || 1));
-    }
-    if (cap < qty) return false;
-    if (stackable) {
-        for (const s of list) {
-            if (qty <= 0) break;
-            if (s && s.name === newItem.name && isStackable(s)) {
-                const add = Math.min(stackLimit(s) - (s.qty || 1), qty);
-                if (add > 0) { s.qty = (s.qty || 1) + add; qty -= add; }
-            }
-        }
-    }
-    while (qty > 0) {
-        const idx = list.findIndex(x => x === null);
-        if (idx === -1) break;
-        const put = Math.min(limit, qty);
-        list[idx] = { ...newItem, qty: put };
-        qty -= put;
-    }
-    return true;
-}
-
 const SCRAP_ITEM = { name: "Iron Scraps", type: 'material', price: 2, desc: "Salvaged metal. 100 make a Refining Stone." };
 
 function getScrapCount() {
@@ -971,7 +941,6 @@ function showItemDetail(index) {
     if (isPotion) actions += `<button onclick="usePotionFromDetail(${index})" class="${btn} bg-emerald-600 hover:bg-emerald-500 text-slate-950">Equip</button>`;
     if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
     if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Gold</button>`;
-    actions += `<button onclick="storeToStash(${index})" class="${btn} bg-slate-800 hover:bg-slate-700 text-slate-200">Store in Stash</button>`;
     actions += '</div>';
     actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
 
@@ -1184,50 +1153,6 @@ function sellAllEquipment() {
     logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
     updateUI();
     saveGame();
-}
-
-// Stash: move items between the bag and the stash
-function storeToStash(index) {
-    const item = player.inventory[index];
-    if (!item) return;
-    if (!placeIntoList(player.stash, { ...item })) { alert("Stash is full!"); return; }
-    player.inventory[index] = null;
-    logMessage(`[Stash] Stored ${item.name}${item.qty > 1 ? ' x' + item.qty : ''}`, 'drop');
-    closeModal();
-    updateUI();
-    saveGame();
-}
-
-function takeFromStash(index) {
-    const item = player.stash[index];
-    if (!item) return;
-    if (!placeItemInInventory({ ...item })) { alert("Inventory is full!"); return; }
-    player.stash[index] = null;
-    logMessage(`[Stash] Took out ${item.name}${item.qty > 1 ? ' x' + item.qty : ''}`, 'drop');
-    closeModal();
-    updateUI();
-    saveGame();
-}
-
-function showStashDetail(index) {
-    const item = player.stash[index];
-    if (!item) return;
-    const rarity = RARITY_INFO[item.rarity];
-    const kind = item.slot || (item.type === 'potion' ? 'Consumable' : 'Item');
-    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    let body = '<div class="flex flex-col gap-2 text-left text-xs">';
-    body += `<span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : kind}</span>`;
-    body += `<span class="text-[10px] text-slate-400 capitalize">${kind}${item.qty > 1 ? ' · Qty ' + item.qty : ''}</span>`;
-    if (item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
-    if (item.stats) body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-        Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
-    if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
-    body += '</div>';
-    const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    const actions = `<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">
-        <button onclick="takeFromStash(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Take to Bag</button></div>
-        <button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
-    showModal(title, '', body + actions);
 }
 
 function manualDrinkPotion() {
@@ -1714,26 +1639,6 @@ function updateUI() {
         });
         let invCountEl = document.getElementById('inventory-count');
         if (invCountEl) invCountEl.innerText = `${filledSlots} / ${BAG_SLOTS} slots`;
-    }
-
-    let stashGrid = document.getElementById('stash-grid');
-    if (stashGrid) {
-        stashGrid.innerHTML = '';
-        if (!Array.isArray(player.stash)) player.stash = new Array(STASH_SLOTS).fill(null);
-        let usedSlots = 0;
-        player.stash.forEach((item, index) => {
-            if (item) usedSlots++;
-            let rInfo = item ? RARITY_INFO[item.rarity] : null;
-            let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-800 text-slate-500';
-            stashGrid.innerHTML += `
-                <div onclick="${item ? `showStashDetail(${index})` : ''}" class="h-14 bg-slate-950/80 border ${rarityColor} rounded flex flex-col justify-center items-center p-1 text-center ${item ? 'cursor-pointer hover:border-amber-500' : 'border-dashed'} transition relative">
-                    <span class="text-[9px] font-bold truncate w-full px-1">${item ? item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '') : ''}</span>
-                    ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
-                </div>
-            `;
-        });
-        let stashCountEl = document.getElementById('stash-count');
-        if (stashCountEl) stashCountEl.innerText = `${usedSlots} / ${STASH_SLOTS} slots`;
     }
 
     el = document.getElementById('stat-points');

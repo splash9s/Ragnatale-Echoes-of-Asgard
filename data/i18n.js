@@ -37,7 +37,7 @@ const I18N = {
         equipTitle: "Equipped Gear",
         weightLabel: "Weight Limit",
         skillsTitle: "Skill Mastery",
-        invTitle: "Inventory Bag (40 Slots)",
+        invTitle: "Inventory Bag (45 Slots)",
         invHint: "Click item to use or equip.",
         statsTitle: "Attributes",
         statPts: "Points:",

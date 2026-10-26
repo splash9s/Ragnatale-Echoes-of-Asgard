@@ -3,8 +3,7 @@
 // ==========================================
 
 const MAX_POTION_SLOT = 5;
-const BAG_SLOTS = 30;
-const STASH_SLOTS = 30;
+const BAG_SLOTS = 45;
 
 let player = {
     name: "Hero",
@@ -51,7 +50,6 @@ let player = {
         potionSlot: { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" }
     },
     inventory: new Array(BAG_SLOTS).fill(null),
-    stash: new Array(STASH_SLOTS).fill(null),
     runes: { critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0, randomHitCount: 0, resurrectionUsed: false }
 };
 
@@ -392,17 +390,16 @@ function loadGame() {
             if (!player.equipped.potionSlot) {
                 player.equipped.potionSlot = { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" };
             }
-            // Bag and stash are 30 slots each. Older bags past 30 slots move into the stash.
+            // Bag is 45 slots. The stash was removed: any old stash items move into free bag slots.
             const oldBag = Array.isArray(player.inventory) ? player.inventory : [];
             const oldStash = Array.isArray(player.stash) ? player.stash : [];
             player.inventory = new Array(BAG_SLOTS).fill(null);
             oldBag.slice(0, BAG_SLOTS).forEach((it, i) => { player.inventory[i] = it || null; });
-            player.stash = new Array(STASH_SLOTS).fill(null);
-            oldStash.slice(0, STASH_SLOTS).forEach((it, i) => { player.stash[i] = it || null; });
-            oldBag.slice(BAG_SLOTS).filter(Boolean).forEach(it => {
-                const idx = player.stash.findIndex(s => s === null);
-                if (idx !== -1) player.stash[idx] = it;
+            oldStash.filter(Boolean).forEach(it => {
+                const idx = player.inventory.findIndex(s => s === null);
+                if (idx !== -1) player.inventory[idx] = it;
             });
+            delete player.stash;
             // Old saves kept scraps as a counter: move them into the bag as stacks
             if (player.materials && player.materials.ironScraps > 0 && typeof addScraps === 'function') {
                 let left = player.materials.ironScraps;
