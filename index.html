@@ -17,6 +17,58 @@
         #char-panel-left::-webkit-scrollbar, #char-panel-mid::-webkit-scrollbar, #char-panel-right::-webkit-scrollbar { display: none; }
         #char-hp-card, #char-hp-card * { color: #e2e8f0 !important; }
         #char-hp-card { background-color: #1e3a5f !important; border: 2px solid #0f1f3d !important; }
+        #skill-sp-badge { background-color: #dbc5a0 !important; border: 2px solid #c09e6a !important; border-radius: 8px; color: #2a1a0e !important; }
+        #skill-sp-badge * { color: #2a1a0e !important; }
+        #skill-pending-bar:empty { display: none !important; }
+        /* Skill page: one window per build column, soft skill cards like the shop */
+        #skill-build-columns > div { height: 888px; overflow-y: auto; scrollbar-width: none; padding: 14px 18px 24px; box-sizing: border-box; }
+        #skill-build-columns > div::-webkit-scrollbar { display: none; }
+        #skill-build-columns .rounded-lg.border { background-color: rgba(214, 190, 140, .92) !important; border-color: #b8945a !important; }
+        #skill-build-columns, #skill-build-columns * { color: #2a1a0e !important; }
+        /* Build headers: darker shade of each build colour, light text for contrast */
+        #skill-build-columns > div:nth-child(1) > div:first-child { background-color: #b45309 !important; border-color: #b45309 !important; }
+        #skill-build-columns > div:nth-child(1) > div:first-child h3, #skill-build-columns > div:nth-child(1) > div:first-child p { color: #fef3c7 !important; }
+        #skill-build-columns > div:nth-child(2) > div:first-child { background-color: #0369a1 !important; border-color: #0369a1 !important; }
+        #skill-build-columns > div:nth-child(2) > div:first-child h3, #skill-build-columns > div:nth-child(2) > div:first-child p { color: #fef3c7 !important; }
+        #skill-build-columns > div:nth-child(3) > div:first-child { background-color: #be123c !important; border-color: #be123c !important; }
+        #skill-build-columns > div:nth-child(3) > div:first-child h3, #skill-build-columns > div:nth-child(3) > div:first-child p { color: #fef3c7 !important; }
+        #skill-build-columns > div:nth-child(4) > div:first-child { background-color: #047857 !important; border-color: #047857 !important; }
+        #skill-build-columns > div:nth-child(4) > div:first-child h3, #skill-build-columns > div:nth-child(4) > div:first-child p { color: #fef3c7 !important; }
+        /* Skill confirm bar: parchment and gold like the page, behind the SP badge */
+        #skill-pending-bar { border: 0 !important; box-shadow: none !important; background: transparent !important; }
+        #skill-pending-bar > div { background-color: #dbc5a0 !important; border: 2px solid #c09e6a !important; margin-left: 140px; height: 47px; padding: 3px !important; box-sizing: border-box; }
+        #skill-pending-bar > div > div { height: 100%; }
+        #skill-pending-bar > div > div > button { height: 100%; padding: 0 2px !important; line-height: 1.1; }
+        #skill-pending-bar button { background-color: #dbc5a0 !important; border: 1px solid #c09e6a !important; color: #2a1a0e !important; }
+        #skill-pending-bar button:hover { background-color: #e8d6b0 !important; }
+        #skill-pending-bar button[onclick="confirmPendingSkills()"] { background-color: #4f8a5b !important; border-color: #3a6b44 !important; color: #f4fbf5 !important; }
+        #skill-pending-bar button[onclick="confirmPendingSkills()"]:hover { background-color: #5f9e6c !important; }
+        /* Character page: Attributes, Combat Stats and Element Resistance use the shop item background */
+        #char-panel-left .rounded-2xl.border { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
+        #char-element-stats { background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; border-radius: 16px; padding: 12px; }
+        /* Artisan page: unselected tab and section headings use the shop item background */
+        #forge-panel-left button.bg-slate-900 { background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; color: #2a1a0e !important; }
+        #forge-panel-left button.bg-slate-900:hover { background-color: rgba(214, 190, 140, .8) !important; }
+        #forge-panel-left h3, #forge-panel-right h3 { display: inline-block; background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; border-radius: 8px; padding: 4px 10px; }
+        /* Refinement list: same soft background as the shop items */
+        #refining-slots-container > div { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
+        /* Diamond Cash Shop header: darker shade of the diamond item lavender */
+        #view-diamond .page-title { background-color: #8f7bb3 !important; border: 2px solid #6d5a94 !important; color: #f5f0ff !important; }
+        /* Quests and Mailbox: items use the shop background, heading a darker shade of it */
+        #quests-container > div, #mailbox-container > div { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
+        /* Quest items: inner milestone buttons and progress tracks use the same tan as the quest rows instead of dark slate */
+        #quests-container .bg-slate-900, #quests-container .bg-slate-950, #quests-container .bg-slate-950\/80 { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
+        #quests-container .bg-slate-900:hover { background-color: rgba(214, 190, 140, .8) !important; }
+        /* Quest milestone chests: each chest gets its own soft background (copper, silver, gold) */
+        #quests-container button[onclick="claimQuestMilestone(1)"] { background-color: rgba(184, 115, 51, .45) !important; border-color: #b87333 !important; }
+        #quests-container button[onclick="claimQuestMilestone(2)"] { background-color: rgba(192, 192, 192, .55) !important; border-color: #9a9a9a !important; }
+        #quests-container button[onclick="claimQuestMilestone(3)"] { background-color: rgba(230, 190, 70, .55) !important; border-color: #c9a227 !important; }
+        /* Quest and mail item text: dark brown on the shop background */
+        #quests-container, #quests-container *, #mailbox-container, #mailbox-container * { color: #2a1a0e !important; }
+        /* Quest and mail items: bigger text */
+        #quests-container [class*="text-xs"], #mailbox-container [class*="text-xs"], #quests-container button, #mailbox-container button { font-size: 22px !important; }
+        #quests-container [class*="text-[10px]"], #mailbox-container [class*="text-[10px]"] { font-size: 19px !important; }
+        #quests-container [class*="text-[9px]"], #mailbox-container [class*="text-[9px]"] { font-size: 18px !important; }
 </style>
     <style>
         .town-stage { position: relative; width: 100%; overflow: hidden; }
@@ -29,9 +81,9 @@
         .ts-inner .ui img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
-        #town-shadow { position: absolute; left: 879px; top: 696px; width: 199px; height: 80px; object-fit: contain; pointer-events: none; z-index: 1; }
-        #town-hero-wrap { position: absolute; left: 893px; top: 425px; width: 170px; height: 339px; pointer-events: none; z-index: 2; }
-        #town-hero { position: absolute; left: 0; top: 0; width: 170px; height: 339px; image-rendering: pixelated; }
+        #town-shadow { position: absolute; left: 855px; top: 690px; width: 197px; height: 79px; object-fit: contain; pointer-events: none; z-index: 1; }
+        #town-hero-wrap { position: absolute; left: 883px; top: 425px; width: 163px; height: 338px; pointer-events: none; z-index: 2; }
+        #town-hero { position: absolute; left: 0; top: 0; width: 163px; height: 338px; image-rendering: pixelated; }
         .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
@@ -100,11 +152,39 @@
         #view-setting .art-panel { border-color: transparent !important; }
         #view-setting h2 { color: #fef3c7 !important; }
         /* Setting page: remove all borders */
+        /* Setting page: vertical items, bigger text (same size as Mail) */
+        #view-setting .art-panel > div button { font-size: 22px !important; padding: 18px 24px !important; }
         #view-setting, #view-setting * { border: 0 !important; }
         /* Campaign Dungeons: all content sits inside the frame's inner window */
         .expo-inner { position: absolute; left: 88px; top: 114px; width: 542px; height: 643px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 6px; }
         /* Campaign Dungeons: each node shows only its own element's maps, so the element tabs are hidden */
         #campaign-path-list { display: none !important; }
+        /* Combat stage (layout: 01_layout/combatlayout.png) */
+        #combat-stage:has(#next-stage-btn:not(.hidden)) #combat-pause-btn { display: none; }
+        /* Potion and resurrection slot buttons: slot graphics, swapped to the press graphic while pressed */
+        .combat-slot-btn { position: absolute; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; border: 0; background-color: transparent; background-size: 100% 100%; background-repeat: no-repeat; color: #f5e6c0; font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px #000; cursor: pointer; }
+        #combat-potion-btn { background-image: url('assets/combat/potionslot.png'); }
+        #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress.png'); }
+        #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion.png'); }
+        #combat-potion-btn.no-potion span { display: none; }
+        .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 6px; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
+        #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
+        #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
+        #combat-elixir-btn span { display: none; }
+        /* Keep HUD, enemy cards and buttons above the foreground layer */
+        #combat-stage .combat-box, #combat-stage button, #combat-stage .ui, #combat-hp-under, #monsters-lineup-container, #combat-rune-list { z-index: 4; }
+        .combat-box.minimized { height: auto !important; }
+        .combat-box.minimized > :not(:first-child) { display: none !important; }
+        .combat-box { position: absolute; box-sizing: border-box; background-color: rgba(15, 23, 42, .92); border: 1px solid #1e293b; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+        #combat-activity-log { flex: 1; min-height: 0; }
+        #combat-player-body { min-height: 0; }
+        #monsters-lineup-container > div { position: absolute; top: auto; width: 200px; pointer-events: auto; }
+        #monsters-lineup-container > div:nth-child(1) { left: 914px; bottom: 186px; }
+        #monsters-lineup-container > div:nth-child(2) { left: 1065px; bottom: 186px; }
+        #monsters-lineup-container > div:nth-child(3) { left: 1218px; bottom: 201px; }
+        #monsters-lineup-container > div:nth-child(4) { left: 1358px; bottom: 249px; }
+        #monsters-lineup-container > div:nth-child(5) { left: 1507px; bottom: 299px; }
+        #monsters-lineup-container > div:nth-child(6) { left: 1658px; bottom: 311px; }
         /* Campaign map tiles: soft background (selected tile keeps its amber highlight) */
         #campaign-map-list > button:not([class*="bg-amber"]) { background-color: rgba(143, 179, 169, .65) !important; }
         /* Campaign Dungeons: soft background on the Close button */
@@ -112,6 +192,10 @@
         /* Events page: Daily / Event cards always in one row; softer Void Tower button */
         #void-tower-card button { background-color: #b7a6d6 !important; }
         #void-tower-card button:hover { background-color: #c8bbe2 !important; }
+        /* Events page: category backgrounds (Daily teal, Event tan, Endless Test lavender) */
+        #event-daily { background-color: rgba(143, 179, 169, .65) !important; border-color: #6f9a8e !important; }
+        #event-gold, #event-xp { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
+        #void-tower-card { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
     </style>
 </head>
 
@@ -202,9 +286,9 @@
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
                 <img src="assets/page01/expeditionbutton.png" alt="" onerror="townSwap(this,'expeditionbutton.png')">
             </div>
-                    <img id="town-shadow" alt="" src="assets/page01/shadow2.png">
+                    <img id="town-shadow" alt="" src="assets/page01/shadow_clean.png">
                     <div id="town-hero-wrap">
-                        <img id="town-hero" alt="" src="assets/page01/idle2_breathing_sheet.png_0001.png">
+                        <img id="town-hero" alt="" src="assets/page01/cha_idle_0001.png">
                     </div>
                 </div>
             </div>
@@ -219,13 +303,7 @@
                         <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
                     <div class="art-panel" style="left:632px; top:261px; width:1488px; height:1014px;">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
-                <div>
-                    <h2 class="page-title text-base font-bold text-amber-300">Setting</h2>
-                    
-                </div>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 gap-3">
                 <button onclick="switchView('library')" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">📚 Library</button>
                 <button onclick="manualSaveGame()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">💾 Save Game</button>
                 <button id="bgm-toggle-btn" onclick="toggleBgm()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer text-left">🎵 BGM</button>
@@ -361,8 +439,9 @@
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-3">
-                <div class="contents">
                     <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+                <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
+                <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
                     <div id="void-tower-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
                         <div>
                             <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
@@ -370,9 +449,6 @@
                         </div>
                         <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
                     </div>
-                </div>
-                <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
             </div>
         </div>
                 </div>
@@ -388,14 +464,12 @@
                     <div class="ui" style="left:1806px; top:6px; width:106px; height:60px;" onclick="switchView('town')">
                         <img src="assets/compaign/smallretunbutton.png" alt="">
                     </div>
-                    <div class="art-panel" style="left:35px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;">
+                    <div id="skill-sp-badge" class="art-panel" style="left:35px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;">
                         <span class="text-xs font-bold">SP: <strong id="skill-page-sp">0</strong></span>
                     </div>
-                    <div class="art-panel" style="left:180px; top:15px; width:420px; height:47px; display:flex; align-items:center;">
-                        <h2 class="page-title text-base font-bold text-purple-400">Skills</h2>
-                    </div>
-                    <div id="skill-pending-bar" class="art-panel" style="left:640px; top:15px; width:1100px; min-height:47px;"></div>
-                    <div id="skill-build-columns" class="art-panel" style="left:82px; top:120px; width:1758px; height:892px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); column-gap:141px;"></div>
+                    
+                    <div id="skill-pending-bar" class="art-panel" style="left:35px; top:15px; width:300px; height:47px; padding:0; border:0; z-index:4;"></div>
+                    <div id="skill-build-columns" style="position:absolute; left:83px; top:123px; width:1756px; height:888px; display:grid; grid-template-columns:repeat(4,331px); column-gap:144px; z-index:5;"></div>
                 </div>
             </div>
         </div>
@@ -407,8 +481,8 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/character/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
                     <img class="art-frame" src="assets/pages/character/window.png" alt="" style="left:25px; top:70px; width:1870px; height:1003px;">
-                    <img class="art-frame pointer-events-none" src="assets/pages/character/shadow.png" alt="" style="left:871px; top:712px; width:178px; height:72px;">
-                    <img class="art-frame pointer-events-none" src="assets/pages/character/idle.png" alt="" style="left:755px; top:414px; width:409px; height:409px;">
+                    <img class="art-frame pointer-events-none" src="assets/pages/character/shadow_clean.png" alt="" style="left:871px; top:712px; width:178px; height:72px;">
+                    <img class="art-frame pointer-events-none" src="assets/pages/character/cha_idle.png" alt="" style="left:883px; top:465px; width:150px; height:310px;">
                     <div class="ui" style="left:1806px; top:6px; width:106px; height:60px;" onclick="switchView('town')">
                         <img src="assets/compaign/smallretunbutton.png" alt="">
                     </div>
@@ -522,17 +596,14 @@
                             <button onclick="switchForgeSubTab('refine')" id="forge-tab-btn-refine" class="px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer">Refinement</button>
                         </div>
                         <div id="forge-gold-section" class="flex flex-col gap-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Consumables</h3>
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
                         </div>
                         <div id="forge-refine-section" class="hidden flex flex-col gap-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Refinement Workshop</h3>
                             <div id="refining-slots-container" class="flex flex-col gap-3"></div>
                         </div>
                     </div>
                     <div id="forge-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
                         <div id="forge-armory-section" class="flex flex-col gap-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Armory & Equipment Shop</h3>
                             <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
                             <div id="shop-items-container" class="flex flex-col gap-2"></div>
                         </div>
@@ -596,74 +667,119 @@
         </div>
 
         <!-- VIEW: COMBAT -->
-        <div id="view-combat" class="hidden flex flex-col gap-4 flex-1">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
-                <div>
-                    <span id="node-mode-tag" class="text-[10px] font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/40 uppercase">Campaign Mode</span>
-                    <h2 id="node-title" class="text-sm font-bold text-slate-200 mt-1">Valgrove Outskirts — Stage 1 / 11</h2>
-                </div>
-                <div class="flex gap-2">
-                    <button id="next-stage-btn" onclick="proceedToNextStage()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Next Stage</button>
-                    <button id="combat-pause-btn" onclick="toggleCombatPause()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Pause</button>
-                    <button onclick="returnToTown()" class="px-4 py-2 bg-red-950/60 hover:bg-red-900 text-red-300 font-bold rounded-xl text-xs transition cursor-pointer">Retreat to Town</button>
-                </div>
-            </div>
+        <div id="view-combat" class="hidden art-screen">
+            <div id="combat-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/combat/earthbg1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;" onerror="townSwap(this,'earthbg1.png')">
+                    <img src="assets/combat/earthbase1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;" onerror="townSwap(this,'earthbase1.png')">
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-4">
-                    <div class="flex items-center justify-between gap-2">
-                        <div>
-                            <h3 id="combat-player-name" class="font-bold text-sm text-slate-100">Hero</h3>
-                            <span class="text-[10px] text-slate-400 font-mono" id="player-hp-text">120 / 120 HP</span>
+                    <!-- Stage title (top centre) -->
+                    <div style="position:absolute; left:660px; top:28px; width:600px; text-align:center;">
+                        <span id="node-mode-tag" class="text-[10px] font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/40 uppercase">Campaign Mode</span>
+                        <h2 id="node-title" class="text-sm font-bold text-slate-200 mt-1">Valgrove Outskirts — Stage 1 / 11</h2>
+                    </div>
+
+                    <!-- Character info (top-left): same panel as the main page, scaled to the layout box -->
+                    <div style="position:absolute; left:20px; top:8px; width:502px; height:254px; z-index:5;">
+                        <img src="assets/page01/characterinfo.png" alt="" style="position:absolute; left:0; top:0; width:502px; height:254px;">
+                        <div class="town-info">
+                            <div class="town-top">
+                                <div id="combat-avatar-c" class="town-avatar"><img src="assets/avatars/slime.png" alt="" /></div>
+                                <div class="town-id">
+                                    <h1 class="town-name"><span id="header-player-name-c">Hero</span><span id="header-vip-badge-c" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
+                                    <div class="town-lv">Base Lv. <strong id="header-base-lv-c">1</strong> • Class Lv. <strong id="header-job-lv-c">1</strong></div>
+                                    <div class="town-exp">
+                                        <div class="row"><span>Base EXP</span><span id="top-base-exp-text-c">0 / 50 (0%)</span></div>
+                                        <div class="bar"><div id="top-base-exp-bar-c" class="fill" style="width: 0%; background:#e0a526"></div></div>
+                                        <div class="row"><span>Class EXP</span><span id="top-job-exp-text-c">0 / 40 (0%)</span></div>
+                                        <div class="bar"><div id="top-job-exp-bar-c" class="fill" style="width: 0%; background:#a06bd6"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="town-money">
+                                <div>💰 <span id="town-gold-c">1000 Gold</span></div>
+                                <div>💎 <span id="town-diamonds-c">1000</span></div>
+                            </div>
                         </div>
-                        <button id="combat-player-toggle" onclick="toggleCombatPlayerPanel()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded cursor-pointer transition">▾ Minimize</button>
                     </div>
-                    <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                        <div id="player-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div>
+
+                    <!-- Battle log (left) -->
+                    <div class="combat-box minimized" style="left:24px; top:290px; width:264px; height:345px;">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Battle Log</h3>
+                            <button onclick="const b=this.closest('.combat-box'); b.classList.toggle('minimized'); this.textContent = b.classList.contains('minimized') ? '▸ Expand' : '▾ Minimize';" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded cursor-pointer transition">▸ Expand</button>
+                        </div>
+                        <div id="combat-activity-log" class="flex flex-col gap-1 font-mono text-[11px] text-slate-300 pr-2 overflow-y-auto">
+                            <div>[Combat] Battle started...</div>
+                        </div>
                     </div>
-                    <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Armor</span><span id="player-armor-text">0 / 0</span></div>
-                    <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="player-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 100%"></div></div>
-                    <div id="combat-rune-progress" class="flex flex-col gap-1" style="display:none">
-                        <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Next Rune</span><span id="combat-rune-progress-text">-</span></div>
-                        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="combat-rune-progress-bar" class="bg-violet-400 h-full transition-all duration-200" style="width: 0%"></div></div>
+
+                    <!-- Player stat (left, bottom) - not minimizable -->
+                    <div class="combat-box" style="left:21px; top:900px; width:265px; height:166px;">
+                        <div id="combat-rune-progress" class="flex flex-col gap-1" style="display:none">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Next Rune</span><span id="combat-rune-progress-text">-</span></div>
+                            <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="combat-rune-progress-bar" class="bg-violet-400 h-full transition-all duration-200" style="width: 0%"></div></div>
+                        </div>
+                        <div id="combat-player-body" class="flex flex-col gap-3">
+                            <div class="grid grid-cols-2 gap-1.5 text-[10px] border-t border-slate-800 pt-3">
+                                <div class="flex justify-between px-1"><span class="text-slate-400">ATK</span><strong id="combat-derived-atk" class="text-slate-100">0</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">DEF</span><strong id="combat-derived-def" class="text-slate-100">0</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">HIT</span><strong id="combat-derived-hit" class="text-slate-100">0</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">FLEE</span><strong id="combat-derived-flee" class="text-slate-100">0</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">CRIT</span><strong id="combat-derived-crit" class="text-slate-100">0%</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">ASPD</span><strong id="combat-derived-aspd" class="text-slate-100">0</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">FIRE</span><strong id="combat-res-fire" class="text-slate-100">0%</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">WATER</span><strong id="combat-res-water" class="text-slate-100">0%</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">EARTH</span><strong id="combat-res-earth" class="text-slate-100">0%</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">WIND</span><strong id="combat-res-wind" class="text-slate-100">0%</strong></div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="combat-player-body" class="flex flex-col gap-4">
-                    <button onclick="manualDrinkPotion()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/50 font-bold rounded-xl text-xs transition cursor-pointer flex justify-between px-3 items-center">
-                        <span>Drink Potion</span>
+
+                    <!-- Player shadow (centre 512, 827) -->
+                    <img src="assets/pages/character/shadow_clean.png" alt="" style="position:absolute; left:403px; top:839px; width:197px; height:79px; pointer-events:none;">
+
+                    <!-- Character sprite (centre 488, 590) -->
+                    <img class="idle-anim" data-frames="assets/combat/chabattle/chabattle_idle_0001.png,assets/combat/chabattle/chabattle_idle_0002.png,assets/combat/chabattle/chabattle_idle_0003.png,assets/combat/chabattle/chabattle_idle_0004.png,assets/combat/chabattle/chabattle_idle_0005.png,assets/combat/chabattle/chabattle_idle_0006.png,assets/combat/chabattle/chabattle_idle_0007.png,assets/combat/chabattle/chabattle_idle_0008.png,assets/combat/chabattle/chabattle_idle_0009.png,assets/combat/chabattle/chabattle_idle_0010.png,assets/combat/chabattle/chabattle_idle_0011.png,assets/combat/chabattle/chabattle_idle_0012.png" src="assets/combat/chabattle/chabattle_idle_0001.png" alt="" style="position:absolute; left:464px; top:657px; width:103px; height:214px; image-rendering:pixelated; pointer-events:none;">
+
+                    <!-- Player HP and armor, below the character -->
+                    <div id="combat-hp-under" style="position:absolute; left:413px; top:896px; width:204px; display:flex; flex-direction:column; gap:4px;">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span id="player-hp-text">120 / 120 HP</span></div>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                            <div id="player-hp-bar" class="bg-emerald-500 h-full transition-all duration-200" style="width: 100%"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span>Armor</span><span id="player-armor-text">0 / 0</span></div>
+                        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="player-armor-bar" class="bg-sky-400 h-full transition-all duration-200" style="width: 100%"></div></div>
+                    </div>
+
+                    <!-- Foreground layer (in front of the character and enemies, does not block clicks) -->
+                    <img src="assets/combat/earthfg1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; z-index:3;" onerror="townSwap(this,'earthfg1.png')">
+
+                    <!-- Enemies: six slots, positioned by CSS -->
+                    <div id="monsters-lineup-container" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;"></div>
+
+                    <!-- Runes acquired (bottom centre) -->
+                    <div id="combat-rune-list" style="position:absolute; left:395px; top:965px; width:820px; height:101px; display:flex; gap:14.5px; overflow-x:auto;"></div>
+
+                    <!-- Resurrection (bottom right) -->
+                    <button id="combat-elixir-btn" onclick="toggleResurrectionUse()" title="Click to turn auto-revive on or off" class="combat-slot-btn" style="left:1777px; top:934px; width:128px; height:128px;">
+                        <span>Resurrection <span id="player-resurrection-state" class="font-bold text-emerald-300">ON</span></span>
+                        <span id="player-resurrection" class="font-mono mt-1">0 left</span>
+                    </button>
+
+                    <!-- Potion (bottom right) -->
+                    <button id="combat-potion-btn" onclick="manualDrinkPotion()" class="combat-slot-btn" style="left:1622px; top:934px; width:128px; height:128px;">
+                        <span>Potion</span>
                         <span id="player-potions" class="font-mono text-[10px]">None</span>
                     </button>
-                    <button onclick="toggleResurrectionUse()" title="Click to turn auto-revive on or off" class="flex justify-between text-[10px] text-slate-400 px-1 w-full cursor-pointer hover:text-slate-200">
-                        <span>Resurrection Potion <span id="player-resurrection-state" class="font-bold text-emerald-300">ON</span></span>
-                        <span id="player-resurrection" class="font-mono">0 left</span>
-                    </button>
-                    <div class="flex flex-col gap-1 border-t border-slate-800 pt-3">
-                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Runes This Run</h4>
-                        <div id="combat-rune-list" class="flex flex-col gap-1 text-[10px]"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-1.5 text-[10px] border-t border-slate-800 pt-3">
-                        <div class="flex justify-between px-1"><span class="text-slate-400">ATK</span><strong id="combat-derived-atk" class="text-slate-100">0</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">DEF</span><strong id="combat-derived-def" class="text-slate-100">0</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">HIT</span><strong id="combat-derived-hit" class="text-slate-100">0</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">FLEE</span><strong id="combat-derived-flee" class="text-slate-100">0</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">CRIT</span><strong id="combat-derived-crit" class="text-slate-100">0%</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">ASPD</span><strong id="combat-derived-aspd" class="text-slate-100">0</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">FIRE</span><strong id="combat-res-fire" class="text-slate-100">0%</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">WATER</span><strong id="combat-res-water" class="text-slate-100">0%</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">EARTH</span><strong id="combat-res-earth" class="text-slate-100">0%</strong></div>
-                        <div class="flex justify-between px-1"><span class="text-slate-400">WIND</span><strong id="combat-res-wind" class="text-slate-100">0%</strong></div>
-                    </div>
-                    </div>
-                </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Enemies Lineup</h3>
-                    <div id="monsters-lineup-container" class="flex flex-col gap-2"></div>
-                </div>
+                    <!-- Pause (bottom right); Next Stage takes its place once the stage is cleared -->
+                    <button id="combat-pause-btn" onclick="toggleCombatPause()" style="position:absolute; left:1778px; top:778px; width:126px; height:128px;" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer">Pause</button>
+                    <button id="next-stage-btn" onclick="proceedToNextStage()" style="position:absolute; left:1778px; top:778px; width:126px; height:128px;" class="hidden bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-sm transition cursor-pointer shadow">Next Stage</button>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Combat Log</h3>
-                    <div id="combat-activity-log" class="h-48 overflow-y-auto flex flex-col gap-1 font-mono text-[11px] text-slate-300 pr-2">
-                        <div>[Combat] Battle started...</div>
+                    <!-- Return (top right) -->
+                    <div class="ui" style="left:1741px; top:8px; width:166px; height:98px;" onclick="returnToTown()">
+                        <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
                 </div>
             </div>

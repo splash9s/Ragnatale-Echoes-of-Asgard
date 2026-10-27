@@ -114,6 +114,34 @@ function startGameWithName() {
     updateUI();
 }
 
+// Combat idle animation: every img.idle-anim cycles through its data-frames list (all monsters use the slime for now)
+const COMBAT_SLIME_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/slime/slime_${String(i + 1).padStart(4, '0')}.png`).join(',');
+const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
+let combatIdleTick = 0;
+setInterval(() => {
+    combatIdleTick++;
+    document.querySelectorAll('img.idle-anim').forEach(img => {
+        const frames = img.dataset.frames.split(',');
+        img.src = frames[combatIdleTick % frames.length];
+    });
+}, 250);
+
+// Combat page copy of the main page character info: mirror its values (IDs end in -c)
+function syncCombatInfo() {
+    ['header-player-name', 'header-base-lv', 'header-job-lv', 'top-base-exp-text', 'top-job-exp-text', 'town-gold', 'town-diamonds'].forEach(id => {
+        const src = document.getElementById(id), dst = document.getElementById(id + '-c');
+        if (src && dst) dst.innerText = src.innerText;
+    });
+    ['top-base-exp-bar', 'top-job-exp-bar'].forEach(id => {
+        const src = document.getElementById(id), dst = document.getElementById(id + '-c');
+        if (src && dst) dst.style.width = src.style.width;
+    });
+    const vip = document.getElementById('header-vip-badge'), vipC = document.getElementById('header-vip-badge-c');
+    if (vip && vipC) { vipC.innerText = vip.innerText; vipC.className = vip.className; }
+    const av = document.getElementById('header-avatar-container'), avC = document.getElementById('combat-avatar-c');
+    if (av && avC) avC.innerHTML = av.innerHTML;
+}
+
 function updateAvatarDisplay() {
     let container = document.getElementById('header-avatar-container');
     if (!container) return;
@@ -134,6 +162,14 @@ function pickPlayerAvatar(av) {
     updateUI();
     saveGame();
     closeModal();
+}
+
+// Click a rune window in combat to see the rune's full detail
+function showRuneDetail(index) {
+    const r = (player.currentRunRunes || [])[index];
+    if (!r) return;
+    const def = RUNE_DEFS[r.id];
+    showModal(r.name, def ? def.text(runeN(r.id)) : r.desc);
 }
 
 function showModal(title, message, customHTML = '', onCloseCallback = null) {
@@ -172,10 +208,10 @@ function switchView(viewName) {
         if (el) el.classList.add('hidden');
     });
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills', 'combat'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills', 'combat'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -1227,14 +1263,14 @@ function renderSkillPage() {
                 ? `<div class="text-[9px] text-slate-500 text-center">▼ needs ${prev.name} Lv. ${s.reqLv}</div>`
                 : '<div class="text-[9px] text-slate-500 text-center">▼ start</div>';
             const disabled = locked || lvl >= s.maxLv || spLeft <= 0;
-            return `${gate}<div class="p-2 rounded-lg border ${locked ? 'border-slate-800 opacity-50' : b.border + ' bg-slate-950/60'} flex flex-col gap-1">
+            return `${gate}<div class="p-2 rounded-lg border ${locked ? 'border-slate-800' : b.border + ' bg-slate-950/60'} flex flex-col gap-1">
                 <div class="flex justify-between items-center gap-2"><span class="font-bold text-xs ${b.color}">${s.name}</span><span class="text-[10px] text-slate-300">Lv. ${lvl}/${s.maxLv}</span></div>
                 <p class="text-[10px] text-slate-400">${s.desc}</p>
                 <button onclick="upgradeSkill('${k}')" ${disabled ? 'disabled' : ''} class="self-end px-2 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded text-[10px] cursor-pointer disabled:opacity-40">+1 SP</button>
             </div>`;
         }).join('');
         return `<div class="flex flex-col gap-2 min-w-0">
-            <div class="p-2 rounded-xl border ${b.border} bg-slate-950/60"><h3 class="font-bold text-sm ${b.color}">${b.name}</h3><p class="text-[10px] text-slate-400">${b.desc} · ${invested}/${SKILL_BUILD_MAX_SP} SP</p></div>
+            <div class="p-2 rounded-xl border ${b.border} bg-slate-950/60 flex items-baseline gap-2"><h3 class="font-bold text-sm ${b.color}">${b.name.replace(/\s*\(.*\)$/, '')}</h3><p class="text-[10px] text-slate-400">${invested}/${SKILL_BUILD_MAX_SP} SP</p></div>
             ${cards}
         </div>`;
     }).join('');
@@ -1318,7 +1354,6 @@ function renderPendingBars() {
         if (total > 0) {
             const parts = Object.entries(pendingAlloc.skills).filter(([, n]) => n > 0).map(([k, n]) => `${player.skills[k].name} +${n}`).join(', ');
             kBar.innerHTML = `<div class="p-2 rounded-lg bg-purple-500/10 border border-purple-500/40 flex flex-col gap-2 text-[10px]">
-                <span class="text-purple-200">Pending: ${parts} (${total} SP)</span>
                 <div class="flex gap-2">
                     <button onclick="resetPendingSkills()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg cursor-pointer">Reset</button>
                     <button onclick="confirmPendingSkills()" class="flex-1 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-100 font-bold rounded-lg cursor-pointer">Confirm ${total} SP</button>
@@ -1592,6 +1627,8 @@ function updateUI() {
     el = document.getElementById('top-job-exp-bar');
     if (el) el.style.width = `${jobExpPct}%`;
 
+    syncCombatInfo();
+
     let eqContainer = document.getElementById('equipment-slots-container');
     if (eqContainer) {
         // One graphic per slot, no text. Equipped gear shows its own picture (item.img) when it has one.
@@ -1732,28 +1769,31 @@ function updateUI() {
     renderSetBonusPanel();
 
     el = document.getElementById('player-potions');
-    if (el) {
-        const ps = player.equipped.potionSlot;
-        el.innerText = (ps && ps.qty > 0) ? `${ps.name} x${ps.qty}` : 'None';
+    const potionSlot = player.equipped.potionSlot;
+    const hasPotion = !!(potionSlot && potionSlot.qty > 0);
+    if (el) el.innerText = hasPotion ? `${potionSlot.name} x${potionSlot.qty}` : 'None';
+    // Combat slot graphics: no potion shows nopotion.png, resurrection ON shows the pressed elixir graphic
+    const potionBtn = document.getElementById('combat-potion-btn');
+    if (potionBtn) {
+        potionBtn.classList.toggle('no-potion', !hasPotion);
+        potionBtn.disabled = !hasPotion; // clicking the empty slot does nothing
     }
+    const elixirBtn = document.getElementById('combat-elixir-btn');
+    if (elixirBtn) elixirBtn.classList.toggle('on', player.resurrectionOn !== false);
     el = document.getElementById('player-resurrection');
     if (el) el.innerText = `${player.resurrectionPotions || 0} left`;
 
     el = document.getElementById('combat-rune-list');
     if (el) {
+        // One window per rune picked this run (blank windows when empty)
         const runes = player.currentRunRunes || [];
-        if (runes.length === 0) {
-            el.innerHTML = '<span class="text-slate-500">No runes acquired yet this run.</span>';
-        } else {
-            const grouped = {};
-            runes.forEach(r => {
-                if (!grouped[r.id]) grouped[r.id] = { ...r, count: 0 };
-                grouped[r.id].count++;
-            });
-            el.innerHTML = Object.values(grouped).map(r =>
-                `<div class="${runeRarityClass(r.id)}">✦ ${r.name}${r.count > 1 ? ' <span class="text-amber-300 font-bold">x' + r.count + '</span>' : ''} <span class="text-slate-400">— ${RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].text(runeN(r.id)) : r.desc}</span></div>`
-            ).join('');
-        }
+        const windowCount = Math.max(8, runes.length);
+        el.innerHTML = Array.from({ length: windowCount }, (_, i) => {
+            const r = runes[i];
+            if (!r) return '<div class="combat-rune-slot"></div>';
+            const txt = RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].text(runeN(r.id)) : r.desc;
+            return `<div class="combat-rune-slot" onclick="showRuneDetail(${i})"><div class="font-bold ${runeRarityClass(r.id)}">${r.name}</div><div class="text-slate-400">${txt}</div></div>`;
+        }).join('');
     }
 
     // Render Monsters Lineup during Combat
@@ -1768,15 +1808,24 @@ function updateUI() {
             let hpPct = Math.max(0, (m.hp / m.maxHp) * 100);
             let tag = isDead ? '<span class="text-[10px] text-slate-400">(Defeated)</span>' : (isTarget ? '<span class="text-[10px] text-amber-400">(Target)</span>' : '');
 
+            // Card: name and HP (element symbol over the HP), with the monster's idle sprite under it
+            const elemIcon = m.element && ELEMENTS[m.element] ? ELEMENTS[m.element].icon : '';
+            const role = roleIconOf(m) || '';
             lineupContainer.innerHTML += `
-                <div class="p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-red-400">${['1st','2nd','3rd','4th','5th'][idx] || (idx+1)+'th'}: ${m.name}</span>${elemTagHTML(m)} ${tag}</span>
-                        <span class="font-mono text-[11px]">${Math.max(0, m.hp)} / ${m.maxHp} HP</span>
+                <div class="flex flex-col items-center gap-1">
+                    <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
+                        <div class="flex justify-between items-center gap-2 text-xs">
+                            <span class="font-bold text-red-400 truncate">${m.name} ${role}</span>
+                            <span class="relative inline-flex items-center justify-center min-w-[84px] h-6 px-2 rounded-full bg-slate-950/70 border border-slate-700">
+                                <span class="font-mono text-[11px] text-slate-100">${Math.max(0, m.hp)} / ${m.maxHp}</span>
+                                <span class="absolute inset-0 flex items-center justify-center text-sm opacity-50 pointer-events-none">${elemIcon}</span>
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50">
+                            <div class="bg-red-500 h-full transition-all duration-200" style="width: ${hpPct}%"></div>
+                        </div>
                     </div>
-                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50">
-                        <div class="bg-red-500 h-full transition-all duration-200" style="width: ${hpPct}%"></div>
-                    </div>
+                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none; ${isDead ? 'opacity:.3;' : ''}">
                 </div>
             `;
         });

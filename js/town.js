@@ -64,8 +64,8 @@
         });
     });
 
-    // Hero idle: single new frame (idle2_breathing_sheet_0001)
-    const frames = ['assets/page01/idle2_breathing_sheet.png_0001.png'];
+    // Hero idle: character idle frames cha_idle_0001 - 0012
+    const frames = ['assets/page01/cha_idle_0001.png', 'assets/page01/cha_idle_0002.png', 'assets/page01/cha_idle_0003.png', 'assets/page01/cha_idle_0004.png', 'assets/page01/cha_idle_0005.png', 'assets/page01/cha_idle_0007.png', 'assets/page01/cha_idle_0008.png', 'assets/page01/cha_idle_0009.png', 'assets/page01/cha_idle_0010.png', 'assets/page01/cha_idle_0011.png', 'assets/page01/cha_idle_0012.png'];
     const hero = document.getElementById('town-hero');
     let i = 0;
     if (hero) setInterval(() => {
