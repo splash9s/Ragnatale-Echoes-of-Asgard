@@ -483,10 +483,10 @@ function dailyFreeCardHTML(key) {
     // Once claimed for the day the card is hidden; until then it shows in red
     if (isDailyFreeClaimed(key)) return '';
     return `
-        <div class="p-3 rounded border flex justify-between items-center" style="background-color:#dc2626; border-color:#991b1b;">
+        <div class="free-reward-card p-3 rounded border flex justify-between items-center">
             <div>
-                <span class="font-bold block text-xs" style="color:#ffffff;">${item.name}</span>
-                <span class="text-[10px]" style="color:#ffffff;">${item.desc}</span>
+                <span class="font-bold block text-xs">${item.name}</span>
+                <span class="text-[10px]">${item.desc}</span>
             </div>
             <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>
         </div>
