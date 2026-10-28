@@ -1791,8 +1791,9 @@ function updateUI() {
         el.innerHTML = Array.from({ length: windowCount }, (_, i) => {
             const r = runes[i];
             if (!r) return '<div class="combat-rune-slot"></div>';
-            const txt = RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].text(runeN(r.id)) : r.desc;
-            return `<div class="combat-rune-slot" onclick="showRuneDetail(${i})"><div class="font-bold ${runeRarityClass(r.id)}">${r.name}</div><div class="text-slate-400">${txt}</div></div>`;
+            // Window shows the rune's rarity picture (r1 to r5)
+            const rarity = Math.min(5, Math.max(1, RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].rarity : 1));
+            return `<div class="combat-rune-slot" onclick="showRuneDetail(${i})"><img src="assets/combat/runes/r${rarity}.png" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
         }).join('');
     }
 
@@ -1808,24 +1809,21 @@ function updateUI() {
             let hpPct = Math.max(0, (m.hp / m.maxHp) * 100);
             let tag = isDead ? '<span class="text-[10px] text-slate-400">(Defeated)</span>' : (isTarget ? '<span class="text-[10px] text-amber-400">(Target)</span>' : '');
 
-            // Card: name and HP (element symbol over the HP), with the monster's idle sprite under it
-            const elemIcon = m.element && ELEMENTS[m.element] ? ELEMENTS[m.element].icon : '';
-            const role = roleIconOf(m) || '';
+            // Card: sprite on top, then the name and HP box below it (no role or element)
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1">
+                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none; ${isDead ? 'opacity:.3;' : ''}">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
-                            <span class="font-bold text-red-400 truncate">${m.name} ${role}</span>
-                            <span class="relative inline-flex items-center justify-center min-w-[84px] h-6 px-2 rounded-full bg-slate-950/70 border border-slate-700">
+                            <span class="font-bold text-red-400 truncate">${m.name}</span>
+                            <span class="inline-flex items-center justify-center min-w-[84px] h-6 px-2 rounded-full bg-slate-950/70 border border-slate-700">
                                 <span class="font-mono text-[11px] text-slate-100">${Math.max(0, m.hp)} / ${m.maxHp}</span>
-                                <span class="absolute inset-0 flex items-center justify-center text-sm opacity-50 pointer-events-none">${elemIcon}</span>
                             </span>
                         </div>
                         <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50">
                             <div class="bg-red-500 h-full transition-all duration-200" style="width: ${hpPct}%"></div>
                         </div>
                     </div>
-                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none; ${isDead ? 'opacity:.3;' : ''}">
                 </div>
             `;
         });

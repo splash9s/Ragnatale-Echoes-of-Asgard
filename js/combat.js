@@ -207,7 +207,7 @@ function upgradeRuneChoice(id, pool, taken) {
 function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
     const choices = pickWeightedRunes(pool, 3).reduce((acc, id) => { acc.push(upgradeRuneChoice(id, pool, acc)); return acc; }, []);
-    let html = `<p class="text-xs text-slate-300 mb-2">Stage ${currentStage} cleared! Select a mystical Rune blessing for this expedition:</p><div class="flex flex-col gap-2">`;
+    let html = `<div class="flex flex-col gap-2">`;
     choices.forEach(id => {
         const r = RUNE_DEFS[id];
         const rar = RARITY_INFO[r.rarity] || RARITY_INFO[1];
@@ -223,7 +223,7 @@ function showRuneChoices(isNew) {
     const canRefresh = runeRefreshLeft > 0;
     html += `</div><button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mt-3 w-full py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button>`;
     if (isNew) {
-        showModal("Choose a Rune Blessing", "", html);
+        showModal("Rune Blessing", "", html);
     } else {
         const area = document.getElementById('modal-content-area');
         if (area) area.innerHTML = html;

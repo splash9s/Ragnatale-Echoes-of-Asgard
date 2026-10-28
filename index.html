@@ -167,7 +167,7 @@
         #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress.png'); }
         #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion.png'); }
         #combat-potion-btn.no-potion span { display: none; }
-        .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 6px; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
+        .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
         #combat-elixir-btn span { display: none; }
@@ -178,13 +178,13 @@
         .combat-box { position: absolute; box-sizing: border-box; background-color: rgba(15, 23, 42, .92); border: 1px solid #1e293b; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
         #combat-activity-log { flex: 1; min-height: 0; }
         #combat-player-body { min-height: 0; }
-        #monsters-lineup-container > div { position: absolute; top: auto; width: 200px; pointer-events: auto; }
-        #monsters-lineup-container > div:nth-child(1) { left: 914px; bottom: 186px; }
-        #monsters-lineup-container > div:nth-child(2) { left: 1065px; bottom: 186px; }
-        #monsters-lineup-container > div:nth-child(3) { left: 1218px; bottom: 201px; }
-        #monsters-lineup-container > div:nth-child(4) { left: 1358px; bottom: 249px; }
-        #monsters-lineup-container > div:nth-child(5) { left: 1507px; bottom: 299px; }
-        #monsters-lineup-container > div:nth-child(6) { left: 1658px; bottom: 311px; }
+        #monsters-lineup-container > div { position: absolute; width: 200px; pointer-events: auto; }
+        #monsters-lineup-container > div:nth-child(1) { left: 914px; top: 784px; }
+        #monsters-lineup-container > div:nth-child(2) { left: 1065px; top: 784px; }
+        #monsters-lineup-container > div:nth-child(3) { left: 1218px; top: 769px; }
+        #monsters-lineup-container > div:nth-child(4) { left: 1358px; top: 721px; }
+        #monsters-lineup-container > div:nth-child(5) { left: 1507px; top: 671px; }
+        #monsters-lineup-container > div:nth-child(6) { left: 1658px; top: 659px; }
         /* Campaign map tiles: soft background (selected tile keeps its amber highlight) */
         #campaign-map-list > button:not([class*="bg-amber"]) { background-color: rgba(143, 179, 169, .65) !important; }
         /* Campaign Dungeons: soft background on the Close button */
