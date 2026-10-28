@@ -792,6 +792,10 @@ function buyDiamondItem(itemId) {
 // Blacksmith: pick an equipped gear from the list to load it into the gear slot, then refine it
 let blacksmithSelectedSlot = null;
 let blacksmithRuneOn = false;
+// Refine success: +0 to +4 always succeed; from +5 the rate drops 15% per level (minimum 10%)
+function refineSuccessRate(lv) {
+    return lv >= 5 ? Math.max(10, 100 - ((lv - 4) * 15)) : 100;
+}
 function blacksmithToggleRune() {
     if (!blacksmithRuneOn && (player.blacksmithRuneStones || 0) < 1) {
         showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
@@ -831,12 +835,16 @@ function renderBlacksmithSlot() {
     if (!gear) {
         slotEl.innerHTML = '<span style="opacity:.6">Empty</span>';
         if (refineBtn) { refineBtn.disabled = true; refineBtn.style.opacity = '.5'; refineBtn.innerHTML = 'Refine'; }
+        const rateEl0 = document.getElementById('bs-success-rate');
+        if (rateEl0) rateEl0.textContent = '';
         return;
     }
     const lv = gear.refineLevel || 0;
     slotEl.innerHTML = `<span style="font-size:20px; line-height:1">${itemEmoji(gear)}</span><span>${lv > 0 ? '+' + lv : ''}</span>`;
     const isMax = lv >= 10;
     const cost = (lv + 1) * 100;
+    const rateEl = document.getElementById('bs-success-rate');
+    if (rateEl) rateEl.textContent = isMax ? 'MAX LEVEL' : `Success: ${refineSuccessRate(lv)}%`;
     if (refineBtn) {
         refineBtn.disabled = isMax;
         refineBtn.style.opacity = isMax ? '.5' : '1';
@@ -868,7 +876,7 @@ function renderRefiningUI() {
         any = true;
         let currentRefine = gear.refineLevel || 0;
         let isMax = currentRefine >= 10;
-        let successRate = currentRefine >= 4 ? Math.max(10, 100 - ((currentRefine - 3) * 15)) : 100;
+        let successRate = refineSuccessRate(currentRefine);
         let costGold = (currentRefine + 1) * 100;
         let selected = blacksmithSelectedSlot === slot;
         container.innerHTML += `
@@ -902,7 +910,7 @@ function refineEquipment(slot) {
     player.gold -= costGold;
     player.refiningStones = Math.max(0, (player.refiningStones || 0) - 1);
 
-    let successRate = current >= 4 ? Math.max(10, 100 - ((current - 3) * 15)) : 100;
+    let successRate = refineSuccessRate(current);
     if (Math.random() * 100 <= successRate) {
         gear.refineLevel = current + 1;
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
@@ -917,7 +925,7 @@ function refineEquipment(slot) {
             showModal("Refinement Failed", `The upgrade failed, but the Blacksmith Rune Stone kept your ${gear.name} at +${current}.`);
         } else {
             // Failure drops the refine level by 1 (never below +0)
-            gear.refineLevel = Math.max(0, current - 1);
+            gear.refineLevel = Math.max(Math.min(current, 4), current - 1);
             logMessage(`[Refine Failed] Upgrade failed. ${gear.name} dropped to +${gear.refineLevel}.`, 'combat');
             showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} dropped to +${gear.refineLevel}.`);
         }
