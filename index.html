@@ -162,7 +162,7 @@
         #view-setting h2 { color: #fef3c7 !important; }
         /* Setting page: remove all borders */
         /* Setting page: vertical items, bigger text (same size as Mail) */
-        #view-setting .art-panel > div button { font-size: 30px !important; padding: 26px 32px !important; }
+        #view-setting .art-panel > div button { font-size: 21px !important; padding: 18px 22px !important; }
         #view-setting, #view-setting * { border: 0 !important; }
         /* Campaign Dungeons: all content sits inside the frame's inner window */
         .expo-inner { position: absolute; left: 88px; top: 114px; width: 542px; height: 643px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 6px; }
@@ -322,13 +322,13 @@
 
         <!-- VIEW: SETTING -->
         <div id="view-setting" class="hidden art-screen">
-            <div id="setting-stage" class="town-stage" data-w="2752" data-h="1536">
-                <div class="ts-inner" style="width:2752px; height:1536px;">
-                    <img class="ts-bg" src="assets/pages/setting/bg.jpg" alt="" style="width:2752px; height:1536px;" onerror="townSwap(this,'setting bg')">
-                    <div class="ui" style="left:2562px; top:18px; width:163px; height:93px;" onclick="switchView('town')">
+            <div id="setting-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/setting/settingpage_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'setting bg')">
+                    <div class="ui" style="left:1788px; top:13px; width:114px; height:65px;" onclick="switchView('town')">
                         <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
-                    <div class="art-panel" style="left:632px; top:261px; width:1488px; height:1014px;">
+                    <div class="art-panel" style="left:441px; top:182px; width:1038px; height:707px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 gap-3">
                 <button onclick="switchView('library')" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">📚 Library</button>
                 <button onclick="manualSaveGame()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">💾 Save Game</button>
