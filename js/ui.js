@@ -507,8 +507,18 @@ function switchEventsTab(tabName) {
     const active = 'border: 2px solid #c9a227';
     const inactive = 'border: 1px solid #b8945a';
     if (btnEvents) btnEvents.setAttribute('style', `background-color: rgba(214, 190, 140, .5); color: #2a1a0e; ${tabName === 'events' ? active : inactive}`);
-    if (btnQuests) btnQuests.setAttribute('style', `background-color: rgba(214, 190, 140, .5); color: #2a1a0e; ${tabName === 'quests' ? active : inactive}`);
     if (tabName === 'quests') renderQuestsView();
+    updateQuestTabButton();
+}
+
+// Daily Quests tab turns red with white text while any daily quest is not complete
+function updateQuestTabButton() {
+    const btnQuests = document.getElementById('events-tab-btn-quests');
+    if (!btnQuests) return;
+    const hasOpenQuest = (player.dailyQuests || []).some(q => !q.completed);
+    const active = currentEventsTab === 'quests' ? 'border: 2px solid #c9a227' : 'border: 1px solid #b8945a';
+    const colors = hasOpenQuest ? 'background-color: #dc2626; color: #ffffff;' : 'background-color: rgba(214, 190, 140, .5); color: #2a1a0e;';
+    btnQuests.setAttribute('style', `${colors} ${active}`);
 }
 
 function renderShop() {
@@ -1710,6 +1720,7 @@ function renderElementStats() {
 }
 
 function updateUI() {
+    if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
     renderInventoryFilters();
     renderElementStats();
     let derived = getDerivedStats();
