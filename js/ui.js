@@ -352,6 +352,29 @@ const COMBAT_ART = {
             }
         }
     },
+    // Ice map (water path): no foreground
+    water: {
+        bg: ['assets/combat/ice/icebg1_q85.jpg', 'assets/combat/ice/icebg2_q85.jpg', 'assets/combat/ice/icebg3_q85.jpg'],
+        base: ['assets/combat/ice/icebase1_q85.webp', 'assets/combat/ice/icebase2_q85.webp', 'assets/combat/ice/icebase3_q85.webp'],
+        fg: null,
+        layouts: {
+            icebase1: {
+                player: { x: 433, y: 926, left: 382, top: 712 },
+                hud: { left: 331, top: 937 },
+                monsters: [[759, 886], [959, 880], [1113, 850], [1289, 867], [1491, 880], [1666, 867]]
+            },
+            icebase2: {
+                player: { x: 403, y: 923, left: 352, top: 709 },
+                hud: { left: 301, top: 934 },
+                monsters: [[707, 874], [908, 874], [1061, 837], [1237, 837], [1390, 837], [1621, 750]]
+            },
+            icebase3: {
+                player: { x: 538, y: 914, left: 487, top: 700 },
+                hud: { left: 436, top: 925 },
+                monsters: [[814, 892], [991, 892], [1143, 855], [1315, 795], [1491, 819], [1665, 708]]
+            }
+        }
+    },
     // World Ender (final map)
     final: {
         bg: ['assets/combat/yggdrasil/yggbg1_q85.jpg'],
