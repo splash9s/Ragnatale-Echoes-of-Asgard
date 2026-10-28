@@ -288,19 +288,33 @@ function closeModal() {
 }
 
 // Earth map: each combat picks 1 background, 1 base layer and the foreground
-const EARTH_BG_LAYERS = ['assets/combat/earthbg1.png', 'assets/combat/earthbg2_q85.jpg'];
-const EARTH_BASE_LAYERS = ['assets/combat/earthbase1.png', 'assets/combat/earthbase2_q85.webp', 'assets/combat/earthbase3_q85.webp'];
-const EARTH_FG_LAYER = 'assets/combat/earthfg1.png';
+// Battle art per path: each stage picks one background and one base layer; the foreground is fixed
+const COMBAT_ART = {
+    earth: {
+        bg: ['assets/combat/earthbg1.png', 'assets/combat/earthbg2_q85.jpg'],
+        base: ['assets/combat/earthbase1.png', 'assets/combat/earthbase2_q85.webp', 'assets/combat/earthbase3_q85.webp'],
+        fg: 'assets/combat/earthfg1.png',
+        layouts: EARTH_LAYOUTS
+    },
+    fire: {
+        bg: ['assets/combat/fire/firebg1_q85.jpg'],
+        base: ['assets/combat/fire/firebase1_q85.webp', 'assets/combat/fire/firebase2_q85.webp', 'assets/combat/fire/firebase3_q85.webp', 'assets/combat/fire/firebase4_q85.webp'],
+        fg: 'assets/combat/fire/firefg2_q85.webp',
+        layouts: {} // positions not set yet: the default layout is used
+    }
+};
 // Each stage picks a new background, base layer and foreground (instant swap, no fade)
 function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) return;
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-    bg.src = pick(EARTH_BG_LAYERS);
-    base.src = pick(EARTH_BASE_LAYERS);
-    fg.src = EARTH_FG_LAYER;
-    const layoutKey = Object.keys(EARTH_LAYOUTS).find(k => base.src.includes(k));
-    const layout = layoutKey ? EARTH_LAYOUTS[layoutKey] : null;
+    const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
+    const art = COMBAT_ART[artKey];
+    bg.src = pick(art.bg);
+    base.src = pick(art.base);
+    fg.src = art.fg;
+    const layoutKey = Object.keys(art.layouts).find(k => base.src.includes(k));
+    const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatEarthMonsterPos = layout ? layout.monsters : null;
     const hud = document.getElementById('combat-hp-under');
