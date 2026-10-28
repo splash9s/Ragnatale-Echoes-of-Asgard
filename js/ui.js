@@ -351,12 +351,13 @@ async function changeEarthLayers() {
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
     const art = COMBAT_ART[artKey];
-    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = art.fg;
-    await Promise.all([nextBg, nextBase, nextFg].map(preloadCombatImage));
+    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = art.fg || null; // fg is optional (null = no foreground)
+    await Promise.all([nextBg, nextBase, nextFg].filter(Boolean).map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
     bg.src = nextBg;
     base.src = nextBase;
-    fg.src = nextFg;
+    fg.src = nextFg || '';
+    fg.style.display = nextFg ? '' : 'none';
     const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
