@@ -376,6 +376,7 @@ function loadGame() {
             const QUEST_TARGETS = { q_slimes: 45, q_crit: 175, q_gold: 30000 };
             player.dailyQuests.forEach(q => { if (QUEST_TARGETS[q.id]) q.target = QUEST_TARGETS[q.id]; });
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
+            if (typeof ensureDailyQuestsToday === 'function') ensureDailyQuestsToday();
             if (!player.materials) player.materials = { ironScraps: 0 };
             player.runes = { ...defaultRunes(), ...(player.runes || {}) };
             if (!player.clearedMaps) {

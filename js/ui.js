@@ -672,7 +672,18 @@ function updateTownAlerts() {
 }
 
 // Refresh everything on the shop row and the town alerts
+// Daily quests start over each new day (progress, completion and milestone claims)
+function ensureDailyQuestsToday() {
+    const today = todayKey();
+    if (!player.dailyQuestsDate) { player.dailyQuestsDate = today; return; } // older saves: keep today's progress
+    if (player.dailyQuestsDate === today) return;
+    player.dailyQuestsDate = today;
+    (player.dailyQuests || []).forEach(q => { q.current = 0; q.completed = false; });
+    player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
+}
+
 function refreshShopAndAlerts() {
+    ensureDailyQuestsToday();
     updateShopTabButtons();
     updateShopBalance();
     updateTownAlerts();
