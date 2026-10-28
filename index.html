@@ -79,6 +79,11 @@
         .ts-inner .ts-bg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
         .ts-inner .ui { position: absolute; cursor: pointer; user-select: none; -webkit-user-select: none; }
         .ts-inner .ui img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+        /* Screen intro: background fades in first, then items (buttons, frames, panels) fade in after it */
+        @keyframes bgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes itemFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .ts-inner .ts-bg { animation: bgFadeIn .5s ease both; }
+        .ts-inner .ui, .ts-inner .art-frame, .ts-inner .art-panel { animation: itemFadeIn .5s ease .45s both; }
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
         #town-shadow { position: absolute; left: 855px; top: 690px; width: 197px; height: 79px; object-fit: contain; pointer-events: none; z-index: 1; }
