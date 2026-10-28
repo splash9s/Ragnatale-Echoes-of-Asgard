@@ -42,7 +42,7 @@
         mail:       () => switchView('quests'),
         setting:    () => switchView('setting'),
         character:  () => switchView('character'),
-        artisan:    () => switchView('forge'),
+        shop:       () => switchView('shop'),
         blacksmith: () => switchView('blacksmith'),
         expedition: () => switchView('expeditions'),
     };

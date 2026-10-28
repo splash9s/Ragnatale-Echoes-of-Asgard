@@ -46,10 +46,10 @@
         /* Character page: Attributes, Combat Stats and Element Resistance use the shop item background */
         #char-panel-left .rounded-2xl.border { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
         #char-element-stats { background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; border-radius: 16px; padding: 12px; }
-        /* Artisan page: unselected tab and section headings use the shop item background */
-        #forge-panel-left button.bg-slate-900 { background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; color: #2a1a0e !important; }
-        #forge-panel-left button.bg-slate-900:hover { background-color: rgba(214, 190, 140, .8) !important; }
-        #forge-panel-left h3, #forge-panel-right h3, #blacksmith-panel-right h3 { display: inline-block; background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; border-radius: 8px; padding: 4px 10px; }
+        /* Shop page: unselected tab and section headings use the shop item background */
+        #shop-panel-left button.bg-slate-900 { background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; color: #2a1a0e !important; }
+        #shop-panel-left button.bg-slate-900:hover { background-color: rgba(214, 190, 140, .8) !important; }
+        #shop-panel-left h3, #shop-panel-right h3, #blacksmith-panel-right h3 { display: inline-block; background-color: rgba(214, 190, 140, .5) !important; border: 1px solid #b8945a !important; border-radius: 8px; padding: 4px 10px; }
         /* Refinement list: same soft background as the shop items */
         #refining-slots-container > div { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
         /* Diamond Cash Shop header: darker shade of the diamond item lavender */
@@ -117,11 +117,11 @@
         .art-panel h2, .art-panel h3, .art-panel > p { color: #3b2716 !important; }
         /* Dark wrapper boxes that hold a page's content become transparent (item rows keep their own background) */
         .art-panel > div { background-color: transparent !important; }
-        /* Artisan windows: left has no border, right border is transparent */
-        #forge-panel-left { border: none; }
+        /* Shop windows: left has no border, right border is transparent */
+        #shop-panel-left { border: none; }
         .page-title { display: inline-block; background-color: #dbc5a0 !important; border: 2px solid #c09e6a !important; padding: 2px 10px; border-radius: 4px; }
         #view-setting .page-title, #view-quests .page-title { border: 2px solid #c09e6a !important; }
-        #forge-panel-right { border-color: transparent; }
+        #shop-panel-right { border-color: transparent; }
         #blacksmith-panel-left { border: none; }
         #blacksmith-panel-right { border-color: transparent; }
         /* Dark font on the art pages (not Mail/Setting, which are .art-dark-off); cards and selects get a light parchment background so the text stays readable */
@@ -144,7 +144,7 @@
         #view-diamond button.bg-purple-600:hover { background-color: #c8bbe2 !important; }
         #view-diamond .bg-purple-950\/60 { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
         #diamond-shop-items-container > div { background-color: rgba(190, 178, 214, .45) !important; border-color: #a593c4 !important; }
-        /* Artisan shop: soft background on each item (consumables and armory) */
+        /* Shop: soft background on each item (consumables and armory) */
         #shop-consumables-container > div, #shop-items-container > div { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
         /* Mail page: no background behind the Daily Quests and Mailbox columns */
         #view-quests .grid > div { background-color: transparent !important; }
@@ -297,11 +297,11 @@
             <div class="ui" data-action="character" style="left:20px; top:925px; width:145px; height:145px;">
                 <img src="assets/page01/characterbutton.png" alt="" onerror="townSwap(this,'characterbutton.png')">
             </div>
-            <div class="ui" data-action="artisan" style="left:183px; top:925px; width:145px; height:145px;">
-                <img src="assets/page01/articanbutton.png" alt="" onerror="townSwap(this,'articanbutton.png')">
+            <div class="ui" data-action="shop" style="left:183px; top:925px; width:145px; height:145px;">
+                <img src="assets/page01/shoppagebutton.png" alt="" onerror="townSwap(this,'shoppagebutton.png')">
             </div>
             <div class="ui" data-action="blacksmith" style="left:346px; top:925px; width:145px; height:145px;">
-                <img src="assets/page01/blacksmithbutton.png" alt="" onerror="townSwap(this,'blacksmithbutton.png')">
+                <img src="assets/page01/articanbutton.png" alt="" onerror="townSwap(this,'articanbutton.png')">
             </div>
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
                 <img src="assets/page01/expeditionbutton.png" alt="" onerror="townSwap(this,'expeditionbutton.png')">
@@ -458,7 +458,17 @@
                     <h2 class="page-title text-base font-bold text-cyan-300">Events</h2>
                 </div>
             </div>
-            <div class="grid grid-cols-1 gap-3">
+            <div class="flex gap-2">
+                <button id="events-tab-btn-events" onclick="switchEventsTab('events')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Events</button>
+                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests</button>
+            </div>
+            <div id="events-tab-quests" class="hidden flex flex-col gap-3">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daily Quests</h3>
+                    <div id="quests-container" class="flex flex-col gap-2"></div>
+                </div>
+            </div>
+            <div id="events-tab-events" class="grid grid-cols-1 gap-3">
                     <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
                 <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
                 <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
@@ -600,8 +610,8 @@
 
 
         <!-- VIEW: FORGE & SHOP -->
-        <div id="view-forge" class="hidden art-screen art-dark">
-            <div id="forge-stage" class="town-stage" data-w="1920" data-h="1080">
+        <div id="view-shop" class="hidden art-screen art-dark">
+            <div id="shop-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/artisan/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
                     <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:109px; top:95px; width:803px; height:953px;">
@@ -609,14 +619,14 @@
                     <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
                         <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
-                    <div id="forge-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
-                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Artisan Shop</h2>
-                        <div id="forge-gold-section" class="flex flex-col gap-3">
+                    <div id="shop-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
+                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Shop</h2>
+                        <div id="shop-gold-section" class="flex flex-col gap-3">
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
                         </div>
                     </div>
-                    <div id="forge-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
-                        <div id="forge-armory-section" class="flex flex-col gap-3">
+                    <div id="shop-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
+                        <div id="shop-armory-section" class="flex flex-col gap-3">
                             <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
                             <div id="shop-items-container" class="flex flex-col gap-2"></div>
                         </div>
@@ -689,15 +699,11 @@
                     <div class="art-panel" style="left:513px; top:326px; width:1727px; height:658px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="page-title text-base font-bold text-amber-400">Quests & Mailbox</h2>
+                    <h2 class="page-title text-base font-bold text-amber-400">Mailbox</h2>
                     
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daily Quests</h3>
-                    <div id="quests-container" class="flex flex-col gap-2"></div>
-                </div>
+            <div class="grid grid-cols-1 gap-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mailbox</h3>
                     <div id="mailbox-container" class="flex flex-col gap-2"></div>

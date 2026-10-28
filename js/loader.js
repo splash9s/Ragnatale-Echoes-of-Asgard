@@ -136,6 +136,8 @@ const LOADING_IMAGES = [
     "assets/page01/settingpress.png",
     "assets/page01/shadow2.png",
     "assets/page01/shadow_clean.png",
+    "assets/page01/shoppagebutton.png",
+    "assets/page01/shoppagebuttonpress.png",
     "assets/pages/artisan/bg.png",
     "assets/pages/artisan/window.png",
     "assets/pages/character/bg.png",

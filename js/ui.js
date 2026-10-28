@@ -267,16 +267,16 @@ function closeModal() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-forge', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'blacksmith', 'character', 'skills', 'combat'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'blacksmith', 'character', 'skills', 'combat'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -298,9 +298,10 @@ function switchView(viewName) {
     if (viewName === 'events') {
         document.getElementById('view-events')?.classList.remove('hidden');
         renderEventsView();
+        switchEventsTab(currentEventsTab);
     }
-    if (viewName === 'forge') {
-        document.getElementById('view-forge')?.classList.remove('hidden');
+    if (viewName === 'shop') {
+        document.getElementById('view-shop')?.classList.remove('hidden');
         renderShop();
     }
     if (viewName === 'blacksmith') {
@@ -313,7 +314,6 @@ function switchView(viewName) {
     }
     if (viewName === 'quests') {
         document.getElementById('view-quests')?.classList.remove('hidden');
-        renderQuestsView();
         renderMailBox();
     }
     if (viewName === 'combat') document.getElementById('view-combat')?.classList.remove('hidden');
@@ -448,10 +448,73 @@ function renderArmoryFilterBar(slots, levels) {
         </select>`;
 }
 
+// ---------- DAILY FREE REWARDS (refresh every day) ----------
+const DAILY_FREE_ITEMS = {
+    gold: { name: "Free 3000 Gold", desc: "Daily free gift. Refreshes every day.", reward: { gold: 3000 } },
+    diamond: { name: "Free 1 Diamond", desc: "Daily free gift. Refreshes every day.", reward: { diamonds: 1 } }
+};
+
+function todayKey() {
+    return new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+}
+
+function isDailyFreeClaimed(key) {
+    return !!(player.dailyFree && player.dailyFree[key] === todayKey());
+}
+
+function claimDailyFree(key) {
+    const item = DAILY_FREE_ITEMS[key];
+    if (!item || isDailyFreeClaimed(key)) return;
+    if (!player.dailyFree) player.dailyFree = {};
+    player.dailyFree[key] = todayKey();
+    if (item.reward.gold) player.gold += item.reward.gold;
+    if (item.reward.diamonds) player.diamonds += item.reward.diamonds;
+    logMessage(`[Free] Received ${item.name}!`, 'levelup');
+    showModal("Free Reward", `You received ${item.name}. Come back tomorrow for another.`);
+    updateUI();
+    renderShop();
+    renderDiamondShop();
+    saveGame();
+}
+
+function dailyFreeCardHTML(key, buttonClass) {
+    const item = DAILY_FREE_ITEMS[key];
+    const claimed = isDailyFreeClaimed(key);
+    return `
+        <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
+            <div>
+                <span class="font-bold text-amber-300 block text-xs">${item.name}</span>
+                <span class="text-[10px] text-slate-400">${item.desc}</span>
+            </div>
+            <button onclick="claimDailyFree('${key}')" ${claimed ? 'disabled' : ''} class="px-3 py-1.5 ${buttonClass} font-bold rounded-lg cursor-pointer text-xs transition disabled:opacity-50">${claimed ? 'Claimed today' : 'Claim'}</button>
+        </div>
+    `;
+}
+
+// ---------- EVENTS PAGE TABS ----------
+let currentEventsTab = 'events';
+
+function switchEventsTab(tabName) {
+    if (tabName !== 'events' && tabName !== 'quests') tabName = 'events';
+    currentEventsTab = tabName;
+    const eventsPane = document.getElementById('events-tab-events');
+    const questsPane = document.getElementById('events-tab-quests');
+    const btnEvents = document.getElementById('events-tab-btn-events');
+    const btnQuests = document.getElementById('events-tab-btn-quests');
+    if (eventsPane) eventsPane.classList.toggle('hidden', tabName !== 'events');
+    if (questsPane) questsPane.classList.toggle('hidden', tabName !== 'quests');
+    // Active tab gets an amber border; inactive tab keeps the parchment background
+    const active = 'border: 2px solid #c9a227';
+    const inactive = 'border: 1px solid #b8945a';
+    if (btnEvents) btnEvents.setAttribute('style', `background-color: rgba(214, 190, 140, .5); color: #2a1a0e; ${tabName === 'events' ? active : inactive}`);
+    if (btnQuests) btnQuests.setAttribute('style', `background-color: rgba(214, 190, 140, .5); color: #2a1a0e; ${tabName === 'quests' ? active : inactive}`);
+    if (tabName === 'quests') renderQuestsView();
+}
+
 function renderShop() {
     let consumablesContainer = document.getElementById('shop-consumables-container');
     if (consumablesContainer) {
-        consumablesContainer.innerHTML = '';
+        consumablesContainer.innerHTML = dailyFreeCardHTML('gold', 'bg-amber-600 hover:bg-amber-500 text-slate-950');
         GOLD_SHOP_CONSUMABLES.forEach(item => {
             consumablesContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
@@ -556,7 +619,7 @@ function renderDiamondShop() {
     if (balanceEl) balanceEl.innerText = player.diamonds;
     
     if (!container) return;
-    container.innerHTML = '';
+    container.innerHTML = dailyFreeCardHTML('diamond', 'bg-purple-600 hover:bg-purple-500 text-slate-950');
 
     DIAMOND_SHOP_ITEMS.forEach(item => {
         container.innerHTML += `
