@@ -13,27 +13,27 @@ let currentLanguage = 'en';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
 const GOLD_SHOP_CONSUMABLES = [
-    { id: 'potion_minor', name: "Minor Healing Potion", price: 50, type: 'potion', heal: 50, desc: "Restores 50 HP" },
-    { id: 'potion_med', name: "Medium Healing Potion", price: 150, type: 'potion', heal: 150, desc: "Restores 150 HP" },
-    { id: 'potion_large', name: "Large Healing Potion", price: 400, type: 'potion', heal: 400, desc: "Restores 400 HP" },
-    { id: 'gchest_copper', name: "Copper Chest", price: 1000, type: 'chest', chestType: 'copper', desc: "Opens for 1-500 Gold and 1 armory item (Rarity 1)." },
-    { id: 'gchest_silver', name: "Silver Chest", price: 4000, type: 'chest', chestType: 'silver', desc: "Opens for 501-1000 Gold and 1 armory item (Rarity 2-3)." },
-    { id: 'gchest_gold', name: "Gold Chest", price: 8000, type: 'chest', chestType: 'gold', desc: "Opens for 1501-2000 Gold and 2 armory items (Rarity 3-4)." }
+    { id: 'potion_minor', name: "Minor Healing Potion", price: 50, type: 'potion', heal: 100, desc: "Restores 100 HP" },
+    { id: 'potion_med', name: "Medium Healing Potion", price: 250, type: 'potion', heal: 250, desc: "Restores 250 HP" },
+    { id: 'potion_large', name: "Large Healing Potion", price: 600, type: 'potion', heal: 500, desc: "Restores 500 HP" },
+    { id: 'gchest_copper', name: "Copper Chest", price: 1000, type: 'chest', chestType: 'copper', desc: "" },
+    { id: 'gchest_silver', name: "Silver Chest", price: 4000, type: 'chest', chestType: 'silver', desc: "" },
+    { id: 'gchest_gold', name: "Gold Chest", price: 8000, type: 'chest', chestType: 'gold', desc: "" }
 ];
 
 const DIAMOND_SHOP_ITEMS = [
-    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 200, type: 'vip', days: 30 },
-    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 50, type: 'vip', days: 7 },
-    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto next stage, no walking between stages, 1 Resurrection Potion by mail every day.", price: 10, type: 'vip', days: 1 },
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30 },
+    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 50, type: 'vip', days: 7 },
+    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 10, type: 'vip', days: 1 },
     { id: 'pet_loyal_slime', name: "Loyal Slime Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
     { id: 'res_potion', name: "Resurrection Potion", price: 3, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
-    { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "Toggle on at the blacksmith. If a refine fails, the gear keeps its level. Used up when it saves a gear." },
-    { id: 'stat_reset', name: "Stat Reset Service", price: 10, type: 'service', desc: "Resets all attributes to 1 and refunds all spent stat points." },
-    { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "Resets all skill levels and refunds all spent Class SP." },
-    { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "Opens for 1-500 Gold and 1 armory item (Rarity 1)." },
-    { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "Opens for 501-1000 Gold and 1 armory item (Rarity 2-3)." },
-    { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "Opens for 1501-2000 Gold and 2 armory items (Rarity 3-4)." }
+    { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear." },
+    { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "" },
+    { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "" },
+    { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "" },
+    { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "" },
+    { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "" }
 ];
 
 
