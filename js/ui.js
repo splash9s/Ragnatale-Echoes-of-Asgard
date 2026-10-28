@@ -147,7 +147,7 @@ const COMBAT_PLAYER_HIT_FRAMES = ['assets/combat/player/hit_0001.png', 'assets/c
 const COMBAT_PLAYER_CRI_FRAMES = ['assets/combat/player/cri_0001.png', 'assets/combat/player/cri_0002.png'];
 const COMBAT_PLAYER_ATTACK_FRAME_MS = 150;
 const COMBAT_PLAYER_HIT_SIZES = [[200, 214], [200, 214]]; // width, height of each hit frame
-const COMBAT_PLAYER_CRI_SIZES = [[130, 187], [120, 231]]; // width, height of each critical frame
+const COMBAT_PLAYER_CRI_SIZES = [[138, 199], [120, 231]]; // width, height of each critical frame
 let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
