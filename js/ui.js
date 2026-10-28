@@ -290,15 +290,10 @@ function closeModal() {
 const EARTH_BG_LAYERS = ['assets/combat/earthbg1.png', 'assets/combat/earthbg2_q85.jpg'];
 const EARTH_BASE_LAYERS = ['assets/combat/earthbase1.png', 'assets/combat/earthbase2_q85.webp', 'assets/combat/earthbase3_q85.webp'];
 const EARTH_FG_LAYER = 'assets/combat/earthfg1.png';
-// Each stage picks a new background, base layer and foreground, with a fade out and in
-async function changeEarthLayers() {
+// Each stage picks a new background, base layer and foreground (instant swap, no fade)
+function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) return;
-    const hud = document.getElementById('combat-hp-under');
-    // Layers, monsters, player and HP block fade together so positions never show before the new layout
-    const layers = [bg, base, fg, document.getElementById('monsters-lineup-container'), document.getElementById('combat-player-sprite'), hud].filter(Boolean);
-    const fade = (el, from, to) => el.animate([{ opacity: from }, { opacity: to }], { duration: 300, fill: 'forwards' }).finished.catch(() => {});
-    await Promise.all(layers.map(el => fade(el, 1, 0)));
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     bg.src = pick(EARTH_BG_LAYERS);
     base.src = pick(EARTH_BASE_LAYERS);
@@ -307,12 +302,12 @@ async function changeEarthLayers() {
     const layout = layoutKey ? EARTH_LAYOUTS[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatEarthMonsterPos = layout ? layout.monsters : null;
+    const hud = document.getElementById('combat-hp-under');
     if (hud) {
         const h = layout && layout.hud ? layout.hud : { left: 413, top: 896 };
         hud.style.left = h.left + 'px';
         hud.style.top = h.top + 'px';
     }
-    await Promise.all(layers.map(el => fade(el, 0, 1)));
 }
 
 function switchView(viewName) {
