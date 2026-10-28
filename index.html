@@ -654,25 +654,25 @@
             <div id="blacksmith-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/blacksmith/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'blacksmith bg')">
-                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:100px; top:109px; width:803px; height:953px;">
-                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:1007px; top:109px; width:803px; height:953px;">
+                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:100px; top:102px; width:803px; height:953px;">
+                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:1007px; top:102px; width:803px; height:953px;">
                     <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
                         <img src="assets/pages/blacksmith/returnbutton_q85.webp" alt="">
                     </div>
                     <!-- Left window: list of equipped gear -->
-                    <div id="blacksmith-panel-left" class="art-panel" style="left:194px; top:210px; width:614px; height:766px;">
+                    <div id="blacksmith-panel-left" class="art-panel" style="left:194px; top:203px; width:614px; height:766px;">
                         <h2 class="page-title text-base font-bold text-amber-400 mb-3">Blacksmith: Refinement</h2>
                         <div id="refining-slots-container" class="flex flex-col gap-3"></div>
                     </div>
                     <!-- Right window: refinery, gear slot, rune slot, buttons, rules -->
-                    <img class="art-frame" src="assets/pages/blacksmith/refinenary_q85.webp" alt="" style="left:1090px; top:195px; width:636px; height:360px;">
-                    <div id="blacksmith-gear-slot" class="ui" style="z-index:4; left:1373px; top:418px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#f5e6c4; font-size:11px; font-weight:700; text-shadow:0 1px 2px #000;"></div>
-                    <div id="bs-success-rate" style="position:absolute; z-index:4; left:1321px; top:501px; width:181px; text-align:center; font-size:12px; font-weight:900; color:#ffffff; text-shadow:0 1px 3px #000;"></div>
-                    <div id="blacksmith-rune-slot" class="ui" onclick="blacksmithToggleRune()" style="z-index:4; left:1374px; top:558px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column;"></div>
-                    <div id="bs-rune-balance" style="position:absolute; z-index:4; left:1321px; top:639px; width:181px; text-align:center; font-size:12px; font-weight:800; color:#000; text-shadow:0 1px 2px rgba(255,255,255,.7);">Rune Stone: 0</div>
-                    <button id="bs-cancel" onclick="blacksmithCancel()" class="cursor-pointer" style="z-index:4; position:absolute; left:1161px; top:575px; width:136px; height:44px; font-size:13px; font-weight:700; line-height:1.2; color:#3b2412; background:#e9dcc0; border:2px solid #8b6a3e; border-radius:6px;">Return</button>
-                    <button id="bs-refine" onclick="blacksmithRefineSelected()" class="cursor-pointer" style="z-index:4; position:absolute; left:1527px; top:575px; width:136px; height:44px; font-size:12px; font-weight:800; line-height:1.2; color:#1c1209; background:#d4a24c; border:2px solid #7a5520; border-radius:6px;">Refine</button>
-                    <div id="blacksmith-panel-right" class="art-panel" style="left:1104px; top:663px; width:595px; height:299px; overflow:auto;">
+                    <img class="art-frame" src="assets/pages/blacksmith/refinenary_q85.webp" alt="" style="left:1090px; top:188px; width:636px; height:360px;">
+                    <div id="blacksmith-gear-slot" class="ui" style="z-index:4; left:1373px; top:411px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#f5e6c4; font-size:11px; font-weight:700; text-shadow:0 1px 2px #000;"></div>
+                    <div id="bs-success-rate" style="position:absolute; z-index:4; left:1321px; top:494px; width:181px; text-align:center; font-size:12px; font-weight:900; color:#ffffff; text-shadow:0 1px 3px #000;"></div>
+                    <div id="blacksmith-rune-slot" class="ui" onclick="blacksmithToggleRune()" style="z-index:4; left:1374px; top:551px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column;"></div>
+                    <div id="bs-rune-balance" style="position:absolute; z-index:4; left:1321px; top:632px; width:181px; text-align:center; font-size:12px; font-weight:800; color:#000; text-shadow:0 1px 2px rgba(255,255,255,.7);">Rune Stone: 0</div>
+                    <button id="bs-cancel" onclick="blacksmithCancel()" class="cursor-pointer" style="z-index:4; position:absolute; left:1161px; top:568px; width:136px; height:44px; font-size:13px; font-weight:700; line-height:1.2; color:#3b2412; background:#e9dcc0; border:2px solid #8b6a3e; border-radius:6px;">Return</button>
+                    <button id="bs-refine" onclick="blacksmithRefineSelected()" class="cursor-pointer" style="z-index:4; position:absolute; left:1527px; top:568px; width:136px; height:44px; font-size:12px; font-weight:800; line-height:1.2; color:#1c1209; background:#d4a24c; border:2px solid #7a5520; border-radius:6px;">Refine</button>
+                    <div id="blacksmith-panel-right" class="art-panel" style="left:1104px; top:656px; width:595px; height:299px; overflow:auto;">
                         <h3 class="text-sm font-bold text-amber-400 mb-2">Refine Rules</h3>
                         <ul class="flex flex-col gap-1 text-xs list-disc pl-5">
                             <li>Each refine costs (current level + 1) × 100 Gold and 1 Refining Stone.</li>
@@ -711,8 +711,8 @@
         <div id="view-combat" class="hidden art-screen">
             <div id="combat-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/combat/earthbg1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;" onerror="townSwap(this,'earthbg1.png')">
-                    <img src="assets/combat/earthbase1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;" onerror="townSwap(this,'earthbase1.png')">
+                    <img id="earth-bg" class="ts-bg" src="assets/combat/earthbg1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;" onerror="townSwap(this,'earthbg1.png')">
+                    <img id="earth-base" src="assets/combat/earthbase1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;" onerror="townSwap(this,'earthbase1.png')">
 
                     <!-- Stage title (top centre) -->
                     <div style="position:absolute; left:660px; top:28px; width:600px; text-align:center; z-index:5;">
@@ -794,7 +794,7 @@
                     </div>
 
                     <!-- Foreground layer (in front of the character and enemies, does not block clicks) -->
-                    <img src="assets/combat/earthfg1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; z-index:3;" onerror="townSwap(this,'earthfg1.png')">
+                    <img id="earth-fg" src="assets/combat/earthfg1.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; z-index:3;" onerror="townSwap(this,'earthfg1.png')">
 
                     <!-- Enemies: six slots, positioned by CSS -->
                     <div id="monsters-lineup-container" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;"></div>

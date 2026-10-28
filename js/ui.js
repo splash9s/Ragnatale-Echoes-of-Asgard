@@ -271,6 +271,18 @@ function closeModal() {
     }
 }
 
+// Earth map: each combat picks 1 background, 1 base layer and the foreground
+const EARTH_BG_LAYERS = ['assets/combat/earthbg1.png', 'assets/combat/earthbg2_q85.jpg'];
+const EARTH_BASE_LAYERS = ['assets/combat/earthbase1.png', 'assets/combat/earthbase2_q85.webp', 'assets/combat/earthbase3_q85.webp'];
+const EARTH_FG_LAYER = 'assets/combat/earthfg1.png';
+function randomizeEarthLayers() {
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
+    if (bg) bg.src = pick(EARTH_BG_LAYERS);
+    if (base) base.src = pick(EARTH_BASE_LAYERS);
+    if (fg) fg.src = EARTH_FG_LAYER;
+}
+
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
     // The Diamond Cash Shop is a tab on the Shop page now
@@ -323,7 +335,7 @@ function switchView(viewName) {
         document.getElementById('view-quests')?.classList.remove('hidden');
         renderMailBox();
     }
-    if (viewName === 'combat') document.getElementById('view-combat')?.classList.remove('hidden');
+    if (viewName === 'combat') { document.getElementById('view-combat')?.classList.remove('hidden'); randomizeEarthLayers(); }
 
     updateUI();
     saveGame();
