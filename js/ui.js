@@ -785,10 +785,46 @@ function buyDiamondItem(itemId) {
     saveGame();
 }
 
+// Blacksmith: pick an equipped gear from the list to load it into the gear slot, then refine it
+let blacksmithSelectedSlot = null;
+function blacksmithSelect(slot) {
+    blacksmithSelectedSlot = slot;
+    renderRefiningUI();
+}
+function blacksmithCancel() {
+    blacksmithSelectedSlot = null;
+    renderRefiningUI();
+}
+function blacksmithRefineSelected() {
+    if (!blacksmithSelectedSlot) return;
+    refineEquipment(blacksmithSelectedSlot);
+}
+function renderBlacksmithSlot() {
+    const slotEl = document.getElementById('blacksmith-gear-slot');
+    const refineBtn = document.getElementById('bs-refine');
+    if (!slotEl) return;
+    const gear = blacksmithSelectedSlot ? player.equipped[blacksmithSelectedSlot] : null;
+    if (!gear) {
+        slotEl.innerHTML = '<span style="opacity:.6">Empty</span>';
+        if (refineBtn) { refineBtn.disabled = true; refineBtn.style.opacity = '.5'; refineBtn.innerHTML = 'Refine'; }
+        return;
+    }
+    const lv = gear.refineLevel || 0;
+    slotEl.innerHTML = `<span style="font-size:20px; line-height:1">${itemEmoji(gear)}</span><span>${lv > 0 ? '+' + lv : ''}</span>`;
+    const isMax = lv >= 10;
+    const cost = (lv + 1) * 100;
+    if (refineBtn) {
+        refineBtn.disabled = isMax;
+        refineBtn.style.opacity = isMax ? '.5' : '1';
+        refineBtn.innerHTML = isMax ? 'MAX LEVEL' : `Refine<br>${cost} Gold`;
+    }
+}
+
 function renderRefiningUI() {
     let container = document.getElementById('refining-slots-container');
     if (!container) return;
     let scraps = getScrapCount();
+    if (blacksmithSelectedSlot && !player.equipped[blacksmithSelectedSlot]) blacksmithSelectedSlot = null;
 
     container.innerHTML = `
         <div class="p-3 bg-slate-950 rounded-xl border border-amber-500/30 mb-3 flex flex-col gap-2">
@@ -797,35 +833,32 @@ function renderRefiningUI() {
                 <button onclick="smeltRefiningStone()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer">Smelt 1 Refining Stone</button>
             </div>
             <span class="text-[10px] text-slate-400">Combine 100 Iron Scraps to forge 1 Refining Stone.</span>
+            <span class="text-xs text-amber-200">🔨 Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
         </div>
-        <div class="p-2 bg-slate-950 rounded border border-amber-500/20 text-xs text-amber-200 mb-2 flex justify-between items-center">
-            <span>🔨 Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
-        </div>
+        <div class="text-[10px] text-slate-400 mb-1">Select gear to refine:</div>
     `;
 
+    let any = false;
     for (let [slot, gear] of Object.entries(player.equipped)) {
         if (!gear || slot === 'pet' || slot === 'potionSlot') continue;
+        any = true;
         let currentRefine = gear.refineLevel || 0;
         let isMax = currentRefine >= 10;
         let successRate = currentRefine >= 4 ? Math.max(10, 100 - ((currentRefine - 3) * 15)) : 100;
         let costGold = (currentRefine + 1) * 100;
-
+        let selected = blacksmithSelectedSlot === slot;
         container.innerHTML += `
-            <div class="p-3 bg-slate-900/80 rounded border border-slate-700 flex flex-col gap-2">
-                <div class="flex justify-between items-center gap-3">
-                    <div>
-                        <span class="font-bold text-amber-300 text-xs">${gear.name} ${currentRefine > 0 ? '+' + currentRefine : ''}</span>
-                        <span class="text-[10px] text-slate-400 block capitalize">Slot: ${slot} | Success Rate: ${isMax ? 'MAX' : successRate + '%'}</span>
-                    </div>
-                    ${!isMax ? `
-                        <button onclick="refineEquipment('${slot}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded cursor-pointer text-xs transition whitespace-nowrap">
-                            Refine: ${costGold} Gold + 1 Stone
-                        </button>
-                    ` : '<span class="text-xs text-emerald-400 font-bold">MAX LEVEL</span>'}
+            <div onclick="blacksmithSelect('${slot}')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900/80 border-slate-700 hover:border-amber-600'}">
+                <div>
+                    <span class="font-bold text-amber-300 text-xs">${itemEmoji(gear)} ${gear.name} ${currentRefine > 0 ? '+' + currentRefine : ''}</span>
+                    <span class="text-[10px] text-slate-400 block capitalize">Slot: ${slot} | Success Rate: ${isMax ? 'MAX' : successRate + '%'}</span>
                 </div>
+                <span class="text-[10px] text-slate-300 whitespace-nowrap">${isMax ? 'MAX LEVEL' : costGold + ' Gold + 1 Stone'}</span>
             </div>
         `;
     }
+    if (!any) container.innerHTML += '<div class="text-xs text-slate-400">No equipped gear to refine.</div>';
+    renderBlacksmithSlot();
 }
 
 function refineEquipment(slot) {

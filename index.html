@@ -653,23 +653,30 @@
         <div id="view-blacksmith" class="hidden art-screen art-dark">
             <div id="blacksmith-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/artisan/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
-                    <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:109px; top:95px; width:803px; height:953px;">
-                    <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
+                    <img class="ts-bg" src="assets/pages/blacksmith/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'blacksmith bg')">
+                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:100px; top:64px; width:803px; height:953px;">
+                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:1007px; top:64px; width:803px; height:953px;">
                     <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
-                        <img src="assets/compaign/returnbutton.png" alt="">
+                        <img src="assets/pages/blacksmith/returnbutton_q85.webp" alt="">
                     </div>
-                    <div id="blacksmith-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
+                    <!-- Left window: list of equipped gear -->
+                    <div id="blacksmith-panel-left" class="art-panel" style="left:194px; top:165px; width:614px; height:766px;">
                         <h2 class="page-title text-base font-bold text-amber-400 mb-3">Blacksmith: Refinement</h2>
                         <div id="refining-slots-container" class="flex flex-col gap-3"></div>
                     </div>
-                    <div id="blacksmith-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
-                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Refine Rules</h2>
-                        <ul class="flex flex-col gap-2 text-xs list-disc pl-5">
+                    <!-- Right window: refinery, gear slot, rune slot, buttons, rules -->
+                    <img class="art-frame" src="assets/pages/blacksmith/refinenary_q85.webp" alt="" style="left:1090px; top:150px; width:636px; height:360px;">
+                    <div id="blacksmith-gear-slot" class="ui" style="left:1373px; top:373px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#f5e6c4; font-size:11px; font-weight:700; text-shadow:0 1px 2px #000;"></div>
+                    <div id="blacksmith-rune-slot" class="ui" style="left:1374px; top:523px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat;"></div>
+                    <button id="bs-cancel" onclick="blacksmithCancel()" class="cursor-pointer" style="position:absolute; left:1161px; top:540px; width:136px; height:44px; font-size:11px; font-weight:700; line-height:1.2; color:#3b2412; background:#e9dcc0; border:2px solid #8b6a3e; border-radius:6px;">Cancel<br>Return item to bag</button>
+                    <button id="bs-refine" onclick="blacksmithRefineSelected()" class="cursor-pointer" style="position:absolute; left:1527px; top:540px; width:136px; height:44px; font-size:12px; font-weight:800; line-height:1.2; color:#1c1209; background:#d4a24c; border:2px solid #7a5520; border-radius:6px;">Refine</button>
+                    <div id="blacksmith-panel-right" class="art-panel" style="left:1104px; top:606px; width:595px; height:311px; overflow:auto;">
+                        <h3 class="text-sm font-bold text-amber-400 mb-2">Refine Rules</h3>
+                        <ul class="flex flex-col gap-1 text-xs list-disc pl-5">
                             <li>Each refine costs (current level + 1) × 100 Gold and 1 Refining Stone.</li>
                             <li>+0 to +3: refining always succeeds.</li>
                             <li>From +4 on, the success rate drops by 15% per level (minimum 10%).</li>
-                            <li>Failed refines consume the Gold and the Refining Stone.</li>
+                            <li>A failed refine drops the gear by 1 level (never below +0) and consumes the Gold and the Refining Stone.</li>
                             <li>Maximum refinement is +10.</li>
                             <li>Refining Stones: 100 Iron Scraps smelt into 1 Refining Stone.</li>
                         </ul>
