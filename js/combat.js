@@ -1045,6 +1045,8 @@ function runCombatTick() {
         const surgeBonus = player.runes.surgeReady ? runeN('surgeFocus') : 0;
         player.runes.surgeReady = false;
         const isCrit = (isFirstHitOfBattle && player.runes.alwaysCritFirst) || runeN('relentless') > 0 || riposteCrit || (Math.random() * 100 < derived.crit + surgeBonus);
+        playPlayerAttackAnim(isCrit);
+        targetEnemy.lastHitCrit = !!isCrit;
         if (isCrit) {
             pDmg = Math.floor(pDmg * (1.5 + (skillBonus('critDmgPct') + setStat('critDmgPct')) / 100));
             updateQuestProgress('crit', 1);

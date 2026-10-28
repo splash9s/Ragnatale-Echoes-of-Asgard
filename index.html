@@ -82,7 +82,7 @@
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
         #town-shadow { position: absolute; left: 855px; top: 690px; width: 197px; height: 79px; object-fit: contain; pointer-events: none; z-index: 1; }
-        #town-hero-wrap { position: absolute; left: 883px; top: 425px; width: 163px; height: 338px; pointer-events: none; z-index: 2; }
+        #town-hero-wrap { position: absolute; left: 883px; top: 425px; width: 163px; height: 338px; pointer-events: auto; cursor: pointer; z-index: 2; }
         #town-hero { position: absolute; left: 0; top: 0; width: 163px; height: 338px; image-rendering: pixelated; }
         .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
         .town-info > * { pointer-events: auto; }
@@ -167,12 +167,16 @@
         #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress.png'); }
         #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion.png'); }
         #combat-potion-btn.no-potion span { display: none; }
+        /* Damage numbers: white for normal, red for critical */
+        .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #fff; font-size: 26px; font-weight: 800; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
+        .combat-dmg.crit { color: #ff3b3b; font-size: 36px; }
+        @keyframes combatDmgUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -70px; } }
         .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
         #combat-elixir-btn span { display: none; }
         /* Keep HUD, enemy cards and buttons above the foreground layer */
-        #combat-stage .combat-box, #combat-stage button, #combat-stage .ui, #combat-hp-under, #monsters-lineup-container, #combat-rune-list { z-index: 4; }
+        #combat-stage .combat-box, #combat-stage button, #combat-stage .ui, #combat-hp-under, #combat-player-sprite, #monsters-lineup-container, #combat-rune-list { z-index: 4; }
         .combat-box.minimized { height: auto !important; }
         .combat-box.minimized > :not(:first-child) { display: none !important; }
         .combat-box { position: absolute; box-sizing: border-box; background-color: rgba(15, 23, 42, .92); border: 1px solid #1e293b; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
@@ -287,7 +291,7 @@
                 <img src="assets/page01/expeditionbutton.png" alt="" onerror="townSwap(this,'expeditionbutton.png')">
             </div>
                     <img id="town-shadow" alt="" src="assets/page01/shadow_clean.png">
-                    <div id="town-hero-wrap">
+                    <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
                         <img id="town-hero" alt="" src="assets/page01/cha_idle_0001.png">
                     </div>
                 </div>
@@ -740,7 +744,7 @@
                     <img src="assets/pages/character/shadow_clean.png" alt="" style="position:absolute; left:403px; top:839px; width:197px; height:79px; pointer-events:none;">
 
                     <!-- Character sprite (centre 488, 590) -->
-                    <img class="idle-anim" data-frames="assets/combat/chabattle/chabattle_idle_0001.png,assets/combat/chabattle/chabattle_idle_0002.png,assets/combat/chabattle/chabattle_idle_0003.png,assets/combat/chabattle/chabattle_idle_0004.png,assets/combat/chabattle/chabattle_idle_0005.png,assets/combat/chabattle/chabattle_idle_0006.png,assets/combat/chabattle/chabattle_idle_0007.png,assets/combat/chabattle/chabattle_idle_0008.png,assets/combat/chabattle/chabattle_idle_0009.png,assets/combat/chabattle/chabattle_idle_0010.png,assets/combat/chabattle/chabattle_idle_0011.png,assets/combat/chabattle/chabattle_idle_0012.png" src="assets/combat/chabattle/chabattle_idle_0001.png" alt="" style="position:absolute; left:464px; top:657px; width:103px; height:214px; image-rendering:pixelated; pointer-events:none;">
+                    <img id="combat-player-sprite" class="idle-anim" data-frames="assets/combat/chabattle/chabattle_idle_0001.png,assets/combat/chabattle/chabattle_idle_0002.png,assets/combat/chabattle/chabattle_idle_0003.png,assets/combat/chabattle/chabattle_idle_0004.png,assets/combat/chabattle/chabattle_idle_0005.png,assets/combat/chabattle/chabattle_idle_0006.png,assets/combat/chabattle/chabattle_idle_0007.png,assets/combat/chabattle/chabattle_idle_0008.png,assets/combat/chabattle/chabattle_idle_0009.png,assets/combat/chabattle/chabattle_idle_0010.png,assets/combat/chabattle/chabattle_idle_0011.png,assets/combat/chabattle/chabattle_idle_0012.png" src="assets/combat/chabattle/chabattle_idle_0001.png" alt="" style="position:absolute; left:464px; top:657px; width:103px; height:214px; image-rendering:pixelated; pointer-events:none;">
 
                     <!-- Player HP and armor, below the character -->
                     <div id="combat-hp-under" style="position:absolute; left:413px; top:896px; width:204px; display:flex; flex-direction:column; gap:4px;">

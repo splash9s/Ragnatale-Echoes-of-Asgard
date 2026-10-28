@@ -114,17 +114,74 @@ function startGameWithName() {
     updateUI();
 }
 
-// Combat idle animation: every img.idle-anim cycles through its data-frames list (all monsters use the slime for now)
+// Combat animation: idle frames loop; after a hit, the damage frames play once (4 frames)
+// One damage picture, shown for 480ms after a hit
+const COMBAT_SLIME_DAMAGE_FRAMES = ['assets/combat/slime/slime_dead_0002.png'];
+const COMBAT_DAMAGE_FRAME_MS = 480;
+// Death: slime_dead_0001 to 0006 play once (150ms each), then the monster disappears
+const COMBAT_SLIME_DEATH_FRAMES = Array.from({ length: 6 }, (_, i) => `assets/combat/slime/slime_dead_${String(i + 1).padStart(4, '0')}.png`);
+const COMBAT_DEATH_FRAME_MS = 150;
+const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FRAME_MS;
 const COMBAT_SLIME_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/slime/slime_${String(i + 1).padStart(4, '0')}.png`).join(',');
 const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
-let combatIdleTick = 0;
+// Floating damage number over a combat sprite (white normal, red critical)
+function showCombatNumber(selector, amount, crit) {
+    const view = document.getElementById('view-combat');
+    if (!view || view.classList.contains('hidden') || !(amount > 0)) return;
+    const anchor = document.querySelector(selector);
+    const stage = document.querySelector('#combat-stage .ts-inner');
+    if (!anchor || !stage) return;
+    const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
+    const b = anchor.getBoundingClientRect(), ib = stage.getBoundingClientRect();
+    const d = document.createElement('div');
+    d.className = 'combat-dmg' + (crit ? ' crit' : '');
+    d.textContent = Math.round(amount);
+    d.style.left = ((b.left + b.width / 2 - ib.left) / sc) + 'px';
+    d.style.top = ((b.top - ib.top) / sc) + 'px';
+    stage.appendChild(d);
+    setTimeout(() => d.remove(), 900);
+}
+
+// Player attack: the battle sprite plays the hit frames, or the uppercut frames on a critical hit, then returns to idle
+const COMBAT_PLAYER_HIT_FRAMES = ['assets/combat/player/hit_0001.png', 'assets/combat/player/hit_0002.png'];
+const COMBAT_PLAYER_CRI_FRAMES = ['assets/combat/player/cri_0001.png', 'assets/combat/player/cri_0002.png'];
+const COMBAT_PLAYER_ATTACK_FRAME_MS = 150;
+let combatPlayerAttack = { at: 0, crit: false };
+function playPlayerAttackAnim(isCrit) {
+    combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
+}
 setInterval(() => {
-    combatIdleTick++;
+    const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
+        if (img.id === 'combat-player-sprite') {
+            const frames = combatPlayerAttack.crit ? COMBAT_PLAYER_CRI_FRAMES : COMBAT_PLAYER_HIT_FRAMES;
+            const e = now - combatPlayerAttack.at;
+            if (combatPlayerAttack.at && e >= 0 && e < frames.length * COMBAT_PLAYER_ATTACK_FRAME_MS) {
+                img.src = frames[Math.floor(e / COMBAT_PLAYER_ATTACK_FRAME_MS)];
+                img.style.left = '415px'; // 200px attack canvas, centred on the idle sprite
+                img.style.width = '200px';
+                return;
+            }
+            img.style.left = '464px';
+            img.style.width = '103px';
+        }
+        const deathAt = Number(img.dataset.deathAt) || 0;
+        if (deathAt) {
+            const e = now - deathAt;
+            if (e < COMBAT_DEATH_TOTAL_MS) img.src = COMBAT_SLIME_DEATH_FRAMES[Math.floor(e / COMBAT_DEATH_FRAME_MS)];
+            else if (img.parentElement) img.parentElement.style.display = 'none';
+            return;
+        }
+        const hitAt = Number(img.dataset.hitAt) || 0;
+        const elapsed = now - hitAt;
+        if (hitAt && elapsed >= 0 && elapsed < COMBAT_SLIME_DAMAGE_FRAMES.length * COMBAT_DAMAGE_FRAME_MS) {
+            img.src = COMBAT_SLIME_DAMAGE_FRAMES[Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS)];
+            return;
+        }
         const frames = img.dataset.frames.split(',');
-        img.src = frames[combatIdleTick % frames.length];
+        img.src = frames[Math.floor(now / 250) % frames.length]; // idle: one frame every 250ms
     });
-}, 250);
+}, 60);
 
 // Combat page copy of the main page character info: mirror its values (IDs end in -c)
 function syncCombatInfo() {
@@ -1733,6 +1790,11 @@ function updateUI() {
 
     el = document.getElementById('player-hp-text');
     if (el) el.innerText = `${player.hp} / ${derived.maxHp} HP`;
+    if (player._prevHpNum !== undefined && player.hp < player._prevHpNum) {
+        const playerDmg = player._prevHpNum - player.hp;
+        setTimeout(() => showCombatNumber('#combat-player-sprite', playerDmg, false), 0);
+    }
+    player._prevHpNum = player.hp;
     const armorNow = Math.max(0, player.armor || 0);
     el = document.getElementById('player-armor-text');
     if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
@@ -1803,6 +1865,18 @@ function updateUI() {
         lineupContainer.innerHTML = '';
         let targetIdx = monstersList.findIndex(m => m.hp > 0);
         monstersList.forEach((m, idx) => {
+            if (m._prevHp !== undefined && m.hp < m._prevHp) {
+                m._hitAt = Date.now();
+                const dmgNum = m._prevHp - m.hp, dmgCrit = !!m.lastHitCrit;
+                m.lastHitCrit = false;
+                setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
+                if (m.hp <= 0) {
+                    m._deathAt = Date.now();
+                    if (typeof playSound === 'function') playSound('sound/slime_dead.mp3');
+                }
+            }
+            const goneAt = m._deathAt ? Date.now() - m._deathAt >= COMBAT_DEATH_TOTAL_MS : false;
+            m._prevHp = m.hp;
             let isDead = m.hp <= 0;
             let isTarget = !isDead && idx === targetIdx;
             let borderColor = isDead ? 'border-slate-800 bg-slate-950/40 opacity-50' : (isTarget ? 'border-amber-500 bg-slate-900/90 shadow-md' : 'border-slate-800 bg-slate-950/40 opacity-70');
@@ -1811,8 +1885,8 @@ function updateUI() {
 
             // Card: sprite on top, then the name and HP box below it (no role or element)
             lineupContainer.innerHTML += `
-                <div class="flex flex-col items-center gap-1">
-                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none; ${isDead ? 'opacity:.3;' : ''}">
+                <div class="flex flex-col items-center gap-1"${goneAt ? ' style="display:none"' : ''}>
+                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
