@@ -1188,7 +1188,7 @@ function onStageCleared() {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
                 showModal("Event Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
-                playSound('mvp.wav');
+                playSound('sound/mvp.wav');
                 updateUI();
                 saveGame();
                 return;
@@ -1211,7 +1211,7 @@ function onStageCleared() {
                 addItemToInventory(reward);
 
                 showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
-                playSound('mvp.wav');
+                playSound('sound/mvp.wav');
                 return;
             }
 
@@ -1220,7 +1220,7 @@ function onStageCleared() {
                 getEventState().dailyCleared = true;
                 updateUI();
                 saveGame();
-                playSound('mvp.wav');
+                playSound('sound/mvp.wav');
                 openChest('gold');
                 switchView('town');
                 return;
