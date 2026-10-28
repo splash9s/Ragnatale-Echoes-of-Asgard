@@ -16,9 +16,9 @@ const GOLD_SHOP_CONSUMABLES = [
     { id: 'potion_minor', name: "Minor Healing Potion", price: 50, type: 'potion', heal: 100, desc: "Restores 100 HP" },
     { id: 'potion_med', name: "Medium Healing Potion", price: 250, type: 'potion', heal: 250, desc: "Restores 250 HP" },
     { id: 'potion_large', name: "Large Healing Potion", price: 600, type: 'potion', heal: 500, desc: "Restores 500 HP" },
-    { id: 'gchest_copper', name: "Copper Chest", price: 1000, type: 'chest', chestType: 'copper', desc: "" },
-    { id: 'gchest_silver', name: "Silver Chest", price: 4000, type: 'chest', chestType: 'silver', desc: "" },
-    { id: 'gchest_gold', name: "Gold Chest", price: 8000, type: 'chest', chestType: 'gold', desc: "" }
+    { id: 'gchest_copper', name: "Copper Chest", price: 2500, type: 'chest', chestType: 'copper', desc: "" },
+    { id: 'gchest_silver', name: "Silver Chest", price: 10000, type: 'chest', chestType: 'silver', desc: "" },
+    { id: 'gchest_gold', name: "Gold Chest", price: 20000, type: 'chest', chestType: 'gold', desc: "" }
 ];
 
 const DIAMOND_SHOP_ITEMS = [
