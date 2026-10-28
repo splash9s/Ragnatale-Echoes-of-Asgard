@@ -43,6 +43,7 @@
         setting:    () => switchView('setting'),
         character:  () => switchView('character'),
         artisan:    () => switchView('forge'),
+        blacksmith: () => switchView('blacksmith'),
         expedition: () => switchView('expeditions'),
     };
 

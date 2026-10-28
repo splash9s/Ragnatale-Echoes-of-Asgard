@@ -10,7 +10,6 @@ function avatarMarkup(av, cls) {
 }
 let selectedAvatarChoice = "assets/avatars/slime.png";
 let currentLanguage = 'en';
-let currentForgeSubTab = 'gold';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
 const GOLD_SHOP_CONSUMABLES = [
@@ -268,16 +267,16 @@ function closeModal() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-forge', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-forge', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills', 'combat'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'blacksmith', 'character', 'skills', 'combat'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'character', 'skills', 'combat'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'forge', 'blacksmith', 'character', 'skills', 'combat'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -302,7 +301,11 @@ function switchView(viewName) {
     }
     if (viewName === 'forge') {
         document.getElementById('view-forge')?.classList.remove('hidden');
-        switchForgeSubTab(currentForgeSubTab);
+        renderShop();
+    }
+    if (viewName === 'blacksmith') {
+        document.getElementById('view-blacksmith')?.classList.remove('hidden');
+        renderRefiningUI();
     }
     if (viewName === 'diamond') {
         document.getElementById('view-diamond')?.classList.remove('hidden');
@@ -317,24 +320,6 @@ function switchView(viewName) {
 
     updateUI();
     saveGame();
-}
-
-function switchForgeSubTab(tabName) {
-    if (tabName !== 'gold' && tabName !== 'refine') tabName = 'gold';
-    currentForgeSubTab = tabName;
-    const goldSection = document.getElementById('forge-gold-section');
-    const refineSection = document.getElementById('forge-refine-section');
-    const btnGold = document.getElementById('forge-tab-btn-gold');
-    const btnRefine = document.getElementById('forge-tab-btn-refine');
-    const active = "px-3 py-1.5 bg-amber-600 text-slate-950 rounded text-xs font-bold transition cursor-pointer";
-    const inactive = "px-3 py-1.5 bg-slate-900 text-slate-400 rounded text-xs font-bold hover:bg-slate-800 transition cursor-pointer";
-    if (goldSection) goldSection.classList.toggle('hidden', tabName !== 'gold');
-    if (refineSection) refineSection.classList.toggle('hidden', tabName !== 'refine');
-    if (btnGold) btnGold.className = tabName === 'gold' ? active : inactive;
-    if (btnRefine) btnRefine.className = tabName === 'refine' ? active : inactive;
-    // Armory (right window) is always visible; consumables and refining fill their left-window tab.
-    renderShop();
-    if (tabName === 'refine') renderRefiningUI();
 }
 
 function getMapPrereqTitle(mapKey) {
