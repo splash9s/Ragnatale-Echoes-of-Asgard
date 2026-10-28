@@ -610,13 +610,22 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/artisan/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
                     <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:109px; top:95px; width:803px; height:953px;">
-                    <img class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
+                    <img id="shop-frame-right" class="art-frame" src="assets/pages/artisan/window.png" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
                     <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
                         <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
                     <div id="shop-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
-                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Shop</h2>
-                        <div id="shop-gold-section" class="flex flex-col gap-3">
+                        <div class="flex gap-2 mb-4">
+                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Diamond Cash Shop</button>
+                            <button id="shop-tab-btn-shop" onclick="switchShopTab('shop')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Shop</button>
+                        </div>
+                        <div id="shop-diamond-section" class="flex flex-col gap-3">
+                            <div class="flex justify-end">
+                                <span class="text-xs font-bold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-500/40">💎 Balance: <strong id="diamond-shop-balance">1000</strong></span>
+                            </div>
+                            <div id="diamond-shop-items-container" class="flex flex-col gap-3"></div>
+                        </div>
+                        <div id="shop-gold-section" class="hidden flex flex-col gap-3">
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
                         </div>
                     </div>
@@ -655,30 +664,6 @@
                             <li>Refining Stones: 100 Iron Scraps smelt into 1 Refining Stone.</li>
                         </ul>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: DIAMOND SHOP -->
-        <div id="view-diamond" class="hidden art-screen art-dark">
-            <div id="diamond-stage" class="town-stage" data-w="1920" data-h="1080">
-                <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/diamond/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'diamond bg')">
-                    <img class="art-frame" src="assets/pages/frame/c.png" alt="" style="left:614px; top:78px; width:803px; height:953px;">
-                    <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
-                        <img src="assets/compaign/returnbutton.png" alt="">
-                    </div>
-                    <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
-                <div>
-                    <h2 class="page-title text-base font-bold text-purple-400">Diamond Cash Shop</h2>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-xs font-bold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-500/40">💎 Balance: <strong id="diamond-shop-balance">1000</strong></span>
-                </div>
-            </div>
-            <div id="diamond-shop-items-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-        </div>
                 </div>
             </div>
         </div>

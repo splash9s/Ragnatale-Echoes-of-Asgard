@@ -267,6 +267,11 @@ function closeModal() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
+    // The Diamond Cash Shop is a tab on the Shop page now
+    if (viewName === 'diamond') {
+        currentShopTab = 'diamond';
+        viewName = 'shop';
+    }
     let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat'];
     views.forEach(id => {
         let el = document.getElementById(id);
@@ -302,15 +307,11 @@ function switchView(viewName) {
     }
     if (viewName === 'shop') {
         document.getElementById('view-shop')?.classList.remove('hidden');
-        renderShop();
+        switchShopTab(currentShopTab);
     }
     if (viewName === 'blacksmith') {
         document.getElementById('view-blacksmith')?.classList.remove('hidden');
         renderRefiningUI();
-    }
-    if (viewName === 'diamond') {
-        document.getElementById('view-diamond')?.classList.remove('hidden');
-        renderDiamondShop();
     }
     if (viewName === 'quests') {
         document.getElementById('view-quests')?.classList.remove('hidden');
@@ -489,6 +490,27 @@ function dailyFreeCardHTML(key, buttonClass) {
             <button onclick="claimDailyFree('${key}')" ${claimed ? 'disabled' : ''} class="px-3 py-1.5 ${buttonClass} font-bold rounded-lg cursor-pointer text-xs transition disabled:opacity-50">${claimed ? 'Claimed today' : 'Claim'}</button>
         </div>
     `;
+}
+
+// ---------- SHOP PAGE TABS (Diamond Cash Shop default, Shop second) ----------
+let currentShopTab = 'diamond';
+
+function switchShopTab(tabName) {
+    if (tabName !== 'diamond' && tabName !== 'shop') tabName = 'diamond';
+    currentShopTab = tabName;
+    const isDiamond = tabName === 'diamond';
+    document.getElementById('shop-diamond-section')?.classList.toggle('hidden', !isDiamond);
+    document.getElementById('shop-gold-section')?.classList.toggle('hidden', isDiamond);
+    // The Diamond tab uses only the left window
+    document.getElementById('shop-panel-right')?.classList.toggle('hidden', isDiamond);
+    document.getElementById('shop-frame-right')?.classList.toggle('hidden', isDiamond);
+    const base = 'background-color: rgba(214, 190, 140, .5); color: #2a1a0e;';
+    const active = 'border: 2px solid #c9a227';
+    const inactive = 'border: 1px solid #b8945a';
+    document.getElementById('shop-tab-btn-diamond')?.setAttribute('style', `${base} ${isDiamond ? active : inactive}`);
+    document.getElementById('shop-tab-btn-shop')?.setAttribute('style', `${base} ${!isDiamond ? active : inactive}`);
+    if (isDiamond) renderDiamondShop();
+    else renderShop();
 }
 
 // ---------- EVENTS PAGE TABS ----------
