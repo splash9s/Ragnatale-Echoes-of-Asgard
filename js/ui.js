@@ -300,7 +300,14 @@ const COMBAT_ART = {
         bg: ['assets/combat/fire/firebg1_q85.jpg'],
         base: ['assets/combat/fire/firebase1_q85.webp', 'assets/combat/fire/firebase2_q85.webp', 'assets/combat/fire/firebase3_q85.webp', 'assets/combat/fire/firebase4_q85.webp'],
         fg: 'assets/combat/fire/firefg2_q85.webp',
-        layouts: {} // positions not set yet: the default layout is used
+        layouts: {
+            firebase1: {
+                player: { x: 444, y: 833, left: 392.5, top: 619 },
+                hud: { left: 342, top: 844 }, // HP and armor below the character
+                monsters: [[662, 793], [860, 781], [1032, 781], [1247, 781], [1437, 744], [1611, 759]]
+            }
+            // firebase2-4: default layout until positions are given
+        }
     }
 };
 // Each stage picks a new background, base layer and foreground (instant swap, no fade)
