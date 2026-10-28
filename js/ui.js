@@ -325,7 +325,7 @@ const COMBAT_ART = {
     }
 };
 // Each stage picks a new background, base layer and foreground.
-// New images are loaded and decoded first, then everything fades out, swaps at once and fades back in.
+// New images are loaded and decoded first, then all of them swap in the same step (no fade).
 let earthLayerToken = 0;
 function preloadCombatImage(src) {
     const img = new Image();
@@ -337,16 +337,12 @@ async function changeEarthLayers() {
     if (!bg || !base || !fg) return;
     const token = ++earthLayerToken;
     const hud = document.getElementById('combat-hp-under');
-    const group = [bg, base, fg, document.getElementById('monsters-lineup-container'), document.getElementById('combat-player-sprite'), hud].filter(Boolean);
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
     const art = COMBAT_ART[artKey];
     const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = art.fg;
     await Promise.all([nextBg, nextBase, nextFg].map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
-    const fade = (el, from, to, ms) => el.animate([{ opacity: from }, { opacity: to }], { duration: ms, fill: 'forwards' }).finished.catch(() => {});
-    await Promise.all(group.map(el => fade(el, 1, 0, 150)));
-    if (token !== earthLayerToken) return;
     bg.src = nextBg;
     base.src = nextBase;
     fg.src = nextFg;
@@ -359,7 +355,6 @@ async function changeEarthLayers() {
         hud.style.left = h.left + 'px';
         hud.style.top = h.top + 'px';
     }
-    await Promise.all(group.map(el => fade(el, 0, 1, 150)));
 }
 
 function switchView(viewName) {
