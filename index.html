@@ -205,6 +205,17 @@
 
 
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+    <!-- LOADING SCREEN: shown while images and sounds are preloaded (see js/loader.js) -->
+    <div id="loading-screen" style="position:fixed; inset:0; z-index:200; background:#050a14; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#e2e8f0; font-family:sans-serif; transition:opacity .4s;">
+        <div style="font-size:30px; font-weight:800; color:#c9a227; letter-spacing:3px;">RAGNATALE</div>
+        <div style="font-size:12px; color:#94a3b8; letter-spacing:1px;">Echoes of Asgard</div>
+        <div style="width:min(420px,80vw); height:14px; background:#0f172a; border:1px solid #334155; border-radius:999px; overflow:hidden; margin-top:12px;">
+            <div id="loading-bar-fill" style="height:100%; width:0%; background:linear-gradient(90deg,#b45309,#fbbf24); transition:width .15s;"></div>
+        </div>
+        <div id="loading-percent" style="font-size:12px; font-family:monospace; color:#fbbf24;">0%</div>
+        <div id="loading-text" style="font-size:12px; color:#cbd5e1; min-height:16px; max-width:80vw; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Starting...</div>
+    </div>
+
 
     <!-- TOP HEADER / HUD -->
     <header id="app-header" class="hidden bg-slate-950/80 border-b border-slate-800/80 backdrop-blur sticky top-0 z-40 px-4 py-2 flex justify-end items-center gap-3">
@@ -809,6 +820,7 @@
     <script src="js/combat.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/town.js"></script>
+    <script src="js/loader.js"></script>
     <audio id="game-bgm" src="sound/bgm.wav" loop preload="auto"></audio>
 
 <script>
@@ -849,7 +861,8 @@
         document.addEventListener('keydown', onInteraction);
     }
 
-    window.onload = function() {
+    // Called by js/loader.js once the loading screen has finished preloading
+    function startGame() {
         initBgm();
         renderAvatarSelection();
         if (loadGame()) {
@@ -861,21 +874,7 @@
             updateUI();
             logMessage("[System] Game loaded successfully!", "winlose");
         }
-    };
+    }
 </script>
-    <script>
-        window.onload = function() {
-            renderAvatarSelection();
-            if (loadGame()) {
-                let nameSelectModal = document.getElementById('view-name-select');
-                if (nameSelectModal) {
-                    nameSelectModal.classList.add('hidden');
-                    nameSelectModal.style.display = 'none';
-                }
-                updateUI();
-                logMessage("[System] Game loaded successfully!", "winlose");
-            }
-        };
-    </script>
 </body>
 </html>
