@@ -680,6 +680,7 @@ function ensureDailyQuestsToday() {
     player.dailyQuestsDate = today;
     (player.dailyQuests || []).forEach(q => { q.current = 0; q.completed = false; });
     player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
+    if (document.getElementById('quests-container')) renderQuestsView(); // redraw so milestones show reset
 }
 
 function refreshShopAndAlerts() {
