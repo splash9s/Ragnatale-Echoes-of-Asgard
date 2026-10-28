@@ -324,26 +324,42 @@ const COMBAT_ART = {
         }
     }
 };
-// Each stage picks a new background, base layer and foreground (instant swap, no fade)
-function changeEarthLayers() {
+// Each stage picks a new background, base layer and foreground.
+// New images are loaded and decoded first, then everything fades out, swaps at once and fades back in.
+let earthLayerToken = 0;
+function preloadCombatImage(src) {
+    const img = new Image();
+    img.src = src;
+    return img.decode ? img.decode().catch(() => {}) : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+}
+async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) return;
+    const token = ++earthLayerToken;
+    const hud = document.getElementById('combat-hp-under');
+    const group = [bg, base, fg, document.getElementById('monsters-lineup-container'), document.getElementById('combat-player-sprite'), hud].filter(Boolean);
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
     const art = COMBAT_ART[artKey];
-    bg.src = pick(art.bg);
-    base.src = pick(art.base);
-    fg.src = art.fg;
-    const layoutKey = Object.keys(art.layouts).find(k => base.src.includes(k));
+    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = art.fg;
+    await Promise.all([nextBg, nextBase, nextFg].map(preloadCombatImage));
+    if (token !== earthLayerToken) return; // a newer stage has started
+    const fade = (el, from, to, ms) => el.animate([{ opacity: from }, { opacity: to }], { duration: ms, fill: 'forwards' }).finished.catch(() => {});
+    await Promise.all(group.map(el => fade(el, 1, 0, 150)));
+    if (token !== earthLayerToken) return;
+    bg.src = nextBg;
+    base.src = nextBase;
+    fg.src = nextFg;
+    const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatEarthMonsterPos = layout ? layout.monsters : null;
-    const hud = document.getElementById('combat-hp-under');
     if (hud) {
         const h = layout && layout.hud ? layout.hud : { left: 413, top: 896 };
         hud.style.left = h.left + 'px';
         hud.style.top = h.top + 'px';
     }
+    await Promise.all(group.map(el => fade(el, 0, 1, 150)));
 }
 
 function switchView(viewName) {
