@@ -480,8 +480,18 @@ function claimDailyFree(key) {
 
 function dailyFreeCardHTML(key) {
     const item = DAILY_FREE_ITEMS[key];
-    // Once claimed for the day the card is hidden; until then it shows in red
-    if (isDailyFreeClaimed(key)) return '';
+    // Unclaimed: red card with a Claim button. Claimed today: grey card, button disabled.
+    if (isDailyFreeClaimed(key)) {
+        return `
+        <div class="free-reward-claimed p-3 rounded border flex justify-between items-center">
+            <div>
+                <span class="font-bold block text-xs">${item.name}</span>
+                <span class="text-[10px]">${item.desc}</span>
+            </div>
+            <button disabled class="px-3 py-1.5 font-bold rounded-lg text-xs">Claimed today</button>
+        </div>
+    `;
+    }
     return `
         <div class="free-reward-card p-3 rounded border flex justify-between items-center">
             <div>
