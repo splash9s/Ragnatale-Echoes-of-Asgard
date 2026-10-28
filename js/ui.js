@@ -146,6 +146,7 @@ function showCombatNumber(selector, amount, crit) {
 const COMBAT_PLAYER_HIT_FRAMES = ['assets/combat/player/hit_0001.png', 'assets/combat/player/hit_0002.png'];
 const COMBAT_PLAYER_CRI_FRAMES = ['assets/combat/player/cri_0001.png', 'assets/combat/player/cri_0002.png'];
 const COMBAT_PLAYER_ATTACK_FRAME_MS = 150;
+const COMBAT_PLAYER_HIT_SIZES = [[130, 187], [120, 231]]; // width, height of each hit frame
 let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
@@ -157,13 +158,27 @@ setInterval(() => {
             const frames = combatPlayerAttack.crit ? COMBAT_PLAYER_CRI_FRAMES : COMBAT_PLAYER_HIT_FRAMES;
             const e = now - combatPlayerAttack.at;
             if (combatPlayerAttack.at && e >= 0 && e < frames.length * COMBAT_PLAYER_ATTACK_FRAME_MS) {
-                img.src = frames[Math.floor(e / COMBAT_PLAYER_ATTACK_FRAME_MS)];
-                img.style.left = '415px'; // 200px attack canvas, centred on the idle sprite
-                img.style.width = '200px';
+                const idx = Math.floor(e / COMBAT_PLAYER_ATTACK_FRAME_MS);
+                img.src = frames[idx];
+                if (combatPlayerAttack.crit) {
+                    img.style.left = '415px'; // 200px attack canvas, centred on the idle sprite
+                    img.style.top = '657px';
+                    img.style.width = '200px';
+                    img.style.height = '214px';
+                } else {
+                    // Hit frames keep their own size, bottom-centred on the idle sprite
+                    const [w, h] = COMBAT_PLAYER_HIT_SIZES[idx];
+                    img.style.left = (515.5 - w / 2) + 'px';
+                    img.style.top = (871 - h) + 'px';
+                    img.style.width = w + 'px';
+                    img.style.height = h + 'px';
+                }
                 return;
             }
             img.style.left = '464px';
+            img.style.top = '657px';
             img.style.width = '103px';
+            img.style.height = '214px';
         }
         const deathAt = Number(img.dataset.deathAt) || 0;
         if (deathAt) {
