@@ -168,6 +168,7 @@ const EARTH_LAYOUTS = {
     },
     earthbase3: {
         player: { x: 616, y: 907, left: 564.5, top: 693 },
+        hud: { left: 514, top: 918 }, // HP and armor below the character
         monsters: [[804, 800], [950, 781], [1095, 781], [1248, 781], [1384, 781], [1575, 745]]
     }
 };
@@ -293,7 +294,9 @@ const EARTH_FG_LAYER = 'assets/combat/earthfg1.png';
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) return;
-    const layers = [bg, base, fg];
+    const hud = document.getElementById('combat-hp-under');
+    // Layers, monsters, player and HP block fade together so positions never show before the new layout
+    const layers = [bg, base, fg, document.getElementById('monsters-lineup-container'), document.getElementById('combat-player-sprite'), hud].filter(Boolean);
     const fade = (el, from, to) => el.animate([{ opacity: from }, { opacity: to }], { duration: 300, fill: 'forwards' }).finished.catch(() => {});
     await Promise.all(layers.map(el => fade(el, 1, 0)));
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -304,6 +307,11 @@ async function changeEarthLayers() {
     const layout = layoutKey ? EARTH_LAYOUTS[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatEarthMonsterPos = layout ? layout.monsters : null;
+    if (hud) {
+        const h = layout && layout.hud ? layout.hud : { left: 413, top: 896 };
+        hud.style.left = h.left + 'px';
+        hud.style.top = h.top + 'px';
+    }
     await Promise.all(layers.map(el => fade(el, 0, 1)));
 }
 
