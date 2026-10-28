@@ -1235,6 +1235,7 @@ function onStageCleared() {
             }
 
             combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (getDerivedStats().aspd * 10)));
+            changeEarthLayers();
             spawnStageMonsters();
         };
 

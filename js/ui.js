@@ -289,16 +289,22 @@ function closeModal() {
 const EARTH_BG_LAYERS = ['assets/combat/earthbg1.png', 'assets/combat/earthbg2_q85.jpg'];
 const EARTH_BASE_LAYERS = ['assets/combat/earthbase1.png', 'assets/combat/earthbase2_q85.webp', 'assets/combat/earthbase3_q85.webp'];
 const EARTH_FG_LAYER = 'assets/combat/earthfg1.png';
-function randomizeEarthLayers() {
-    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+// Each stage picks a new background, base layer and foreground, with a fade out and in
+async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
-    if (bg) bg.src = pick(EARTH_BG_LAYERS);
-    if (base) base.src = pick(EARTH_BASE_LAYERS);
-    if (fg) fg.src = EARTH_FG_LAYER;
-    const layoutKey = base ? Object.keys(EARTH_LAYOUTS).find(k => base.src.includes(k)) : null;
-    const layout = bg && layoutKey ? EARTH_LAYOUTS[layoutKey] : null;
+    if (!bg || !base || !fg) return;
+    const layers = [bg, base, fg];
+    const fade = (el, from, to) => el.animate([{ opacity: from }, { opacity: to }], { duration: 300, fill: 'forwards' }).finished.catch(() => {});
+    await Promise.all(layers.map(el => fade(el, 1, 0)));
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    bg.src = pick(EARTH_BG_LAYERS);
+    base.src = pick(EARTH_BASE_LAYERS);
+    fg.src = EARTH_FG_LAYER;
+    const layoutKey = Object.keys(EARTH_LAYOUTS).find(k => base.src.includes(k));
+    const layout = layoutKey ? EARTH_LAYOUTS[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatEarthMonsterPos = layout ? layout.monsters : null;
+    await Promise.all(layers.map(el => fade(el, 0, 1)));
 }
 
 function switchView(viewName) {
@@ -353,7 +359,7 @@ function switchView(viewName) {
         document.getElementById('view-quests')?.classList.remove('hidden');
         renderMailBox();
     }
-    if (viewName === 'combat') { document.getElementById('view-combat')?.classList.remove('hidden'); randomizeEarthLayers(); }
+    if (viewName === 'combat') { document.getElementById('view-combat')?.classList.remove('hidden'); changeEarthLayers(); }
 
     updateUI();
     saveGame();
