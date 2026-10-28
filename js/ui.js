@@ -159,7 +159,9 @@ function playPlayerAttackAnim(isCrit) {
 }
 // Player and monster positions for the current earth layout (default: the original layout)
 let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = feet centre, left/top = idle sprite
-let combatEarthMonsterPos = null; // per-monster [left, top] for the current layout, or null for the default
+let combatEarthMonsterPos = null; // per-position [left, top] for the current layout, or null for the default
+// Default lineup position for each of the 6 slots (same as the CSS nth-child rules)
+const LINEUP_DEFAULT_POS = [[914, 784], [1065, 784], [1218, 769], [1358, 721], [1507, 671], [1658, 659]];
 // Positions per earth base layer (keyed by the base file name)
 const EARTH_LAYOUTS = {
     earthbase2: {
@@ -334,8 +336,9 @@ function preloadCombatImage(src) {
 }
 // Move the monster cards already on screen to the current layout (no waiting for the next redraw)
 function applyCombatEarthPositions() {
-    document.querySelectorAll('#monsters-lineup-container > div').forEach((card, i) => {
-        const p = combatEarthMonsterPos && combatEarthMonsterPos[i];
+    document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
+        const pos = Number(card.dataset.pos);
+        const p = (combatEarthMonsterPos && combatEarthMonsterPos[pos]) || (card.dataset.slot === '' ? null : LINEUP_DEFAULT_POS[pos]);
         card.style.left = p ? p[0] + 'px' : '';
         card.style.top = p ? p[1] + 'px' : '';
     });
@@ -2226,13 +2229,14 @@ function updateUI() {
             let tag = isDead ? '<span class="text-[10px] text-slate-400">(Defeated)</span>' : (isTarget ? '<span class="text-[10px] text-amber-400">(Target)</span>' : '');
 
             // Card: sprite on top, then the name and HP box below it (no role or element)
+            // Position: a fixed lineup slot (boss stages) or the monster's place in the list
+            const hasSlot = typeof m.lineupSlot === 'number';
+            const posIdx = hasSlot ? m.lineupSlot : idx;
+            const p = (combatEarthMonsterPos && combatEarthMonsterPos[posIdx]) || (hasSlot ? LINEUP_DEFAULT_POS[posIdx] : null);
             let cardStyle = goneAt ? 'display:none' : '';
-            if (combatEarthMonsterPos && combatEarthMonsterPos[idx]) {
-                const [cl, ct] = combatEarthMonsterPos[idx];
-                cardStyle += `${cardStyle ? '; ' : ''}left:${cl}px; top:${ct}px`;
-            }
+            if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
-                <div class="flex flex-col items-center gap-1"${cardStyle ? ` style="${cardStyle}"` : ''}>
+                <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
                     <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
