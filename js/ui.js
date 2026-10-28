@@ -355,7 +355,7 @@ const COMBAT_ART = {
     // Ice map (water path): no foreground
     water: {
         bg: ['assets/combat/ice/icebg1_q85.jpg', 'assets/combat/ice/icebg2_q85.jpg', 'assets/combat/ice/icebg3_q85.jpg'],
-        base: ['assets/combat/ice/icebase1_q85.webp', 'assets/combat/ice/icebase2_q85.webp', 'assets/combat/ice/icebase3_q85.webp'],
+        base: ['assets/combat/ice/icebase1_q85.webp', 'assets/combat/ice/icebase2_q85.webp', 'assets/combat/ice/icebase3_q85.webp', 'assets/combat/ice/icebase4_q85.webp'],
         fg: null,
         layouts: {
             icebase1: {
@@ -372,6 +372,11 @@ const COMBAT_ART = {
                 player: { x: 538, y: 914, left: 487, top: 700 },
                 hud: { left: 436, top: 925 },
                 monsters: [[814, 892], [991, 892], [1143, 855], [1315, 795], [1491, 819], [1665, 708]]
+            },
+            icebase4: {
+                player: { x: 396, y: 926, left: 345, top: 712 },
+                hud: { left: 294, top: 937 },
+                monsters: [[675, 902], [852, 902], [1004, 867], [1180, 874], [1355, 792], [1563, 735]]
             }
         }
     },
