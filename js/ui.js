@@ -670,25 +670,31 @@ function renderRefiningUI() {
 
 function refineEquipment(slot) {
     let gear = player.equipped[slot];
-    if (!gear || gear.refineLevel >= 10) return;
+    if (!gear) return;
+    // Gear without a valid level counts as +0; the level is never below +0
+    gear.refineLevel = Math.max(0, Math.floor(Number(gear.refineLevel) || 0));
+    if (gear.refineLevel >= 10) return;
 
-    let costGold = (gear.refineLevel + 1) * 100;
+    let current = gear.refineLevel;
+    let costGold = (current + 1) * 100;
     if (player.gold < costGold || (player.refiningStones || 0) < 1) {
         alert(`Refining needs ${costGold} Gold and 1 Refining Stone.`);
         return;
     }
 
     player.gold -= costGold;
-    player.refiningStones -= 1;
+    player.refiningStones = Math.max(0, (player.refiningStones || 0) - 1);
 
-    let successRate = gear.refineLevel >= 4 ? Math.max(10, 100 - ((gear.refineLevel - 3) * 15)) : 100;
+    let successRate = current >= 4 ? Math.max(10, 100 - ((current - 3) * 15)) : 100;
     if (Math.random() * 100 <= successRate) {
-        gear.refineLevel++;
+        gear.refineLevel = current + 1;
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
         showModal("Refinement Successful!", `Your ${gear.name} was upgraded to +${gear.refineLevel}!`);
     } else {
+        // Failure keeps the current level; only the gold and stone are lost
+        gear.refineLevel = current;
         logMessage(`[Refine Failed] Upgrade failed. Materials consumed.`, 'combat');
-        showModal("Refinement Failed", `The upgrade process failed.`);
+        showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} stays at +${current}.`);
     }
 
     updateUI();
