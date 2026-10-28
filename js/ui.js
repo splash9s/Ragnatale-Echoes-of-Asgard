@@ -324,6 +324,56 @@ const COMBAT_ART = {
                 monsters: [[563, 799], [771, 799], [1000, 783], [1186, 765], [1373, 741], [1560, 728]]
             }
         }
+    },
+    wind: {
+        bg: ['assets/combat/wind/windbg1_q85.jpg'],
+        base: ['assets/combat/wind/windbase1_q85.webp', 'assets/combat/wind/windbase2_q85.webp', 'assets/combat/wind/windbase3_q85.webp', 'assets/combat/wind/windbase4_q85.webp'],
+        fg: ['assets/combat/wind/windfg1_q85.webp', null], // foreground is random on or off
+        layouts: {
+            windbase1: {
+                player: { x: 493, y: 769, left: 442, top: 555 },
+                hud: { left: 391, top: 780 },
+                monsters: [[771, 744], [947, 708], [1101, 654], [1276, 671], [1452, 636], [1632, 635]]
+            },
+            windbase2: {
+                player: { x: 348, y: 776, left: 297, top: 562 },
+                hud: { left: 246, top: 787 },
+                monsters: [[623, 749], [836, 757], [1049, 749], [1297, 749], [1552, 749], [1727, 749]]
+            },
+            windbase3: {
+                player: { x: 468, y: 699, left: 417, top: 485 },
+                hud: { left: 366, top: 710 },
+                monsters: [[747, 708], [1026, 780], [1222, 744], [1398, 738], [1624, 738], [804, 956]]
+            },
+            windbase4: {
+                player: { x: 287, y: 819, left: 236, top: 605 },
+                hud: { left: 185, top: 830 },
+                monsters: [[556, 772], [759, 756], [962, 765], [1180, 831], [1422, 802], [1666, 765]]
+            }
+        }
+    },
+    // World Ender (final map)
+    final: {
+        bg: ['assets/combat/yggdrasil/yggbg1_q85.jpg'],
+        base: ['assets/combat/yggdrasil/yggbase1_q85.webp', 'assets/combat/yggdrasil/yggbase2_q85.webp', 'assets/combat/yggdrasil/yggbase3_q85.webp'],
+        fg: ['assets/combat/yggdrasil/fg1_q85.webp', 'assets/combat/yggdrasil/fg2_q85.webp', null], // foreground: fg1, fg2 or none (random)
+        layouts: {
+            yggbase1: {
+                player: { x: 284, y: 860, left: 233, top: 646 },
+                hud: { left: 182, top: 871 },
+                monsters: [[591, 875], [816, 867], [1024, 861], [1196, 758], [1359, 652], [1704, 505]]
+            },
+            yggbase2: {
+                player: { x: 272, y: 806, left: 221, top: 592 },
+                hud: { left: 170, top: 817 },
+                monsters: [[615, 636], [1041, 479], [1731, 445], [836, 895], [1279, 844], [1556, 743]]
+            },
+            yggbase3: {
+                player: { x: 210, y: 697, left: 159, top: 483 },
+                hud: { left: 108, top: 708 },
+                monsters: [[689, 655], [893, 803], [1138, 783], [1329, 478], [1494, 712], [1750, 631]]
+            }
+        }
     }
 };
 // Each stage picks a new background, base layer and foreground.
@@ -351,7 +401,8 @@ async function changeEarthLayers() {
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
     const art = COMBAT_ART[artKey];
-    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = art.fg || null; // fg is optional (null = no foreground)
+    const fgList = Array.isArray(art.fg) ? art.fg : [art.fg]; // a null entry means no foreground
+    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = pick(fgList) || null;
     await Promise.all([nextBg, nextBase, nextFg].filter(Boolean).map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
     bg.src = nextBg;
