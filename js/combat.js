@@ -587,7 +587,7 @@ function mapPower() {
 }
 
 // Monster hit and flee are based on the map level, like the player's (player hit = 100 + level + DEX, flee = 40 + level + AGI).
-// Monster hit = level + MON_HIT_BASE, monster flee = level + MON_FLEE_BASE.
+// Monster hit = level × 3 + MON_HIT_BASE, monster flee = level + MON_FLEE_BASE. Monster hit chance floor is 35%.
 const MON_HIT_BASE = 40;
 const MON_FLEE_BASE = 60;
 
@@ -599,7 +599,7 @@ function combatHitFlee(t) {
     }
     if (activeMap && (currentMode === 'campaign' || currentMode === 'event')) {
         const lv = activeMap.finalMap ? finalStageLevel(currentStage) : (activeMap.levelReq || 1);
-        return { hit: lv + MON_HIT_BASE, flee: lv + MON_FLEE_BASE };
+        return { hit: lv * 3 + MON_HIT_BASE, flee: lv + MON_FLEE_BASE };
     }
     return { hit: t.hit, flee: t.flee };
 }
@@ -956,7 +956,7 @@ function monsterAct(m, derived, position = 0) {
     // Melee and tank units only strike when they are the first monster facing the player
     if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
-    const hitChance = Math.min(0.95, Math.max(0.2, (m.hit - derived.flee + 50) / 100));
+    const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
