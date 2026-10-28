@@ -164,6 +164,7 @@ let combatEarthMonsterPos = null; // per-monster [left, top] for the current lay
 const EARTH_LAYOUTS = {
     earthbase2: {
         player: { x: 526, y: 851, left: 474.5, top: 637 },
+        hud: { left: 424, top: 862 }, // HP and armor below the character
         monsters: [[719, 738], [888, 738], [1038, 738], [1186, 738], [1337, 738], [1488, 738]]
     },
     earthbase3: {
