@@ -123,18 +123,23 @@ const COMBAT_DEATH_FRAME_MS = 150;
 const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FRAME_MS;
 const COMBAT_SLIME_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/slime/slime_${String(i + 1).padStart(4, '0')}.png`).join(',');
 const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
-// Floating damage number over a combat sprite (white normal, red critical)
+// Floating damage number over a combat sprite: bold white normal, bold orange critical
 function showCombatNumber(selector, amount, crit) {
+    if (!(amount > 0)) return;
+    showCombatText(selector, String(Math.round(amount)), crit ? 'crit' : '');
+}
+// Floating text above the top border of a combat sprite (damage numbers, MISS)
+function showCombatText(selector, text, variant) {
     const view = document.getElementById('view-combat');
-    if (!view || view.classList.contains('hidden') || !(amount > 0)) return;
+    if (!view || view.classList.contains('hidden')) return;
     const anchor = document.querySelector(selector);
     const stage = document.querySelector('#combat-stage .ts-inner');
     if (!anchor || !stage) return;
     const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
     const b = anchor.getBoundingClientRect(), ib = stage.getBoundingClientRect();
     const d = document.createElement('div');
-    d.className = 'combat-dmg' + (crit ? ' crit' : '');
-    d.textContent = Math.round(amount);
+    d.className = 'combat-dmg' + (variant ? ' ' + variant : '');
+    d.textContent = text;
     d.style.left = ((b.left + b.width / 2 - ib.left) / sc) + 'px';
     d.style.top = ((b.top - ib.top) / sc) + 'px';
     stage.appendChild(d);
