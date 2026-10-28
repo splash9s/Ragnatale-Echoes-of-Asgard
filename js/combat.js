@@ -1234,9 +1234,11 @@ function onStageCleared() {
                 if (titleEl) titleEl.innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages} ${isBossStage() ? '(Boss)' : ''}`;
             }
 
-            combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (getDerivedStats().aspd * 10)));
-            changeEarthLayers();
-            spawnStageMonsters();
+            // Layers and positions swap first; the stage's monsters and ticks start after that
+            changeEarthLayers().then(() => {
+                combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (getDerivedStats().aspd * 10)));
+                spawnStageMonsters();
+            });
         };
 
         if (isRuneDueAfter(currentStage) && currentStage < maxStages) {

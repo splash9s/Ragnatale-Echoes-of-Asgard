@@ -332,6 +332,14 @@ function preloadCombatImage(src) {
     img.src = src;
     return img.decode ? img.decode().catch(() => {}) : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
 }
+// Move the monster cards already on screen to the current layout (no waiting for the next redraw)
+function applyCombatEarthPositions() {
+    document.querySelectorAll('#monsters-lineup-container > div').forEach((card, i) => {
+        const p = combatEarthMonsterPos && combatEarthMonsterPos[i];
+        card.style.left = p ? p[0] + 'px' : '';
+        card.style.top = p ? p[1] + 'px' : '';
+    });
+}
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) return;
@@ -355,6 +363,7 @@ async function changeEarthLayers() {
         hud.style.left = h.left + 'px';
         hud.style.top = h.top + 'px';
     }
+    applyCombatEarthPositions();
 }
 
 function switchView(viewName) {
