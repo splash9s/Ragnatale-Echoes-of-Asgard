@@ -492,8 +492,46 @@ function dailyFreeCardHTML(key, buttonClass) {
     `;
 }
 
-// ---------- SHOP PAGE TABS (Diamond Cash Shop default, Shop second) ----------
+// ---------- SHOP PAGE TABS (Diamond default, Shop second) ----------
 let currentShopTab = 'diamond';
+
+function isFreeGoldAvailable() { return !isDailyFreeClaimed('gold'); }
+function isFreeDiamondAvailable() { return !isDailyFreeClaimed('diamond'); }
+
+// Balance on the shop row: diamonds on the Diamond tab, gold on the Shop tab
+function updateShopBalance() {
+    const label = document.getElementById('shop-balance-label');
+    const value = document.getElementById('shop-balance-value');
+    if (!label || !value) return;
+    if (currentShopTab === 'diamond') {
+        label.innerText = '💎 Balance:';
+        value.innerText = player.diamonds;
+    } else {
+        label.innerText = '💰 Cash Balance:';
+        value.innerText = player.gold;
+    }
+}
+
+// Tab buttons: Diamond keeps the diamond item colour, turns red with white text while the free diamond is unclaimed
+function updateShopTabButtons() {
+    const btnDiamond = document.getElementById('shop-tab-btn-diamond');
+    const btnShop = document.getElementById('shop-tab-btn-shop');
+    const isDiamond = currentShopTab === 'diamond';
+    const RED = 'background-color: #dc2626; color: #ffffff;';
+    const diamondBase = 'background-color: rgba(190, 178, 214, .45); color: #2a1a0e;';
+    const shopBase = 'background-color: rgba(214, 190, 140, .5); color: #2a1a0e;';
+    const active = 'border: 2px solid #c9a227';
+    const inactive = 'border: 1px solid #a593c4';
+    const inactiveShop = 'border: 1px solid #b8945a';
+    if (btnDiamond) {
+        const colors = isFreeDiamondAvailable() ? RED : diamondBase;
+        btnDiamond.setAttribute('style', `${colors} ${isDiamond ? active : inactive}`);
+    }
+    if (btnShop) {
+        const colors = isFreeGoldAvailable() ? RED : shopBase;
+        btnShop.setAttribute('style', `${colors} ${!isDiamond ? active : inactiveShop}`);
+    }
+}
 
 function switchShopTab(tabName) {
     if (tabName !== 'diamond' && tabName !== 'shop') tabName = 'diamond';
@@ -501,16 +539,28 @@ function switchShopTab(tabName) {
     const isDiamond = tabName === 'diamond';
     document.getElementById('shop-diamond-section')?.classList.toggle('hidden', !isDiamond);
     document.getElementById('shop-gold-section')?.classList.toggle('hidden', isDiamond);
-    // The Diamond tab uses only the left window
-    document.getElementById('shop-panel-right')?.classList.toggle('hidden', isDiamond);
-    document.getElementById('shop-frame-right')?.classList.toggle('hidden', isDiamond);
-    const base = 'background-color: rgba(214, 190, 140, .5); color: #2a1a0e;';
-    const active = 'border: 2px solid #c9a227';
-    const inactive = 'border: 1px solid #b8945a';
-    document.getElementById('shop-tab-btn-diamond')?.setAttribute('style', `${base} ${isDiamond ? active : inactive}`);
-    document.getElementById('shop-tab-btn-shop')?.setAttribute('style', `${base} ${!isDiamond ? active : inactive}`);
+    // The gear shop (right window) always shows
+    renderShop();
     if (isDiamond) renderDiamondShop();
-    else renderShop();
+    updateShopTabButtons();
+    updateShopBalance();
+}
+
+// Town alerts: quests not complete (Events button); free gold or free diamond unclaimed (Shop button)
+function updateTownAlerts() {
+    const questOpen = (player.dailyQuests || []).some(q => !q.completed);
+    const shopFree = isFreeGoldAvailable() || isFreeDiamondAvailable();
+    const ev = document.getElementById('alert-events');
+    const sh = document.getElementById('alert-shop');
+    if (ev) ev.style.display = questOpen ? 'block' : 'none';
+    if (sh) sh.style.display = shopFree ? 'block' : 'none';
+}
+
+// Refresh everything on the shop row and the town alerts
+function refreshShopAndAlerts() {
+    updateShopTabButtons();
+    updateShopBalance();
+    updateTownAlerts();
 }
 
 // ---------- EVENTS PAGE TABS ----------
@@ -647,8 +697,7 @@ function buyArmoryItem(itemIndex) {
 
 function renderDiamondShop() {
     let container = document.getElementById('diamond-shop-items-container');
-    let balanceEl = document.getElementById('diamond-shop-balance');
-    if (balanceEl) balanceEl.innerText = player.diamonds;
+    updateShopBalance();
     
     if (!container) return;
     container.innerHTML = dailyFreeCardHTML('diamond', 'bg-purple-600 hover:bg-purple-500 text-slate-950');
@@ -1743,6 +1792,7 @@ function renderElementStats() {
 
 function updateUI() {
     if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
+    if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();
     renderInventoryFilters();
     renderElementStats();
     let derived = getDerivedStats();

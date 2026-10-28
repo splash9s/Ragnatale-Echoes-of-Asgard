@@ -284,6 +284,7 @@
                     </div>
             <div class="ui" data-action="events" style="left:1280px; top:8px; width:144px; height:145px;">
                 <img src="assets/page01/eventsbutton.png" alt="" onerror="townSwap(this,'eventsbutton.png')">
+                <img id="alert-events" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; left:212px; top:3px; width:75px; height:75px; pointer-events:none;">
             </div>
             <div class="ui" data-action="diamond" style="left:1442px; top:8px; width:144px; height:145px;">
                 <img src="assets/page01/diamondbutton.png" alt="" onerror="townSwap(this,'diamondbutton.png')">
@@ -299,6 +300,7 @@
             </div>
             <div class="ui" data-action="shop" style="left:183px; top:925px; width:145px; height:145px;">
                 <img src="assets/page01/shoppagebutton.png" alt="" onerror="townSwap(this,'shoppagebutton.png')">
+                <img id="alert-shop" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; left:212px; top:3px; width:75px; height:75px; pointer-events:none;">
             </div>
             <div class="ui" data-action="blacksmith" style="left:346px; top:925px; width:145px; height:145px;">
                 <img src="assets/page01/articanbutton.png" alt="" onerror="townSwap(this,'articanbutton.png')">
@@ -615,14 +617,12 @@
                         <img src="assets/compaign/returnbutton.png" alt="">
                     </div>
                     <div id="shop-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
-                        <div class="flex gap-2 mb-4">
-                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Diamond Cash Shop</button>
+                        <div class="flex items-center gap-2 mb-4">
+                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Diamond</button>
                             <button id="shop-tab-btn-shop" onclick="switchShopTab('shop')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Shop</button>
+                            <span class="ml-auto text-xs font-bold text-slate-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-700/40 whitespace-nowrap"><span id="shop-balance-label">💎 Balance:</span> <strong id="shop-balance-value">0</strong></span>
                         </div>
                         <div id="shop-diamond-section" class="flex flex-col gap-3">
-                            <div class="flex justify-end">
-                                <span class="text-xs font-bold text-purple-300 bg-purple-950/60 px-3 py-1.5 rounded-xl border border-purple-500/40">💎 Balance: <strong id="diamond-shop-balance">1000</strong></span>
-                            </div>
                             <div id="diamond-shop-items-container" class="flex flex-col gap-3"></div>
                         </div>
                         <div id="shop-gold-section" class="hidden flex flex-col gap-3">
@@ -881,6 +881,7 @@
             updateUI();
             logMessage("[System] Game loaded successfully!", "winlose");
         }
+        if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();
     }
 </script>
 </body>
