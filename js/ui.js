@@ -28,6 +28,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'pet_loyal_slime', name: "Loyal Slime Pet", desc: "ATK +2%, HP +50", price: 50, type: 'pet', stats: { hp: 50, atkPct: 2 } },
     { id: 'res_potion', name: "Resurrection Potion", price: 3, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
+    { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "Toggle on at the blacksmith. If a refine fails, the gear keeps its level. Used up when it saves a gear." },
     { id: 'stat_reset', name: "Stat Reset Service", price: 10, type: 'service', desc: "Resets all attributes to 1 and refunds all spent stat points." },
     { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "Resets all skill levels and refunds all spent Class SP." },
     { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "Opens for 1-500 Gold and 1 armory item (Rarity 1)." },
@@ -755,6 +756,9 @@ function buyDiamondItem(itemId) {
     } else if (item.type === 'material') {
         player.refiningStones = (player.refiningStones || 0) + 5;
         showModal("Purchase Successful", "You bought 5 Refining Stones!");
+    } else if (item.type === 'bs_rune') {
+        player.blacksmithRuneStones = (player.blacksmithRuneStones || 0) + 1;
+        showModal("Purchase Successful", "You bought a Blacksmith Rune Stone!");
     } else if (item.type === 'service') {
         let totalSpent = (player.stats.str - 1) + (player.stats.agi - 1) + (player.stats.vit - 1) + (player.stats.int - 1) + (player.stats.dex - 1) + (player.stats.luk - 1);
         player.statPoints += totalSpent;
@@ -787,6 +791,15 @@ function buyDiamondItem(itemId) {
 
 // Blacksmith: pick an equipped gear from the list to load it into the gear slot, then refine it
 let blacksmithSelectedSlot = null;
+let blacksmithRuneOn = false;
+function blacksmithToggleRune() {
+    if (!blacksmithRuneOn && (player.blacksmithRuneStones || 0) < 1) {
+        showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
+        return;
+    }
+    blacksmithRuneOn = !blacksmithRuneOn;
+    renderRefiningUI();
+}
 function blacksmithSelect(slot) {
     blacksmithSelectedSlot = slot;
     renderRefiningUI();
@@ -799,9 +812,20 @@ function blacksmithRefineSelected() {
     if (!blacksmithSelectedSlot) return;
     refineEquipment(blacksmithSelectedSlot);
 }
+function renderRuneSlot() {
+    const runeEl = document.getElementById('blacksmith-rune-slot');
+    const balEl = document.getElementById('bs-rune-balance');
+    const count = player.blacksmithRuneStones || 0;
+    if (count < 1) blacksmithRuneOn = false;
+    if (runeEl) {
+        runeEl.innerHTML = `<span style="font-size:20px; line-height:1">🔮</span><span style="font-size:12px; font-weight:900; color:${blacksmithRuneOn ? '#86efac' : '#fca5a5'};">${blacksmithRuneOn ? 'ON' : 'OFF'}</span>`;
+    }
+    if (balEl) balEl.textContent = `Rune Stone: ${count}`;
+}
 function renderBlacksmithSlot() {
     const slotEl = document.getElementById('blacksmith-gear-slot');
     const refineBtn = document.getElementById('bs-refine');
+    renderRuneSlot();
     if (!slotEl) return;
     const gear = blacksmithSelectedSlot ? player.equipped[blacksmithSelectedSlot] : null;
     if (!gear) {
@@ -884,10 +908,19 @@ function refineEquipment(slot) {
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
         showModal("Refinement Successful!", `Your ${gear.name} was upgraded to +${gear.refineLevel}!`);
     } else {
-        // Failure drops the refine level by 1 (never below +0)
-        gear.refineLevel = Math.max(0, current - 1);
-        logMessage(`[Refine Failed] Upgrade failed. ${gear.name} dropped to +${gear.refineLevel}.`, 'combat');
-        showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} dropped to +${gear.refineLevel}.`);
+        if (blacksmithRuneOn && (player.blacksmithRuneStones || 0) > 0) {
+            // Rune Stone on: the failed refine keeps the level and uses one stone
+            player.blacksmithRuneStones -= 1;
+            if (player.blacksmithRuneStones <= 0) blacksmithRuneOn = false;
+            gear.refineLevel = current;
+            logMessage(`[Refine Failed] Rune Stone protected ${gear.name} at +${current}.`, 'combat');
+            showModal("Refinement Failed", `The upgrade failed, but the Blacksmith Rune Stone kept your ${gear.name} at +${current}.`);
+        } else {
+            // Failure drops the refine level by 1 (never below +0)
+            gear.refineLevel = Math.max(0, current - 1);
+            logMessage(`[Refine Failed] Upgrade failed. ${gear.name} dropped to +${gear.refineLevel}.`, 'combat');
+            showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} dropped to +${gear.refineLevel}.`);
+        }
     }
 
     updateUI();
