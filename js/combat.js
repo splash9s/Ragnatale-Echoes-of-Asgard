@@ -853,7 +853,7 @@ function checkStageClearAfterHeal() {
 
 
 function onPlayerDodged(m, source) {
-    setTimeout(() => showCombatText('#combat-player-sprite', 'MISS', 'miss'), 0);
+    setTimeout(() => showCombatText('#combat-player-sprite', 'DODGE', 'miss'), 0);
     logMessage(`[Dodge] You evaded ${m.name}'s attack! (${source})`, 'combat');
     monsterHitStreak = 0;
     dodgeStreak++;
