@@ -160,9 +160,16 @@ function playPlayerAttackAnim(isCrit) {
 // Player and monster positions for the current earth layout (default: the original layout)
 let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = feet centre, left/top = idle sprite
 let combatEarthMonsterPos = null; // per-monster [left, top] for the current layout, or null for the default
-const EARTH_BASE3_LAYOUT = {
-    player: { x: 616, y: 907, left: 564.5, top: 693 },
-    monsters: [[804, 800], [950, 781], [1095, 781], [1248, 781], [1384, 781], [1575, 745]]
+// Positions per earth base layer (keyed by the base file name)
+const EARTH_LAYOUTS = {
+    earthbase2: {
+        player: { x: 526, y: 851, left: 474.5, top: 637 },
+        monsters: [[719, 738], [888, 738], [1038, 738], [1186, 738], [1337, 738], [1488, 738]]
+    },
+    earthbase3: {
+        player: { x: 616, y: 907, left: 564.5, top: 693 },
+        monsters: [[804, 800], [950, 781], [1095, 781], [1248, 781], [1384, 781], [1575, 745]]
+    }
 };
 setInterval(() => {
     const now = Date.now();
@@ -288,7 +295,8 @@ function randomizeEarthLayers() {
     if (bg) bg.src = pick(EARTH_BG_LAYERS);
     if (base) base.src = pick(EARTH_BASE_LAYERS);
     if (fg) fg.src = EARTH_FG_LAYER;
-    const layout = bg && base && base.src.includes('earthbase3') ? EARTH_BASE3_LAYOUT : null;
+    const layoutKey = base ? Object.keys(EARTH_LAYOUTS).find(k => base.src.includes(k)) : null;
+    const layout = bg && layoutKey ? EARTH_LAYOUTS[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatEarthMonsterPos = layout ? layout.monsters : null;
 }
