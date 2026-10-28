@@ -478,16 +478,17 @@ function claimDailyFree(key) {
     saveGame();
 }
 
-function dailyFreeCardHTML(key, buttonClass) {
+function dailyFreeCardHTML(key) {
     const item = DAILY_FREE_ITEMS[key];
-    const claimed = isDailyFreeClaimed(key);
+    // Once claimed for the day the card is hidden; until then it shows in red
+    if (isDailyFreeClaimed(key)) return '';
     return `
-        <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
+        <div class="p-3 rounded border flex justify-between items-center" style="background-color:#dc2626; border-color:#991b1b;">
             <div>
-                <span class="font-bold text-amber-300 block text-xs">${item.name}</span>
-                <span class="text-[10px] text-slate-400">${item.desc}</span>
+                <span class="font-bold block text-xs" style="color:#ffffff;">${item.name}</span>
+                <span class="text-[10px]" style="color:#ffffff;">${item.desc}</span>
             </div>
-            <button onclick="claimDailyFree('${key}')" ${claimed ? 'disabled' : ''} class="px-3 py-1.5 ${buttonClass} font-bold rounded-lg cursor-pointer text-xs transition disabled:opacity-50">${claimed ? 'Claimed today' : 'Claim'}</button>
+            <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>
         </div>
     `;
 }
@@ -596,7 +597,7 @@ function updateQuestTabButton() {
 function renderShop() {
     let consumablesContainer = document.getElementById('shop-consumables-container');
     if (consumablesContainer) {
-        consumablesContainer.innerHTML = dailyFreeCardHTML('gold', 'bg-amber-600 hover:bg-amber-500 text-slate-950');
+        consumablesContainer.innerHTML = dailyFreeCardHTML('gold');
         GOLD_SHOP_CONSUMABLES.forEach(item => {
             consumablesContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
@@ -700,7 +701,7 @@ function renderDiamondShop() {
     updateShopBalance();
     
     if (!container) return;
-    container.innerHTML = dailyFreeCardHTML('diamond', 'bg-purple-600 hover:bg-purple-500 text-slate-950');
+    container.innerHTML = dailyFreeCardHTML('diamond');
 
     DIAMOND_SHOP_ITEMS.forEach(item => {
         container.innerHTML += `
