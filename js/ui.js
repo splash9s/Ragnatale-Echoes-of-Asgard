@@ -851,10 +851,10 @@ function refineEquipment(slot) {
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
         showModal("Refinement Successful!", `Your ${gear.name} was upgraded to +${gear.refineLevel}!`);
     } else {
-        // Failure keeps the current level; only the gold and stone are lost
-        gear.refineLevel = current;
-        logMessage(`[Refine Failed] Upgrade failed. Materials consumed.`, 'combat');
-        showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} stays at +${current}.`);
+        // Failure drops the refine level by 1 (never below +0)
+        gear.refineLevel = Math.max(0, current - 1);
+        logMessage(`[Refine Failed] Upgrade failed. ${gear.name} dropped to +${gear.refineLevel}.`, 'combat');
+        showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} dropped to +${gear.refineLevel}.`);
     }
 
     updateUI();
