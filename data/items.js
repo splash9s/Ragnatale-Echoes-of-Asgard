@@ -73,81 +73,81 @@ SHOP_ITEMS.push(...RING_ITEMS);
 
 const GEAR_POOL = {
     map1: [
-        { name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
-        { name: "Wooden Buckler", slot: "shield", levelReq: 1, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
-        { name: "Iron Cuirass", slot: "armor", levelReq: 1, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
-        { name: "Cotton Cloak", slot: "garment", levelReq: 1, stats: { flee: 2 }, desc: "FLEE +2" },
-        { name: "Leather Boots", slot: "footgear", levelReq: 1, stats: { hp: 20 }, desc: "HP +20" }
+        { id: "G001", name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
+        { id: "G002", name: "Wooden Buckler", slot: "shield", levelReq: 1, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
+        { id: "G003", name: "Iron Cuirass", slot: "armor", levelReq: 1, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
+        { id: "G004", name: "Cotton Cloak", slot: "garment", levelReq: 1, stats: { flee: 2 }, desc: "FLEE +2" },
+        { id: "G005", name: "Leather Boots", slot: "footgear", levelReq: 1, stats: { hp: 20 }, desc: "HP +20" }
     ],
     map10: [
-        { name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, stats: { atk: 25 }, desc: "Atk +25" },
-        { name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, stats: { def: 6, block: 10 }, desc: "DEF +6, Block +10%" },
-        { name: "Steel Plate Armor", slot: "armor", levelReq: 10, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
-        { name: "Chain Mail Mantle", slot: "garment", levelReq: 10, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
-        { name: "Armored Greaves", slot: "footgear", levelReq: 10, stats: { hp: 50, def: 3 }, desc: "HP +50, DEF +3" }
+        { id: "G006", name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, stats: { atk: 25 }, desc: "Atk +25" },
+        { id: "G007", name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, stats: { def: 6, block: 10 }, desc: "DEF +6, Block +10%" },
+        { id: "G008", name: "Steel Plate Armor", slot: "armor", levelReq: 10, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
+        { id: "G009", name: "Chain Mail Mantle", slot: "garment", levelReq: 10, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
+        { id: "G010", name: "Armored Greaves", slot: "footgear", levelReq: 10, stats: { hp: 50, def: 3 }, desc: "HP +50, DEF +3" }
     ],
     map20: [
-        { name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, stats: { atk: 50, crit: 2 }, desc: "Atk +50, CRIT +2%" },
-        { name: "Royal Aegis", slot: "shield", levelReq: 20, stats: { def: 12, block: 15 }, desc: "DEF +12, Block +15%" },
-        { name: "Mithril Cuirass", slot: "armor", levelReq: 20, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
-        { name: "Valkyrie Cloak", slot: "garment", levelReq: 20, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
-        { name: "Knight Striders", slot: "footgear", levelReq: 20, stats: { hp: 100, aspd: 5 }, desc: "HP +100, ASPD +5" }
+        { id: "G011", name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, stats: { atk: 50, crit: 2 }, desc: "Atk +50, CRIT +2%" },
+        { id: "G012", name: "Royal Aegis", slot: "shield", levelReq: 20, stats: { def: 12, block: 15 }, desc: "DEF +12, Block +15%" },
+        { id: "G013", name: "Mithril Cuirass", slot: "armor", levelReq: 20, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
+        { id: "G014", name: "Valkyrie Cloak", slot: "garment", levelReq: 20, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
+        { id: "G015", name: "Knight Striders", slot: "footgear", levelReq: 20, stats: { hp: 100, aspd: 5 }, desc: "HP +100, ASPD +5" }
     ],
     map30: [
-        { name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, stats: { atk: 90, crit: 4 }, desc: "Atk +90, CRIT +4%" },
-        { name: "Shield of Asgard", slot: "shield", levelReq: 30, stats: { def: 20, block: 25 }, desc: "DEF +20, Block +25%" },
-        { name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
-        { name: "Winged Shroud", slot: "garment", levelReq: 30, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
-        { name: "Boots of Swift Retribution", slot: "footgear", levelReq: 30, stats: { hp: 200, aspd: 12 }, desc: "HP +200, ASPD +12" }
+        { id: "G016", name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, stats: { atk: 90, crit: 4 }, desc: "Atk +90, CRIT +4%" },
+        { id: "G017", name: "Shield of Asgard", slot: "shield", levelReq: 30, stats: { def: 20, block: 25 }, desc: "DEF +20, Block +25%" },
+        { id: "G018", name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
+        { id: "G019", name: "Winged Shroud", slot: "garment", levelReq: 30, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
+        { id: "G020", name: "Boots of Swift Retribution", slot: "footgear", levelReq: 30, stats: { hp: 200, aspd: 12 }, desc: "HP +200, ASPD +12" }
     ],
     map40: [
-        { name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, stats: { atk: 140, crit: 6 }, desc: "Atk +140, CRIT +6%" },
-        { name: "Aegis of Light", slot: "shield", levelReq: 40, stats: { def: 32, block: 30 }, desc: "DEF +32, Block +30%" },
-        { name: "Solar Plate", slot: "armor", levelReq: 40, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
-        { name: "Solar Mantle", slot: "garment", levelReq: 40, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
-        { name: "Solar Greaves", slot: "footgear", levelReq: 40, stats: { hp: 350, aspd: 18 }, desc: "HP +350, ASPD +18" }
+        { id: "G021", name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, stats: { atk: 140, crit: 6 }, desc: "Atk +140, CRIT +6%" },
+        { id: "G022", name: "Aegis of Light", slot: "shield", levelReq: 40, stats: { def: 32, block: 30 }, desc: "DEF +32, Block +30%" },
+        { id: "G023", name: "Solar Plate", slot: "armor", levelReq: 40, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
+        { id: "G024", name: "Solar Mantle", slot: "garment", levelReq: 40, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
+        { id: "G025", name: "Solar Greaves", slot: "footgear", levelReq: 40, stats: { hp: 350, aspd: 18 }, desc: "HP +350, ASPD +18" }
     ],
     map50: [
-        { name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, stats: { atk: 210, crit: 7 }, desc: "Atk +210, CRIT +7%" },
-        { name: "Ultimate Aegis", slot: "shield", levelReq: 50, stats: { def: 50, block: 40 }, desc: "DEF +50, Block +40%" },
-        { name: "Armor of the Gods", slot: "armor", levelReq: 50, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
-        { name: "Shroud of Eternity", slot: "garment", levelReq: 50, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
-        { name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
+        { id: "G026", name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, stats: { atk: 210, crit: 7 }, desc: "Atk +210, CRIT +7%" },
+        { id: "G027", name: "Ultimate Aegis", slot: "shield", levelReq: 50, stats: { def: 50, block: 40 }, desc: "DEF +50, Block +40%" },
+        { id: "G028", name: "Armor of the Gods", slot: "armor", levelReq: 50, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
+        { id: "G029", name: "Shroud of Eternity", slot: "garment", levelReq: 50, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
+        { id: "G030", name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
     ],
     map60: [
-        { name: "Jotun Ice Axe (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
-        { name: "Jotun Rime Shield", slot: "shield", levelReq: 60, stats: { def: 65, block: 45 }, desc: "DEF +65, Block +45%" },
-        { name: "Jotun Fur Armor", slot: "armor", levelReq: 60, stats: { hp: 1900, def: 115 }, desc: "HP +1900, DEF +115" },
-        { name: "Jotun Snow Cloak", slot: "garment", levelReq: 60, stats: { flee: 65, def: 30 }, desc: "FLEE +65, DEF +30" },
-        { name: "Jotun Ice Striders", slot: "footgear", levelReq: 60, stats: { hp: 800, aspd: 30 }, desc: "HP +800, ASPD +30" }
+        { id: "G031", name: "Jotun Ice Axe (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
+        { id: "G032", name: "Jotun Rime Shield", slot: "shield", levelReq: 60, stats: { def: 65, block: 45 }, desc: "DEF +65, Block +45%" },
+        { id: "G033", name: "Jotun Fur Armor", slot: "armor", levelReq: 60, stats: { hp: 1900, def: 115 }, desc: "HP +1900, DEF +115" },
+        { id: "G034", name: "Jotun Snow Cloak", slot: "garment", levelReq: 60, stats: { flee: 65, def: 30 }, desc: "FLEE +65, DEF +30" },
+        { id: "G035", name: "Jotun Ice Striders", slot: "footgear", levelReq: 60, stats: { hp: 800, aspd: 30 }, desc: "HP +800, ASPD +30" }
     ],
     map70: [
-        { name: "Einherjar Blade (1H)", slot: "weapon", levelReq: 70, stats: { atk: 340, crit: 9 }, desc: "Atk +340, CRIT +9%" },
-        { name: "Valkyrie Bulwark", slot: "shield", levelReq: 70, stats: { def: 80, block: 50 }, desc: "DEF +80, Block +50%" },
-        { name: "Valkyrie Plate", slot: "armor", levelReq: 70, stats: { hp: 2400, def: 140 }, desc: "HP +2400, DEF +140" },
-        { name: "Valkyrie Wing Mantle", slot: "garment", levelReq: 70, stats: { flee: 80, def: 38 }, desc: "FLEE +80, DEF +38" },
-        { name: "Valkyrie Greaves", slot: "footgear", levelReq: 70, stats: { hp: 1000, aspd: 35 }, desc: "HP +1000, ASPD +35" }
+        { id: "G036", name: "Einherjar Blade (1H)", slot: "weapon", levelReq: 70, stats: { atk: 340, crit: 9 }, desc: "Atk +340, CRIT +9%" },
+        { id: "G037", name: "Valkyrie Bulwark", slot: "shield", levelReq: 70, stats: { def: 80, block: 50 }, desc: "DEF +80, Block +50%" },
+        { id: "G038", name: "Valkyrie Plate", slot: "armor", levelReq: 70, stats: { hp: 2400, def: 140 }, desc: "HP +2400, DEF +140" },
+        { id: "G039", name: "Valkyrie Wing Mantle", slot: "garment", levelReq: 70, stats: { flee: 80, def: 38 }, desc: "FLEE +80, DEF +38" },
+        { id: "G040", name: "Valkyrie Greaves", slot: "footgear", levelReq: 70, stats: { hp: 1000, aspd: 35 }, desc: "HP +1000, ASPD +35" }
     ],
     map80: [
-        { name: "Muspel Flame Blade (1H)", slot: "weapon", levelReq: 80, stats: { atk: 420, crit: 10 }, desc: "Atk +420, CRIT +10%" },
-        { name: "Muspel Ember Shield", slot: "shield", levelReq: 80, stats: { def: 100, block: 55 }, desc: "DEF +100, Block +55%" },
-        { name: "Muspel Forged Plate", slot: "armor", levelReq: 80, stats: { hp: 3000, def: 170 }, desc: "HP +3000, DEF +170" },
-        { name: "Muspel Ash Cloak", slot: "garment", levelReq: 80, stats: { flee: 95, def: 45 }, desc: "FLEE +95, DEF +45" },
-        { name: "Muspel Ember Boots", slot: "footgear", levelReq: 80, stats: { hp: 1250, aspd: 40 }, desc: "HP +1250, ASPD +40" }
+        { id: "G041", name: "Muspel Flame Blade (1H)", slot: "weapon", levelReq: 80, stats: { atk: 420, crit: 10 }, desc: "Atk +420, CRIT +10%" },
+        { id: "G042", name: "Muspel Ember Shield", slot: "shield", levelReq: 80, stats: { def: 100, block: 55 }, desc: "DEF +100, Block +55%" },
+        { id: "G043", name: "Muspel Forged Plate", slot: "armor", levelReq: 80, stats: { hp: 3000, def: 170 }, desc: "HP +3000, DEF +170" },
+        { id: "G044", name: "Muspel Ash Cloak", slot: "garment", levelReq: 80, stats: { flee: 95, def: 45 }, desc: "FLEE +95, DEF +45" },
+        { id: "G045", name: "Muspel Ember Boots", slot: "footgear", levelReq: 80, stats: { hp: 1250, aspd: 40 }, desc: "HP +1250, ASPD +40" }
     ],
     map90: [
-        { name: "Hel Bone Blade (1H)", slot: "weapon", levelReq: 90, stats: { atk: 520, crit: 12 }, desc: "Atk +520, CRIT +12%" },
-        { name: "Hel Grave Shield", slot: "shield", levelReq: 90, stats: { def: 125, block: 60 }, desc: "DEF +125, Block +60%" },
-        { name: "Hel Death Plate", slot: "armor", levelReq: 90, stats: { hp: 3800, def: 210 }, desc: "HP +3800, DEF +210" },
-        { name: "Hel Shroud", slot: "garment", levelReq: 90, stats: { flee: 115, def: 55 }, desc: "FLEE +115, DEF +55" },
-        { name: "Hel Walkers", slot: "footgear", levelReq: 90, stats: { hp: 1550, aspd: 45 }, desc: "HP +1550, ASPD +45" }
+        { id: "G046", name: "Hel Bone Blade (1H)", slot: "weapon", levelReq: 90, stats: { atk: 520, crit: 12 }, desc: "Atk +520, CRIT +12%" },
+        { id: "G047", name: "Hel Grave Shield", slot: "shield", levelReq: 90, stats: { def: 125, block: 60 }, desc: "DEF +125, Block +60%" },
+        { id: "G048", name: "Hel Death Plate", slot: "armor", levelReq: 90, stats: { hp: 3800, def: 210 }, desc: "HP +3800, DEF +210" },
+        { id: "G049", name: "Hel Shroud", slot: "garment", levelReq: 90, stats: { flee: 115, def: 55 }, desc: "FLEE +115, DEF +55" },
+        { id: "G050", name: "Hel Walkers", slot: "footgear", levelReq: 90, stats: { hp: 1550, aspd: 45 }, desc: "HP +1550, ASPD +45" }
     ],
     map99: [
-        { name: "Dusk Reaper Blade (1H)", slot: "weapon", levelReq: 99, stats: { atk: 680, crit: 14 }, desc: "Atk +680, CRIT +14%" },
-        { name: "Dusk Ward Shield", slot: "shield", levelReq: 99, stats: { def: 160, block: 65 }, desc: "DEF +160, Block +65%" },
-        { name: "Dusk Titan Plate", slot: "armor", levelReq: 99, stats: { hp: 5000, def: 260 }, desc: "HP +5000, DEF +260" },
-        { name: "Dusk Veil Cloak", slot: "garment", levelReq: 99, stats: { flee: 140, def: 65 }, desc: "FLEE +140, DEF +65" },
-        { name: "Dusk Walkers", slot: "footgear", levelReq: 99, stats: { hp: 1900, aspd: 50 }, desc: "HP +1900, ASPD +50" }
+        { id: "G051", name: "Dusk Reaper Blade (1H)", slot: "weapon", levelReq: 99, stats: { atk: 680, crit: 14 }, desc: "Atk +680, CRIT +14%" },
+        { id: "G052", name: "Dusk Ward Shield", slot: "shield", levelReq: 99, stats: { def: 160, block: 65 }, desc: "DEF +160, Block +65%" },
+        { id: "G053", name: "Dusk Titan Plate", slot: "armor", levelReq: 99, stats: { hp: 5000, def: 260 }, desc: "HP +5000, DEF +260" },
+        { id: "G054", name: "Dusk Veil Cloak", slot: "garment", levelReq: 99, stats: { flee: 140, def: 65 }, desc: "FLEE +140, DEF +65" },
+        { id: "G055", name: "Dusk Walkers", slot: "footgear", levelReq: 99, stats: { hp: 1900, aspd: 50 }, desc: "HP +1900, ASPD +50" }
     ]
 };
 
@@ -250,8 +250,8 @@ Object.keys(HAT_BY_LEVEL).forEach(lv => {
 
 // Warrior weapon and shield stay as plain gear (only SET_SLOTS carry set buffs)
 GEAR_POOL.map10.push(
-    { name: "Warrior Blade (1H)", slot: "weapon", levelReq: 10, stats: { atk: 22 }, desc: "Atk +22" },
-    { name: "Warrior Bulwark", slot: "shield", levelReq: 10, stats: { def: 5, block: 8 }, desc: "DEF +5, Block +8%" }
+    { id: "G056", name: "Warrior Blade (1H)", slot: "weapon", levelReq: 10, stats: { atk: 22 }, desc: "Atk +22" },
+    { id: "G057", name: "Warrior Bulwark", slot: "shield", levelReq: 10, stats: { def: 5, block: 8 }, desc: "DEF +5, Block +8%" }
 );
 
 // Each map drops gear of its own level only.
@@ -262,13 +262,13 @@ Object.keys(GEAR_POOL).forEach(k => {
     GEAR_POOL[k].push(...HIGH_RING_ITEMS.filter(r => r.levelReq === lv));
     if (HAT_BY_LEVEL[lv]) {
         const h = HAT_BY_LEVEL[lv];
-        GEAR_POOL[k].push({ name: h.name, slot: "hat", levelReq: lv, stats: h.stats, desc: statText(h.stats) });
+        GEAR_POOL[k].push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: lv, stats: h.stats, desc: statText(h.stats) });
     }
     Object.keys(SET_PIECE_NAMES).forEach(setKey => {
         SET_SLOTS.forEach(slot => {
             const base = GEAR_POOL[k].find(i => i.slot === slot && !i.setName);
             if (!base) return;
-            GEAR_POOL[k].push({ name: `${SET_PIECE_NAMES[setKey][slot]} (Lv ${lv})`, slot, levelReq: lv, setName: setKey, stats: { ...base.stats }, desc: statText(base.stats) });
+            GEAR_POOL[k].push({ id: `set_${setKey}_${slot}_${lv}`, name: `${SET_PIECE_NAMES[setKey][slot]} (Lv ${lv})`, slot, levelReq: lv, setName: setKey, stats: { ...base.stats }, desc: statText(base.stats) });
         });
     });
 });
