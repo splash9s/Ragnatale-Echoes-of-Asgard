@@ -310,8 +310,13 @@ const COMBAT_ART = {
                 player: { x: 423, y: 766, left: 371.5, top: 552 },
                 hud: { left: 321, top: 777 }, // HP and armor below the character
                 monsters: [[646, 711], [853, 667], [1036, 637], [1244, 637], [1427, 621], [1610, 637]]
+            },
+            firebase3: {
+                player: { x: 487, y: 885, left: 435.5, top: 671 },
+                hud: { left: 385, top: 896 }, // HP and armor below the character
+                monsters: [[738, 829], [898, 775], [1059, 741], [1242, 720], [1424, 705], [1584, 686]]
             }
-            // firebase3-4: default layout until positions are given
+            // firebase4: default layout until positions are given
         }
     }
 };
