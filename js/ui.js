@@ -157,6 +157,13 @@ let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
 }
+// Player and monster positions for the current earth layout (default: the original layout)
+let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = feet centre, left/top = idle sprite
+let combatEarthMonsterPos = null; // per-monster [left, top] for the current layout, or null for the default
+const EARTH_BASE3_LAYOUT = {
+    player: { x: 616, y: 907, left: 564.5, top: 693 },
+    monsters: [[804, 800], [950, 781], [1095, 781], [1248, 781], [1384, 781], [1575, 745]]
+};
 setInterval(() => {
     const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
@@ -168,14 +175,14 @@ setInterval(() => {
                 img.src = frames[idx];
                 // Attack frames keep their own size, bottom-centred on the idle sprite
                 const [w, h] = (combatPlayerAttack.crit ? COMBAT_PLAYER_CRI_SIZES : COMBAT_PLAYER_HIT_SIZES)[idx];
-                img.style.left = (515.5 - w / 2) + 'px';
-                img.style.top = (871 - h) + 'px';
+                img.style.left = (combatPlayerAnchor.x - w / 2) + 'px';
+                img.style.top = (combatPlayerAnchor.y - h) + 'px';
                 img.style.width = w + 'px';
                 img.style.height = h + 'px';
                 return;
             }
-            img.style.left = '464px';
-            img.style.top = '657px';
+            img.style.left = combatPlayerAnchor.left + 'px';
+            img.style.top = combatPlayerAnchor.top + 'px';
             img.style.width = '103px';
             img.style.height = '214px';
         }
@@ -281,6 +288,9 @@ function randomizeEarthLayers() {
     if (bg) bg.src = pick(EARTH_BG_LAYERS);
     if (base) base.src = pick(EARTH_BASE_LAYERS);
     if (fg) fg.src = EARTH_FG_LAYER;
+    const layout = bg && base && base.src.includes('earthbase3') ? EARTH_BASE3_LAYOUT : null;
+    combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
+    combatEarthMonsterPos = layout ? layout.monsters : null;
 }
 
 function switchView(viewName) {
@@ -2143,8 +2153,13 @@ function updateUI() {
             let tag = isDead ? '<span class="text-[10px] text-slate-400">(Defeated)</span>' : (isTarget ? '<span class="text-[10px] text-amber-400">(Target)</span>' : '');
 
             // Card: sprite on top, then the name and HP box below it (no role or element)
+            let cardStyle = goneAt ? 'display:none' : '';
+            if (combatEarthMonsterPos && combatEarthMonsterPos[idx]) {
+                const [cl, ct] = combatEarthMonsterPos[idx];
+                cardStyle += `${cardStyle ? '; ' : ''}left:${cl}px; top:${ct}px`;
+            }
             lineupContainer.innerHTML += `
-                <div class="flex flex-col items-center gap-1"${goneAt ? ' style="display:none"' : ''}>
+                <div class="flex flex-col items-center gap-1"${cardStyle ? ` style="${cardStyle}"` : ''}>
                     <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
