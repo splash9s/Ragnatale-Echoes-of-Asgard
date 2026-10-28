@@ -260,3 +260,14 @@ Object.keys(GEAR_POOL).forEach(k => {
         });
     });
 });
+
+// Shop: gear for tiers 60-90 (hats are added above). Each tier costs 2x the one before,
+// starting from the Lv 50 shop price of each slot.
+const SHOP_TIER50_PRICE = { weapon: 5000, shield: 4500, armor: 6500, garment: 3800, footgear: 3800, ring: 5000 };
+[60, 70, 80, 90].forEach(lv => {
+    const mult = Math.pow(2, (lv - 50) / 10);
+    (GEAR_POOL[`map${lv}`] || []).forEach(i => {
+        if (i.setName || SHOP_TIER50_PRICE[i.slot] === undefined) return;
+        SHOP_ITEMS.push({ id: `shop_${i.id}`, name: i.name, slot: i.slot, levelReq: lv, price: Math.round(SHOP_TIER50_PRICE[i.slot] * mult), stats: i.stats, desc: statText(i.stats) });
+    });
+});
