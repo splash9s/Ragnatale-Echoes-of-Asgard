@@ -305,7 +305,7 @@ function getDerivedStats() {
     let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3);
     let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;
-    let flee = 40 + lvl + ST.agi + rn('shadowStep') * rn('killCount');
+    let flee = Math.floor(40 * 0.5) + lvl + ST.agi + rn('shadowStep') * rn('killCount');
     let crit = 1 + Math.floor(ST.luk / 3) + rn('critBonus') + rn('glassCannon') + skillBonus('critPct');
     let aspd = Math.floor(130 * 0.6 * 0.7) + Math.floor(ST.agi * 0.8) + Math.floor(ST.dex * 0.2);
     let movementSpeed = (player.baseMovementSpeed || 3);
