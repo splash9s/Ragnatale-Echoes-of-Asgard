@@ -924,6 +924,16 @@ function elemIconText(item) {
     return (item && item.element && ELEMENTS[item.element]) ? ` ${ELEMENTS[item.element].icon}` : '';
 }
 
+// Inventory picture: gear by slot, consumables by type
+const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', garment: '🧣', footgear: '👢', hat: '🎩', ring: '💍', pet: '🐾' };
+const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
+function itemEmoji(item) {
+    if (!item) return '';
+    if (item.slot && ITEM_SLOT_EMOJI[item.slot]) return ITEM_SLOT_EMOJI[item.slot];
+    if (item.type && ITEM_TYPE_EMOJI[item.type]) return ITEM_TYPE_EMOJI[item.type];
+    return '📦';
+}
+
 function elementDetailHTML(el) {
     const e = ELEMENTS[el];
     if (!e) return '';
@@ -1738,6 +1748,7 @@ function updateUI() {
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="w-[77px] h-[79px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot.png'); background-size:100% 100%;">
+                    <span class="text-base leading-none">${itemEmoji(item)}</span>
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
                     ${isGearItem(item) ? `<button onclick="event.stopPropagation(); toggleFavorite(${index})" title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 ${item.favorite ? 'text-amber-300' : 'text-slate-600 hover:text-amber-300'}">${item.favorite ? '★' : '☆'}</button>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
