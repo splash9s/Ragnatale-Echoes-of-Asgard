@@ -2133,7 +2133,7 @@ function updateUI() {
             // Card: sprite on top, then the name and HP box below it (no role or element)
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1"${goneAt ? ' style="display:none"' : ''}>
-                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:86px; height:72px; image-rendering:pixelated; pointer-events:none;">
+                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
