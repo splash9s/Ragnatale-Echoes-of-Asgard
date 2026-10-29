@@ -2,18 +2,36 @@
 // RAGNATALE - MAPS.JS
 // ==========================================
 
-// Mini boss: a tougher version of one map monster
-function makeMiniBoss(t) {
+// Level scaling: each base monster has stats for its home level (lv). On a map of level L its
+// HP, attack and rewards grow by LEVEL_GROWTH per level (fitted from the normal monsters: about 4% per level).
+const LEVEL_GROWTH = 1.0405;
+function levelScaled(t, level) {
+    const d = (level || 1) - (t.lv || 1);
+    if (d === 0) return t;
+    const f = Math.pow(LEVEL_GROWTH, d);
+    const r = v => Math.max(1, Math.round(v * f));
     return {
         ...t,
+        hp: r(t.hp), maxHp: r(t.maxHp),
+        atkMin: r(t.atkMin), atkMax: r(t.atkMax),
+        ...(t.heal ? { heal: r(t.heal) } : {}),
+        baseExp: r(t.baseExp), jobExp: r(t.jobExp), gold: r(t.gold)
+    };
+}
+
+// Mini boss: a tougher version of one base monster, scaled to the map level
+function makeMiniBoss(t, level) {
+    const s = levelScaled(t, level);
+    return {
+        ...s,
         name: `${t.name} [Mini Boss]`,
-        hp: t.hp * 3,
-        maxHp: t.maxHp * 3,
-        atkMin: Math.floor(t.atkMin * 1.5),
-        atkMax: Math.floor(t.atkMax * 1.5),
-        baseExp: t.baseExp * 3,
-        jobExp: t.jobExp * 3,
-        gold: t.gold * 3,
+        hp: s.hp * 3,
+        maxHp: s.maxHp * 3,
+        atkMin: Math.floor(s.atkMin * 1.5),
+        atkMax: Math.floor(s.atkMax * 1.5),
+        baseExp: s.baseExp * 3,
+        jobExp: s.jobExp * 3,
+        gold: s.gold * 3,
         isMiniBoss: true
     };
 }
@@ -43,6 +61,27 @@ const WAVE_SETS = [
     ['melee', 'melee', 'melee', 'mage', 'healer']
 ];
 
+// The 15 base monsters (3 per role). Every normal map uses these; the map level scales their stats.
+// lv = home level (the monster's own level). Rock Golem is a tank.
+const BASE_15 = {
+    slime:          { ...MONSTERS_DATA.slime,          role: 'melee',  lv: 1 },
+    frostTroll:     { ...MONSTERS_DATA.frostTroll,     role: 'melee',  lv: 60 },
+    iceRaider:      { ...MONSTERS_DATA.iceRaider,      role: 'melee',  lv: 60 },
+    mossyBoulder:   { ...MONSTERS_DATA.mossyBoulder,   role: 'tank',   lv: 1 },
+    draugrKnight:   { ...MONSTERS_DATA.draugrKnight,   role: 'tank',   lv: 90 },
+    rockGolem:      { ...MONSTERS_DATA.rockGolem,      role: 'tank',   lv: 10 },
+    sniperKobold:   { ...MONSTERS_DATA.sniperKobold,   role: 'range',  lv: 10 },
+    archerGoblin:   { ...MONSTERS_DATA.archerGoblin,   role: 'range',  lv: 1 },
+    frostArcher:    { ...MONSTERS_DATA.frostArcher,    role: 'range',  lv: 60 },
+    jotunFrostMage: { ...MONSTERS_DATA.jotunFrostMage, role: 'mage',   lv: 60 },
+    helStoneMage:   { ...MONSTERS_DATA.helStoneMage,   role: 'mage',   lv: 90 },
+    duskStormMage:  { ...MONSTERS_DATA.duskStormMage,  role: 'mage',   lv: 99 },
+    frostShaman:    { ...MONSTERS_DATA.frostShaman,    role: 'healer', lv: 60 },
+    duskPriest:     { ...MONSTERS_DATA.duskPriest,     role: 'healer', lv: 99 },
+    haloPriest:     { ...MONSTERS_DATA.haloPriest,     role: 'healer', lv: 40 }
+};
+const BASE_LIST = Object.values(BASE_15);
+
 // Base maps (shared by campaign paths, events and the daily challenge)
 // miniStage: stage with the mini boss (default 7, the stage after the 3rd rune). campaignStages: total stages in a campaign run (boss on the last stage).
 // bossSupport: monsters that stand behind the boss on its stage (pos = lineup position, 1 = boss row).
@@ -50,103 +89,85 @@ const GAME_DATA = {
     maps: {
         map1: {
             title: "Map Lv. 1", levelReq: 1, campaignStages: 11, miniStage: 7, stageGrowth: 0.07, dropKey: 'map1',
-            enemies: [MONSTERS_DATA.slime, MONSTERS_DATA.farbo, MONSTERS_DATA.archerGoblin],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.bossGiantMossSlime,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.farbo)
+            miniBoss: makeMiniBoss(BASE_15.mossyBoulder, 1)
         },
         map10: {
             title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, stageGrowth: 0.08, dropKey: 'map10',
-            enemies: [MONSTERS_DATA.caveBat, MONSTERS_DATA.rockGolem, MONSTERS_DATA.sniperKobold],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.bossCavernBehemoth,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.rockGolem)
+            miniBoss: makeMiniBoss(BASE_15.rockGolem, 10)
         },
         map20: {
             title: "Map Lv. 20", levelReq: 20, campaignStages: 15, miniStage: 7, dropKey: 'map20',
-            enemies: [MONSTERS_DATA.desertScorpion, MONSTERS_DATA.sandWarrior, MONSTERS_DATA.windArcher],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.bossAncientPharaoh,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.desertScorpion)
+            miniBoss: makeMiniBoss(BASE_15.sniperKobold, 20)
         },
         map30: {
             title: "Map Lv. 30", levelReq: 30, campaignStages: 16, miniStage: 7, dropKey: 'map30',
-            enemies: [MONSTERS_DATA.abyssalImp, MONSTERS_DATA.hellhound, MONSTERS_DATA.demonGunner, MONSTERS_DATA.abyssPriest],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.bossLordAbyss,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.hellhound),
+            miniBoss: makeMiniBoss(BASE_15.jotunFrostMage, 30),
             bossSupport: [{ pos: 2, role: 'healer' }]
         },
         map40: {
             title: "Map Lv. 40", levelReq: 40, campaignStages: 16, miniStage: 7, dropKey: 'map40',
-            enemies: [MONSTERS_DATA.celestialSentinel, MONSTERS_DATA.seraphimEcho, MONSTERS_DATA.heavenlyBallista, MONSTERS_DATA.haloPriest],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.bossArchangelCorrupted,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.seraphimEcho),
+            miniBoss: makeMiniBoss(BASE_15.haloPriest, 40),
             bossSupport: [{ pos: 2, role: 'healer' }]
         },
         map50: {
             title: "Map Lv. 50", levelReq: 50, campaignStages: 21, miniStage: 7, dropKey: 'map50',
-            enemies: [MONSTERS_DATA.astralHorror, MONSTERS_DATA.voidSniper, MONSTERS_DATA.starlightMender],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.voidColossus,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.astralHorror),
+            miniBoss: makeMiniBoss(BASE_15.duskStormMage, 50),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }]
         },
         map60: {
             title: "Map Lv. 60", levelReq: 60, campaignStages: 21, miniStage: 7, dropKey: 'map60', stageGrowth: 0.10,
-            enemies: [MONSTERS_DATA.frostTroll, MONSTERS_DATA.snowWolf, MONSTERS_DATA.iceRaider, MONSTERS_DATA.iceGolem,
-                      MONSTERS_DATA.frostArcher, MONSTERS_DATA.iceSpearThrower, MONSTERS_DATA.frostShaman,
-                      MONSTERS_DATA.jotunFlameMage, MONSTERS_DATA.jotunStoneMage, MONSTERS_DATA.jotunFrostMage, MONSTERS_DATA.jotunStormMage],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.hrymFrostKing,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.frostTrollChief),
+            miniBoss: makeMiniBoss(BASE_15.frostTroll, 60),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }]
         },
         map70: {
             title: "Map Lv. 70", levelReq: 70, campaignStages: 21, miniStage: 7, dropKey: 'map70', stageGrowth: 0.10,
-            enemies: [MONSTERS_DATA.einherjarWarrior, MONSTERS_DATA.raiderSwordsman, MONSTERS_DATA.battleBoar, MONSTERS_DATA.ironShieldGuard,
-                      MONSTERS_DATA.valkyrieArcher, MONSTERS_DATA.javelinThrower, MONSTERS_DATA.valkyrieHealer,
-                      MONSTERS_DATA.battleFlameMage, MONSTERS_DATA.battleStoneMage, MONSTERS_DATA.battleFrostMage, MONSTERS_DATA.battleStormMage],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.brynhildValkyrieQueen,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.einherjarChampion),
+            miniBoss: makeMiniBoss(BASE_15.draugrKnight, 70),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }]
         },
         map80: {
             title: "Map Lv. 80", levelReq: 80, campaignStages: 26, miniStage: 7, dropKey: 'map80', stageGrowth: 0.10,
-            enemies: [MONSTERS_DATA.fireBerserker, MONSTERS_DATA.lavaHound, MONSTERS_DATA.emberBrute, MONSTERS_DATA.magmaGolem,
-                      MONSTERS_DATA.flameArcher, MONSTERS_DATA.emberSlinger, MONSTERS_DATA.emberPriest,
-                      MONSTERS_DATA.muspelFlameMage, MONSTERS_DATA.muspelStoneMage, MONSTERS_DATA.muspelFrostMage, MONSTERS_DATA.muspelStormMage],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.surtrFlameGiant,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.lavaBerserkerChief),
+            miniBoss: makeMiniBoss(BASE_15.frostArcher, 80),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }, { pos: 4, role: 'healer' }]
         },
         map90: {
             title: "Map Lv. 90", levelReq: 90, campaignStages: 26, miniStage: 7, dropKey: 'map90', stageGrowth: 0.10,
-            enemies: [MONSTERS_DATA.draugrWarrior, MONSTERS_DATA.deathHound, MONSTERS_DATA.graveThrall, MONSTERS_DATA.draugrKnight,
-                      MONSTERS_DATA.helArcher, MONSTERS_DATA.ghostSpearman, MONSTERS_DATA.soulKeeper,
-                      MONSTERS_DATA.helFlameMage, MONSTERS_DATA.helStoneMage, MONSTERS_DATA.helFrostMage, MONSTERS_DATA.helStormMage],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.queenHel,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.draugrLord),
+            miniBoss: makeMiniBoss(BASE_15.helStoneMage, 90),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }, { pos: 4, role: 'healer' }]
         },
         map99: {
             title: "Map Lv. 99", levelReq: 99, campaignStages: 31, miniStage: 7, dropKey: 'map99', stageGrowth: 0.10,
-            enemies: [MONSTERS_DATA.duskWolf, MONSTERS_DATA.duskWarrior, MONSTERS_DATA.brokenThrall, MONSTERS_DATA.duskTitan,
-                      MONSTERS_DATA.duskArcher, MONSTERS_DATA.duskGunner, MONSTERS_DATA.duskPriest,
-                      MONSTERS_DATA.duskFlameMage, MONSTERS_DATA.duskStoneMage, MONSTERS_DATA.duskFrostMage, MONSTERS_DATA.duskStormMage],
+            enemies: [...BASE_LIST],
             boss: MONSTERS_DATA.brynhildValkyrieQueen,
-            miniBoss: makeMiniBoss(MONSTERS_DATA.brokenEinherjar),
+            miniBoss: makeMiniBoss(BASE_15.iceRaider, 99),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }, { pos: 4, role: 'healer' }]
         },
         finalMap: {
             title: "Final Map Lv. 110", levelReq: 110, campaignStages: 25, miniStage: 0, dropKey: 'map99', finalMap: true, stageGrowth: 0,
-            enemies: [], boss: MONSTERS_DATA.bossWorldEater, miniBoss: null, bossSupport: []
+            enemies: [...BASE_LIST], boss: MONSTERS_DATA.bossWorldEater, miniBoss: null, bossSupport: []
         }
     },
     paths: {}
 };
-
-// Tanks and mages for Lv 1-50 (added before path copies are built)
-GAME_DATA.maps.map1.enemies.push(MONSTERS_DATA.mossyBoulder, MONSTERS_DATA.leafSpriteMage);
-GAME_DATA.maps.map10.enemies.push(MONSTERS_DATA.caveStoneGuard, MONSTERS_DATA.batWitch);
-GAME_DATA.maps.map20.enemies.push(MONSTERS_DATA.sandColossus, MONSTERS_DATA.desertSorcerer);
-GAME_DATA.maps.map30.enemies.push(MONSTERS_DATA.abyssalBrute, MONSTERS_DATA.impSummoner);
-GAME_DATA.maps.map40.enemies.push(MONSTERS_DATA.haloWarden, MONSTERS_DATA.starlitOracle);
-GAME_DATA.maps.map50.enemies.push(MONSTERS_DATA.voidBulwark, MONSTERS_DATA.astralMage);
 
 // Stage growth: one curve for every map (enemy HP/ATK per stage = 1 + (stage-1) * STAGE_GROWTH)
 const STAGE_GROWTH = 0.10;

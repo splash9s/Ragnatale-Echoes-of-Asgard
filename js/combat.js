@@ -410,7 +410,7 @@ function finalStageLevel(stage) {
 
 function finalMonsterPool(level) {
     const m = GAME_DATA.maps[FINAL_LEVEL_MAPS[level]];
-    return level === 100 ? [...m.enemies, MONSTERS_DATA.worldEnderMinion] : m.enemies;
+    return m.enemies;
 }
 
 // Monster strength across the 25 final stages: grows by 4% per stage (stage 25 = x1.96)
@@ -425,10 +425,10 @@ function spawnFinalStage() {
         const up = v => Math.floor(v * FINAL_BOSS_MULT);
         const finalBoss = { ...boss, hp: up(boss.hp), maxHp: up(boss.maxHp), atkMin: up(boss.atkMin), atkMax: up(boss.atkMax), isFinalBoss: true };
         const escorts = [
-            makeUnit(MONSTERS_DATA.starlightMender, mult),
-            makeUnit(MONSTERS_DATA.voidSniper, mult),
-            { ...makeUnit(MONSTERS_DATA.duskFrostMage, mult), element: 'water' },
-            { ...makeUnit(MONSTERS_DATA.duskStoneMage, mult), element: 'earth' }
+            makeUnit(levelScaled(BASE_15.haloPriest, 100), mult),
+            makeUnit(levelScaled(BASE_15.frostArcher, 100), mult),
+            { ...makeUnit(levelScaled(BASE_15.jotunFrostMage, 100), mult), element: 'water' },
+            { ...makeUnit(levelScaled(BASE_15.helStoneMage, 100), mult), element: 'earth' }
         ];
         monstersList = [finalBoss, ...escorts];
         logMessage(`[Final Boss] ${finalBoss.name} appears with its escort!`, 'winlose');
@@ -445,7 +445,7 @@ function spawnFinalStage() {
     const [lo, hi] = campaignCountRange();
     const count = randomInRange(lo, hi);
     monstersList = [];
-    for (let i = 0; i < count; i++) monstersList.push(makeUnit(pool[Math.floor(Math.random() * pool.length)], mult));
+    for (let i = 0; i < count; i++) monstersList.push(makeUnit(levelScaled(pool[Math.floor(Math.random() * pool.length)], level), mult));
 }
 
 function isBossStage() {
@@ -463,7 +463,8 @@ function getBossTemplate() {
 
 function getDailyEnemyPool() {
     const key = ['map1', 'map10', 'map20', 'map30'][Math.min(3, Math.floor((currentStage - 1) / 10))];
-    return GAME_DATA.maps[key].enemies;
+    const lv = GAME_DATA.maps[key].levelReq;
+    return GAME_DATA.maps[key].enemies.map(t => levelScaled(t, lv));
 }
 
 // Bosses are stronger than their template and use the boss skills in monsterAct()
@@ -519,7 +520,8 @@ function spawnStageMonsters() {
             const count = Math.floor(Math.random() * 5) + 2;
             const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : stageMultiplier();
             for (let i = 0; i < count; i++) {
-                const template = pool[Math.floor(Math.random() * pool.length)];
+                const picked = pool[Math.floor(Math.random() * pool.length)];
+                const template = currentMode === 'daily' ? picked : levelScaled(picked, activeMap && activeMap.levelReq);
                 const base = {
                     ...template,
                     hp: Math.floor(template.hp * mult),
@@ -660,7 +662,7 @@ function spawnWaveFromSet(dailyScale, scaled) {
     const pool = activeMap.enemies;
     const mult = stageMultiplier();
     set.forEach(role => {
-        const unit = makeUnit(pickUnit(pool, role), mult);
+        const unit = makeUnit(levelScaled(pickUnit(pool, role), activeMap.levelReq), mult);
         monstersList.push(dailyScale === 1 ? unit : scaled(unit));
     });
     logMessage(`[Wave] ${monstersList.length} enemies come forward!`, 'combat');
@@ -679,7 +681,7 @@ function addBossSupport(boss) {
     };
     const supports = [];
     ((activeMap && activeMap.bossSupport) || []).forEach(s => {
-        const unit = makeUnit(pickUnit(activeMap.enemies, s.role), mult);
+        const unit = makeUnit(levelScaled(pickUnit(activeMap.enemies, s.role), activeMap.levelReq), mult);
         let want = s.pos - 1;
         if (s.role === 'range' || s.role === 'mage') want = 5;
         else if (s.role === 'tank') want = 4;
@@ -1411,6 +1413,7 @@ function buildEventMap(kind, mapKey) {
     return {
         title: `${EVENT_CONFIG[kind].name} — ${base.title}`,
         dropKey: base.dropKey,
+        levelReq: base.levelReq,
         maxStages: base.campaignStages || 11,
         miniStage: base.miniStage,
         bossSupport: base.bossSupport,
