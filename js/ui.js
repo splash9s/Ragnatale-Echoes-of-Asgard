@@ -212,6 +212,7 @@ function playPlayerReactAnim(kind) {
 // Monster colour by element (CSS filter on the shared slime sprite). Bosses and mini-bosses keep their own look.
 function monsterTintClass(m) {
     if (m.isBoss || m.isMiniBoss) return '';
+    if (currentPath === 'fire') return ''; // fire map: no colour tint
     return ({ fire: 'tint-fire', water: 'tint-water', wind: 'tint-wind' })[m.element] || '';
 }
 // Dodge lunge: the sprite moves 40px back and returns in 0.2s. Web Animations API, so every dodge plays.
@@ -2430,7 +2431,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    ${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim ${monsterTintClass(m)}${sp && sp.bob ? ' idle-bob' : ''}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-hurt-frames="${sp ? '' : COMBAT_SLIME_DAMAGE_FRAMES.join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="width:110px; height:110px; object-fit:contain; object-position:50% 100%; image-rendering:pixelated; pointer-events:none;">`; })()}
+                    ${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim ${monsterTintClass(m)}${sp && sp.bob ? ' idle-bob' : ''}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-hurt-frames="${sp ? '' : COMBAT_SLIME_DAMAGE_FRAMES.join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="${sp ? '' : 'width:110px; height:110px; object-fit:contain; object-position:50% 100%; '}image-rendering:pixelated; pointer-events:none;">`; })()}
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
