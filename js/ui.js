@@ -157,6 +157,13 @@ let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
 }
+// Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one 256x256 frame for a short time.
+const COMBAT_PLAYER_REACT_FRAMES = { block: 'assets/combat/player/cha_block1_q85.webp', dodge: 'assets/combat/player/cha_dodge1_q85.webp' };
+const COMBAT_PLAYER_REACT_MS = 600;
+let combatPlayerReact = { at: 0, kind: null };
+function playPlayerReactAnim(kind) {
+    combatPlayerReact = { at: Date.now(), kind };
+}
 // Player and monster positions for the current earth layout (default: the original layout)
 let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = feet centre, left/top = idle sprite
 let combatEarthMonsterPos = null; // per-position [left, top] for the current layout, or null for the default
@@ -190,6 +197,16 @@ setInterval(() => {
                 img.style.top = (combatPlayerAnchor.y - h) + 'px';
                 img.style.width = w + 'px';
                 img.style.height = h + 'px';
+                return;
+            }
+            const re = now - combatPlayerReact.at;
+            if (combatPlayerReact.kind && re >= 0 && re < COMBAT_PLAYER_REACT_MS) {
+                // The 256x256 frame has the figure centred at x=128 with its feet at y=224
+                img.src = COMBAT_PLAYER_REACT_FRAMES[combatPlayerReact.kind];
+                img.style.left = (combatPlayerAnchor.x - 128) + 'px';
+                img.style.top = (combatPlayerAnchor.y - 224) + 'px';
+                img.style.width = '256px';
+                img.style.height = '256px';
                 return;
             }
             img.style.left = combatPlayerAnchor.left + 'px';

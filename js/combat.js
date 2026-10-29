@@ -873,6 +873,7 @@ function checkStageClearAfterHeal() {
 
 function onPlayerDodged(m, source) {
     setTimeout(() => showCombatText('#combat-player-sprite', 'DODGE', 'miss'), 0);
+    playPlayerReactAnim('dodge');
     logMessage(`[Dodge] You evaded ${m.name}'s attack! (${source})`, 'combat');
     monsterHitStreak = 0;
     dodgeStreak++;
@@ -899,6 +900,7 @@ function onPlayerDodged(m, source) {
 // Armor absorbs damage first, the rest goes to HP
 // Armor absorbs damage first, the rest goes to HP
 function takePlayerDamage(dmg, m) {
+    playPlayerReactAnim('block');
     lastHitBy = m.name;
     dmg = Math.floor(dmg * (1 - skillBonus('dmgReducePct') / 100));
     // Element resistance from gear: a negative value means extra damage from that element
