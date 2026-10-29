@@ -7,6 +7,7 @@ let activeMap = null;
 let currentStage = 1;
 let maxStages = 11;
 let combatInterval = null;
+let combatSessionId = 0; // changes whenever the player leaves combat; stale timers check it and stop
 let combatPaused = false;
 let runeRefreshLeft = 0;
 const RUNE_REFRESH_MAX = 3;
@@ -1201,9 +1202,12 @@ function onStageCleared() {
     stageClearing = true;
     clearInterval(combatInterval);
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
+    const sid = combatSessionId;
 
     setTimeout(() => {
+        if (sid !== combatSessionId) return; // player left combat before the stage ended
         const proceedNext = () => {
+            if (sid !== combatSessionId) return;
             stageClearing = false;
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.add('hidden');
@@ -1260,6 +1264,7 @@ function onStageCleared() {
 
             // Layers and positions swap first; the stage's monsters and ticks start after that
             changeEarthLayers().then(() => {
+                if (sid !== combatSessionId) return; // left combat while the next stage loaded
                 combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (getDerivedStats().aspd * 10)));
                 spawnStageMonsters();
             });
@@ -1437,6 +1442,7 @@ function startEvent(kind, mapKey) {
 
 // Leaving combat restores HP and armor
 function restoreAfterCombat() {
+    combatSessionId++;
     if (!player.inCombat) return;
     player.inCombat = false;
     if (combatInterval) clearInterval(combatInterval);
