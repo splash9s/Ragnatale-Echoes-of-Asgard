@@ -163,14 +163,15 @@ const COMBAT_PLAYER_REACT_MS = 600;
 let combatPlayerReact = { at: 0, kind: null };
 function playPlayerReactAnim(kind) {
     combatPlayerReact = { at: Date.now(), kind };
-}
-// Dodge lunge: a CSS animation (0.2s) that restarts on every dodge
-function playPlayerDodgeLunge() {
+    // Show the reaction frame at its full 256x256 size right away (no waiting for the next sprite tick)
     const el = document.getElementById('combat-player-sprite');
-    if (!el) return;
-    el.classList.remove('player-dodge');
-    void el.offsetWidth; // restart the animation
-    el.classList.add('player-dodge');
+    if (el && COMBAT_PLAYER_REACT_FRAMES[kind]) {
+        el.src = COMBAT_PLAYER_REACT_FRAMES[kind];
+        el.style.left = (combatPlayerAnchor.x - 128) + 'px';
+        el.style.top = (combatPlayerAnchor.y - 224) + 'px';
+        el.style.width = '256px';
+        el.style.height = '256px';
+    }
 }
 // Red flash on the player's battle sprite when it takes damage
 function flashPlayerHurt() {

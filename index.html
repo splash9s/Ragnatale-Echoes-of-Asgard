@@ -220,9 +220,6 @@
         /* Player hit: short red flash on the battle sprite */
         @keyframes playerHurtFlash { 0% { filter: none; } 30% { filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 100% { filter: none; } }
         #combat-player-sprite.player-hurt { animation: playerHurtFlash .3s ease; }
-        /* Dodge: the sprite lunges back 40px and returns in 0.2s */
-        @keyframes playerDodgeLunge { 0% { transform: translateX(0); } 50% { transform: translateX(-40px); } 100% { transform: translateX(0); } }
-        #combat-player-sprite.player-dodge { animation: playerDodgeLunge .2s ease; }
         /* Keep the aspect ratio when a frame is not exactly the set size (some idle frames are 103x216) */
         #combat-player-sprite { object-fit: contain; }
         /* Entering combat: hide default (earth) art, HUD and monsters until the chosen map's layers are swapped in */
