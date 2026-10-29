@@ -212,7 +212,7 @@ function playPlayerReactAnim(kind) {
 // Monster colour by element (CSS filter on the shared slime sprite). Bosses and mini-bosses keep their own look.
 function monsterTintClass(m) {
     if (m.isBoss || m.isMiniBoss) return '';
-    if (currentPath === 'fire') return ''; // fire map: no colour tint
+    if (monsterSpriteOf(m) && currentPath === 'fire') return ''; // Rock Golem keeps its own colour on the lava (fire) map
     return ({ fire: 'tint-fire', water: 'tint-water', wind: 'tint-wind' })[m.element] || '';
 }
 // Dodge lunge: the sprite moves 40px back and returns in 0.2s. Web Animations API, so every dodge plays.
