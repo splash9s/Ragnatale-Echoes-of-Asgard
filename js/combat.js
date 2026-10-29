@@ -948,7 +948,6 @@ function monsterAct(m, derived, position = 0) {
         return;
     }
     if (m.isBoss) m.attackCount = (m.attackCount || 0) + 1;
-    m._attackAt = Date.now(); // starts the lunge toward the player
 
     // Healers restore the most wounded ally by a flat amount instead of attacking
     if (roleOf(m) === 'healer' && m.heal) {

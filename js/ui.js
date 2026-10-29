@@ -222,11 +222,6 @@ setInterval(() => {
             img.style.width = '103px';
             img.style.height = '214px';
         }
-        // Monster attack: the sprite lunges toward the player (left) and back over 320ms
-        const atkAt = Number(img.dataset.attackAt) || 0;
-        const ae = now - atkAt;
-        if (atkAt && ae >= 0 && ae < 320) img.style.transform = `translateX(${(-Math.sin(Math.PI * ae / 320) * 40).toFixed(1)}px)`;
-        else if (img.style.transform) img.style.transform = '';
         const deathAt = Number(img.dataset.deathAt) || 0;
         if (deathAt) {
             const e = now - deathAt;
@@ -2364,7 +2359,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-attack-at="${m._attackAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
+                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
