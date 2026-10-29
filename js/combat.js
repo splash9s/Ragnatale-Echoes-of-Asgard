@@ -916,6 +916,8 @@ function takePlayerDamage(dmg, m) {
     }
     if (remaining > 0) player.hp -= remaining;
     logMessage(`[Combat] ${m.name} hits you for ${dmg} damage${absorbed ? ` (${absorbed} absorbed by armor)` : ''}`, 'combat');
+    // Damage number on the player's sprite: the damage taken (armor-absorbed damage included)
+    showCombatNumber('#combat-player-sprite', dmg, false);
 
     if (!battleFirstDamageTaken) {
         battleFirstDamageTaken = true;

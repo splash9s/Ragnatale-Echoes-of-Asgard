@@ -233,8 +233,11 @@ setInterval(() => {
         const elapsed = now - hitAt;
         if (hitAt && elapsed >= 0 && elapsed < COMBAT_SLIME_DAMAGE_FRAMES.length * COMBAT_DAMAGE_FRAME_MS) {
             img.src = COMBAT_SLIME_DAMAGE_FRAMES[Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS)];
+            // Same red flash as the player's battle sprite (first 300ms of the hit)
+            img.style.filter = elapsed < 300 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             return;
         }
+        if (img.style.filter) img.style.filter = '';
         const frames = img.dataset.frames.split(',');
         img.src = frames[Math.floor(now / 250) % frames.length]; // idle: one frame every 250ms
     });
@@ -2258,10 +2261,6 @@ function updateUI() {
 
     el = document.getElementById('player-hp-text');
     if (el) el.innerText = `${player.hp} / ${derived.maxHp} HP`;
-    if (player._prevHpNum !== undefined && player.hp < player._prevHpNum) {
-        const playerDmg = player._prevHpNum - player.hp;
-        setTimeout(() => showCombatNumber('#combat-player-sprite', playerDmg, false), 0);
-    }
     player._prevHpNum = player.hp;
     const armorNow = Math.max(0, player.armor || 0);
     el = document.getElementById('player-armor-text');
