@@ -215,6 +215,9 @@
         #event-daily { background-color: rgba(143, 179, 169, .65) !important; border-color: #6f9a8e !important; }
         #event-gold, #event-xp { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
         #void-tower-card { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
+        /* Entering combat: hide default (earth) art, HUD and monsters until the chosen map's layers are swapped in */
+        #view-combat.art-loading #earth-bg, #view-combat.art-loading #earth-base, #view-combat.art-loading #earth-fg,
+        #view-combat.art-loading #combat-hp-under, #view-combat.art-loading #monsters-lineup-container { visibility: hidden; }
     </style>
 </head>
 

@@ -447,6 +447,7 @@ async function changeEarthLayers() {
         hud.style.top = h.top + 'px';
     }
     applyCombatEarthPositions();
+    document.getElementById('view-combat')?.classList.remove('art-loading'); // first layers are in place
 }
 
 function switchView(viewName) {
@@ -501,7 +502,11 @@ function switchView(viewName) {
         document.getElementById('view-quests')?.classList.remove('hidden');
         renderMailBox();
     }
-    if (viewName === 'combat') { document.getElementById('view-combat')?.classList.remove('hidden'); changeEarthLayers(); }
+    if (viewName === 'combat') {
+        const combatView = document.getElementById('view-combat');
+        if (combatView) { combatView.classList.remove('hidden'); combatView.classList.add('art-loading'); }
+        changeEarthLayers();
+    }
 
     updateUI();
     saveGame();
