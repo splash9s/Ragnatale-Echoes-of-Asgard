@@ -218,6 +218,8 @@
         /* Player hit: short red flash on the battle sprite */
         @keyframes playerHurtFlash { 0% { filter: none; } 30% { filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 100% { filter: none; } }
         #combat-player-sprite.player-hurt { animation: playerHurtFlash .3s ease; }
+        /* Keep the aspect ratio when a frame is not exactly the set size (some idle frames are 103x216) */
+        #combat-player-sprite { object-fit: contain; }
         /* Entering combat: hide default (earth) art, HUD and monsters until the chosen map's layers are swapped in */
         #view-combat.art-loading #earth-bg, #view-combat.art-loading #earth-base, #view-combat.art-loading #earth-fg,
         #view-combat.art-loading #combat-hp-under, #view-combat.art-loading #monsters-lineup-container { visibility: hidden; }
