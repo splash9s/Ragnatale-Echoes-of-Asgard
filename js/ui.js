@@ -122,6 +122,15 @@ const COMBAT_DAMAGE_FRAME_MS = 480;
 const COMBAT_SLIME_DEATH_FRAMES = Array.from({ length: 6 }, (_, i) => `assets/combat/slime/slime_dead_${String(i + 1).padStart(4, '0')}.png`);
 const COMBAT_DEATH_FRAME_MS = 150;
 const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FRAME_MS;
+// Monsters with their own art, by monster id. Others use the slime frames (colour comes from CSS).
+// bob: a slow 3px up-and-down while idle. dead: death frames, each shown for deathMs.
+const MONSTER_SPRITES = {
+    M006: { idle: ['assets/combat/rockgolem/rockgolem.png'], bob: true, dead: ['assets/combat/rockgolem/rockgolemdead1.png', 'assets/combat/rockgolem/rockgolemdead2.png'], deathMs: 400 }
+};
+function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
+function monsterDeathFrames(m) { const s = monsterSpriteOf(m); return s ? s.dead : COMBAT_SLIME_DEATH_FRAMES; }
+function monsterDeathMs(m) { const s = monsterSpriteOf(m); return s ? s.deathMs : COMBAT_DEATH_FRAME_MS; }
+function monsterDeathTotalMs(m) { return monsterDeathFrames(m).length * monsterDeathMs(m); }
 const COMBAT_SLIME_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/slime/slime_${String(i + 1).padStart(4, '0')}.png`).join(',');
 const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
 // Floating damage number over a combat sprite: bold white normal, bold orange critical
@@ -272,14 +281,19 @@ setInterval(() => {
         const deathAt = Number(img.dataset.deathAt) || 0;
         if (deathAt) {
             const e = now - deathAt;
-            if (e < COMBAT_DEATH_TOTAL_MS) img.src = COMBAT_SLIME_DEATH_FRAMES[Math.floor(e / COMBAT_DEATH_FRAME_MS)];
+            const total = Number(img.dataset.deathTotal) || COMBAT_DEATH_TOTAL_MS;
+            const ms = Number(img.dataset.deathMs) || COMBAT_DEATH_FRAME_MS;
+            const dead = img.dataset.deathFrames ? img.dataset.deathFrames.split(',') : COMBAT_SLIME_DEATH_FRAMES;
+            if (e < total) img.src = dead[Math.min(dead.length - 1, Math.floor(e / ms))];
             else if (img.parentElement) img.parentElement.style.display = 'none';
             return;
         }
         const hitAt = Number(img.dataset.hitAt) || 0;
         const elapsed = now - hitAt;
         if (hitAt && elapsed >= 0 && elapsed < COMBAT_SLIME_DAMAGE_FRAMES.length * COMBAT_DAMAGE_FRAME_MS) {
-            img.src = COMBAT_SLIME_DAMAGE_FRAMES[Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS)];
+            // Monsters with their own art keep their idle frame here (data-hurt-frames is empty); the red flash still plays
+            const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
+            if (hurt.length) img.src = hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))];
             // Same red flash as the player's battle sprite (first 300ms of the hit)
             img.style.filter = elapsed < 300 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             return;
@@ -2396,7 +2410,7 @@ function updateUI() {
                     if (typeof playSound === 'function') playSound('sound/slime_dead.mp3');
                 }
             }
-            const goneAt = m._deathAt ? Date.now() - m._deathAt >= COMBAT_DEATH_TOTAL_MS : false;
+            const goneAt = m._deathAt ? Date.now() - m._deathAt >= monsterDeathTotalMs(m) : false;
             if (m._prevHp !== undefined && m.hp > m._prevHp) {
                 setTimeout(() => showHealAura(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`), 0);
             }
@@ -2416,7 +2430,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <img class="idle-anim ${monsterTintClass(m)}" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
+                    ${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim ${monsterTintClass(m)}${sp && sp.bob ? ' idle-bob' : ''}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-hurt-frames="${sp ? '' : COMBAT_SLIME_DAMAGE_FRAMES.join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="width:110px; height:110px; object-fit:contain; object-position:50% 100%; image-rendering:pixelated; pointer-events:none;">`; })()}
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
