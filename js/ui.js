@@ -158,20 +158,37 @@ function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one 256x256 frame for a short time.
-const COMBAT_PLAYER_REACT_FRAMES = { block: 'assets/combat/player/cha_block1_q85.webp', dodge: 'assets/combat/player/cha_dodge1_q85.webp' };
+// Each reaction frame is scaled so its figure is the same height as the idle sprite (214px).
+// w/h = frame size on screen; fx/fy = feet point inside the frame (placed on the player's anchor).
+const COMBAT_PLAYER_REACT_FRAMES = {
+    block: { src: 'assets/combat/player/cha_block1_q85.webp', w: 347, h: 347, fx: 173.5, fy: 303.6 },
+    dodge: { src: 'assets/combat/player/cha_dodge1_q85.webp', w: 315, h: 315, fx: 157.5, fy: 275.6 }
+};
+// Place a reaction frame on the player's feet point
+function applyPlayerReactFrame(img, f) {
+    img.src = f.src;
+    img.style.left = (combatPlayerAnchor.x - f.fx) + 'px';
+    img.style.top = (combatPlayerAnchor.y - f.fy) + 'px';
+    img.style.width = f.w + 'px';
+    img.style.height = f.h + 'px';
+}
 const COMBAT_PLAYER_REACT_MS = 600;
 let combatPlayerReact = { at: 0, kind: null };
 function playPlayerReactAnim(kind) {
     combatPlayerReact = { at: Date.now(), kind };
-    // Show the reaction frame at its full 256x256 size right away (no waiting for the next sprite tick)
+    // Show the reaction frame right away (no waiting for the next sprite tick)
     const el = document.getElementById('combat-player-sprite');
-    if (el && COMBAT_PLAYER_REACT_FRAMES[kind]) {
-        el.src = COMBAT_PLAYER_REACT_FRAMES[kind];
-        el.style.left = (combatPlayerAnchor.x - 128) + 'px';
-        el.style.top = (combatPlayerAnchor.y - 224) + 'px';
-        el.style.width = '256px';
-        el.style.height = '256px';
-    }
+    if (el && COMBAT_PLAYER_REACT_FRAMES[kind]) applyPlayerReactFrame(el, COMBAT_PLAYER_REACT_FRAMES[kind]);
+}
+// Dodge lunge: the sprite moves 40px back and returns in 0.2s. Web Animations API, so every dodge plays.
+function playPlayerDodgeLunge() {
+    const el = document.getElementById('combat-player-sprite');
+    if (!el || !el.animate) return;
+    el.animate([
+        { transform: 'translateX(0px)' },
+        { transform: 'translateX(-40px)', offset: 0.5 },
+        { transform: 'translateX(0px)' }
+    ], { duration: 200, easing: 'ease-in-out' });
 }
 // Red flash on the player's battle sprite when it takes damage
 function flashPlayerHurt() {
@@ -218,12 +235,7 @@ setInterval(() => {
             }
             const re = now - combatPlayerReact.at;
             if (combatPlayerReact.kind && re >= 0 && re < COMBAT_PLAYER_REACT_MS) {
-                // The 256x256 frame has the figure centred at x=128 with its feet at y=224
-                img.src = COMBAT_PLAYER_REACT_FRAMES[combatPlayerReact.kind];
-                img.style.left = (combatPlayerAnchor.x - 128) + 'px';
-                img.style.top = (combatPlayerAnchor.y - 224) + 'px';
-                img.style.width = '256px';
-                img.style.height = '256px';
+                applyPlayerReactFrame(img, COMBAT_PLAYER_REACT_FRAMES[combatPlayerReact.kind]);
                 return;
             }
             img.style.left = combatPlayerAnchor.left + 'px';
