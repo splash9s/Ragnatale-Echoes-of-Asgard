@@ -224,6 +224,7 @@ function flashPlayerHurt() {
     el.classList.add('player-hurt');
 }
 // Player and monster positions for the current earth layout (default: the original layout)
+let combatShadowLift = 0; // px the player shadow is raised on fire, wind and ice bases
 let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = feet centre, left/top = idle sprite
 let combatEarthMonsterPos = null; // per-position [left, top] for the current layout, or null for the default
 // Default lineup position for each of the 6 slots (same as the CSS nth-child rules)
@@ -492,7 +493,7 @@ function applyCombatEarthPositions() {
     const shadow = document.getElementById('combat-player-shadow');
     if (shadow) {
         shadow.style.left = (combatPlayerAnchor.x - 112.5) + 'px';
-        shadow.style.top = (combatPlayerAnchor.y - 32) + 'px';
+        shadow.style.top = (combatPlayerAnchor.y - 32 - combatShadowLift) + 'px';
     }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
         const pos = Number(card.dataset.pos);
@@ -521,6 +522,7 @@ async function changeEarthLayers() {
     const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
+    combatShadowLift = /(windbase|icebase|firebase)/.test(nextBase) ? 50 : 0;
     combatEarthMonsterPos = layout ? layout.monsters : null;
     if (hud) {
         const h = layout && layout.hud ? layout.hud : { left: 413, top: 896 };
