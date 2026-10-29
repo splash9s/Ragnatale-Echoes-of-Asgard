@@ -343,7 +343,7 @@ const COMBAT_ART = {
             windbase3: {
                 player: { x: 468, y: 699, left: 417, top: 485 },
                 hud: { left: 366, top: 710 },
-                monsters: [[747, 708], [1026, 780], [1222, 744], [1398, 738], [1624, 738], [804, 956]]
+                monsters: [[747, 708], [1026, 740], [1222, 704], [1398, 738], [1624, 738], [804, 956]]
             },
             windbase4: {
                 player: { x: 287, y: 819, left: 236, top: 605 },
@@ -423,7 +423,7 @@ function applyCombatEarthPositions() {
 }
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
-    if (!bg || !base || !fg) return;
+    if (!bg || !base || !fg) { document.getElementById('view-combat')?.classList.remove('art-loading'); return; }
     const token = ++earthLayerToken;
     const hud = document.getElementById('combat-hp-under');
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -435,7 +435,8 @@ async function changeEarthLayers() {
     if (token !== earthLayerToken) return; // a newer stage has started
     bg.src = nextBg;
     base.src = nextBase;
-    fg.src = nextFg || '';
+    // No foreground: keep a valid 1x1 transparent image (an empty src fires an error) and hide it
+    fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
     const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
