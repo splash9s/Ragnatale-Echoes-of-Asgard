@@ -215,8 +215,12 @@ setInterval(() => {
                 img.style.top = (combatPlayerAnchor.y - 224) + 'px';
                 img.style.width = '256px';
                 img.style.height = '256px';
+                // Dodge: the sprite lunges back 40px and returns over 0.2s
+                const back = combatPlayerReact.kind === 'dodge' && re < 200 ? -Math.sin(Math.PI * re / 200) * 40 : 0;
+                img.style.transform = back ? `translateX(${back.toFixed(1)}px)` : '';
                 return;
             }
+            img.style.transform = '';
             img.style.left = combatPlayerAnchor.left + 'px';
             img.style.top = combatPlayerAnchor.top + 'px';
             img.style.width = '103px';
