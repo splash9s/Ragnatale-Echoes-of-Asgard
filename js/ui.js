@@ -488,6 +488,12 @@ function preloadCombatImage(src) {
 }
 // Move the monster cards already on screen to the current layout (no waiting for the next redraw)
 function applyCombatEarthPositions() {
+    // Shadow keeps the default offset from the feet (default feet 515.5,871 -> shadow left 403, top 839)
+    const shadow = document.getElementById('combat-player-shadow');
+    if (shadow) {
+        shadow.style.left = (combatPlayerAnchor.x - 112.5) + 'px';
+        shadow.style.top = (combatPlayerAnchor.y - 32) + 'px';
+    }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
         const pos = Number(card.dataset.pos);
         const p = (combatEarthMonsterPos && combatEarthMonsterPos[pos]) || (card.dataset.slot === '' ? null : LINEUP_DEFAULT_POS[pos]);

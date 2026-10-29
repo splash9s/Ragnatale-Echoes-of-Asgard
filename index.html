@@ -232,7 +232,7 @@
         .tint-wind  { filter: saturate(0) brightness(0.9); }
         /* Entering combat: hide default (earth) art, HUD and monsters until the chosen map's layers are swapped in */
         #view-combat.art-loading #earth-bg, #view-combat.art-loading #earth-base, #view-combat.art-loading #earth-fg,
-        #view-combat.art-loading #combat-hp-under, #view-combat.art-loading #monsters-lineup-container { visibility: hidden; }
+        #view-combat.art-loading #combat-hp-under, #view-combat.art-loading #monsters-lineup-container, #view-combat.art-loading #combat-player-shadow { visibility: hidden; }
     </style>
 </head>
 
@@ -794,8 +794,8 @@
                         </div>
                     </div>
 
-                    <!-- Player shadow (centre 512, 827) -->
-                    <img src="assets/pages/character/shadow_clean.png" alt="" style="position:absolute; left:403px; top:839px; width:197px; height:79px; pointer-events:none;">
+                    <!-- Player shadow: placed under the player's feet by applyCombatEarthPositions() for each base layout -->
+                    <img id="combat-player-shadow" src="assets/pages/character/shadow_clean.png" alt="" style="position:absolute; left:403px; top:839px; width:197px; height:79px; pointer-events:none; z-index:3;">
 
                     <!-- Character sprite (centre 488, 590) -->
                     <img id="combat-player-sprite" class="idle-anim" data-frames="assets/combat/chabattle/chabattle_idle_0001.png,assets/combat/chabattle/chabattle_idle_0002.png,assets/combat/chabattle/chabattle_idle_0003.png,assets/combat/chabattle/chabattle_idle_0004.png,assets/combat/chabattle/chabattle_idle_0005.png,assets/combat/chabattle/chabattle_idle_0006.png,assets/combat/chabattle/chabattle_idle_0007.png,assets/combat/chabattle/chabattle_idle_0008.png,assets/combat/chabattle/chabattle_idle_0009.png,assets/combat/chabattle/chabattle_idle_0010.png,assets/combat/chabattle/chabattle_idle_0011.png,assets/combat/chabattle/chabattle_idle_0012.png" src="assets/combat/chabattle/chabattle_idle_0001.png" alt="" style="position:absolute; left:464px; top:657px; width:103px; height:214px; image-rendering:pixelated; pointer-events:none;">
