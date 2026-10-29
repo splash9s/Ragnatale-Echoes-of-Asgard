@@ -179,6 +179,11 @@ function playPlayerReactAnim(kind) {
     const el = document.getElementById('combat-player-sprite');
     if (el && COMBAT_PLAYER_REACT_FRAMES[kind]) applyPlayerReactFrame(el, COMBAT_PLAYER_REACT_FRAMES[kind]);
 }
+// Monster colour by element (CSS filter on the shared slime sprite). Bosses and mini-bosses keep their own look.
+function monsterTintClass(m) {
+    if (m.isBoss || m.isMiniBoss) return '';
+    return ({ fire: 'tint-fire', water: 'tint-water', wind: 'tint-wind' })[m.element] || '';
+}
 // Dodge lunge: the sprite moves 40px back and returns in 0.2s. Web Animations API, so every dodge plays.
 function playPlayerDodgeLunge() {
     const el = document.getElementById('combat-player-sprite');
@@ -2379,7 +2384,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <img class="idle-anim" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
+                    <img class="idle-anim ${monsterTintClass(m)}" data-frames="${COMBAT_SLIME_FRAMES}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" src="${COMBAT_SLIME_FRAMES.split(',')[0]}" alt="" style="width:110px; height:110px; image-rendering:pixelated; pointer-events:none;">
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
