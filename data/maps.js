@@ -163,7 +163,7 @@ const GAME_DATA = {
         },
         finalMap: {
             title: "Final Map Lv. 110", levelReq: 110, campaignStages: 25, miniStage: 0, dropKey: 'map99', finalMap: true, stageGrowth: 0,
-            enemies: [...BASE_LIST], boss: MONSTERS_DATA.bossWorldEater, miniBoss: null, bossSupport: []
+            enemies: [], boss: MONSTERS_DATA.bossWorldEater, miniBoss: null, bossSupport: []
         }
     },
     paths: {}
