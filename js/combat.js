@@ -901,6 +901,7 @@ function onPlayerDodged(m, source) {
 // Armor absorbs damage first, the rest goes to HP
 function takePlayerDamage(dmg, m) {
     playPlayerReactAnim('block');
+    flashPlayerHurt();
     lastHitBy = m.name;
     dmg = Math.floor(dmg * (1 - skillBonus('dmgReducePct') / 100));
     // Element resistance from gear: a negative value means extra damage from that element

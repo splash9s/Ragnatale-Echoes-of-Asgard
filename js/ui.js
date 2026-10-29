@@ -164,6 +164,14 @@ let combatPlayerReact = { at: 0, kind: null };
 function playPlayerReactAnim(kind) {
     combatPlayerReact = { at: Date.now(), kind };
 }
+// Red flash on the player's battle sprite when it takes damage
+function flashPlayerHurt() {
+    const el = document.getElementById('combat-player-sprite');
+    if (!el) return;
+    el.classList.remove('player-hurt');
+    void el.offsetWidth; // restart the animation
+    el.classList.add('player-hurt');
+}
 // Player and monster positions for the current earth layout (default: the original layout)
 let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = feet centre, left/top = idle sprite
 let combatEarthMonsterPos = null; // per-position [left, top] for the current layout, or null for the default
