@@ -147,6 +147,27 @@ function showCombatText(selector, text, variant) {
     setTimeout(() => d.remove(), 900);
 }
 
+// Green aura over a combat sprite when it is healed (monster or player). Same placement as the damage numbers.
+function showHealAura(selector) {
+    const view = document.getElementById('view-combat');
+    if (!view || view.classList.contains('hidden')) return;
+    const anchor = document.querySelector(selector);
+    const stage = document.querySelector('#combat-stage .ts-inner');
+    if (!anchor || !stage) return;
+    const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
+    const b = anchor.getBoundingClientRect(), ib = stage.getBoundingClientRect();
+    const size = Math.max(b.width, b.height) / sc * 1.2;
+    const cx = (b.left + b.width / 2 - ib.left) / sc, cy = (b.top + b.height / 2 - ib.top) / sc;
+    const d = document.createElement('div');
+    d.className = 'heal-aura';
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+    d.style.left = (cx - size / 2) + 'px';
+    d.style.top = (cy - size / 2) + 'px';
+    stage.appendChild(d);
+    setTimeout(() => d.remove(), 900);
+}
+
 // Player attack: the battle sprite plays the hit frames, or the uppercut frames on a critical hit, then returns to idle
 const COMBAT_PLAYER_HIT_FRAMES = ['assets/combat/player/hit_0001.png', 'assets/combat/player/hit_0002.png'];
 const COMBAT_PLAYER_CRI_FRAMES = ['assets/combat/player/cri_0001.png', 'assets/combat/player/cri_0002.png'];
@@ -2368,6 +2389,9 @@ function updateUI() {
                 }
             }
             const goneAt = m._deathAt ? Date.now() - m._deathAt >= COMBAT_DEATH_TOTAL_MS : false;
+            if (m._prevHp !== undefined && m.hp > m._prevHp) {
+                setTimeout(() => showHealAura(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`), 0);
+            }
             m._prevHp = m.hp;
             let isDead = m.hp <= 0;
             let isTarget = !isDead && idx === targetIdx;

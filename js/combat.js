@@ -838,6 +838,7 @@ function healPlayer(amount, source) {
     const before = player.hp;
     player.hp = Math.min(maxHp, player.hp + amount);
     const gained = player.hp - before;
+    if (gained > 0) showHealAura('#combat-player-sprite');
     const over = amount - gained;
     if (over > 0 && runeN('overflow') > 0) {
         const alive = getAliveMonsters();
