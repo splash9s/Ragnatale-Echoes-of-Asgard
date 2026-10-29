@@ -158,11 +158,10 @@ function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one 256x256 frame for a short time.
-// Each reaction frame is scaled so its figure is the same height as the idle sprite (214px).
-// w/h = frame size on screen; fx/fy = feet point inside the frame (placed on the player's anchor).
+// Reaction frames are 256x256 (original size). w/h = frame size on screen; fx/fy = feet point inside the frame (placed on the player's anchor).
 const COMBAT_PLAYER_REACT_FRAMES = {
-    block: { src: 'assets/combat/player/cha_block1_q85.webp', w: 347, h: 347, fx: 173.5, fy: 303.6 },
-    dodge: { src: 'assets/combat/player/cha_dodge1_q85.webp', w: 315, h: 315, fx: 157.5, fy: 275.6 }
+    block: { src: 'assets/combat/player/cha_block1_q85.webp', w: 256, h: 256, fx: 128, fy: 224 },
+    dodge: { src: 'assets/combat/player/cha_dodge1_q85.webp', w: 256, h: 256, fx: 128, fy: 224 }
 };
 // Place a reaction frame on the player's feet point
 function applyPlayerReactFrame(img, f) {
