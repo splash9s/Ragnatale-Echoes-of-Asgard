@@ -215,6 +215,8 @@
         #event-daily { background-color: rgba(143, 179, 169, .65) !important; border-color: #6f9a8e !important; }
         #event-gold, #event-xp { background-color: rgba(214, 190, 140, .5) !important; border-color: #b8945a !important; }
         #void-tower-card { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
+        /* Player HP and armor bars: the dark track was showing as a black border, so make it transparent */
+        #combat-hp-under .bg-slate-950 { background: transparent !important; }
         /* Player hit: short red flash on the battle sprite */
         @keyframes playerHurtFlash { 0% { filter: none; } 30% { filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 100% { filter: none; } }
         #combat-player-sprite.player-hurt { animation: playerHurtFlash .3s ease; }
