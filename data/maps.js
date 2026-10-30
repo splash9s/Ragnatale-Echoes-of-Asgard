@@ -12,18 +12,27 @@ function spawnTweak(t) {
     if (t.heal) out = { ...out, heal: Math.max(1, Math.round(out.heal * 0.6)) };
     return out;
 }
+// Map Lv. 10 monsters are tougher: +50% HP and +50% ATK (bosses are not affected)
+const LV10_HP_ATK_MULT = 1.5;
 function levelScaled(t, level) {
     const d = (level || 1) - (t.lv || 1);
-    if (d === 0) return spawnTweak(t);
-    const f = Math.pow(LEVEL_GROWTH, d);
-    const r = v => Math.max(1, Math.round(v * f));
-    return spawnTweak({
-        ...t,
-        hp: r(t.hp), maxHp: r(t.maxHp),
-        atkMin: r(t.atkMin), atkMax: r(t.atkMax),
-        ...(t.heal ? { heal: r(t.heal) } : {}),
-        baseExp: r(t.baseExp), jobExp: r(t.jobExp), gold: r(t.gold)
-    });
+    let out = t;
+    if (d !== 0) {
+        const f = Math.pow(LEVEL_GROWTH, d);
+        const r = v => Math.max(1, Math.round(v * f));
+        out = {
+            ...t,
+            hp: r(t.hp), maxHp: r(t.maxHp),
+            atkMin: r(t.atkMin), atkMax: r(t.atkMax),
+            ...(t.heal ? { heal: r(t.heal) } : {}),
+            baseExp: r(t.baseExp), jobExp: r(t.jobExp), gold: r(t.gold)
+        };
+    }
+    if ((level || 1) === 10) {
+        const m = v => Math.max(1, Math.round(v * LV10_HP_ATK_MULT));
+        out = { ...out, hp: m(out.hp), maxHp: m(out.maxHp), atkMin: m(out.atkMin), atkMax: m(out.atkMax) };
+    }
+    return spawnTweak(out);
 }
 
 // Mini boss: a tougher version of one base monster, scaled to the map level
