@@ -155,6 +155,13 @@ const MONSTER_SPRITES = {
         deathMs: 600,
         shift: { 'assets/combat/goblinarcher/goblinarcherattack.png': [-3, -2], 'assets/combat/goblinarcher/goblinarcherdead.png': [0, -1] }
     },
+    M102: { // Halo Priest (floating: no ground shift, each frame is centred and bottom-aligned)
+        idle: ['assets/combat/halopriest/halopriest.png'],
+        attack: ['assets/combat/halopriest/halopriestattack.png'],
+        hurt: ['assets/combat/halopriest/halopriestdamaged.png'],
+        dead: ['assets/combat/halopriest/halopriestdead.png'],
+        deathMs: 600
+    },
     M025: { // Mossy Boulder
         idle: ['assets/combat/mossyboulder/mossyboulder.png'],
         attack: ['assets/combat/mossyboulder/mossyboulderattack.png'],
