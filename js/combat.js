@@ -962,6 +962,7 @@ function monsterAct(m, derived, position = 0) {
     if (roleOf(m) === 'healer' && m.heal) {
         const wounded = getAliveMonsters().filter(x => x.hp < x.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
         if (wounded) {
+            startMonsterAttack(m, monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0); // healing plays the attack animation
             const amount = Math.min(m.heal, wounded.maxHp - wounded.hp);
             wounded.hp += amount;
             logMessage(`[Heal] ${m.name} heals ${wounded.name} for ${amount} HP`, 'combat');
