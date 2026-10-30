@@ -302,7 +302,7 @@ function getDerivedStats() {
     const skl = name => daily ? 0 : (player.skills[name]?.level || 0);
 
     let maxHp = Math.floor((100 + (ST.vit * 15) + (lvl * 10)) * (1 + (rn('maxHpBonus') + rn('fortitudeStacks')) / 100) * (1 + (rn('runeScholar') > 0 ? 0.05 * (player.currentRunRunes || []).length : 0))) + rn('bloodlust') * rn('killCount');
-    let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3);
+    let atk = Math.floor((10 + (ST.str * 2) + Math.floor(ST.luk / 3)) * 1.2); // base ATK x1.2
     let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;
     let flee = Math.floor(40 * 0.5) + lvl + ST.agi + rn('shadowStep') * rn('killCount');
