@@ -452,7 +452,28 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     }
     window.modalCallback = onCloseCallback;
     if (modalEl) modalEl.classList.remove('hidden');
+    fitModalPanel(!!customHTML);
 }
+// The summary panel is laid out at a fixed design width and scaled to fit the window (like the combat stage).
+// Plain notifications keep their normal size.
+const SUMMARY_PANEL_W = 1000;
+function fitModalPanel(isSummary) {
+    const panel = document.querySelector('#game-modal > div');
+    if (!panel) return;
+    if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; return; }
+    panel.style.width = SUMMARY_PANEL_W + 'px';
+    panel.style.maxWidth = 'none';
+    panel.style.transform = 'none';
+    const h = panel.offsetHeight;
+    // Same scale as the combat stage (window / 1920x1080), never bigger than the window allows
+    const stageScale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    const s = Math.min(stageScale, (window.innerWidth * 0.94) / SUMMARY_PANEL_W, (window.innerHeight * 0.94) / h);
+    panel.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', () => {
+    const modalEl = document.getElementById('game-modal');
+    if (modalEl && !modalEl.classList.contains('hidden') && document.getElementById('modal-content-area')?.innerHTML) fitModalPanel(true);
+});
 
 function closeModal() {
     let modalEl = document.getElementById('game-modal');
