@@ -196,6 +196,7 @@
         @keyframes monsterIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
         .player-idle { animation: playerIdle 2.4s infinite; transform-origin: 50% 100%; }
         .monster-idle { animation: monsterIdle 2.4s infinite; transform-origin: 50% 100%; }
+        .monster-idle[data-stunned="1"] { animation: none; }
         @media (prefers-reduced-motion: reduce) { .player-idle, .monster-idle { animation: none; } }
         .combat-dmg.miss { color: #ffffff; font-size: 26px; letter-spacing: 1px; }
         .combat-dmg.stun { color: #facc15; font-size: 26px; letter-spacing: 1px; }
