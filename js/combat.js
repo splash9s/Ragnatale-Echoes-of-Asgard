@@ -109,7 +109,7 @@ const RUNE_DEFS = {
     angelOfDeath: { name: "Angel of Death Rune", rarity: 5, flag: true, desc: "Once per run, when you die, restore full HP", text: () => "Once per run: revive at full HP" },
     hawkEye: { name: "Hawk Eye Rune", rarity: 2, add: 1, once: true, desc: "Attacks never miss", text: () => "Attacks never miss" },
     ironGuard: { name: "Iron Guard Rune", rarity: 2, add: 5, once: true, desc: "Critical hits restore 5% armor", text: v => `Critical hits restore ${v}% armor` },
-    overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "Overheal deals that amount to a random monster as damage", text: () => "Overheal deals that amount to a random monster as damage" },
+    overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "The part of a heal above full HP deals that amount as damage to a random monster", text: () => "The part of a heal above full HP deals that amount as damage to a random monster" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a Critical Hit", text: () => "Every attack is a Critical Hit" },
     bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 10, once: true, desc: "Every kill increases max HP by 10", text: v => `Every kill increases max HP by ${v}` },
     shadowStep: { name: "Shadow Step Rune", rarity: 4, add: 0.5, once: true, desc: "Every kill increases FLEE by 0.5", text: v => `Every kill increases FLEE by ${v}` },
@@ -843,7 +843,7 @@ function healPlayer(amount, source) {
     player.hp = Math.min(maxHp, player.hp + amount);
     const gained = player.hp - before;
     if (gained > 0) showHealAura('#combat-player-sprite');
-    const over = amount - gained;
+    const over = amount - Math.max(0, gained); // only the part of the heal above full HP
     if (over > 0 && runeN('overflow') > 0) {
         const alive = getAliveMonsters();
         if (alive.length > 0) {
