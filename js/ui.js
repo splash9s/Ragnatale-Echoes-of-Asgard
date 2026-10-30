@@ -116,22 +116,20 @@ function startGameWithName() {
 
 // Combat animation: idle frames loop; after a hit, the damage frames play once (4 frames)
 // One damage picture, shown for 480ms after a hit
-const COMBAT_SLIME_DAMAGE_FRAMES = ['assets/combat/slime/slime_dead_0002.png'];
+const COMBAT_SLIME_DAMAGE_FRAMES = ['assets/combat/slime/slimedamaged.png'];
 const COMBAT_DAMAGE_FRAME_MS = 480;
 // Death: slime_dead_0001 to 0006 play once (150ms each), then the monster disappears
-const COMBAT_SLIME_DEATH_FRAMES = Array.from({ length: 6 }, (_, i) => `assets/combat/slime/slime_dead_${String(i + 1).padStart(4, '0')}.png`);
-const COMBAT_DEATH_FRAME_MS = 150;
+const COMBAT_SLIME_DEATH_FRAMES = ['assets/combat/slime/slimedead.png'];
+const COMBAT_DEATH_FRAME_MS = 600;
 const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FRAME_MS;
 // Monsters with their own art, by monster id. Others use the slime frames (colour comes from CSS).
 // bob: a slow 3px up-and-down while idle. dead: death frames, each shown for deathMs.
-const MONSTER_SPRITES = {
-    M006: { idle: ['assets/combat/rockgolem/rockgolem.png'], bob: true, dead: ['assets/combat/rockgolem/rockgolemdead1.png', 'assets/combat/rockgolem/rockgolemdead2.png'], deathMs: 400 }
-};
+const MONSTER_SPRITES = {}; // all monsters use the slime art for now
 function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
 function monsterDeathFrames(m) { const s = monsterSpriteOf(m); return s ? s.dead : COMBAT_SLIME_DEATH_FRAMES; }
 function monsterDeathMs(m) { const s = monsterSpriteOf(m); return s ? s.deathMs : COMBAT_DEATH_FRAME_MS; }
 function monsterDeathTotalMs(m) { return monsterDeathFrames(m).length * monsterDeathMs(m); }
-const COMBAT_SLIME_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/slime/slime_${String(i + 1).padStart(4, '0')}.png`).join(',');
+const COMBAT_SLIME_FRAMES = 'assets/combat/slime/slimebase.png';
 const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
 // Floating damage number over a combat sprite: bold white normal, bold orange critical
 function showCombatNumber(selector, amount, crit) {
@@ -177,12 +175,12 @@ function showHealAura(selector) {
     setTimeout(() => d.remove(), 900);
 }
 
-// Player attack: the battle sprite plays the hit frames, or the uppercut frames on a critical hit, then returns to idle
-const COMBAT_PLAYER_HIT_FRAMES = ['assets/combat/player/hit_0001.png', 'assets/combat/player/hit_0002.png'];
-const COMBAT_PLAYER_CRI_FRAMES = ['assets/combat/player/cri_0001.png', 'assets/combat/player/cri_0002.png'];
-const COMBAT_PLAYER_ATTACK_FRAME_MS = 150;
-const COMBAT_PLAYER_HIT_SIZES = [[200, 214], [200, 214]]; // width, height of each hit frame
-const COMBAT_PLAYER_CRI_SIZES = [[138, 199], [120, 231]]; // width, height of each critical frame
+// Player battle sprite. Every frame is shown at its exact file size, placed by its feet point (bottom centre).
+const COMBAT_PLAYER_IDLE = { src: 'assets/combat/cha/idle_01.png', w: 90, h: 187 };
+const COMBAT_PLAYER_ATTACK = { src: 'assets/combat/cha/cha_hit_0001.png', w: 161, h: 192 };
+const COMBAT_PLAYER_CRI = { src: 'assets/combat/cha/cha_cri0001.png', w: 138, h: 199 };
+const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
+const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
     combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
@@ -190,9 +188,26 @@ function playPlayerAttackAnim(isCrit) {
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one 256x256 frame for a short time.
 // Reaction frames are 256x256 (original size). w/h = frame size on screen; fx/fy = feet point inside the frame (placed on the player's anchor).
 const COMBAT_PLAYER_REACT_FRAMES = {
-    block: { src: 'assets/combat/player/cha_block1_q85.webp', w: 256, h: 256, fx: 128, fy: 224 },
-    dodge: { src: 'assets/combat/player/cha_dodge1_q85.webp', w: 256, h: 256, fx: 128, fy: 224 }
+    block: { src: 'assets/combat/cha/cha_block1.png', w: 124, h: 149, fx: 62, fy: 149 },
+    dodge: { src: 'assets/combat/cha/cha_dodge1.png', w: 115, h: 189, fx: 57.5, fy: 189 }
 };
+// Place a battle frame on the player's feet point (exact size)
+function applyPlayerFrame(img, f) {
+    img.src = f.src;
+    img.style.left = (combatPlayerAnchor.x - f.w / 2) + 'px';
+    img.style.top = (combatPlayerAnchor.y - f.h) + 'px';
+    img.style.width = f.w + 'px';
+    img.style.height = f.h + 'px';
+}
+// Short lunge of the player sprite (dx px out and back, 0.2s)
+function playPlayerLunge(el, dx) {
+    if (!el || !el.animate) return;
+    el.animate([
+        { transform: 'translateX(0px)' },
+        { transform: `translateX(${dx}px)`, offset: 0.5 },
+        { transform: 'translateX(0px)' }
+    ], { duration: 200, easing: 'ease-in-out' });
+}
 // Place a reaction frame on the player's feet point
 function applyPlayerReactFrame(img, f) {
     img.src = f.src;
@@ -239,34 +254,18 @@ let combatPlayerAnchor = { x: 515.5, y: 871, left: 464, top: 657 }; // x/y = fee
 let combatEarthMonsterPos = null; // per-position [left, top] for the current layout, or null for the default
 // Default lineup position for each of the 6 slots (same as the CSS nth-child rules)
 const LINEUP_DEFAULT_POS = [[914, 784], [1065, 784], [1218, 769], [1358, 721], [1507, 671], [1658, 659]];
-// Positions per earth base layer (keyed by the base file name)
-const EARTH_LAYOUTS = {
-    earthbase2: {
-        player: { x: 526, y: 851, left: 474.5, top: 637 },
-        hud: { left: 424, top: 862 }, // HP and armor below the character
-        monsters: [[719, 738], [888, 738], [1038, 738], [1186, 738], [1337, 738], [1488, 738]]
-    },
-    earthbase3: {
-        player: { x: 616, y: 907, left: 564.5, top: 693 },
-        hud: { left: 514, top: 918 }, // HP and armor below the character
-        monsters: [[804, 800], [950, 781], [1095, 781], [1248, 781], [1384, 781], [1575, 745]]
-    }
-};
 setInterval(() => {
     const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
         if (img.id === 'combat-player-sprite') {
-            const frames = combatPlayerAttack.crit ? COMBAT_PLAYER_CRI_FRAMES : COMBAT_PLAYER_HIT_FRAMES;
-            const e = now - combatPlayerAttack.at;
-            if (combatPlayerAttack.at && e >= 0 && e < frames.length * COMBAT_PLAYER_ATTACK_FRAME_MS) {
-                const idx = Math.floor(e / COMBAT_PLAYER_ATTACK_FRAME_MS);
-                img.src = frames[idx];
-                // Attack frames keep their own size, bottom-centred on the idle sprite
-                const [w, h] = (combatPlayerAttack.crit ? COMBAT_PLAYER_CRI_SIZES : COMBAT_PLAYER_HIT_SIZES)[idx];
-                img.style.left = (combatPlayerAnchor.x - w / 2) + 'px';
-                img.style.top = (combatPlayerAnchor.y - h) + 'px';
-                img.style.width = w + 'px';
-                img.style.height = h + 'px';
+            const ae = now - combatPlayerAttack.at;
+            if (combatPlayerAttack.at && ae >= 0 && ae < COMBAT_PLAYER_ATTACK_MS) {
+                // Attack: the attack pose plays and the sprite lunges forward once per attack
+                if (img.dataset.lungeAt !== String(combatPlayerAttack.at)) {
+                    img.dataset.lungeAt = String(combatPlayerAttack.at);
+                    playPlayerLunge(img, COMBAT_PLAYER_LUNGE_PX);
+                }
+                applyPlayerFrame(img, combatPlayerAttack.crit ? COMBAT_PLAYER_CRI : COMBAT_PLAYER_ATTACK);
                 return;
             }
             const re = now - combatPlayerReact.at;
@@ -274,10 +273,8 @@ setInterval(() => {
                 applyPlayerReactFrame(img, COMBAT_PLAYER_REACT_FRAMES[combatPlayerReact.kind]);
                 return;
             }
-            img.style.left = combatPlayerAnchor.left + 'px';
-            img.style.top = combatPlayerAnchor.top + 'px';
-            img.style.width = '103px';
-            img.style.height = '214px';
+            applyPlayerFrame(img, COMBAT_PLAYER_IDLE);
+            return;
         }
         const deathAt = Number(img.dataset.deathAt) || 0;
         if (deathAt) {
@@ -381,118 +378,30 @@ function closeModal() {
 
 // Earth map: each combat picks 1 background, 1 base layer and the foreground
 // Battle art per path: each stage picks one background and one base layer; the foreground is fixed
-const COMBAT_ART = {
-    earth: {
-        bg: ['assets/combat/earthbg1.png', 'assets/combat/earthbg2_q85.jpg'],
-        base: ['assets/combat/earthbase1.png', 'assets/combat/earthbase2_q85.webp', 'assets/combat/earthbase3_q85.webp'],
-        fg: 'assets/combat/earthfg1.png',
-        layouts: EARTH_LAYOUTS
-    },
-    fire: {
-        bg: ['assets/combat/fire/firebg1_q85.jpg'],
-        base: ['assets/combat/fire/firebase1_q85.webp', 'assets/combat/fire/firebase2_q85.webp', 'assets/combat/fire/firebase3_q85.webp', 'assets/combat/fire/firebase4_q85.webp'],
-        fg: 'assets/combat/fire/firefg2_q85.webp',
-        layouts: {
-            firebase1: {
-                player: { x: 444, y: 833, left: 392.5, top: 619 },
-                hud: { left: 342, top: 844 }, // HP and armor below the character
-                monsters: [[662, 793], [860, 781], [1032, 781], [1247, 781], [1437, 744], [1611, 759]]
-            },
-            firebase2: {
-                player: { x: 423, y: 766, left: 371.5, top: 552 },
-                hud: { left: 321, top: 777 }, // HP and armor below the character
-                monsters: [[646, 711], [853, 667], [1036, 637], [1244, 637], [1427, 621], [1610, 637]]
-            },
-            firebase3: {
-                player: { x: 487, y: 885, left: 435.5, top: 671 },
-                hud: { left: 385, top: 896 }, // HP and armor below the character
-                monsters: [[738, 829], [898, 775], [1059, 741], [1242, 720], [1424, 705], [1584, 686]]
-            },
-            firebase4: {
-                player: { x: 332, y: 826, left: 280.5, top: 612 },
-                hud: { left: 230, top: 837 }, // HP and armor below the character
-                monsters: [[563, 799], [771, 799], [1000, 783], [1186, 765], [1373, 741], [1560, 728]]
-            }
-        }
-    },
-    wind: {
-        bg: ['assets/combat/wind/windbg1_q85.jpg'],
-        base: ['assets/combat/wind/windbase1_q85.webp', 'assets/combat/wind/windbase2_q85.webp', 'assets/combat/wind/windbase3_q85.webp', 'assets/combat/wind/windbase4_q85.webp'],
-        fg: ['assets/combat/wind/windfg1_q85.webp', null], // foreground is random on or off
-        layouts: {
-            windbase1: {
-                player: { x: 493, y: 769, left: 442, top: 555 },
-                hud: { left: 391, top: 780 },
-                monsters: [[721, 654], [897, 658], [1051, 604], [1226, 586], [1382, 606], [1532, 585]]
-            },
-            windbase2: {
-                player: { x: 348, y: 776, left: 297, top: 562 },
-                hud: { left: 246, top: 787 },
-                monsters: [[623, 729], [836, 737], [1049, 729], [1297, 709], [1552, 709], [1727, 659]]
-            },
-            windbase3: {
-                player: { x: 468, y: 699, left: 417, top: 485 },
-                hud: { left: 366, top: 710 },
-                monsters: [[697, 648], [724, 886], [996, 690], [1222, 704], [1398, 703], [1554, 688]]
-            },
-            windbase4: {
-                player: { x: 287, y: 819, left: 236, top: 605 },
-                hud: { left: 185, top: 830 },
-                monsters: [[556, 702], [759, 756], [962, 765], [1180, 781], [1422, 702], [1666, 715]]
-            }
-        }
-    },
-    // Ice map (water path): no foreground
-    water: {
-        bg: ['assets/combat/ice/icebg1_q85.jpg', 'assets/combat/ice/icebg2_q85.jpg', 'assets/combat/ice/icebg3_q85.jpg'],
-        base: ['assets/combat/ice/icebase1_q85.webp', 'assets/combat/ice/icebase2_q85.webp', 'assets/combat/ice/icebase3_q85.webp', 'assets/combat/ice/icebase4_q85.webp'],
+// Flat stage art: one full-stage image per path (no background or foreground layers).
+// feet = the player's feet point; monsters = each slot's feet point (sprite bottom on the flat ground). Positions are first-pass placements.
+const COMBAT_TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+function flatLayout(feet, monsterFeet) {
+    return {
+        player: { x: feet[0], y: feet[1], left: feet[0] - COMBAT_PLAYER_IDLE.w / 2, top: feet[1] - COMBAT_PLAYER_IDLE.h },
+        hud: { left: feet[0] - 102, top: feet[1] + 20 }, // HP and armor below the character
+        monsters: monsterFeet.map(([x, y]) => [x - 100, y - 100]) // card: 200px wide, sprite bottom at the card's 100px sprite box
+    };
+}
+function flatArt(name, feet, monsterFeet) {
+    return {
+        bg: [`assets/combat/flat/${name}_flat_q85.webp`],
+        base: [COMBAT_TRANSPARENT],
         fg: null,
-        layouts: {
-            icebase1: {
-                player: { x: 433, y: 926, left: 382, top: 712 },
-                hud: { left: 331, top: 937 },
-                monsters: [[759, 866], [959, 860], [1113, 830], [1289, 847], [1491, 860], [1666, 847]]
-            },
-            icebase2: {
-                player: { x: 403, y: 923, left: 352, top: 709 },
-                hud: { left: 301, top: 934 },
-                monsters: [[657, 824], [858, 824], [1011, 787], [1187, 787], [1340, 787], [1571, 700]]
-            },
-            icebase3: {
-                player: { x: 538, y: 914, left: 487, top: 700 },
-                hud: { left: 436, top: 925 },
-                monsters: [[764, 842], [941, 842], [1093, 805], [1265, 745], [1441, 699], [1615, 658]]
-            },
-            icebase4: {
-                player: { x: 396, y: 926, left: 345, top: 712 },
-                hud: { left: 294, top: 937 },
-                monsters: [[555, 852], [732, 852], [884, 817], [1060, 824], [1235, 742], [1443, 685]]
-            }
-        }
-    },
-    // World Ender (final map)
-    final: {
-        bg: ['assets/combat/yggdrasil/yggbg1_q85.jpg'],
-        base: ['assets/combat/yggdrasil/yggbase1_q85.webp', 'assets/combat/yggdrasil/yggbase2_q85.webp', 'assets/combat/yggdrasil/yggbase3_q85.webp'],
-        fg: ['assets/combat/yggdrasil/fg1_q85.webp', 'assets/combat/yggdrasil/fg2_q85.webp', null], // foreground: fg1, fg2 or none (random)
-        layouts: {
-            yggbase1: {
-                player: { x: 284, y: 860, left: 233, top: 646 },
-                hud: { left: 182, top: 871 },
-                monsters: [[516, 800], [741, 792], [949, 786], [1121, 683], [1284, 577], [1629, 430]]
-            },
-            yggbase2: {
-                player: { x: 272, y: 806, left: 221, top: 592 },
-                hud: { left: 170, top: 817 },
-                monsters: [[540, 561], [966, 404], [1656, 370], [761, 820], [1204, 769], [1481, 668]]
-            },
-            yggbase3: {
-                player: { x: 210, y: 697, left: 159, top: 483 },
-                hud: { left: 108, top: 708 },
-                monsters: [[614, 580], [818, 728], [1063, 708], [1254, 403], [1419, 637], [1675, 556]]
-            }
-        }
-    }
+        layouts: { [`${name}_flat`]: flatLayout(feet, monsterFeet) }
+    };
+}
+const COMBAT_ART = {
+    earth: flatArt('earth', [560, 690], [[900, 700], [1050, 700], [1200, 690], [1350, 680], [1500, 670], [1650, 660]]),
+    fire: flatArt('fire', [520, 680], [[900, 690], [1050, 690], [1200, 680], [1350, 675], [1500, 670], [1650, 665]]),
+    wind: flatArt('wind', [500, 625], [[880, 630], [1030, 630], [1180, 622], [1330, 616], [1480, 610], [1630, 604]]),
+    water: flatArt('ice', [480, 690], [[850, 700], [1000, 700], [1150, 690], [1300, 680], [1450, 670], [1600, 665]]),
+    final: flatArt('yggdrasil', [460, 592], [[820, 598], [970, 598], [1120, 592], [1270, 588], [1420, 584], [1570, 580]])
 };
 // Each stage picks a new background, base layer and foreground.
 // New images are loaded and decoded first, then all of them swap in the same step (no fade).
@@ -534,7 +443,7 @@ async function changeEarthLayers() {
     // No foreground: keep a valid 1x1 transparent image (an empty src fires an error) and hide it
     fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
-    const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k));
+    const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k) || nextBg.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatShadowLift = /(windbase|icebase|firebase)/.test(nextBase) ? 50 : 0;
@@ -2433,7 +2342,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    ${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim ${monsterTintClass(m)}${sp && sp.bob ? ' idle-bob' : ''}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-hurt-frames="${sp ? '' : COMBAT_SLIME_DAMAGE_FRAMES.join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="${sp ? '' : 'width:110px; height:110px; object-fit:contain; object-position:50% 100%; '}image-rendering:pixelated; pointer-events:none;">`; })()}
+                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center;">${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim ${monsterTintClass(m)}${sp && sp.bob ? ' idle-bob' : ''}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-hurt-frames="${sp ? '' : COMBAT_SLIME_DAMAGE_FRAMES.join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none;">`; })()}</div>
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
