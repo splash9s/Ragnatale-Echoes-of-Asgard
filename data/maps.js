@@ -183,6 +183,39 @@ const CAMPAIGN_PATHS = {
     wind:  { name: "Wind Path",  element: 'wind',  icon: "🌪️" }
 };
 
+// Each element path has its own roster: one melee, one tank, one range, one healer and one mage.
+// Monsters are taken from MONSTERS_DATA and get the path's element (set below). lv = the monster's home level.
+const PATH_ROSTERS = {
+    earth: [
+        { ...MONSTERS_DATA.slime,        role: 'melee',  lv: 1 },
+        { ...MONSTERS_DATA.mossyBoulder, role: 'tank',   lv: 1 },
+        { ...MONSTERS_DATA.archerGoblin, role: 'range',  lv: 1 },
+        { ...MONSTERS_DATA.haloPriest,   role: 'healer', lv: 40 },
+        { ...MONSTERS_DATA.helStoneMage, role: 'mage',   lv: 90 }
+    ],
+    fire: [
+        { ...MONSTERS_DATA.slime,            role: 'melee',  lv: 1 },
+        { ...MONSTERS_DATA.rockGolem,        role: 'tank',   lv: 10 },
+        { ...MONSTERS_DATA.flameArcher,      role: 'range',  lv: 70 },
+        { ...MONSTERS_DATA.emberPriest,      role: 'healer', lv: 90 },
+        { ...MONSTERS_DATA.muspelFlameMage,  role: 'mage',   lv: 70 }
+    ],
+    water: [
+        { ...MONSTERS_DATA.slime,        role: 'melee',  lv: 1 },
+        { ...MONSTERS_DATA.iceGolem,     role: 'tank',   lv: 90 },
+        { ...MONSTERS_DATA.frostArcher,  role: 'range',  lv: 60 },
+        { ...MONSTERS_DATA.frostShaman,  role: 'healer', lv: 60 },
+        { ...MONSTERS_DATA.jotunFrostMage, role: 'mage', lv: 60 }
+    ],
+    wind: [
+        { ...MONSTERS_DATA.einherjarWarrior, role: 'melee',  lv: 70 },
+        { ...MONSTERS_DATA.haloWarden,       role: 'tank',   lv: 60 },
+        { ...MONSTERS_DATA.sniperKobold,     role: 'range',  lv: 10 },
+        { ...MONSTERS_DATA.valkyrieHealer,   role: 'healer', lv: 60 },
+        { ...MONSTERS_DATA.battleStormMage,  role: 'mage',   lv: 60 }
+    ]
+};
+
 // Every monster, mini boss and boss on a path takes that path's element
 Object.keys(CAMPAIGN_PATHS).forEach(pk => {
     const path = CAMPAIGN_PATHS[pk];
@@ -194,7 +227,7 @@ Object.keys(CAMPAIGN_PATHS).forEach(pk => {
             ...base,
             maxStages: base.campaignStages || CAMPAIGN_STAGES,
             title: `${path.name} · ${base.title}`,
-            enemies: base.enemies.map(tint),
+            enemies: PATH_ROSTERS[pk].map(tint),
             boss: tint(base.boss),
             miniBoss: tint(base.miniBoss)
         };
