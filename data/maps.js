@@ -5,18 +5,25 @@
 // Level scaling: each base monster has stats for its home level (lv). On a map of level L its
 // HP, attack and rewards grow by LEVEL_GROWTH per level (fitted from the normal monsters: about 4% per level).
 const LEVEL_GROWTH = 1.0405;
+// Spawn tweaks applied to every monster that enters a fight: range monsters hit for 1.2x, healers heal for 0.6x
+function spawnTweak(t) {
+    let out = t;
+    if (t.role === 'range') out = { ...out, atkMin: Math.max(1, Math.round(out.atkMin * 1.2)), atkMax: Math.max(1, Math.round(out.atkMax * 1.2)) };
+    if (t.heal) out = { ...out, heal: Math.max(1, Math.round(out.heal * 0.6)) };
+    return out;
+}
 function levelScaled(t, level) {
     const d = (level || 1) - (t.lv || 1);
-    if (d === 0) return t;
+    if (d === 0) return spawnTweak(t);
     const f = Math.pow(LEVEL_GROWTH, d);
     const r = v => Math.max(1, Math.round(v * f));
-    return {
+    return spawnTweak({
         ...t,
         hp: r(t.hp), maxHp: r(t.maxHp),
         atkMin: r(t.atkMin), atkMax: r(t.atkMax),
         ...(t.heal ? { heal: r(t.heal) } : {}),
         baseExp: r(t.baseExp), jobExp: r(t.jobExp), gold: r(t.gold)
-    };
+    });
 }
 
 // Mini boss: a tougher version of one base monster, scaled to the map level
