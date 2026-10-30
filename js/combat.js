@@ -966,6 +966,7 @@ function monsterAct(m, derived, position = 0) {
     // Melee and tank units only strike when they are the first monster facing the player
     if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
+    m._attackAt = Date.now(); // the attack animation (attack frame and lunge) starts here
     const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
