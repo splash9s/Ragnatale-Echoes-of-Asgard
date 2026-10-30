@@ -147,6 +147,14 @@ const MONSTER_SPRITES = {
         deathMs: 600,
         shift: { 'assets/combat/koboltsniper/koboltsniperdamaged.png': [-9, -2], 'assets/combat/koboltsniper/koboltsniperattack.png': [0, -2], 'assets/combat/koboltsniper/koboltsniperdead.png': [0, -1] }
     },
+    M003: { // Goblin Archer
+        idle: ['assets/combat/goblinarcher/goblinarcher.png'],
+        attack: ['assets/combat/goblinarcher/goblinarcherattack.png'],
+        hurt: ['assets/combat/goblinarcher/goblinarcherdamaged.png'],
+        dead: ['assets/combat/goblinarcher/goblinarcherdead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/goblinarcher/goblinarcherattack.png': [-3, -2], 'assets/combat/goblinarcher/goblinarcherdead.png': [0, -1] }
+    },
     M025: { // Mossy Boulder
         idle: ['assets/combat/mossyboulder/mossyboulder.png'],
         attack: ['assets/combat/mossyboulder/mossyboulderattack.png'],
@@ -2426,7 +2434,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center;">${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;">`; })()}</div>
+                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center;">${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;">`; })()}</div>
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
