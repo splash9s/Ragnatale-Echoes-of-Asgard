@@ -137,6 +137,18 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/rockgolem/rockgolemdead.png'],
         deathMs: 600,
         shift: { 'assets/combat/rockgolem/rockgolemattack.png': -7, 'assets/combat/rockgolem/rockgolemdamaged.png': 5, 'assets/combat/rockgolem/rockgolemdead.png': 7 }
+    },
+    M025: { // Mossy Boulder: natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/mossyboulder/mossyboulder.png'],
+        attack: ['assets/combat/mossyboulder/mossyboulderattack.png'],
+        hurt: ['assets/combat/mossyboulder/mossyboulderdamaged.png'],
+        dead: ['assets/combat/mossyboulder/mossyboulderdead.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/mossyboulder/mossyboulderattack.png': [-29, -4],
+            'assets/combat/mossyboulder/mossyboulderdamaged.png': [4, 1],
+            'assets/combat/mossyboulder/mossyboulderdead.png': [2, -2]
+        }
     }
 };
 function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
@@ -149,8 +161,10 @@ function monsterHurtFrames(m) { const s = monsterSpriteOf(m); return s ? (s.hurt
 function setMonsterFrame(img, src) {
     img.src = src;
     const s = MONSTER_SPRITES[img.dataset.sprite];
-    const dx = (s && s.shift && s.shift[src]) || 0;
-    if (img.style.left !== dx + 'px') img.style.left = dx + 'px';
+    const sh = (s && s.shift && s.shift[src]) || [0, 0];
+    const [dx, dy] = typeof sh === 'number' ? [sh, 0] : sh;
+    img.style.left = dx + 'px';
+    img.style.top = dy + 'px';
 }
 const COMBAT_SLIME_FRAMES = 'assets/combat/slime/slimebase.png';
 const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
