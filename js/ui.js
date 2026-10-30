@@ -155,6 +155,18 @@ const MONSTER_SPRITES = {
         deathMs: 600,
         shift: { 'assets/combat/goblinarcher/goblinarcherattack.png': [-3, -2], 'assets/combat/goblinarcher/goblinarcherdead.png': [0, -1] }
     },
+    M004: { // Giant Moss Slime (boss, map lv 1): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/giantmossslime/giantmossslime.png'],
+        attack: ['assets/combat/giantmossslime/giantmossslimeattack.png'],
+        hurt: ['assets/combat/giantmossslime/giantmossslimedamaged.png'],
+        dead: ['assets/combat/giantmossslime/giantmossslimedead.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/giantmossslime/giantmossslimeattack.png': [30, 3],
+            'assets/combat/giantmossslime/giantmossslimedamaged.png': [7, 6],
+            'assets/combat/giantmossslime/giantmossslimedead.png': [6, 6]
+        }
+    },
     M102: { // Halo Priest (floating: no ground shift, each frame is centred and bottom-aligned)
         idle: ['assets/combat/halopriest/halopriest.png'],
         attack: ['assets/combat/halopriest/halopriestattack.png'],
