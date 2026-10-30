@@ -65,14 +65,7 @@
         });
     });
 
-    // Hero idle: character idle frames cha_idle_0001 - 0012
-    const frames = ['assets/page01/cha_idle_0001.png', 'assets/page01/cha_idle_0002.png', 'assets/page01/cha_idle_0003.png', 'assets/page01/cha_idle_0004.png', 'assets/page01/cha_idle_0005.png', 'assets/page01/cha_idle_0007.png', 'assets/page01/cha_idle_0008.png', 'assets/page01/cha_idle_0009.png', 'assets/page01/cha_idle_0010.png', 'assets/page01/cha_idle_0011.png', 'assets/page01/cha_idle_0012.png'];
-    const hero = document.getElementById('town-hero');
-    let i = 0;
-    if (hero) setInterval(() => {
-        i = (i + 1) % frames.length;
-        hero.src = frames[i];
-    }, 250);
+    // Hero idle: one base frame with the CSS idle effect (class player-idle on #town-hero)
 
     // ---- Campaign map (Expedition Gates) ----
     window.openCampaignPath = function (path) {

@@ -15,6 +15,9 @@ let stageSummary = null;
 let lastHitBy = null;
 let monstersList = [];
 let isFirstHitOfBattle = true;
+// Monsters start their first attack of a map this long after the player's first attack
+const COMBAT_OPENER_MONSTER_DELAY_MS = 500;
+let monsterOpenerRound = false; // true from entering a map until the first monster turn ends
 let battlePlayerHits = 0;
 let battleFirstDamageTaken = false;
 let stageRuneUses = { fullHeal: 0, fullArmor: 0 };
@@ -346,6 +349,7 @@ function startExpedition(mode, opts = {}) {
     runeRefreshLeft = RUNE_REFRESH_MAX;
     combatPaused = false;
     updatePauseButton();
+    monsterOpenerRound = true;
     spawnStageMonsters();
 
     if (combatInterval) clearInterval(combatInterval);
@@ -966,7 +970,7 @@ function monsterAct(m, derived, position = 0) {
     // Melee and tank units only strike when they are the first monster facing the player
     if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
-    startMonsterAttack(m); // attack frame and lunge start now, the same moment as the player's
+    startMonsterAttack(m, monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0); // same moment as the player's attack, except the first round of a map
     const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
@@ -1160,6 +1164,7 @@ function runCombatTick() {
     // ---- Monster turn (every living monster attacks) ----
     tickPlayerDebuffs();
     alive.forEach((m, i) => monsterAct(m, derived, i));
+    monsterOpenerRound = false;
 
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
     if (getAliveMonsters().length === 0) {

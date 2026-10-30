@@ -130,24 +130,33 @@ const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FR
 // dead: death frames, each shown for deathMs. shift: px offset per frame (keeps the feet on one spot;
 // the frame is natural size, so frames with a different width are centred by their bounding box).
 const MONSTER_SPRITES = {
-    M006: {
+    // Each frame is centred by its own canvas width (flex), so shift is only the correction from the feet-point check.
+    // shift: { frame path: [dx, dy] px }. Frames without an entry use [0, 0].
+    M006: { // Rock Golem
         idle: ['assets/combat/rockgolem/rockgolem.png'],
         attack: ['assets/combat/rockgolem/rockgolemattack.png'],
         hurt: ['assets/combat/rockgolem/rockgolemdamaged.png'],
         dead: ['assets/combat/rockgolem/rockgolemdead.png'],
-        deathMs: 600,
-        shift: { 'assets/combat/rockgolem/rockgolemattack.png': -7, 'assets/combat/rockgolem/rockgolemdamaged.png': 5, 'assets/combat/rockgolem/rockgolemdead.png': 7 }
+        deathMs: 600
     },
-    M025: { // Mossy Boulder: natural size; shift is [dx, dy] px so the feet stay on the same spot
+    M007: { // Kobold Sniper
+        idle: ['assets/combat/koboltsniper/koboltsniper.png'],
+        attack: ['assets/combat/koboltsniper/koboltsniperattack.png'],
+        hurt: ['assets/combat/koboltsniper/koboltsniperdamaged.png'],
+        dead: ['assets/combat/koboltsniper/koboltsniperdead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/koboltsniper/koboltsniperdamaged.png': [-9, -2], 'assets/combat/koboltsniper/koboltsniperattack.png': [0, -2], 'assets/combat/koboltsniper/koboltsniperdead.png': [0, -1] }
+    },
+    M025: { // Mossy Boulder
         idle: ['assets/combat/mossyboulder/mossyboulder.png'],
         attack: ['assets/combat/mossyboulder/mossyboulderattack.png'],
         hurt: ['assets/combat/mossyboulder/mossyboulderdamaged.png'],
         dead: ['assets/combat/mossyboulder/mossyboulderdead.png'],
         deathMs: 600,
         shift: {
-            'assets/combat/mossyboulder/mossyboulderattack.png': [-29, -4],
-            'assets/combat/mossyboulder/mossyboulderdamaged.png': [4, 1],
-            'assets/combat/mossyboulder/mossyboulderdead.png': [2, -2]
+            'assets/combat/mossyboulder/mossyboulderattack.png': [2, -4],
+            'assets/combat/mossyboulder/mossyboulderdamaged.png': [3, 1],
+            'assets/combat/mossyboulder/mossyboulderdead.png': [3, -2]
         }
     }
 };
@@ -167,7 +176,6 @@ function setMonsterFrame(img, src) {
     img.style.top = dy + 'px';
 }
 const COMBAT_SLIME_FRAMES = 'assets/combat/slime/slimebase.png';
-const COMBAT_CHA_FRAMES = Array.from({ length: 12 }, (_, i) => `assets/combat/cha/cha_idle_${String(i + 1).padStart(4, '0')}.png`).join(',');
 // Floating damage number over a combat sprite: bold white normal, bold orange critical
 function showCombatNumber(selector, amount, crit) {
     if (!(amount > 0)) return;
@@ -255,7 +263,8 @@ function lungeEl(el, dx, startedAgoMs) {
     ], { duration: 200, easing: 'ease-in-out' });
     if (startedAgoMs) a.currentTime = startedAgoMs; // a redraw in the middle of the lunge resumes it
 }
-function startMonsterAttack(m) {
+function startMonsterAttack(m, delayMs = 0) {
+    if (delayMs > 0) { setTimeout(() => { if (m.hp > 0) startMonsterAttack(m, 0); }, delayMs); return; }
     m._attackAt = Date.now();
     m._animAt = m._attackAt;
     const el = monsterCardImg(m);
@@ -369,7 +378,7 @@ setInterval(() => {
             return;
         }
         const frames = img.dataset.frames.split(',');
-        setMonsterFrame(img, frames[Math.floor(now / 250) % frames.length]); // idle: one frame every 250ms
+        setMonsterFrame(img, frames[Math.floor(now / 500) % frames.length]); // idle: one frame every 500ms
     });
 }, 60);
 
