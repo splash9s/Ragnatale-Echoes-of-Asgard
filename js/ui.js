@@ -167,6 +167,18 @@ const MONSTER_SPRITES = {
             'assets/combat/giantmossslime/giantmossslimedead.png': [6, 6]
         }
     },
+    M084: { // Hel Stone Mage (earth mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/helstonemage/helstonemage.png'],
+        attack: ['assets/combat/helstonemage/helstonemageattack.png'],
+        hurt: ['assets/combat/helstonemage/helstonemagedamaged.png'],
+        dead: ['assets/combat/helstonemage/helstonemagedead.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/helstonemage/helstonemageattack.png': [0, 2],
+            'assets/combat/helstonemage/helstonemagedamaged.png': [-10, 2],
+            'assets/combat/helstonemage/helstonemagedead.png': [0, 1]
+        }
+    },
     M102: { // Halo Priest (floating: no ground shift, each frame is centred and bottom-aligned)
         idle: ['assets/combat/halopriest/halopriest.png'],
         attack: ['assets/combat/halopriest/halopriestattack.png'],
