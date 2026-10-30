@@ -307,10 +307,10 @@ function playPlayerReactAnim(kind) {
     const el = document.getElementById('combat-player-sprite');
     if (el && COMBAT_PLAYER_REACT_FRAMES[kind]) applyPlayerReactFrame(el, COMBAT_PLAYER_REACT_FRAMES[kind]);
 }
-// Monster colour by element (CSS filter on the shared slime sprite). Bosses and mini-bosses keep their own look.
+// Monster colour by element (CSS filter on the shared slime sprite only). Bosses, mini-bosses and monsters with their own art keep their look.
 function monsterTintClass(m) {
     if (m.isBoss || m.isMiniBoss) return '';
-    if (monsterSpriteOf(m) && currentPath === 'fire') return ''; // Rock Golem keeps its own colour on the lava (fire) map
+    if (monsterSpriteOf(m)) return ''; // monsters with their own art keep their colours; only the slime art is tinted
     return ({ fire: 'tint-fire', water: 'tint-water', wind: 'tint-wind' })[m.element] || '';
 }
 // Dodge lunge: the sprite moves 40px back and returns in 0.2s. Web Animations API, so every dodge plays.
