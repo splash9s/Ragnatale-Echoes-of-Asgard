@@ -208,7 +208,7 @@ const PATH_ROSTERS = {
         { ...MONSTERS_DATA.jotunFrostMage, role: 'mage', lv: 60 }
     ],
     wind: [
-        { ...MONSTERS_DATA.einherjarWarrior, role: 'melee',  lv: 70 },
+        { ...MONSTERS_DATA.slime,            role: 'melee',  lv: 1 },
         { ...MONSTERS_DATA.haloWarden,       role: 'tank',   lv: 60 },
         { ...MONSTERS_DATA.sniperKobold,     role: 'range',  lv: 10 },
         { ...MONSTERS_DATA.valkyrieHealer,   role: 'healer', lv: 60 },
