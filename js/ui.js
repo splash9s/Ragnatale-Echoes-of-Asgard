@@ -2233,8 +2233,8 @@ function updateUI() {
             { slot: 'midHead', img: 'middleheadslot.png', x: 370, y: 126 },
             { slot: 'mouth', img: 'lowerheadslot.png', x: 0, y: 234 },
             { slot: 'armor', img: 'armorslot.png', x: 370, y: 234 },
-            { slot: 'weapon', img: 'weaponslot.png', x: 0, y: 342 },
-            { slot: 'shield', img: 'shieldslot.png', x: 370, y: 342 },
+            { slot: 'shield', img: 'shieldslot.png', x: 0, y: 342 },   // left hand
+            { slot: 'weapon', img: 'weaponslot.png', x: 370, y: 342 }, // right hand
             { slot: 'garment', img: 'garmentslot.png', x: 0, y: 450 },
             { slot: 'footgear', img: 'footslot.png', x: 370, y: 450 },
             { slot: 'ringLeft', img: 'ring.png', x: 0, y: 558 },
@@ -2242,8 +2242,8 @@ function updateUI() {
             { slot: 'pet', img: 'petslot.png', x: 78, y: 666 },
             { slot: 'potionSlot', img: 'potionslot.png', x: 292, y: 666 },
         ];
-        // Only these slots show the equipped item's picture: hat, middle head, lower head (mouth) and weapon. Other slots keep their default graphic.
-        const VISUAL_EQUIP_SLOTS = ['hat', 'midHead', 'mouth', 'weapon'];
+        // Only these slots show the equipped item's picture: hat, middle head, lower head (mouth), left hand (shield) and right hand (weapon). Other slots keep their default graphic.
+        const VISUAL_EQUIP_SLOTS = ['hat', 'midHead', 'mouth', 'shield', 'weapon'];
         const eqSlot = ({ slot, img, x, y }) => {
             const gear = player.equipped[slot];
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
