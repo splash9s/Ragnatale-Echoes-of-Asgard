@@ -2242,11 +2242,13 @@ function updateUI() {
             { slot: 'pet', img: 'petslot.png', x: 78, y: 666 },
             { slot: 'potionSlot', img: 'potionslot.png', x: 292, y: 666 },
         ];
+        // Only these slots show the equipped item's picture: hat, middle head, lower head (mouth) and weapon. Other slots keep their default graphic.
+        const VISUAL_EQUIP_SLOTS = ['hat', 'midHead', 'mouth', 'weapon'];
         const eqSlot = ({ slot, img, x, y }) => {
             const gear = player.equipped[slot];
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
             const base = `assets/pages/character/slots/${img}`;
-            const src = has && gear.img ? gear.img : base;
+            const src = has && gear.img && VISUAL_EQUIP_SLOTS.includes(slot) ? gear.img : base;
             return `<div ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
                 <img src="${src}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='${base}'">
             </div>`;
