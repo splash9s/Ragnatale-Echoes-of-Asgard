@@ -491,14 +491,14 @@ const SUMMARY_PANEL_W = 1000;
 function fitModalPanel(isSummary) {
     const panel = document.querySelector('#game-modal > div');
     if (!panel) return;
-    if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; return; }
+    if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; panel.style.maxHeight = ''; panel.style.overflowY = ''; return; }
+    // Scale by width (about 90% of the window), then cap the height and scroll inside the panel if the log is long
     panel.style.width = SUMMARY_PANEL_W + 'px';
     panel.style.maxWidth = 'none';
-    panel.style.transform = 'none';
-    const h = panel.offsetHeight;
-    // Fill about 90% of the window, keeping the panel's proportions (scaled up or down)
-    const s = Math.min(2.5, (window.innerWidth * 0.9) / SUMMARY_PANEL_W, (window.innerHeight * 0.9) / h);
+    const s = Math.min(2.5, (window.innerWidth * 0.9) / SUMMARY_PANEL_W);
     panel.style.transform = `scale(${s})`;
+    panel.style.maxHeight = ((window.innerHeight * 0.9) / s) + 'px'; // design px: 90% of the window height when scaled
+    panel.style.overflowY = 'auto';
 }
 window.addEventListener('resize', () => {
     const modalEl = document.getElementById('game-modal');
