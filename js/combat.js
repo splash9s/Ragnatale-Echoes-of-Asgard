@@ -143,6 +143,9 @@ const RUNE_DEFS = {
     freezeTouch: { name: "Freeze Touch Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to freeze the enemy for 2 seconds (it cannot attack or dodge, and becomes water element)", text: () => "Hits have a 10% chance to freeze the enemy for 2 seconds (it cannot attack or dodge, and becomes water element)" },
     rockCurse: { name: "Rock Curse Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to turn the enemy to rock for 2 seconds (it cannot attack or dodge, and becomes earth element)", text: () => "Hits have a 10% chance to turn the enemy to rock for 2 seconds (it cannot attack or dodge, and becomes earth element)" },
     splash: { name: "Splash Rune", rarity: 3, flag: true, desc: "Hits have a 20% chance to deal 20% damage to the enemy behind", text: () => "Hits have a 20% chance to deal 20% damage to the enemy behind" },
+    stunTouch: { name: "Stun Touch Rune", rarity: 1, flag: true, desc: "Hits have a 10% chance to stun the enemy for 2 seconds (it cannot attack)", text: () => "Hits have a 10% chance to stun the enemy for 2 seconds (it cannot attack)" },
+    rangeStun: { name: "Ranged Stun Rune", rarity: 2, flag: true, desc: "Hits have a 20% chance to stun a random ranged, mage or healer enemy for 2 seconds", text: () => "Hits have a 20% chance to stun a random ranged, mage or healer enemy for 2 seconds" },
+    critSplash: { name: "Critical Splash Rune", rarity: 2, flag: true, desc: "Critical hits deal 20% of their damage to a random enemy", text: () => "Critical hits deal 20% of their damage to a random enemy" },
     chainStrike: { name: "Chain Strike Rune", rarity: 2, add: 1, disabled: true, desc: "First attack also hits the next enemy", text: () => "First attack also hits the next enemy" },
     sharedDamage: { name: "Shared Pain Rune", rarity: 3, flag: true, desc: "Each attack splits damage among all enemies", text: () => "Each attack splits damage among all enemies" },
     phantomVeil: { name: "Phantom Veil Rune", rarity: 2, flag: true, disabled: true, desc: "Always dodge the first attack from an enemy", text: () => "Always dodge the first attack from an enemy" }
@@ -743,6 +746,14 @@ function tickEnemyStatuses(tickMs) {
     });
 }
 
+// Stuns a monster for 2 seconds (it cannot attack) and shows the STUNNED text. Returns true if applied.
+function applyStunStatus(m) {
+    if (!m || m.hp <= 0 || m.status) return false;
+    m.status = { kind: 'stun', ms: STATUS_MS };
+    const i = monstersList.indexOf(m);
+    if (i >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${i + 1}) img`, 'STUNNED', 'stun');
+    return true;
+}
 function getAliveMonsters() {
     return monstersList.filter(m => m.hp > 0);
 }
@@ -1090,6 +1101,15 @@ function runCombatTick() {
             playSound('sound/critical.wav');
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
             critStreak++;
+            if (runeN('critSplash') > 0) {
+                const pool = getAliveMonsters();
+                if (pool.length) {
+                    const pick = pool[Math.floor(Math.random() * pool.length)];
+                    const splash = Math.max(1, Math.floor(pDmg * 0.2));
+                    pick.hp -= splash;
+                    logMessage(`[Critical Splash] ${splash} damage to ${pick.name}`, 'drop');
+                }
+            }
             if (runeN('ironGuard') > 0) player.armor = Math.min(derived.maxArmor, player.armor + Math.floor(derived.maxArmor * runeN('ironGuard') / 100));
             if (runeN('fortitude') > 0 && Math.random() < 0.2) player.runes.fortitudeStacks = (player.runes.fortitudeStacks || 0) + 1;
             player.runes.surgeReady = runeN('surgeFocus') > 0;
@@ -1122,6 +1142,11 @@ function runCombatTick() {
         battlePlayerHits++;
         if (targetEnemy.hp > 0 && runeN('freezeTouch') > 0 && Math.random() < 0.10) applyEnemyStatus(targetEnemy, 'freeze');
         if (targetEnemy.hp > 0 && runeN('rockCurse') > 0 && Math.random() < 0.10) applyEnemyStatus(targetEnemy, 'rock');
+        if (targetEnemy.hp > 0 && runeN('stunTouch') > 0 && Math.random() < 0.10) applyStunStatus(targetEnemy);
+        if (runeN('rangeStun') > 0 && Math.random() < 0.20) {
+            const casters = getAliveMonsters().filter(m => ['range', 'mage', 'healer'].includes(roleOf(m)) && !m.status);
+            if (casters.length) applyStunStatus(casters[Math.floor(Math.random() * casters.length)]);
+        }
         ['fireBolt', 'coldBolt', 'thunderBolt', 'rockBolt'].forEach(id => {
             const ch = runeN(id);
             if (ch > 0 && Math.random() * 100 < ch) {
@@ -1151,12 +1176,7 @@ function runCombatTick() {
         logMessage(`[Shockwave] ${blast} damage to all monsters`, 'drop');
     }
     if (runeN('killStun') > 0 && newlyDead.length > 0) {
-        getAliveMonsters().forEach(m => {
-            if (m.status) return;
-            m.status = { kind: 'stun', ms: STATUS_MS };
-            const i = monstersList.indexOf(m);
-            if (i >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${i + 1}) img`, 'STUNNED', 'stun');
-        });
+        getAliveMonsters().forEach(applyStunStatus);
         logMessage(`[Stun Burst] All enemies are stunned for 2 seconds!`, 'drop');
     }
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
