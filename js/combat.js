@@ -521,7 +521,7 @@ function spawnStageMonsters() {
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
-            const count = Math.floor(Math.random() * 5) + 2;
+            const count = Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
             const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : stageMultiplier();
             for (let i = 0; i < count; i++) {
                 const picked = pool[Math.floor(Math.random() * pool.length)];
@@ -643,6 +643,7 @@ function makeUnit(t, mult) {
 // Lv 1-20: 1-3 | Lv 30-40: 2-3 | Lv 50-80: 3 | Lv 90-110: 4. Boss and mini boss stages are not affected.
 function campaignCountRange() {
     const lv = activeMap.levelReq || 1;
+    if (lv <= 1) return [1, 3]; // level 1 maps never have more than 3 monsters at once
     const firstHalf = currentStage <= Math.floor(maxStages / 2);
     if (!firstHalf) return [4, 6];
     if (lv <= 20) return [1, 3];

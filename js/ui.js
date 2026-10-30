@@ -461,7 +461,7 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     if (modalEl) modalEl.classList.remove('hidden');
     fitModalPanel(!!customHTML);
 }
-// The summary panel is laid out at a fixed design width and scaled to fit the window (like the combat stage).
+// The summary panel is laid out at a fixed design width and scaled to fill the window.
 // Plain notifications keep their normal size.
 const SUMMARY_PANEL_W = 1000;
 function fitModalPanel(isSummary) {
@@ -472,9 +472,8 @@ function fitModalPanel(isSummary) {
     panel.style.maxWidth = 'none';
     panel.style.transform = 'none';
     const h = panel.offsetHeight;
-    // Same scale as the combat stage (window / 1920x1080), never bigger than the window allows
-    const stageScale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    const s = Math.min(stageScale, (window.innerWidth * 0.94) / SUMMARY_PANEL_W, (window.innerHeight * 0.94) / h);
+    // Fill about 90% of the window, keeping the panel's proportions (scaled up or down)
+    const s = Math.min(2.5, (window.innerWidth * 0.9) / SUMMARY_PANEL_W, (window.innerHeight * 0.9) / h);
     panel.style.transform = `scale(${s})`;
 }
 window.addEventListener('resize', () => {
