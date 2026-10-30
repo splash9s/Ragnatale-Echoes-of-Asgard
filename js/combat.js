@@ -1151,7 +1151,12 @@ function runCombatTick() {
         logMessage(`[Shockwave] ${blast} damage to all monsters`, 'drop');
     }
     if (runeN('killStun') > 0 && newlyDead.length > 0) {
-        getAliveMonsters().forEach(m => { if (!m.status) m.status = { kind: 'stun', ms: STATUS_MS }; });
+        getAliveMonsters().forEach(m => {
+            if (m.status) return;
+            m.status = { kind: 'stun', ms: STATUS_MS };
+            const i = monstersList.indexOf(m);
+            if (i >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${i + 1}) img`, 'STUNNED', 'stun');
+        });
         logMessage(`[Stun Burst] All enemies are stunned for 2 seconds!`, 'drop');
     }
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });

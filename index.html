@@ -198,6 +198,7 @@
         .monster-idle { animation: monsterIdle 2.4s infinite; transform-origin: 50% 100%; }
         @media (prefers-reduced-motion: reduce) { .player-idle, .monster-idle { animation: none; } }
         .combat-dmg.miss { color: #ffffff; font-size: 26px; letter-spacing: 1px; }
+        .combat-dmg.stun { color: #facc15; font-size: 26px; letter-spacing: 1px; }
         @keyframes combatDmgUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -70px; } }
         .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
