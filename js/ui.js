@@ -2645,7 +2645,11 @@ function renderLibraryView() {
         }).join('');
     }
     if (monstersEl && typeof MONSTERS_DATA !== 'undefined') {
-        const rows = Object.values(MONSTERS_DATA).map(m => {
+        // Normal monsters the game uses: base roster and element-path rosters (bosses are not listed here)
+        const normalIds = new Set();
+        if (typeof BASE_15 !== 'undefined') Object.values(BASE_15).forEach(m => normalIds.add(m.id));
+        if (typeof PATH_ROSTERS !== 'undefined') Object.values(PATH_ROSTERS).forEach(list => list.forEach(m => normalIds.add(m.id)));
+        const rows = Object.values(MONSTERS_DATA).filter(m => normalIds.has(m.id) && !m.isBoss).map(m => {
             const el = (ROLE_ICONS[m.role || (m.isRanged ? 'range' : 'melee')] || '') + ' ' + (m.element && ELEMENTS[m.element] ? `${ELEMENTS[m.element].icon} ${ELEMENTS[m.element].name}` : 'None');
             const type = m.isBoss ? 'Boss' : (m.isRanged ? 'Ranged' : 'Melee');
             return `<tr class="border-t border-slate-800 ${m.isBoss ? 'text-amber-300' : 'text-slate-200'}">
