@@ -301,7 +301,13 @@ function getDerivedStats() {
     const ST = daily ? { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 } : player.stats;
     const skl = name => daily ? 0 : (player.skills[name]?.level || 0);
 
-    let maxHp = Math.floor((100 + (ST.vit * 15) + (lvl * 10)) * (1 + (rn('maxHpBonus') + rn('fortitudeStacks')) / 100) * (1 + (rn('runeScholar') > 0 ? 0.05 * (player.currentRunRunes || []).length : 0))) + rn('bloodlust') * rn('killCount');
+    // Max HP runes work on the current max HP: Vitality +50% per pick, Fortitude +2% per proc, Bloodlust +2% per kill
+    const baseMaxHp = 100 + (ST.vit * 15) + (lvl * 10);
+    let maxHp = Math.floor(baseMaxHp
+        * Math.pow(1.5, rn('maxHpBonus') / 50)
+        * Math.pow(1 + rn('fortitude') / 100, rn('fortitudeStacks'))
+        * Math.pow(1 + rn('bloodlust') / 100, rn('killCount'))
+        * (rn('runeScholar') > 0 ? 1 + 0.05 * (player.currentRunRunes || []).length : 1));
     let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3) + (!daily && player.baseLv === 1 ? 5 : 0); // base level 1: +5 ATK
     let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;

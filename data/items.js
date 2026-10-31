@@ -264,11 +264,27 @@ Object.keys(GEAR_POOL).forEach(k => {
     GEAR_POOL[k] = drops;
 });
 
-// Helmets (hat slot) drop only from campaign bosses. Per helmet level: the base helm.
+// Boss helmets: every campaign boss has its own unique helmet (drops only from that boss).
+// Stats follow the helmet tier of the boss's map level (HAT_BY_LEVEL).
+const BOSS_HELMETS = {
+    1:  { name: "Mossbloom Cap", boss: "Giant Moss Slime", appearance: "A rounded mushroom cap crusted with moss and creeping vines. Small mushrooms sprout along its edge, and a glowing amber gem sits at the front." },
+    10: { name: "Magma Horn Helm", boss: "Cave Beast", appearance: "A black stone helm with two thick bony horns and a jaw-shaped brow of cracked stone. Shaggy red-orange fur trims the edges, and molten lines run down the cheek plates." },
+    20: { name: "Pharaoh's Gold Crown", boss: "Sand King", appearance: "A tall gold crown wrapped in gold-threaded bandage cloth, with a red gem at the front. Sand trickles from its base." },
+    30: { name: "Abyssal Coral Crown", boss: "Abyss Lord", appearance: "A dark blue-black coral crown with jagged points. Water streams off its tips and runs down the sides." },
+    40: { name: "Cracked Halo Crown", boss: "Fallen Angel", appearance: "A scorched black band holding a cracked golden halo that leaks dark light. Ash-grey feathers fall from its sides." },
+    50: { name: "Worldshell Helm", boss: "Dusk World-Eater", appearance: "A helm carved from a cracked stone shell, with a toothed ring around the crown." },
+    60: { name: "Icicle Crown of Hrym", boss: "Hrym, Frost King", appearance: "A frost-covered iron helm topped with a crown of long icicles. Cold mist rolls off its edges." },
+    70: { name: "Black Feather Valkyrie Helm", boss: "Brynhild, Valkyrie Queen", appearance: "A silver and gold winged helm with a plume of black feathers. Lightning flickers around its wing tips." },
+    80: { name: "Burning Stone Crown", boss: "Surtr, Flame Giant", appearance: "A crown of black rock with glowing orange cracks. Flames lick from its points." },
+    90: { name: "Hel's Bone Crown", boss: "Queen Hel", appearance: "A grey bone crown, one side smooth and pale, the other a hollow skull. Grave dust drifts from its rim." },
+    99: { name: "Starlight Void Crown", boss: "Void Colossus", appearance: "A dark star-shaped crown of cracked purple stone. Faint starlight glows through the cracks." }
+};
+// Which helmet tier each boss drops, by boss id (the final map boss is the Dusk World-Eater, same helmet as Map 50)
+const BOSS_HELMET_LEVEL_BY_ID = { M004: 1, M008: 10, M012: 20, M016: 30, M020: 40, M024: 50, M049: 60, M062: 70, M075: 80, M088: 90, M104: 99 };
 const HELMET_DROP_POOL = {};
-Object.keys(HAT_BY_LEVEL).forEach(lv => {
-    const L = Number(lv), h = HAT_BY_LEVEL[lv];
-    HELMET_DROP_POOL[lv] = [{ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: L, stats: h.stats, desc: statText(h.stats) }];
+Object.keys(BOSS_HELMETS).forEach(lv => {
+    const L = Number(lv), b = BOSS_HELMETS[lv], stats = HAT_BY_LEVEL[lv].stats;
+    HELMET_DROP_POOL[lv] = [{ id: `boss_helm_${lv}`, name: b.name, slot: "hat", levelReq: L, boss: b.boss, appearance: b.appearance, dropOnly: true, stats, desc: statText(stats) }];
 });
 // Boss helmet chance by the boss's map level: 1-30 5%, 40-60 2.5%, 70-99 1.5%
 function bossHelmetChance(levelReq) {

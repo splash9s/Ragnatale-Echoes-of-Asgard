@@ -87,11 +87,11 @@ const RUNE_RARITY_WEIGHT = { 1: 33, 2: 27, 3: 20, 4: 13, 5: 7 };
 const RUNE_DEFS = {
     critBonus: { name: "Berserk Rune", rarity: 1, add: 10, desc: "+10% Critical Rate", text: v => `+${v}% Critical Rate` },
     dodge: { name: "Dodge Rune", rarity: 1, add: 10, desc: "+10 FLEE (raises dodge chance)", text: v => `+${v} FLEE (raises dodge chance)` },
-    zeroArmor: { name: "Zero Armor Rune", rarity: 2, flag: true, desc: "No armor equipped: +10 FLEE. Armor equipped: incoming damage reduced 10%", text: () => "No armor: +10 FLEE | With armor: incoming damage -10%" },
-    swiftRun: { name: "Swift Feet Rune", rarity: 1, add: 10, desc: "Stage walk time reduced to 1 second", text: () => "Stage walk time reduced to 1 second" },
+    zeroArmor: { name: "Zero Armor Rune", rarity: 2, flag: true, desc: "No armor: +10 FLEE. Armor > 0: incoming damage reduced 10%", text: () => "No armor: +10 FLEE | Armor > 0: incoming damage -10%" },
+    swiftRun: { name: "Swift Feet Rune", rarity: 1, flag: true, desc: "When the stage ends, automatically move to the next stage", text: () => "When the stage ends, automatically move to the next stage" },
     focus: { name: "Focus Rune", rarity: 1, add: 10, desc: "Missed attacks restore 10% HP", text: v => `Missed attacks restore ${v}% HP` },
-    maxHpBonus: { name: "Vitality Rune", rarity: 3, add: 50, desc: "+50% Max HP", text: v => `+${v}% Max HP` },
-    firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "+50% Bonus Damage on First Hit", text: v => `+${v}% Bonus Damage on First Hit` },
+    maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% Max HP (from current max HP)", text: v => `+${v}% Max HP (from current max HP)` },
+    firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "+50% Bonus Damage on First Hit against every enemy", text: v => `+${v}% Bonus Damage on First Hit against every enemy` },
     randomHitCount: { name: "Chaos Rune", rarity: 2, add: 1, once: true, desc: "Attacks have a 50% chance to strike random targets", text: () => "Attacks have a 50% chance to strike random targets" },
     thorn: { name: "Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage taken", text: v => `Reflect ${v}% of melee damage taken` },
     critHeal: { name: "Critical Heal Rune", rarity: 2, add: 5, desc: "Critical hits restore 5% HP", text: v => `Critical hits restore ${v}% HP` },
@@ -101,7 +101,7 @@ const RUNE_DEFS = {
     alwaysCritFirst: { name: "Assassination Rune", rarity: 3, flag: true, desc: "First hit of every battle is always a Critical Hit", text: () => "First hit of every battle is always a Critical Hit" },
     vampire: { name: "Vampire Rune", rarity: 4, add: 20, desc: "Heal 20% of damage dealt", text: v => `Heal ${v}% of damage dealt` },
     divineLight: { name: "Divine Light Rune", rarity: 3, add: 100, once: true, desc: "Every 3rd attack deals +100% ATK bonus damage", text: v => `Every 3rd attack deals +${v}% ATK bonus damage` },
-    momentum: { name: "Momentum Rune", rarity: 3, add: 10, once: true, desc: "3 critical hits in a row restore 10% HP", text: v => `3 critical hits in a row restore ${v}% HP` },
+    momentum: { name: "Momentum Rune", rarity: 2, add: 20, once: true, desc: "3 critical hits in a row restore 20% HP", text: v => `3 critical hits in a row restore ${v}% HP` },
     retribution: { name: "Retribution Rune", rarity: 3, add: 5, once: true, desc: "Healing deals 5% of heal damage to a random monster", text: v => `Healing deals ${v}% of heal damage to a random monster` },
     killBlast: { name: "Shockwave Rune", rarity: 4, add: 20, once: true, desc: "Killing an enemy deals 20% ATK to all other enemies", text: v => `Killing an enemy deals ${v}% ATK to all other enemies` },
     elementIgnore: { name: "Void Rune", rarity: 5, flag: true, desc: "Ignore monster elements", text: () => "Ignore monster elements" },
@@ -112,10 +112,10 @@ const RUNE_DEFS = {
     ironGuard: { name: "Iron Guard Rune", rarity: 2, add: 5, once: true, desc: "Critical hits restore 5% armor", text: v => `Critical hits restore ${v}% armor` },
     overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "The part of a heal above full HP deals that amount as damage to a random monster", text: () => "The part of a heal above full HP deals that amount as damage to a random monster" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a Critical Hit", text: () => "Every attack is a Critical Hit" },
-    bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 10, once: true, desc: "Every kill increases max HP by 10", text: v => `Every kill increases max HP by ${v}` },
-    shadowStep: { name: "Shadow Step Rune", rarity: 4, add: 0.5, once: true, desc: "Every kill increases FLEE by 0.5", text: v => `Every kill increases FLEE by ${v}` },
+    bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 2, once: true, desc: "Every kill increases max HP by 2% (from current max HP)", text: v => `Every kill increases max HP by ${v}% (from current max HP)` },
+    shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Every kill increases FLEE by 0.5", text: v => `Every kill increases FLEE by ${v}` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Killing an enemy restores 10% HP", text: v => `Killing an enemy restores ${v}% HP` },
-    fortitude: { name: "Fortitude Rune", rarity: 2, add: 1, once: true, desc: "Critical hits have a 20% chance to increase max HP by 1%", text: v => `Critical hits have a 20% chance to increase max HP by ${v}%` },
+    fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Critical hits have a 50% chance to increase max HP by 2% (from current max HP)", text: v => `Critical hits have a 50% chance to increase max HP by ${v}% (from current max HP)` },
     glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 20, once: true, desc: "Max armor becomes 0, +20% Critical Rate", text: v => `Max armor becomes 0, +${v}% Critical Rate` },
     runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% max HP for each owned rune", text: () => "+5% max HP for each owned rune" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each owned rune", text: () => "+20% damage for each owned rune" },
@@ -124,7 +124,7 @@ const RUNE_DEFS = {
     monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 50, once: true, desc: "Damage to normal monsters +50%", text: v => `Damage to normal monsters +${v}%` },
     ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0, damage +200%", text: () => "While armor is above 0, damage +200%" },
     patientStrike: { name: "Patient Strike Rune", rarity: 1, flag: true, desc: "After a miss, your next attack deals 300% more damage", text: () => "After a miss, your next attack deals 300% more damage" },
-    twinEvasion: { name: "Twin Evasion Rune", rarity: 1, add: 5, once: true, desc: "Dodging twice in a row restores 5% HP", text: v => `Dodging twice in a row restores ${v}% HP` },
+    twinEvasion: { name: "Twin Evasion Rune", rarity: 1, add: 10, once: true, desc: "Dodging twice in a row restores 10% HP", text: v => `Dodging twice in a row restores ${v}% HP` },
     tripleDodge: { name: "Triple Dodge Rune", rarity: 5, flag: true, desc: "Dodging 3 times in a row fully heals you", text: () => "Dodging 3 times in a row fully heals you" },
     lastResort: { name: "Last Resort Rune", rarity: 1, flag: true, desc: "Taking 10 hits in a row fully heals you", text: () => "Taking 10 hits in a row fully heals you" },
     counterStrike: { name: "Counter Strike Rune", rarity: 2, add: 125, once: true, desc: "Dodging deals 125% ATK damage to the attacker", text: v => `Dodging deals ${v}% ATK damage to the attacker` },
@@ -870,7 +870,8 @@ function awardKill(m) {
     }
     // Helmet: only from campaign bosses, chance by the map level (see bossHelmetChance)
     if (m.isBoss && activeMap && Math.random() < (isVoidTest ? 1 : bossHelmetChance(activeMap.levelReq))) {
-        const list = HELMET_DROP_POOL[bossHelmetLevel(activeMap.levelReq)];
+        const helmLv = BOSS_HELMET_LEVEL_BY_ID[m.id] || bossHelmetLevel(activeMap.levelReq);
+        const list = HELMET_DROP_POOL[helmLv];
         const template = list[Math.floor(Math.random() * list.length)];
         const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
         logMessage(`[Helmet Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
@@ -1127,7 +1128,7 @@ function monsterAct(m, derived, position = 0) {
             if (m.spell === 'rockCurse') { playerDebuffs.curseUntil = Date.now() + 3000; logMessage('[Curse] Your attacks are weaker for 3 seconds', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 seconds)'); }
             if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
         }
-        if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.9);
+        if (player.runes.zeroArmor && player.armor > 0) eDmg = Math.floor(eDmg * 0.9);
         takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
         if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'swordSweep' && m.attackCount % 3 === 0 && player.hp > 0) {
@@ -1207,7 +1208,9 @@ function runCombatTick() {
     if (stunned) logMessage('[Stun] You are stunned and cannot attack!', 'winlose');
     const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - (playerDebuffs.frost > 0 ? 20 : 0) - targetEnemy.flee + 50) / 100));
     if (!attackBlocked && (runeN('hawkEye') > 0 || !!targetEnemy.status || Math.random() <= hitChance)) {
-        const bonusDmg = (isFirstHitOfBattle ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
+        const firstOnThis = !targetEnemy._struck; // Stunning Strike: first hit against each enemy
+        targetEnemy._struck = true;
+        const bonusDmg = (firstOnThis ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
         const elemMult = player.runes.elementIgnore ? 1 : getElementMultiplier(player.equipped.weapon?.element, targetEnemy.element);
         if (elemMult !== 1 && !player.runes.elementIgnore) {
             logMessage(`[Element] ${elemMult > 1 ? 'Advantage' : 'Resisted'} x${elemMult} vs ${targetEnemy.name}`, elemMult > 1 ? 'drop' : 'combat');
@@ -1258,7 +1261,7 @@ function runCombatTick() {
                 }
             }
             if (runeN('ironGuard') > 0) player.armor = Math.min(derived.maxArmor, player.armor + Math.floor(derived.maxArmor * runeN('ironGuard') / 100));
-            if (runeN('fortitude') > 0 && Math.random() < 0.2) player.runes.fortitudeStacks = (player.runes.fortitudeStacks || 0) + 1;
+            if (runeN('fortitude') > 0 && Math.random() < 0.5) player.runes.fortitudeStacks = (player.runes.fortitudeStacks || 0) + 1;
             player.runes.surgeReady = runeN('surgeFocus') > 0;
             if (runeN('critHeal') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('critHeal') / 100), 'Critical Heal');
             if (critStreak >= 3) {
@@ -1396,7 +1399,6 @@ function runCombatTick() {
 // Time between stages: faster movement means a shorter walk. VIP skips the walk.
 function stageDelay() {
     if (isVipActive()) return 300;
-    if (runeN('swiftRun') > 0) return 1000;
     const mv = getDerivedStats().movementSpeed || 3;
     return Math.max(400, Math.round(6000 / mv));
 }
@@ -1481,7 +1483,7 @@ function onStageCleared() {
             checkRuneSelectionPrompt(proceedNext);
         } else {
             window.pendingStageProceed = proceedNext;
-            if (isVipActive()) {
+            if (isVipActive() || runeN('swiftRun') > 0) { // Swift Feet: move on automatically
                 proceedToNextStage();
                 return;
             }
