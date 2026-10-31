@@ -711,7 +711,7 @@ function applyCombatEarthPositions() {
     const shadow = document.getElementById('combat-player-shadow');
     if (shadow) {
         shadow.style.left = (combatPlayerAnchor.x - 56) + 'px';
-        shadow.style.top = (combatPlayerAnchor.y - 30 - combatShadowLift) + 'px';
+        shadow.style.top = (combatPlayerAnchor.y - 33 - combatShadowLift) + 'px';
     }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
         const pos = Number(card.dataset.pos);
