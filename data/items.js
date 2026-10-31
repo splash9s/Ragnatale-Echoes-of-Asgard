@@ -62,6 +62,7 @@ SHOP_ITEMS.push(...RING_ITEMS);
 const GEAR_POOL = {
     map1: [
         { id: "G001", name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
+        { id: "kd1", name: "Iron Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 1, stats: { atk: 16 }, desc: "Atk +16 (2H knuckle, takes Shield slot)" },
         { id: "G002", name: "Wooden Buckler", slot: "shield", levelReq: 1, stats: { def: 2, block: 5 }, desc: "DEF +2, Block +5%" },
         { id: "G003", name: "Iron Cuirass", slot: "armor", levelReq: 1, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
         { id: "G004", name: "Cotton Cloak", slot: "garment", levelReq: 1, stats: { flee: 2 }, desc: "FLEE +2" },
@@ -69,6 +70,7 @@ const GEAR_POOL = {
     ],
     map10: [
         { id: "G006", name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, stats: { atk: 25 }, desc: "Atk +25" },
+        { id: "kd10", name: "Spiked Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 10, stats: { atk: 38 }, desc: "Atk +38 (2H knuckle, takes Shield slot)" },
         { id: "G007", name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, stats: { def: 6, block: 10 }, desc: "DEF +6, Block +10%" },
         { id: "G008", name: "Steel Plate Armor", slot: "armor", levelReq: 10, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
         { id: "G009", name: "Chain Mail Mantle", slot: "garment", levelReq: 10, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
@@ -76,6 +78,7 @@ const GEAR_POOL = {
     ],
     map20: [
         { id: "G011", name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, stats: { atk: 50, crit: 2 }, desc: "Atk +50, CRIT +2%" },
+        { id: "kd20", name: "Bone Crusher Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 20, stats: { atk: 75 }, desc: "Atk +75 (2H knuckle, takes Shield slot)" },
         { id: "G012", name: "Royal Aegis", slot: "shield", levelReq: 20, stats: { def: 12, block: 15 }, desc: "DEF +12, Block +15%" },
         { id: "G013", name: "Mithril Cuirass", slot: "armor", levelReq: 20, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
         { id: "G014", name: "Valkyrie Cloak", slot: "garment", levelReq: 20, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
@@ -83,6 +86,7 @@ const GEAR_POOL = {
     ],
     map30: [
         { id: "G016", name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, stats: { atk: 90, crit: 4 }, desc: "Atk +90, CRIT +4%" },
+        { id: "kd30", name: "Dusk Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 30, stats: { atk: 140, crit: 2 }, desc: "Atk +140, CRIT +2% (2H knuckle, takes Shield slot)" },
         { id: "G017", name: "Shield of Asgard", slot: "shield", levelReq: 30, stats: { def: 20, block: 25 }, desc: "DEF +20, Block +25%" },
         { id: "G018", name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
         { id: "G019", name: "Winged Shroud", slot: "garment", levelReq: 30, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
@@ -90,6 +94,7 @@ const GEAR_POOL = {
     ],
     map40: [
         { id: "G021", name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, stats: { atk: 140, crit: 6 }, desc: "Atk +140, CRIT +6%" },
+        { id: "kd40", name: "Solar Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 40, stats: { atk: 220, crit: 4 }, desc: "Atk +220, CRIT +4% (2H knuckle, takes Shield slot)" },
         { id: "G022", name: "Aegis of Light", slot: "shield", levelReq: 40, stats: { def: 32, block: 30 }, desc: "DEF +32, Block +30%" },
         { id: "G023", name: "Solar Plate", slot: "armor", levelReq: 40, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
         { id: "G024", name: "Solar Mantle", slot: "garment", levelReq: 40, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
@@ -97,6 +102,7 @@ const GEAR_POOL = {
     ],
     map50: [
         { id: "G026", name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, stats: { atk: 210, crit: 7 }, desc: "Atk +210, CRIT +7%" },
+        { id: "kd50", name: "Dusk World-Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 50, stats: { atk: 330, crit: 6 }, desc: "Atk +330, CRIT +6% (2H knuckle, takes Shield slot)" },
         { id: "G027", name: "Ultimate Aegis", slot: "shield", levelReq: 50, stats: { def: 50, block: 40 }, desc: "DEF +50, Block +40%" },
         { id: "G028", name: "Armor of the Gods", slot: "armor", levelReq: 50, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
         { id: "G029", name: "Shroud of Eternity", slot: "garment", levelReq: 50, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
@@ -248,8 +254,9 @@ const HEAVY_LIGHT_SLOTS = ['armor', 'garment', 'footgear'];
 Object.keys(GEAR_POOL).forEach(k => {
     const lv = parseInt(k.replace('map', ''), 10);
     const base = GEAR_POOL[k].filter(i => !i.setName);
+    const shopBase = base.filter(i => !i.twoHanded); // knuckles are sold from SHOP_ITEMS, not the shop source
     const rings = [...RING_ITEMS, ...HIGH_RING_ITEMS].filter(r => r.levelReq === lv);
-    GEAR_SHOP_SOURCE[k] = [...base, ...rings];
+    GEAR_SHOP_SOURCE[k] = [...shopBase, ...rings];
     const armorBase = base.find(i => i.slot === 'armor');
     const drops = base.filter(i => i.slot === 'weapon' || i.slot === 'shield');
     drops.push(...rings);
