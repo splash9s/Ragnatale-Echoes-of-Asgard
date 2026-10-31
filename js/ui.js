@@ -209,7 +209,7 @@ function monsterHurtFrames(m) { const s = monsterSpriteOf(m); return s ? (s.hurt
 // Stun effect above the monster's head; the sprite loop shakes it
 function stunFxHTML(m) {
     if (!(m.status && m.status.kind === 'stun' && m.hp > 0)) return '';
-    return '<img class="stun-fx" src="assets/combat/stun/stuneffect.png" alt="" style="position:absolute; left:50%; top:-12px; width:102px; height:78px; max-width:none; transform:translateX(-50%); pointer-events:none; image-rendering:pixelated;">';
+    return '<img class="stun-fx" src="assets/combat/stun/stuneffect.png" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; max-width:none; pointer-events:none; image-rendering:pixelated;">';
 }
 function setMonsterFrame(img, src) {
     img.src = src;
@@ -425,8 +425,14 @@ setInterval(() => {
         const frames = img.dataset.frames.split(',');
         setMonsterFrame(img, frames[Math.floor(now / 500) % frames.length]); // idle: one frame every 500ms
     });
+    // Stun effect: centred on the top edge of the monster's sprite, shaking side to side
     document.querySelectorAll('img.stun-fx').forEach(fx => {
-        fx.style.transform = `translateX(calc(-50% + ${Math.round(Math.sin(now / 50) * 4)}px))`;
+        const body = fx.parentElement && fx.parentElement.querySelector('img.idle-anim');
+        if (!body) return;
+        const fw = fx.offsetWidth || 102, fh = fx.offsetHeight || 78;
+        const shake = Math.round(Math.sin(now / 50) * 4);
+        fx.style.left = (body.offsetLeft + body.offsetWidth / 2 - fw / 2 + shake) + 'px';
+        fx.style.top = (body.offsetTop - fh / 2) + 'px';
     });
 }, 60);
 
