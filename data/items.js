@@ -151,12 +151,12 @@ const HIGH_RING_ITEMS = [
 // ---------- HATS (new gear slot) ----------
 // One hat per gear tier. Tiers 1-50 are also sold in the shop.
 const HAT_BY_LEVEL = {
-    1:  { name: "Cloth Cap", stats: { hp: 15, def: 1 }, price: 25 },
-    10: { name: "Iron Helm", stats: { hp: 60, def: 4 }, price: 90 },
+    1:  { name: "Cloth Cap", stats: { hp: 15, def: 1 }, price: 25, appearance: "A plain brown cloth cap stitched from rough linen, with a folded brim and a small leather tie at the back." },
+    10: { name: "Iron Helm", stats: { hp: 60, def: 4 }, price: 90, appearance: "A round iron helm with a flat nose guard and a riveted rim. Dull grey and lightly scratched." },
     20: { name: "Knight Helm", stats: { hp: 120, def: 8 }, price: 280 },
-    30: { name: "Winged Helm", stats: { hp: 250, def: 12, flee: 5 }, price: 750 },
+    30: { name: "Winged Helm", stats: { hp: 250, def: 12, flee: 5 }, price: 750, appearance: "A polished steel helm with a pair of small white feathered wings on each side of the crown." },
     40: { name: "Solar Crown", stats: { hp: 420, def: 18, flee: 8 }, price: 1700 },
-    50: { name: "Helm of Odin", stats: { hp: 700, def: 25, flee: 10 }, price: 3500 },
+    50: { name: "Helm of Odin", stats: { hp: 700, def: 25, flee: 10 }, price: 3500, appearance: "A gold-trimmed helm with a wide brim and a single blue gem above the brow, engraved with runes." },
     60: { name: "Jotun Helm", stats: { hp: 1000, def: 35, flee: 15 }, price: 7000 },
     70: { name: "Valkyrie Helm", stats: { hp: 1300, def: 45, flee: 20 }, price: 14000 },
     80: { name: "Muspel Crown", stats: { hp: 1600, def: 55, flee: 25 }, price: 28000 },
@@ -234,7 +234,7 @@ const SHOP_HAT_LEVELS = [1, 10, 30, 50];
 Object.keys(HAT_BY_LEVEL).forEach(lv => {
     const h = HAT_BY_LEVEL[lv];
     if (!h.price || !SHOP_HAT_LEVELS.includes(Number(lv))) return;
-    SHOP_ITEMS.push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: Number(lv), price: h.price, stats: h.stats, desc: statText(h.stats) });
+    SHOP_ITEMS.push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: Number(lv), price: h.price, stats: h.stats, desc: statText(h.stats), appearance: h.appearance });
 });
 
 
