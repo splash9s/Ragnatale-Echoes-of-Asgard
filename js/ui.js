@@ -421,6 +421,7 @@ function startMonsterAttack(m, delayMs = 0) {
     }
     m._attackAt = Date.now();
     m._animAt = m._attackAt;
+    m._hitAt = 0; // a new attack cancels the damaged animation
     const el = monsterCardImg(m);
     if (!el) return;
     el.dataset.attackAt = String(m._attackAt);
@@ -520,21 +521,20 @@ setInterval(() => {
         const elapsed = now - hitAt;
         const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
         const hurtLen = Math.max(1, hurt.length) * COMBAT_DAMAGE_FRAME_MS;
+        const hurtOn = hitAt && elapsed >= 0 && elapsed < hurtLen;
         const atkAt = Number(img.dataset.attackAt) || 0;
         const ae = now - atkAt;
         const attackOn = atkAt && ae >= 0 && ae < COMBAT_MONSTER_ATTACK_MS;
-        // hurt frames only if the hit came after the latest attack (a later attack overrides them for good)
-        const hurtOn = hitAt && elapsed >= 0 && elapsed < hurtLen && hitAt >= atkAt;
-        // Red hit flash (same as the player's battle sprite, first 150ms of a hit): a CSS effect that always shows on a hit, even over an attack pose
-        const flashOn = hitAt && elapsed >= 0 && elapsed < 150;
-        const flashCss = 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)';
-        if (hurtOn) {
+        if (hurtOn && (!attackOn || hitAt >= atkAt)) {
             if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
-            img.style.filter = flashOn ? flashCss : '';
+            // Same red flash as the player's battle sprite (first 150ms of the hit)
+            img.style.filter = elapsed < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             return;
         }
         if (attackOn) {
-            img.style.filter = flashOn ? flashCss : '';
+            const flashAt = Number(img.dataset.flashAt) || 0;
+            const flashOn = flashAt && now - flashAt >= 0 && now - flashAt < 150;
+            img.style.filter = flashOn ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             setMonsterFrame(img, img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME);
             return;
         }
@@ -2592,6 +2592,7 @@ function updateUI() {
         monstersList.forEach((m, idx) => {
             if (m._prevHp !== undefined && m.hp < m._prevHp) {
                 m._hitAt = Date.now();
+                m._flashAt = m._hitAt; // red hit flash (CSS) has its own timestamp
                 m._attackAt = 0; // a hit cancels any attack pose still playing
                 const dmgNum = m._prevHp - m.hp, dmgCrit = !!m.lastHitCrit;
                 m.lastHitCrit = false;
@@ -2625,7 +2626,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;">`; })()}${stunFxHTML(m)}</div>
+                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;">`; })()}${stunFxHTML(m)}</div>
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
