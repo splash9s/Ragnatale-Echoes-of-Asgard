@@ -412,7 +412,7 @@ function playPlayerAttackAnim(isCrit) {
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
 const COMBAT_PLAYER_REACT_FRAMES = {
-    block: { src: 'assets/cha/chablock.png', w: 520, h: 710, fx: 257.01, fy: 695 },
+    block: { src: 'assets/cha/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
     dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 111.33, fy: 138 }
 };
 // Place a battle frame so its feet point sits on the player's feet (exact size)
