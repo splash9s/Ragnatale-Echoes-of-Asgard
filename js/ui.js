@@ -571,6 +571,11 @@ setInterval(() => {
                 return;
             }
             img.style.filter = '';
+            if (hurtMs) {
+                // Boss death in slow motion: the death frames step slowly while the body fades out
+                const p = Math.min(1, (e - hurtMs) / Math.max(1, total - hurtMs));
+                img.style.opacity = String(1 - 0.75 * p * p);
+            }
             setMonsterFrame(img, dead[Math.min(dead.length - 1, Math.floor((e - hurtMs) / ms))]);
             return;
         }
