@@ -179,6 +179,55 @@ const MONSTER_SPRITES = {
             'assets/combat/helstonemage/helstonemagedead.png': [0, 1]
         }
     },
+    M008: { // Cave Beast (boss, map lv 10): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/cavebeast/cavebeast.png'],
+        attack: ['assets/combat/cavebeast/cavebeastattack.png'],
+        hurt: ['assets/combat/cavebeast/cavebeastdamaged.png'],
+        dead: ['assets/combat/cavebeast/cavebeastdead1.png', 'assets/combat/cavebeast/cavebeastdead2.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/cavebeast/cavebeastattack.png': [0, -3],
+            'assets/combat/cavebeast/cavebeastdamaged.png': [0, 0],
+            'assets/combat/cavebeast/cavebeastdead1.png': [0, 0],
+            'assets/combat/cavebeast/cavebeastdead2.png': [0, -1]
+        }
+    },
+    M060: { // Battle Storm Mage (wind mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/battlestormmage/battlestormmage.png'],
+        attack: ['assets/combat/battlestormmage/battlestormmageattack.png'],
+        hurt: ['assets/combat/battlestormmage/battlestormmagedamaged.png'],
+        dead: ['assets/combat/battlestormmage/battlestormmagedead.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/battlestormmage/battlestormmageattack.png': [0, 0],
+            'assets/combat/battlestormmage/battlestormmagedamaged.png': [0, 0],
+            'assets/combat/battlestormmage/battlestormmagedead.png': [0, -9]
+        }
+    },
+    M033: { // Halo Warden (wind tank): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/halowarden/halowarden.png'],
+        attack: ['assets/combat/halowarden/halowardenattack.png'],
+        hurt: ['assets/combat/halowarden/halowardendamaged.png'],
+        dead: ['assets/combat/halowarden/halowardendead.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/halowarden/halowardenattack.png': [11, -5],
+            'assets/combat/halowarden/halowardendamaged.png': [-11, -2],
+            'assets/combat/halowarden/halowardendead.png': [27, -3]
+        }
+    },
+    M056: { // Valkyrie Healer (wind healer): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/valkyriehealer/valkyriehealer.png'],
+        attack: ['assets/combat/valkyriehealer/valkyriehealerattack.png'],
+        hurt: ['assets/combat/valkyriehealer/valkyriehealerdamaged.png'],
+        dead: ['assets/combat/valkyriehealer/valkyriehealerdead.png'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/valkyriehealer/valkyriehealerattack.png': [17, 4],
+            'assets/combat/valkyriehealer/valkyriehealerdamaged.png': [29, 3],
+            'assets/combat/valkyriehealer/valkyriehealerdead.png': [0, 1]
+        }
+    },
     M102: { // Halo Priest (floating: no ground shift, each frame is centred and bottom-aligned)
         idle: ['assets/combat/halopriest/halopriest.png'],
         attack: ['assets/combat/halopriest/halopriestattack.png'],
