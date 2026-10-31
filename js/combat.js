@@ -356,7 +356,7 @@ function startExpedition(mode, opts = {}) {
     monsterOpenerRound = true;
     spawnStageMonsters();
 
-    if (combatInterval) clearInterval(combatInterval);
+    if (combatInterval) clearInterval(combatInterval); combatRunId++;
     combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)));
 }
 
@@ -503,6 +503,8 @@ function spawnStageMonsters() {
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
     playerDebuffs = { curse: 0, frost: 0, stun: 0 };
     playerStunUntil = 0;
+    playerTimedDebuffs = {};
+    playerAspdToggle = false;
     const derived = getDerivedStats();
     monstersList = [];
     const dailyScale = currentMode === 'daily' ? 0.7 : 1;
@@ -566,6 +568,13 @@ function spawnStageMonsters() {
 let playerDebuffs = { curse: 0, frost: 0, stun: 0 };
 // Player stun from tank attacks: the time (ms) until which the player cannot attack
 let playerStunUntil = 0;
+// Timed debuffs on the player from boss skills: { atk | hit | flee | aspd: { until, pct } }
+let playerTimedDebuffs = {};
+let playerAspdToggle = false; // Devour: every other player attack tick is skipped while ASPD is down
+let combatRunId = 0; // delayed boss effects from an earlier fight do nothing
+const BOSS_UNIQUE_SKILL = { M008: 'magmaRoar', M012: 'sandstorm', M016: 'undertow', M020: 'ashFeathers', M024: 'devour', M049: 'iceShield', M062: 'lightningSpear', M075: 'swordSweep', M088: 'raiseDead', M104: 'voidPull' };
+function applyPlayerDebuff(kind, pct, ms) { playerTimedDebuffs[kind] = { until: Date.now() + ms, pct }; }
+function playerDebuffPct(kind) { const d = playerTimedDebuffs[kind]; return d && Date.now() < d.until ? d.pct : 0; }
 
 const SPELL_DEFS = {
     fireBolt:    { label: "Fire Bolt",    mult: 1.2 },
@@ -915,6 +924,7 @@ function tankStunPlayer(m) {
     playerStunUntil = Math.max(playerStunUntil, Date.now() + ms);
     setTimeout(() => showCombatText('#combat-player-sprite', 'STUNNED', 'stun'), 0);
     logMessage(`[Stun] ${m.name} stuns you for ${(ms / 1000).toFixed(2)} seconds!`, 'winlose');
+    if (typeof showBossBalloon === 'function') showBossBalloon('Stunned!');
 }
 function onPlayerDodged(m, source) {
     setTimeout(() => showCombatText('#combat-player-sprite', 'DODGE', 'miss'), 0);
@@ -945,7 +955,7 @@ function onPlayerDodged(m, source) {
 
 // Armor absorbs damage first, the rest goes to HP
 // Armor absorbs damage first, the rest goes to HP
-function takePlayerDamage(dmg, m) {
+function takePlayerDamage(dmg, m, ignoreArmor = false) {
     playPlayerReactAnim('block');
     flashPlayerHurt();
     lastHitBy = m.name;
@@ -955,7 +965,7 @@ function takePlayerDamage(dmg, m) {
     dmg = Math.floor(dmg * (1 - incomingRes / 100));
     let remaining = dmg;
     let absorbed = 0;
-    if (player.armor > 0) {
+    if (player.armor > 0 && !ignoreArmor) {
         absorbed = Math.min(player.armor, remaining);
         player.armor -= absorbed;
         remaining -= absorbed;
@@ -986,14 +996,78 @@ function bossTurnStart(m) {
     }
 }
 
+// Boss unique skills: one per boss (BOSS_UNIQUE_SKILL). Each one shows a speech box when it triggers.
+function bossDebuffPlayer(m, kind, pct, ms, skillName, label) {
+    applyPlayerDebuff(kind, pct, ms);
+    logMessage(`[Boss Skill] ${m.name} uses ${skillName}! ${label} for ${ms / 1000} seconds`, 'winlose');
+    if (typeof showBossBalloon === 'function') showBossBalloon(`${skillName}! ${label} (${ms / 1000}s)`);
+}
+function bossSkillOnAttack(m) {
+    const n = m.attackCount;
+    switch (BOSS_UNIQUE_SKILL[m.id]) {
+        case 'sandstorm': if (n % 5 === 0) bossDebuffPlayer(m, 'hit', 30, 5000, 'Sandstorm', 'HIT -30%'); break;
+        case 'ashFeathers': if (n % 5 === 0) bossDebuffPlayer(m, 'flee', 30, 5000, 'Ash Feathers', 'FLEE -30%'); break;
+        case 'devour': if (n % 5 === 0) bossDebuffPlayer(m, 'aspd', 50, 5000, 'Devour', 'ASPD -50%'); break;
+        case 'undertow':
+            if (n % 5 === 0) {
+                m.undertowUntil = Date.now() + 5000;
+                logMessage(`[Boss Skill] ${m.name} uses Undertow! It heals from its hits for 5 seconds`, 'winlose');
+                if (typeof showBossBalloon === 'function') showBossBalloon('Undertow! Heals on hit (5s)');
+            }
+            break;
+        case 'voidPull': if (n % 4 === 0) voidPullPlayer(m); break;
+        case 'raiseDead': if (n % 6 === 0) raiseFallenMonster(m); break;
+    }
+}
+function bossIceShieldTick(m) {
+    if (BOSS_UNIQUE_SKILL[m.id] !== 'iceShield' || m.hp <= 0) return;
+    if (Date.now() - (m._shieldAt || 0) >= 5000) {
+        m._shieldAt = Date.now();
+        m.iceShieldReady = true; // the next hit on this boss is reduced by 20%
+        logMessage(`[Boss Skill] ${m.name} raises an Ice Shield`, 'winlose');
+        if (typeof showBossBalloon === 'function') showBossBalloon('Ice Shield! Blocks 20% of the next hit');
+    }
+}
+function voidPullPlayer(m) {
+    const runId = combatRunId;
+    logMessage(`[Boss Skill] ${m.name} uses Void Pull! You lose 5% of max HP each second for 3 seconds`, 'winlose');
+    if (typeof showBossBalloon === 'function') showBossBalloon('Void Pull! -5% HP per second (3s)');
+    for (let i = 1; i <= 3; i++) {
+        setTimeout(() => {
+            if (runId !== combatRunId || player.hp <= 0) return;
+            const d = Math.max(1, Math.floor(getDerivedStats().maxHp * 0.05));
+            player.hp -= d;
+            showCombatText('#combat-player-sprite', String(d), '');
+            logMessage(`[Void Pull] ${m.name} drains ${d} HP`, 'combat');
+        }, i * 1000);
+    }
+}
+function raiseFallenMonster(m) {
+    const fallen = monstersList.filter(x => x !== m && x.hp <= 0 && !x.isBoss && !x.isMiniBoss);
+    if (!fallen.length) return;
+    const t = fallen[Math.floor(Math.random() * fallen.length)];
+    t.hp = Math.max(1, Math.floor(t.maxHp * 0.3));
+    t._deathAt = 0;
+    t.status = null;
+    logMessage(`[Boss Skill] ${m.name} uses Raise Dead! ${t.name} rises again at 30% HP`, 'winlose');
+    if (typeof showBossBalloon === 'function') showBossBalloon(`Raise Dead! ${t.name} rises`);
+}
+function stunPlayerFor(ms, m, label) {
+    playerStunUntil = Math.max(playerStunUntil, Date.now() + ms);
+    setTimeout(() => showCombatText('#combat-player-sprite', 'STUNNED', 'stun'), 0);
+    logMessage(`[Stun] ${m.name}'s ${label} stuns you for ${(ms / 1000).toFixed(1)} seconds!`, 'winlose');
+    if (typeof showBossBalloon === 'function') showBossBalloon(`${label}! Stunned (${(ms / 1000).toFixed(1)}s)`);
+}
+
 function monsterAct(m, derived, position = 0) {
     if (player.hp <= 0 || m.hp <= 0) return;
-    if (m.isBoss) bossTurnStart(m);
+    if (m.isBoss) { bossTurnStart(m); bossIceShieldTick(m); }
     if (m.status) {
         logMessage(`[${STATUS_DEFS[m.status.kind].label}] ${m.name} cannot attack!`, 'winlose');
         return;
     }
     if (m.isBoss) m.attackCount = (m.attackCount || 0) + 1;
+    if (m.isBoss) bossSkillOnAttack(m);
 
     // Healers restore the most wounded ally by a flat amount instead of attacking
     if (roleOf(m) === 'healer' && m.heal) {
@@ -1020,16 +1094,35 @@ function monsterAct(m, derived, position = 0) {
             logMessage(`[Boss Skill] ${m.name} uses Heavy Strike!`, 'winlose');
             if (typeof showBossBalloon === 'function') showBossBalloon('Heavy Strike!');
         }
+        let ignoreArmor = false;
+        if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'magmaRoar' && m.attackCount % 5 === 0) {
+            eDmg = Math.floor(eDmg * 2);
+            bossDebuffPlayer(m, 'atk', 25, 5000, 'Magma Roar', 'ATK -25%');
+        }
+        if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'lightningSpear') {
+            ignoreArmor = true; // the spear goes through armor
+            if (Math.random() < 0.2) stunPlayerFor(1500, m, 'Lightning Spear');
+        }
         if (m.spell) {
             const def = SPELL_DEFS[m.spell];
             eDmg = Math.floor(eDmg * def.mult);
             logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
-            if (m.spell === 'rockCurse') { playerDebuffs.curse = 3; logMessage('[Curse] Your attacks are weaker for 3 turns', 'winlose'); }
-            if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); }
+            if (m.spell === 'rockCurse') { playerDebuffs.curse = 3; logMessage('[Curse] Your attacks are weaker for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 turns)'); }
+            if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
         }
         if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.9);
-        takePlayerDamage(eDmg, m);
+        takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
+        if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'swordSweep' && m.attackCount % 3 === 0 && player.hp > 0) {
+            logMessage(`[Boss Skill] ${m.name} uses Sword Sweep! It strikes twice`, 'winlose');
+            if (typeof showBossBalloon === 'function') showBossBalloon('Sword Sweep! Second strike');
+            takePlayerDamage(eDmg, m);
+        }
+        if (m.isBoss && m.undertowUntil > Date.now() && m.hp > 0) {
+            const heal = Math.floor(eDmg * 0.3);
+            m.hp = Math.min(m.maxHp, m.hp + heal);
+            logMessage(`[Undertow] ${m.name} heals ${heal} HP`, 'combat');
+        }
         dodgeStreak = 0;
         monsterHitStreak++;
         if (runeN('lastResort') > 0 && monsterHitStreak >= 10) {
@@ -1092,9 +1185,11 @@ function runCombatTick() {
     }
 
     const stunned = Date.now() < playerStunUntil;
+    const aspdSkip = playerDebuffPct('aspd') > 0 && (playerAspdToggle = !playerAspdToggle); // Devour: every other tick
+    const attackBlocked = stunned || aspdSkip;
     if (stunned) logMessage('[Stun] You are stunned and cannot attack!', 'winlose');
     const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - (playerDebuffs.frost > 0 ? 20 : 0) - targetEnemy.flee + 50) / 100));
-    if (!stunned && (runeN('hawkEye') > 0 || !!targetEnemy.status || Math.random() <= hitChance)) {
+    if (!attackBlocked && (runeN('hawkEye') > 0 || !!targetEnemy.status || Math.random() <= hitChance)) {
         const bonusDmg = (isFirstHitOfBattle ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
         const elemMult = player.runes.elementIgnore ? 1 : getElementMultiplier(player.equipped.weapon?.element, targetEnemy.element);
         if (elemMult !== 1 && !player.runes.elementIgnore) {
@@ -1106,6 +1201,12 @@ function runCombatTick() {
         if (runeN('powerSurge') > 0) pDmg = Math.floor(pDmg * (1 + runeN('powerSurge') / 100));
         if (runeN('runeMastery') > 0) pDmg = Math.floor(pDmg * (1 + 0.2 * (player.currentRunRunes || []).length));
         if (targetEnemy.isBoss || targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + skillBonus('bossDmgPct') / 100));
+        if (targetEnemy.iceShieldReady) {
+            pDmg = Math.floor(pDmg * 0.8);
+            targetEnemy.iceShieldReady = false;
+            logMessage(`[Ice Shield] ${targetEnemy.name} blocks 20% of your hit`, 'winlose');
+            if (typeof showBossBalloon === 'function') showBossBalloon('Ice Shield blocks 20%!');
+        }
         if (targetEnemy.hp > 0 && targetEnemy.hp <= targetEnemy.maxHp * 0.5) pDmg = Math.floor(pDmg * (1 + skillBonus('lowHpDmgPct') / 100));
         if (runeN('giantSlayer') > 0 && (targetEnemy.isBoss || targetEnemy.isMiniBoss)) pDmg = Math.floor(pDmg * (1 + runeN('giantSlayer') / 100));
         if (runeN('monsterHunter') > 0 && !targetEnemy.isBoss && !targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + runeN('monsterHunter') / 100));
@@ -1190,8 +1291,8 @@ function runCombatTick() {
         if (runeN('vampire') > 0) healPlayer(Math.floor(pDmg * runeN('vampire') / 100), 'Vampire');
     } else {
         critStreak = 0;
-        if (!stunned) playPlayerAttackAnim(false); // the swing plays on a miss too
-        if (!stunned) {
+        if (!attackBlocked) playPlayerAttackAnim(false); // the swing plays on a miss too
+        if (!attackBlocked) {
             const di = monstersList.indexOf(targetEnemy);
             if (di >= 0) setTimeout(() => showCombatText(`#monsters-lineup-container > div:nth-child(${di + 1}) img`, 'DODGE', 'miss'), 0);
         }
@@ -1261,7 +1362,7 @@ function runCombatTick() {
             return;
         }
 
-        clearInterval(combatInterval);
+        clearInterval(combatInterval); combatRunId++;
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.hp = derived.maxHp;
@@ -1282,7 +1383,7 @@ function stageDelay() {
 function onStageCleared() {
     if (stageClearing) return;
     stageClearing = true;
-    clearInterval(combatInterval);
+    clearInterval(combatInterval); combatRunId++;
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     const sid = combatSessionId;
 
@@ -1375,7 +1476,7 @@ function proceedToNextStage() {
 }
 
 function returnToTown() {
-    clearInterval(combatInterval);
+    clearInterval(combatInterval); combatRunId++;
     combatPaused = false;
     updatePauseButton();
     if (typeof resetMapRunes === 'function') resetMapRunes();
@@ -1528,7 +1629,7 @@ function restoreAfterCombat() {
     combatSessionId++;
     if (!player.inCombat) return;
     player.inCombat = false;
-    if (combatInterval) clearInterval(combatInterval);
+    if (combatInterval) clearInterval(combatInterval); combatRunId++;
     const d = getDerivedStats();
     player.hp = d.maxHp;
     player.armor = d.maxArmor;

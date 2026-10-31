@@ -347,6 +347,12 @@ function getDerivedStats() {
     const maxArmor = Math.max(0, Math.floor(extra.armor * (1 + skillBonus('armorPct') / 100)));
 
 
+    // Timed boss debuffs (ATK, HIT, FLEE) lower the values used in combat and shown in the stats
+    if (typeof playerDebuffPct === 'function') {
+        atk = Math.floor(atk * (1 - playerDebuffPct('atk') / 100));
+        hit = Math.floor(hit * (1 - playerDebuffPct('hit') / 100));
+        flee = Math.floor(flee * (1 - playerDebuffPct('flee') / 100));
+    }
     const elemRes = { fire: extra.res_fire, wind: extra.res_wind, earth: extra.res_earth, water: extra.res_water };
     const finalMaxArmor = rn('glassCannon') > 0 ? 0 : maxArmor;
     if (player.runes.zeroArmor && finalMaxArmor === 0) flee += 10;
