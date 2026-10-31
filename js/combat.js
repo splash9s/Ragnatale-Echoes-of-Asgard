@@ -547,9 +547,9 @@ function spawnStageMonsters() {
             }
         }
     }
-    // Map Lv. 1 (campaign): monsters deal 3x damage, except mages (normal damage)
+    // Map Lv. 1 (campaign): monsters deal 1.5x damage, except mages (normal damage)
     if (currentMode === 'campaign' && activeMap && activeMap.levelReq === 1) {
-        monstersList.forEach(m => { if (roleOf(m) !== 'mage') { m.atkMin *= 3; m.atkMax *= 3; } });
+        monstersList.forEach(m => { if (roleOf(m) !== 'mage') { m.atkMin = Math.max(1, Math.round(m.atkMin * 1.5)); m.atkMax = Math.max(1, Math.round(m.atkMax * 1.5)); } });
     }
     updateUI();
 }
