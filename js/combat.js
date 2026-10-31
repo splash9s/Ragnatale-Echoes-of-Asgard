@@ -522,13 +522,13 @@ function spawnStageMonsters() {
     if (activeMap && activeMap.finalMap) {
         spawnFinalStage();
     } else if (isMiniBossStage()) {
-        const mini = { ...activeMap.miniBoss, ...combatHitFlee(activeMap.miniBoss), rewarded: false, ailments: {}, isMiniBoss: true, lineupSlot: 5 };
+        const mini = { ...activeMap.miniBoss, ...combatHitFlee(activeMap.miniBoss), rewarded: false, ailments: {}, isMiniBoss: true, lineupSlot: BOSS_LINEUP_SLOT };
         monstersList.push(mini);
         logMessage(`[Mini Boss] ${mini.name} appears!`, 'winlose');
     } else if (isBossStage()) {
         const boss = makeBoss(getBossTemplate());
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
-        monstersList[0].lineupSlot = 5; // boss stands in the lineup's last slot
+        monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
         if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
         logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), Heavy Strike (every 4th attack, x2 damage), Regeneration (1.5% HP per turn).`, 'winlose');
     } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
@@ -701,12 +701,13 @@ function spawnWaveFromSet(dailyScale, scaled) {
     logMessage(`[Wave] ${monstersList.length} enemies come forward!`, 'combat');
 }
 
-// Boss stage: the boss stands in front, and support monsters fill their lineup positions
-// Lineup slots 1-6 (index 0-5). Range and mage go to slot 6, tank to slot 5; the boss takes
-// the last free slot: slot 5 when no tank is there, slot 6 when a tank took slot 5.
+// Boss stage: the boss stands in the 3rd lineup position, and support monsters fill the other positions
+// Lineup slots 1-6 (index 0-5). Range and mage go to slot 6, tank to slot 5 (or the next free slot).
+const BOSS_LINEUP_SLOT = 2; // boss (and mini-boss) stand in the 3rd lineup position (index 2)
 function addBossSupport(boss) {
     const mult = stageMultiplier();
     const used = [];
+    used[BOSS_LINEUP_SLOT] = true; // reserved for the boss, so the support units fill the other slots
     const freeSlot = wanted => {
         if (!used[wanted]) return wanted;
         for (let i = 0; i < 6; i++) if (!used[i]) return i;
@@ -723,9 +724,7 @@ function addBossSupport(boss) {
         unit.lineupSlot = at;
         supports.push(unit);
     });
-    const bossAt = freeSlot(used[5] ? 4 : 5);
-    used[bossAt] = true;
-    boss.lineupSlot = bossAt;
+    boss.lineupSlot = BOSS_LINEUP_SLOT;
     monstersList = [boss, ...supports.filter(Boolean)];
     const names = monstersList.slice(1).map(m => m.name).join(', ');
     if (names) logMessage(`[Support] ${names} stand behind ${boss.name}.`, 'winlose');
