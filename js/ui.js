@@ -331,6 +331,27 @@ function showCombatNumber(selector, amount, crit) {
     showCombatText(selector, String(Math.round(amount)), crit ? 'crit' : '');
 }
 // Floating text above the top border of a combat sprite (damage numbers, MISS)
+// Speech balloon at the top middle of the combat screen (white box, thick black border, big bold black text)
+function showBossBalloon(text) {
+    const stage = document.querySelector('#combat-stage .ts-inner');
+    if (!stage) return;
+    document.getElementById('boss-balloon')?.remove();
+    const wrap = document.createElement('div');
+    wrap.id = 'boss-balloon';
+    wrap.style.cssText = 'position:absolute; left:960px; top:90px; transform:translateX(-50%); z-index:20; pointer-events:none; display:flex; flex-direction:column; align-items:center;';
+    const box = document.createElement('div');
+    box.textContent = text;
+    box.style.cssText = 'background:#ffffff; border:7px solid #000; border-radius:22px; padding:16px 34px; font-size:34px; font-weight:900; color:#000; white-space:nowrap; box-shadow:0 5px 0 #000;';
+    const tail = document.createElement('div');
+    tail.style.cssText = 'width:0; height:0; border-left:22px solid transparent; border-right:22px solid transparent; border-top:26px solid #000; margin-top:-7px; position:relative;';
+    const tailIn = document.createElement('div');
+    tailIn.style.cssText = 'position:absolute; left:-15px; top:-33px; width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:19px solid #ffffff;';
+    tail.appendChild(tailIn);
+    wrap.appendChild(box);
+    wrap.appendChild(tail);
+    stage.appendChild(wrap);
+    setTimeout(() => { if (wrap.parentNode) wrap.remove(); }, 3000);
+}
 function showCombatText(selector, text, variant) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
