@@ -1524,11 +1524,12 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
     const title = kind === 'win'
         ? `<h3 class="font-bold text-sm text-emerald-300">Map Cleared</h3>`
         : `<h3 class="font-bold text-sm text-red-300">Defeated</h3>`;
+    // All three sections start collapsed; the Return button sits in the window's top-right corner (see showModal)
     const sections = kind === 'win'
-        ? section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody) + section('Fight Log', s.log.length, logBody, false)
-        : section('Fight Log', s.log.length, logBody, false) + section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody);
-    const footer = `<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
-    return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div>${footer}</div>`;
+        ? section('Item Drop', s.items.length, itemBody, false) + section('Rune Picked', s.runes.length, runeBody, false) + section('Fight Log', s.log.length, logBody, false)
+        : section('Fight Log', s.log.length, logBody, false) + section('Item Drop', s.items.length, itemBody, false) + section('Rune Picked', s.runes.length, runeBody, false);
+    window.summaryReturnLabel = returnLabel;
+    return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
 function toggleCombatPause() {
