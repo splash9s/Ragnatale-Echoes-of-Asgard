@@ -120,6 +120,7 @@ const LOADING_IMAGES = [
     "assets/combat/runes/r4.png",
     "assets/combat/runes/r5.png",
     "assets/compaign/compaign.png",
+    "assets/compaign/compaign2.png",
     "assets/compaign/mapbutton.png",
     "assets/compaign/mapbuttonoff.png",
     "assets/compaign/returnbutton.png",
