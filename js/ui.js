@@ -704,10 +704,6 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     if (titleEl) titleEl.innerText = title;
     if (msgEl) msgEl.innerText = message;
     if (area) area.innerHTML = customHTML;
-    const returnBtn = document.getElementById('summary-return-btn');
-    const returnLabel = customHTML ? window.summaryReturnLabel : null;
-    window.summaryReturnLabel = null;
-    if (returnBtn) { returnBtn.innerText = returnLabel || ''; returnBtn.classList.toggle('hidden', !returnLabel); }
     if (btn) {
         if (customHTML) btn.classList.add('hidden');
         else btn.classList.remove('hidden');

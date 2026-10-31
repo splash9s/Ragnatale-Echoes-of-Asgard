@@ -530,7 +530,7 @@ function spawnStageMonsters() {
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
         monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
         if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
-        logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), Heavy Strike (every 4th attack, x2 damage), Regeneration (1.5% HP per turn).`, 'winlose');
+        logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
     } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
         spawnWaveFromSet(dailyScale, scaled);
     } else {
@@ -1089,7 +1089,7 @@ function monsterAct(m, derived, position = 0) {
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
-        if (m.isBoss && m.attackCount % 4 === 0) {
+        if (m.isBoss && !m.noHeavyStrike && m.attackCount % 4 === 0) {
             eDmg = Math.floor(eDmg * 2);
             logMessage(`[Boss Skill] ${m.name} uses Heavy Strike!`, 'winlose');
             if (typeof showBossBalloon === 'function') showBossBalloon('Heavy Strike!');
@@ -1529,8 +1529,9 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
     const sections = kind === 'win'
         ? section('Item Drop', s.items.length, itemBody, false) + section('Rune Picked', s.runes.length, runeBody, false) + section('Fight Log', s.log.length, logBody, false)
         : section('Fight Log', s.log.length, logBody, false) + section('Item Drop', s.items.length, itemBody, false) + section('Rune Picked', s.runes.length, runeBody, false);
-    window.summaryReturnLabel = returnLabel;
-    return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div></div>`;
+    const returnBtn = `<button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
+    const header = `<div class="flex items-center justify-between gap-3">${title}${returnBtn}</div>`;
+    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
 function toggleCombatPause() {
