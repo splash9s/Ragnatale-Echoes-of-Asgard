@@ -421,7 +421,6 @@ function startMonsterAttack(m, delayMs = 0) {
     }
     m._attackAt = Date.now();
     m._animAt = m._attackAt;
-    m._hitAt = 0; // a new attack cancels the damaged animation
     const el = monsterCardImg(m);
     if (!el) return;
     el.dataset.attackAt = String(m._attackAt);
@@ -521,18 +520,21 @@ setInterval(() => {
         const elapsed = now - hitAt;
         const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
         const hurtLen = Math.max(1, hurt.length) * COMBAT_DAMAGE_FRAME_MS;
-        const hurtOn = hitAt && elapsed >= 0 && elapsed < hurtLen;
         const atkAt = Number(img.dataset.attackAt) || 0;
         const ae = now - atkAt;
         const attackOn = atkAt && ae >= 0 && ae < COMBAT_MONSTER_ATTACK_MS;
-        if (hurtOn && (!attackOn || hitAt >= atkAt)) {
+        // hurt frames only if the hit came after the latest attack (a later attack overrides them for good)
+        const hurtOn = hitAt && elapsed >= 0 && elapsed < hurtLen && hitAt >= atkAt;
+        // Red hit flash (same as the player's battle sprite, first 150ms of a hit): a CSS effect that always shows on a hit, even over an attack pose
+        const flashOn = hitAt && elapsed >= 0 && elapsed < 150;
+        const flashCss = 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)';
+        if (hurtOn) {
             if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
-            // Same red flash as the player's battle sprite (first 150ms of the hit)
-            img.style.filter = elapsed < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
+            img.style.filter = flashOn ? flashCss : '';
             return;
         }
         if (attackOn) {
-            if (img.style.filter) img.style.filter = '';
+            img.style.filter = flashOn ? flashCss : '';
             setMonsterFrame(img, img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME);
             return;
         }
