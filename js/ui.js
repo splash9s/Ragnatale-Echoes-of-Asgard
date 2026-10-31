@@ -364,9 +364,15 @@ function lungeEl(el, dx, startedAgoMs) {
     if (startedAgoMs) a.currentTime = startedAgoMs; // a redraw in the middle of the lunge resumes it
 }
 function startMonsterAttack(m, delayMs = 0) {
-    if (delayMs > 0) { setTimeout(() => { if (m.hp > 0) startMonsterAttack(m, 0); }, delayMs); return; }
+    if (delayMs > 0) {
+        const requestedAt = Date.now();
+        // a hit after the request cancels this pending attack
+        setTimeout(() => { if (m.hp > 0 && !(m._hitAt > requestedAt)) startMonsterAttack(m, 0); }, delayMs);
+        return;
+    }
     m._attackAt = Date.now();
     m._animAt = m._attackAt;
+    m._hitAt = 0; // a new attack cancels the damaged animation
     const el = monsterCardImg(m);
     if (!el) return;
     el.dataset.attackAt = String(m._attackAt);
@@ -2535,6 +2541,7 @@ function updateUI() {
         monstersList.forEach((m, idx) => {
             if (m._prevHp !== undefined && m.hp < m._prevHp) {
                 m._hitAt = Date.now();
+                m._attackAt = 0; // a hit cancels any attack pose still playing
                 const dmgNum = m._prevHp - m.hp, dmgCrit = !!m.lastHitCrit;
                 m.lastHitCrit = false;
                 setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
