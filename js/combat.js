@@ -868,6 +868,14 @@ function awardKill(m) {
         logMessage(`[Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(droppedItem);
     }
+    // Helmet: only from campaign bosses, chance by the map level (see bossHelmetChance)
+    if (m.isBoss && activeMap && Math.random() < (isVoidTest ? 1 : bossHelmetChance(activeMap.levelReq))) {
+        const list = HELMET_DROP_POOL[bossHelmetLevel(activeMap.levelReq)];
+        const template = list[Math.floor(Math.random() * list.length)];
+        const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
+        logMessage(`[Helmet Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
+        addItemToInventory(droppedItem);
+    }
 }
 
 // ---------- HEALING / DAMAGE HELPERS ----------

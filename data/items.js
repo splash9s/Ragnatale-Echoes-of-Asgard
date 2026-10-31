@@ -229,10 +229,11 @@ function statText(stats) {
     return Object.keys(stats).map(k => `${STAT_TEXT[k] || k} +${stats[k]}`).join(', ');
 }
 
-// Shop: hats for tiers 1-50
+// Shop: only these four helmets are sold
+const SHOP_HAT_LEVELS = [1, 10, 30, 50];
 Object.keys(HAT_BY_LEVEL).forEach(lv => {
     const h = HAT_BY_LEVEL[lv];
-    if (!h.price) return;
+    if (!h.price || !SHOP_HAT_LEVELS.includes(Number(lv))) return;
     SHOP_ITEMS.push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: Number(lv), price: h.price, stats: h.stats, desc: statText(h.stats) });
 });
 
@@ -243,23 +244,39 @@ GEAR_POOL.map10.push(
 );
 
 // Each map drops gear of its own level only.
-// Every pool gets: its level's ring, its level's hat, and one set piece per set per set slot.
+// Every pool gets: its level's ring, and one set piece per set per set slot (helmets excluded: see HELMET_DROP_POOL).
 Object.keys(GEAR_POOL).forEach(k => {
     const lv = parseInt(k.replace('map', ''), 10);
     GEAR_POOL[k].push(...RING_ITEMS.filter(r => r.levelReq === lv));
     GEAR_POOL[k].push(...HIGH_RING_ITEMS.filter(r => r.levelReq === lv));
-    if (HAT_BY_LEVEL[lv]) {
-        const h = HAT_BY_LEVEL[lv];
-        GEAR_POOL[k].push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: lv, stats: h.stats, desc: statText(h.stats) });
-    }
     Object.keys(SET_PIECE_NAMES).forEach(setKey => {
-        SET_SLOTS.forEach(slot => {
+        SET_SLOTS.filter(slot => slot !== 'hat').forEach(slot => {
             const base = GEAR_POOL[k].find(i => i.slot === slot && !i.setName);
             if (!base) return;
             GEAR_POOL[k].push({ id: `set_${setKey}_${slot}_${lv}`, name: `${SET_PIECE_NAMES[setKey][slot]} (Lv ${lv})`, slot, levelReq: lv, setName: setKey, stats: { ...base.stats }, desc: statText(base.stats) });
         });
     });
 });
+
+// Helmets (hat slot) drop only from campaign bosses. Per helmet level: the base helm and one set helm per set.
+const HELMET_DROP_POOL = {};
+Object.keys(HAT_BY_LEVEL).forEach(lv => {
+    const L = Number(lv), h = HAT_BY_LEVEL[lv];
+    const list = [{ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: L, stats: h.stats, desc: statText(h.stats) }];
+    Object.keys(SET_PIECE_NAMES).forEach(setKey => list.push({ id: `set_${setKey}_hat_${lv}`, name: `${SET_PIECE_NAMES[setKey].hat} (Lv ${lv})`, slot: "hat", levelReq: L, setName: setKey, stats: { ...h.stats }, desc: statText(h.stats) }));
+    HELMET_DROP_POOL[lv] = list;
+});
+// Boss helmet chance by the boss's map level: 1-30 5%, 40-60 2.5%, 70-99 1.5%
+function bossHelmetChance(levelReq) {
+    if (levelReq <= 30) return 0.05;
+    if (levelReq <= 60) return 0.025;
+    return 0.015;
+}
+// The helmet tier a boss drops: the highest helmet level at or below the map level (final map uses 99)
+function bossHelmetLevel(levelReq) {
+    const levels = Object.keys(HELMET_DROP_POOL).map(Number).filter(l => l <= levelReq);
+    return levels.length ? Math.max(...levels) : 1;
+}
 
 // Shop: gear for tiers 60-90 (hats are added above). Each tier costs 2x the one before,
 // starting from the Lv 50 shop price of each slot.
