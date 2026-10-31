@@ -17,6 +17,7 @@ let monstersList = [];
 let isFirstHitOfBattle = true;
 // Monsters start their first attack of a map this long after the player's first attack
 const COMBAT_OPENER_MONSTER_DELAY_MS = 500;
+const COMBAT_MONSTER_STAGGER_MS = 150; // each monster further back in the lineup starts its attack animation this much later
 let monsterOpenerRound = false; // true from entering a map until the first monster turn ends
 let battlePlayerHits = 0;
 let battleFirstDamageTaken = false;
@@ -974,7 +975,7 @@ function monsterAct(m, derived, position = 0) {
         const hurtAllies = getAliveMonsters().filter(x => x !== m && x.hp < x.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp));
         const wounded = hurtAllies[0] || (m.hp < m.maxHp ? m : null); // no hurt ally: heal self
         if (wounded) {
-            startMonsterAttack(m, monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0); // healing plays the attack animation
+            startMonsterAttack(m, (monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0) + position * COMBAT_MONSTER_STAGGER_MS); // healing plays the attack animation
             const amount = Math.min(m.heal, wounded.maxHp - wounded.hp);
             wounded.hp += amount;
             logMessage(`[Heal] ${m.name} heals ${wounded.name} for ${amount} HP`, 'combat');
@@ -984,7 +985,7 @@ function monsterAct(m, derived, position = 0) {
     // Melee and tank units only strike when they are the first monster facing the player
     if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
-    startMonsterAttack(m, monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0); // same moment as the player's attack, except the first round of a map
+    startMonsterAttack(m, (monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0) + position * COMBAT_MONSTER_STAGGER_MS); // same moment as the player's attack, except the first round of a map
     const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
