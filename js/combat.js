@@ -982,6 +982,7 @@ function bossTurnStart(m) {
     if (!m.enraged && m.hp <= m.maxHp * 0.35) {
         m.enraged = true;
         logMessage(`[Boss Skill] ${m.name} enrages! ATK +50%`, 'winlose');
+        if (typeof showBossBalloon === 'function') showBossBalloon('Enraged!');
     }
 }
 
@@ -1017,6 +1018,7 @@ function monsterAct(m, derived, position = 0) {
         if (m.isBoss && m.attackCount % 4 === 0) {
             eDmg = Math.floor(eDmg * 2);
             logMessage(`[Boss Skill] ${m.name} uses Heavy Strike!`, 'winlose');
+            if (typeof showBossBalloon === 'function') showBossBalloon('Heavy Strike!');
         }
         if (m.spell) {
             const def = SPELL_DEFS[m.spell];
