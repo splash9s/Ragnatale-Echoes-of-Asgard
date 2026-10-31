@@ -2400,7 +2400,11 @@ function updateUI() {
     el = document.getElementById('player-armor-text');
     if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
     el = document.getElementById('player-resurrection-state');
-    if (el) el.innerText = player.resurrectionOn !== false ? 'ON' : 'OFF';
+    if (el) { // combat page button: shows OFF when auto-revive is off, nothing when on
+        const off = player.resurrectionOn === false;
+        el.innerText = off ? 'OFF' : '';
+        el.className = off ? 'font-bold text-red-400' : 'font-bold';
+    }
     el = document.getElementById('player-armor-bar');
     if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
 
