@@ -190,6 +190,9 @@
         @media (prefers-reduced-motion: reduce) { .heal-aura { animation-duration: .01s; } }
         /* Idle bob for monsters that have it (Rock Golem): 3px up and down, slow */
         @keyframes monsterBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        /* Mini boss aura: embers rise from its feet, coloured by the map element (set inline as --ember) */
+        .mini-ember { position: absolute; bottom: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--ember); box-shadow: 0 0 8px var(--ember); pointer-events: none; animation: miniEmber 2.2s linear infinite; }
+        @keyframes miniEmber { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), -120px); opacity: 0; } }
         /* Idle breathing: player sways up and down with a slight stretch; monsters squish gently */
         /* Stepped loop: each pose holds (steps) for about 0.3s, four poses per 1.2s cycle */
         @keyframes playerIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
