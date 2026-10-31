@@ -86,9 +86,9 @@
         .ts-inner .ui, .ts-inner .art-frame, .ts-inner .art-panel { animation: itemFadeIn .2s ease .2s both; }
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
-        #town-shadow { position: absolute; left: 855px; top: 690px; width: 197px; height: 79px; object-fit: contain; pointer-events: none; z-index: 1; }
-        #town-hero-wrap { position: absolute; left: 883px; top: 425px; width: 163px; height: 338px; pointer-events: auto; cursor: pointer; z-index: 2; }
-        #town-hero { position: absolute; left: 0; top: 0; width: 163px; height: 338px; image-rendering: pixelated; }
+        #town-shadow { position: absolute; left: 915px; top: 743px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; }
+        #town-hero-wrap { position: absolute; left: 921px; top: 580px; width: 88px; height: 183px; pointer-events: auto; cursor: pointer; z-index: 2; }
+        #town-hero { position: absolute; left: 0; top: 0; width: 88px; height: 183px; image-rendering: pixelated; }
         .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
@@ -318,7 +318,7 @@
         <div id="view-town" class="flex flex-col flex-1">
             <div id="town-stage" class="town-stage">
                 <div class="ts-inner">
-                    <img class="ts-bg" src="assets/page01/bgmain.png" alt="" onerror="townSwap(this,'bgmain.png')">
+                    <img class="ts-bg" src="assets/page01/mainbg.png" alt="" onerror="townSwap(this,'mainbg.png')">
                     <div class="ui" style="left:20px; top:8px; width:502px; height:254px; cursor:default;">
                         <img src="assets/page01/characterinfo.png" alt="" onerror="townSwap(this,'characterinfo.png')">
                         <div class="town-info">
@@ -365,9 +365,9 @@
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
                 <img src="assets/page01/expeditionbutton.png" alt="" onerror="townSwap(this,'expeditionbutton.png')">
             </div>
-                    <img id="town-shadow" alt="" src="assets/page01/shadow_clean.png">
+                    <img id="town-shadow" alt="" src="assets/cha/chashadow.png">
                     <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
-                        <img id="town-hero" class="player-idle" alt="" src="assets/page01/cha_idle_0001.png">
+                        <img id="town-hero" class="player-idle" alt="" src="assets/cha/chabase.png">
                     </div>
                 </div>
             </div>
@@ -565,8 +565,8 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/character/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
                     <img class="art-frame" src="assets/pages/character/window.png" alt="" style="left:25px; top:70px; width:1870px; height:1003px;">
-                    <img class="art-frame pointer-events-none" src="assets/pages/character/shadow_clean.png" alt="" style="left:871px; top:712px; width:178px; height:72px;">
-                    <img class="art-frame pointer-events-none" src="assets/pages/character/cha_idle.png" alt="" style="left:883px; top:465px; width:150px; height:310px;">
+                    <img class="art-frame pointer-events-none" src="assets/cha/chashadow.png" alt="" style="left:910px; top:755px; width:102px; height:41px;">
+                    <img class="art-frame pointer-events-none" src="assets/cha/chabase.png" alt="" style="left:916px; top:592px; width:88px; height:183px;">
                     <div class="ui" style="left:1806px; top:6px; width:106px; height:60px;" onclick="switchView('town')">
                         <img src="assets/compaign/smallretunbutton.png" alt="">
                     </div>
