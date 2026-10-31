@@ -237,11 +237,6 @@ Object.keys(HAT_BY_LEVEL).forEach(lv => {
     SHOP_ITEMS.push({ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: Number(lv), price: h.price, stats: h.stats, desc: statText(h.stats) });
 });
 
-// Warrior weapon and shield stay as plain gear (only SET_SLOTS carry set buffs)
-GEAR_POOL.map10.push(
-    { id: "G056", name: "Warrior Blade (1H)", slot: "weapon", levelReq: 10, stats: { atk: 22 }, desc: "Atk +22" },
-    { id: "G057", name: "Warrior Bulwark", slot: "shield", levelReq: 10, stats: { def: 5, block: 8 }, desc: "DEF +5, Block +8%" }
-);
 
 // Each map drops gear of its own level only.
 // Every pool gets: its level's ring, and one set piece per set per set slot (helmets excluded: see HELMET_DROP_POOL).
