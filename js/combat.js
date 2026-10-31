@@ -1206,7 +1206,7 @@ function runCombatTick() {
         if (m.hp > 0 || !m.splitOnDeath || m.splitDone) return;
         m.splitDone = true;
         logMessage(`[Split] ${m.name} splits into ${m.splitOnDeath} slimes!`, 'winlose');
-        if (typeof showBossBalloon === 'function') showBossBalloon('Giant Moss Slime split into small slime.');
+        if (typeof showBossBalloon === 'function') showBossBalloon('Divide and Slime!');
         for (let i = 0; i < m.splitOnDeath; i++) {
             const slime = makeUnit(levelScaled(BASE_15.slime, activeMap.levelReq), stageMultiplier());
             monstersList.push({ ...slime, element: m.element, isBoss: false, isMiniBoss: false, rewarded: false });

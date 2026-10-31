@@ -338,7 +338,7 @@ function showBossBalloon(text) {
     document.getElementById('boss-balloon')?.remove();
     const wrap = document.createElement('div');
     wrap.id = 'boss-balloon';
-    wrap.style.cssText = 'position:absolute; left:960px; top:91px; transform:translateX(-50%); z-index:20; pointer-events:none;';
+    wrap.style.cssText = 'position:absolute; left:960px; top:103px; transform:translateX(-50%); z-index:20; pointer-events:none;';
     const box = document.createElement('div');
     box.textContent = text;
     box.style.cssText = 'background:#ffffff; border:7px solid #000; padding:16px 34px; font-size:34px; font-weight:900; color:#000; white-space:nowrap; box-shadow:0 5px 0 #000;';
