@@ -338,17 +338,11 @@ function showBossBalloon(text) {
     document.getElementById('boss-balloon')?.remove();
     const wrap = document.createElement('div');
     wrap.id = 'boss-balloon';
-    wrap.style.cssText = 'position:absolute; left:960px; top:90px; transform:translateX(-50%); z-index:20; pointer-events:none; display:flex; flex-direction:column; align-items:center;';
+    wrap.style.cssText = 'position:absolute; left:960px; top:91px; transform:translateX(-50%); z-index:20; pointer-events:none;';
     const box = document.createElement('div');
     box.textContent = text;
-    box.style.cssText = 'background:#ffffff; border:7px solid #000; border-radius:22px; padding:16px 34px; font-size:34px; font-weight:900; color:#000; white-space:nowrap; box-shadow:0 5px 0 #000;';
-    const tail = document.createElement('div');
-    tail.style.cssText = 'width:0; height:0; border-left:22px solid transparent; border-right:22px solid transparent; border-top:26px solid #000; margin-top:-7px; position:relative;';
-    const tailIn = document.createElement('div');
-    tailIn.style.cssText = 'position:absolute; left:-15px; top:-33px; width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:19px solid #ffffff;';
-    tail.appendChild(tailIn);
+    box.style.cssText = 'background:#ffffff; border:7px solid #000; padding:16px 34px; font-size:34px; font-weight:900; color:#000; white-space:nowrap; box-shadow:0 5px 0 #000;';
     wrap.appendChild(box);
-    wrap.appendChild(tail);
     stage.appendChild(wrap);
     setTimeout(() => { if (wrap.parentNode) wrap.remove(); }, 3000);
 }
@@ -391,7 +385,7 @@ function showHealAura(selector) {
 }
 
 // Player battle sprite. Every frame is shown at its exact file size, placed by its feet point (bottom centre).
-const COMBAT_PLAYER_IDLE = { src: 'assets/combat/cha/idle_01.png', w: 90, h: 187 };
+const COMBAT_PLAYER_IDLE = { src: 'assets/cha/chabase.png', w: 88, h: 183 }; // same character art as the main page
 const COMBAT_PLAYER_ATTACK = { src: 'assets/combat/cha/cha_hit_0001.png', w: 161, h: 192 };
 const COMBAT_PLAYER_CRI = { src: 'assets/combat/cha/cha_cri0001.png', w: 138, h: 199 };
 const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
@@ -707,10 +701,10 @@ function preloadCombatImage(src) {
 // Move the monster cards already on screen to the current layout (no waiting for the next redraw)
 function applyCombatEarthPositions() {
     // Shadow: the character's right foot sits on the shadow's dark spot (spot at 78,29 in the 102x41 shadow;
-    // right foot at 67,186 in the 90x187 combat sprite, whose bottom edge is the feet anchor)
+    // right foot at 67.5,182 in the 88x183 sprite, whose bottom edge is the feet anchor). Same as the main page.
     const shadow = document.getElementById('combat-player-shadow');
     if (shadow) {
-        shadow.style.left = (combatPlayerAnchor.x - 56) + 'px';
+        shadow.style.left = (combatPlayerAnchor.x - 55) + 'px';
         shadow.style.top = (combatPlayerAnchor.y - 33 - combatShadowLift) + 'px';
     }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
