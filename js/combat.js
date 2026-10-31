@@ -547,6 +547,10 @@ function spawnStageMonsters() {
             }
         }
     }
+    // Map Lv. 1 (campaign): every monster deals 3x damage
+    if (currentMode === 'campaign' && activeMap && activeMap.levelReq === 1) {
+        monstersList.forEach(m => { m.atkMin *= 3; m.atkMax *= 3; });
+    }
     updateUI();
 }
 

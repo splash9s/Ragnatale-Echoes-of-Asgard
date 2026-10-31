@@ -907,14 +907,17 @@ function switchShopTab(tabName) {
     updateShopBalance();
 }
 
-// Town alerts: quests not complete (Events button); free gold or free diamond unclaimed (Shop button)
+// Town alerts: quests not complete (Events button); free gold or free diamond unclaimed (Shop button); unclaimed mail (Mail button)
 function updateTownAlerts() {
     const questOpen = (player.dailyQuests || []).some(q => !q.completed);
     const shopFree = isFreeGoldAvailable() || isFreeDiamondAvailable();
     const ev = document.getElementById('alert-events');
     const sh = document.getElementById('alert-shop');
+    const ml = document.getElementById('alert-mail');
+    const mailOpen = (player.mailBox || []).some(m => !m.claimed);
     if (ev) ev.style.display = questOpen ? 'block' : 'none';
     if (sh) sh.style.display = shopFree ? 'block' : 'none';
+    if (ml) ml.style.display = mailOpen ? 'block' : 'none';
 }
 
 // Refresh everything on the shop row and the town alerts
