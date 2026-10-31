@@ -700,7 +700,7 @@ function flatLayout(feet, monsterFeet) {
 }
 function flatArt(name, feet, monsterFeet) {
     return {
-        bg: [`assets/combat/flat/${name}_flat.png`],
+        bg: [`assets/combat/flat/${name}_flat_q85.jpg`],
         base: [COMBAT_TRANSPARENT],
         fg: null,
         layouts: { [`${name}_flat`]: flatLayout(feet, monsterFeet) }
