@@ -415,11 +415,37 @@ function showHealAura(selector) {
 // Each frame's feet point is placed at COMBAT_PLAYER_FOOT relative to the anchor.
 // That offset is the idle frame's feet point, so the idle pose stays where it was.
 const COMBAT_PLAYER_FOOT = { x: 23.5, y: -1 };
-const COMBAT_PLAYER_IDLE = { src: 'assets/cha/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 };
-const COMBAT_PLAYER_ATTACK = { src: 'assets/cha/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 };
-const COMBAT_PLAYER_CRI = { src: 'assets/cha/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 };
-const COMBAT_PLAYER_DEAD1 = { src: 'assets/cha/chadead1.png', w: 162, h: 137, fx: 110.56, fy: 129 }; // falling
-const COMBAT_PLAYER_DEAD2 = { src: 'assets/cha/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 }; // on the ground
+// Pose sets: 'base' is the bare-headed body. Wearing a Cloth Cap uses the 'clothCap' set (full-body art with the cap).
+// Both sets share the same anchors (fx,fy) so the feet stay in place when the pose changes.
+const COMBAT_POSE_SETS = {
+    base: {
+        IDLE: { src: 'assets/cha/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 },
+        ATTACK: { src: 'assets/cha/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 },
+        CRI: { src: 'assets/cha/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 },
+        DEAD1: { src: 'assets/cha/chadead1.png', w: 162, h: 137, fx: 99.56, fy: 129 }, // falling
+        DEAD2: { src: 'assets/cha/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 }, // on the ground
+        REACT: {
+            block: { src: 'assets/cha/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
+            dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 108.33, fy: 138 }
+        }
+    },
+    clothCap: {
+        IDLE: { src: 'assets/helmet/cloth-cap/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 },
+        ATTACK: { src: 'assets/helmet/cloth-cap/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 },
+        CRI: { src: 'assets/helmet/cloth-cap/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 },
+        DEAD1: { src: 'assets/helmet/cloth-cap/chadead1.png', w: 174, h: 137, fx: 110.56, fy: 129 },
+        DEAD2: { src: 'assets/helmet/cloth-cap/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 },
+        REACT: {
+            block: { src: 'assets/helmet/cloth-cap/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
+            dodge: { src: 'assets/helmet/cloth-cap/chadodge.png', w: 152, h: 140, fx: 111.33, fy: 138 }
+        }
+    }
+};
+// The pose set for the player's current hat
+function combatPose() {
+    const hat = player && player.equipped && player.equipped.hat;
+    return hat && hat.name === 'Cloth Cap' ? COMBAT_POSE_SETS.clothCap : COMBAT_POSE_SETS.base;
+}
 const COMBAT_PLAYER_FALL_MS = 2000; // fall time (6 fps steps from COMBAT_PLAYER_FALL_PX above the ground)
 const COMBAT_PLAYER_FALL_PX = 120;
 const COMBAT_PLAYER_FALL_FPS = 6;
@@ -433,14 +459,10 @@ function playPlayerAttackAnim(isCrit) {
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
     el.dataset.lungeAt = String(combatPlayerAttack.at);
-    applyPlayerFrame(el, combatPlayerAttack.crit ? COMBAT_PLAYER_CRI : COMBAT_PLAYER_ATTACK);
+    applyPlayerFrame(el, combatPlayerAttack.crit ? combatPose().CRI : combatPose().ATTACK);
     playPlayerLunge(el, COMBAT_PLAYER_LUNGE_PX);
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
-const COMBAT_PLAYER_REACT_FRAMES = {
-    block: { src: 'assets/cha/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
-    dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 111.33, fy: 138 }
-};
 // Place a battle frame so its feet point sits on the player's feet (exact size)
 function applyPlayerFrame(img, f, dy = 0) {
     img.src = f.src;
@@ -496,9 +518,9 @@ function applyPlayerDeathFrame(img, t) {
     if (t < COMBAT_PLAYER_FALL_MS) {
         const steps = COMBAT_PLAYER_FALL_MS * COMBAT_PLAYER_FALL_FPS / 1000;
         const step = Math.min(steps, Math.floor(t * COMBAT_PLAYER_FALL_FPS / 1000));
-        applyPlayerFrame(img, COMBAT_PLAYER_DEAD1, -COMBAT_PLAYER_FALL_PX * (1 - step / steps));
+        applyPlayerFrame(img, combatPose().DEAD1, -COMBAT_PLAYER_FALL_PX * (1 - step / steps));
     } else {
-        applyPlayerFrame(img, COMBAT_PLAYER_DEAD2);
+        applyPlayerFrame(img, combatPose().DEAD2);
     }
 }
 function startPlayerDeathAnim() { combatPlayerDeath.at = Date.now(); }
@@ -511,7 +533,7 @@ function playPlayerReactAnim(kind) {
     combatPlayerReact = { at: Date.now(), kind };
     // Show the reaction frame right away (no waiting for the next sprite tick)
     const el = document.getElementById('combat-player-sprite');
-    if (el && COMBAT_PLAYER_REACT_FRAMES[kind]) applyPlayerReactFrame(el, COMBAT_PLAYER_REACT_FRAMES[kind]);
+    if (el && combatPose().REACT[kind]) applyPlayerReactFrame(el, combatPose().REACT[kind]);
 }
 // Monster colour by element (CSS filter on the shared slime sprite only). Bosses, mini-bosses and monsters with their own art keep their look.
 function monsterTintClass(m) {
@@ -558,16 +580,16 @@ setInterval(() => {
                     img.dataset.lungeAt = String(combatPlayerAttack.at);
                     playPlayerLunge(img, COMBAT_PLAYER_LUNGE_PX);
                 }
-                applyPlayerFrame(img, combatPlayerAttack.crit ? COMBAT_PLAYER_CRI : COMBAT_PLAYER_ATTACK);
+                applyPlayerFrame(img, combatPlayerAttack.crit ? combatPose().CRI : combatPose().ATTACK);
                 return;
             }
             const re = now - combatPlayerReact.at;
             if (combatPlayerReact.kind && re >= 0 && re < COMBAT_PLAYER_REACT_MS) {
-                applyPlayerReactFrame(img, COMBAT_PLAYER_REACT_FRAMES[combatPlayerReact.kind]);
+                applyPlayerReactFrame(img, combatPose().REACT[combatPlayerReact.kind]);
                 return;
             }
             if (img.style.animation) img.style.animation = ''; // back from the death fall
-            applyPlayerFrame(img, COMBAT_PLAYER_IDLE);
+            applyPlayerFrame(img, combatPose().IDLE);
             return;
         }
         const deathAt = Number(img.dataset.deathAt) || 0;
@@ -749,7 +771,7 @@ function closeModal() {
 const COMBAT_TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 function flatLayout(feet, monsterFeet) {
     return {
-        player: { x: feet[0], y: feet[1], left: feet[0] - COMBAT_PLAYER_IDLE.fx, top: feet[1] - COMBAT_PLAYER_IDLE.fy },
+        player: { x: feet[0], y: feet[1], left: feet[0] - combatPose().IDLE.fx, top: feet[1] - combatPose().IDLE.fy },
         hud: { left: feet[0] - 102, top: feet[1] + 20 }, // HP and armor below the character
         monsters: monsterFeet.map(([x, y]) => [x - 100, y - 100]) // card: 200px wide, sprite bottom at the card's 100px sprite box
     };
