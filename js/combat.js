@@ -396,6 +396,13 @@ function runeProgressInfo() {
 
 // Resurrection Potion auto-use on/off (default on)
 function toggleResurrectionUse() {
+    if (player.resurrectionOn === false && (player.resurrectionPotions || 0) <= 0) {
+        // Nothing to revive with: stay off and say why
+        logMessage('[Resurrection] No Resurrection Potion left. Buy one in the shop or get one from mail.', 'winlose');
+        showCombatText('#combat-elixir-btn', 'NO POTION', 'miss');
+        updateUI();
+        return;
+    }
     player.resurrectionOn = player.resurrectionOn === false;
     updateUI();
 }
