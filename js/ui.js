@@ -2609,7 +2609,7 @@ function updateUI() {
         runeWrap.style.display = info ? '' : 'none';
         if (info) {
             const t = document.getElementById('combat-rune-progress-text');
-            if (t) t.innerText = info.remaining === 1 ? 'Rune after this stage' : `Rune in ${info.remaining} stages`;
+            if (t) t.innerText = info.remaining === 1 ? '' : `Rune in ${info.remaining} stages`;
             const b = document.getElementById('combat-rune-progress-bar');
             if (b) b.style.width = `${info.pct}%`;
         }

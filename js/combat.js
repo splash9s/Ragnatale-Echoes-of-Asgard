@@ -1515,7 +1515,7 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
     const label = escapeHtml(kind === 'win' && activeMap ? activeMap.title : (document.getElementById('node-title')?.innerText || `Stage ${s.stage}`));
     const fmt = n => Number(n).toLocaleString();
     const card = (title, value, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-center min-w-0"><div class="text-[10px] text-slate-500 uppercase">${title}</div><div class="text-sm font-bold font-mono truncate ${cls}">${value}</div></div>`;
-    const section = (title, count, body) => `<details open class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
+    const section = (title, count, body, open = true) => `<details ${open ? 'open' : ''} class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
     const itemBody = s.items.length ? s.items.map(i => `<div><span class="${(RARITY_INFO[i.rarity] || RARITY_INFO[1]).text}">${escapeHtml(i.name)}</span> <span class="text-slate-500">(Rarity ${i.rarity})</span></div>`).join('') : '<div class="text-slate-500">No item dropped</div>';
     const runeBody = s.runes.length ? s.runes.map(r => `<div class="${(RARITY_INFO[r.rarity] || RARITY_INFO[1]).text}">${escapeHtml(r.text)}</div>`).join('') : '<div class="text-slate-500">No rune picked</div>';
     const logBody = s.log.length ? `<div class="max-h-48 overflow-y-auto font-mono text-[10px] flex flex-col gap-0.5">${s.log.map(l => `<div class="${logClassFor(l.type)}">${l.msg}</div>`).join('')}</div>` : '<div class="text-slate-500">No log</div>';
@@ -1526,8 +1526,8 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
         ? `<h3 class="font-bold text-sm text-emerald-300">Map Cleared</h3>`
         : `<h3 class="font-bold text-sm text-red-300">Defeated</h3>`;
     const sections = kind === 'win'
-        ? section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody) + section('Fight Log', s.log.length, logBody)
-        : section('Fight Log', s.log.length, logBody) + section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody);
+        ? section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody) + section('Fight Log', s.log.length, logBody, false)
+        : section('Fight Log', s.log.length, logBody, false) + section('Item Drop', s.items.length, itemBody) + section('Rune Picked', s.runes.length, runeBody);
     const footer = `<button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
     return `<div class="flex flex-col gap-3 text-left">${title}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div>${footer}</div>`;
 }
