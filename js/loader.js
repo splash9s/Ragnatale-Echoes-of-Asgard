@@ -254,3 +254,19 @@ window.addEventListener('load', () => {
             hideLoading();
         });
 });
+
+// Phone browsers (Chrome): go full screen on a touch, since Chrome does not do it by itself.
+// Only touches start it (desktop clicks are ignored), and only while the page is not already full screen.
+(function () {
+    const el = document.documentElement;
+    const request = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (!request) return; // not supported (e.g. iPhone Safari): nothing to do
+    document.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'touch') return;
+        if (document.fullscreenElement || document.webkitFullscreenElement) return;
+        try {
+            const r = request.call(el);
+            if (r && r.catch) r.catch(() => {}); // refused (no gesture, or disabled): ignore
+        } catch (err) { /* ignore */ }
+    }, { passive: true });
+})();
