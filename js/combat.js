@@ -971,7 +971,8 @@ function monsterAct(m, derived, position = 0) {
 
     // Healers restore the most wounded ally by a flat amount instead of attacking
     if (roleOf(m) === 'healer' && m.heal) {
-        const wounded = getAliveMonsters().filter(x => x.hp < x.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp))[0];
+        const hurtAllies = getAliveMonsters().filter(x => x !== m && x.hp < x.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp));
+        const wounded = hurtAllies[0] || (m.hp < m.maxHp ? m : null); // no hurt ally: heal self
         if (wounded) {
             startMonsterAttack(m, monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0); // healing plays the attack animation
             const amount = Math.min(m.heal, wounded.maxHp - wounded.hp);
