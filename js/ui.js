@@ -610,6 +610,20 @@ setInterval(() => {
         fx.style.left = (body.offsetLeft + body.offsetWidth / 2 - fw / 2 + shake) + 'px';
         fx.style.top = (body.offsetTop - fh / 2) + 'px';
     });
+    // Player stun effect: the same picture on the top edge of the player's sprite while stunned
+    const pfx = document.getElementById('combat-player-stun-fx');
+    const psp = document.getElementById('combat-player-sprite');
+    if (pfx && psp) {
+        const stunned = Date.now() < playerStunUntil;
+        pfx.style.display = stunned ? '' : 'none';
+        if (stunned) {
+            const fw = 102, fh = 78;
+            const sl = parseFloat(psp.style.left) || 0, st = parseFloat(psp.style.top) || 0, sw = parseFloat(psp.style.width) || 95;
+            const shake = Math.round(Math.sin(now / 50) * 4);
+            pfx.style.left = (sl + sw / 2 - fw / 2 + shake) + 'px';
+            pfx.style.top = (st - fh / 2) + 'px';
+        }
+    }
 }, 60);
 
 // Combat page copy of the main page character info: mirror its values (IDs end in -c)

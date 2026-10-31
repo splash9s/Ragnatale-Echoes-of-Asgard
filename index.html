@@ -829,6 +829,9 @@
                     <!-- Character sprite (centre 488, 590) -->
                     <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase.png" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
 
+                    <!-- Player stun effect: shown over the head while stunned (see the 60ms loop in ui.js) -->
+                    <img id="combat-player-stun-fx" src="assets/combat/stun/stuneffect.png" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; display:none; max-width:none; pointer-events:none; image-rendering:pixelated; z-index:5;">
+
                     <!-- Player HP and armor, below the character -->
                     <div id="combat-hp-under" style="position:absolute; left:413px; top:896px; width:204px; display:flex; flex-direction:column; gap:4px;">
                         <div class="flex justify-between text-[10px] text-slate-400 font-mono"><span id="player-hp-text" class="hud-text">120 / 120 HP</span></div>

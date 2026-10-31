@@ -501,7 +501,7 @@ function spawnStageMonsters() {
     battleFirstDamageTaken = false;
     critStreak = 0;
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
-    playerDebuffs = { curse: 0, frost: 0, stun: 0 };
+    playerDebuffs = { curseUntil: 0, frost: 0, stun: 0 };
     playerStunUntil = 0;
     playerTimedDebuffs = {};
     playerAspdToggle = false;
@@ -565,8 +565,8 @@ function spawnStageMonsters() {
 }
 
 // ---------- WAVES, ROLES AND SUPPORT ----------
-// Player debuffs caused by enemy spells (turns left)
-let playerDebuffs = { curse: 0, frost: 0, stun: 0 };
+// Player debuffs caused by enemy spells: curseUntil = time (ms) the curse ends; frost = turns left
+let playerDebuffs = { curseUntil: 0, frost: 0, stun: 0 };
 // Player stun from tank attacks: the time (ms) until which the player cannot attack
 let playerStunUntil = 0;
 // Timed debuffs on the player from boss skills: { atk | hit | flee | aspd: { until, pct } }
@@ -733,7 +733,6 @@ function addBossSupport(boss) {
 
 // Curse and frost wear off one turn at a time
 function tickPlayerDebuffs() {
-    if (playerDebuffs.curse > 0) playerDebuffs.curse--;
     if (playerDebuffs.frost > 0) playerDebuffs.frost--;
 }
 
@@ -1108,7 +1107,7 @@ function monsterAct(m, derived, position = 0) {
             const def = SPELL_DEFS[m.spell];
             eDmg = Math.floor(eDmg * def.mult);
             logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
-            if (m.spell === 'rockCurse') { playerDebuffs.curse = 3; logMessage('[Curse] Your attacks are weaker for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 turns)'); }
+            if (m.spell === 'rockCurse') { playerDebuffs.curseUntil = Date.now() + 3000; logMessage('[Curse] Your attacks are weaker for 3 seconds', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 seconds)'); }
             if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
         }
         if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.9);
@@ -1197,7 +1196,7 @@ function runCombatTick() {
             logMessage(`[Element] ${elemMult > 1 ? 'Advantage' : 'Resisted'} x${elemMult} vs ${targetEnemy.name}`, elemMult > 1 ? 'drop' : 'combat');
         }
         let pDmg = Math.floor((derived.atk + bonusDmg) * elemMult);
-        if (playerDebuffs.curse > 0) pDmg = Math.floor(pDmg * 0.8);
+        if (Date.now() < playerDebuffs.curseUntil) pDmg = Math.floor(pDmg * 0.8);
         if (targetEnemy.armor) pDmg = Math.floor(pDmg * (1 - targetEnemy.armor / 100));
         if (runeN('powerSurge') > 0) pDmg = Math.floor(pDmg * (1 + runeN('powerSurge') / 100));
         if (runeN('runeMastery') > 0) pDmg = Math.floor(pDmg * (1 + 0.2 * (player.currentRunRunes || []).length));
