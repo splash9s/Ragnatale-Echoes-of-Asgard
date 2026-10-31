@@ -1392,6 +1392,9 @@ function onStageCleared() {
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     const sid = combatSessionId;
 
+    // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
+    const bossStayLeft = monstersList.reduce((t, x) => (monsterIsBoss(x) && x.hp <= 0)
+        ? Math.max(t, (x._deathAt || Date.now()) + BOSS_DEATH_STAY_MS - Date.now()) : t, 0);
     setTimeout(() => {
         if (sid !== combatSessionId) return; // player left combat before the stage ended
         const proceedNext = () => {
@@ -1469,7 +1472,7 @@ function onStageCleared() {
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.remove('hidden');
         }
-    }, stageDelay());
+    }, Math.max(stageDelay(), bossStayLeft));
 }
 
 function proceedToNextStage() {
