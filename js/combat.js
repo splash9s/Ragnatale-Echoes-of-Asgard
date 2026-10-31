@@ -547,9 +547,9 @@ function spawnStageMonsters() {
             }
         }
     }
-    // Map Lv. 1 (campaign): every monster deals 3x damage
+    // Map Lv. 1 (campaign): monsters deal 3x damage, except mages (normal damage)
     if (currentMode === 'campaign' && activeMap && activeMap.levelReq === 1) {
-        monstersList.forEach(m => { m.atkMin *= 3; m.atkMax *= 3; });
+        monstersList.forEach(m => { if (roleOf(m) !== 'mage') { m.atkMin *= 3; m.atkMax *= 3; } });
     }
     updateUI();
 }
@@ -1194,6 +1194,16 @@ function runCombatTick() {
     isFirstHitOfBattle = false;
 
     // ---- Kills ----
+    // Split on death (Lv. 1 Giant Moss Slime): once dead, spawn slimes that keep the fight going
+    monstersList.forEach(m => {
+        if (m.hp > 0 || !m.splitOnDeath || m.splitDone) return;
+        m.splitDone = true;
+        logMessage(`[Split] ${m.name} splits into ${m.splitOnDeath} slimes!`, 'winlose');
+        for (let i = 0; i < m.splitOnDeath; i++) {
+            const slime = makeUnit(levelScaled(BASE_15.slime, activeMap.levelReq), stageMultiplier());
+            monstersList.push({ ...slime, element: m.element, isBoss: false, isMiniBoss: false, rewarded: false });
+        }
+    });
     const newlyDead = monstersList.filter(m => m.hp <= 0 && !m.rewarded);
     if (runeN('killBlast') > 0 && newlyDead.length > 0) {
         const blast = Math.floor(derived.atk * runeN('killBlast') / 100) * newlyDead.length;
