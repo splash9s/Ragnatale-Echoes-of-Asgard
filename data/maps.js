@@ -138,7 +138,7 @@ const GAME_DATA = {
         map50: {
             title: "Map Lv. 50", levelReq: 50, campaignStages: 21, miniStage: 7, dropKey: 'map50',
             enemies: [...BASE_LIST],
-            boss: MONSTERS_DATA.voidColossus,
+            boss: MONSTERS_DATA.bossWorldEater,
             miniBoss: makeMiniBoss(BASE_15.duskStormMage, 50),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }]
         },
@@ -173,7 +173,7 @@ const GAME_DATA = {
         map99: {
             title: "Map Lv. 99", levelReq: 99, campaignStages: 31, miniStage: 7, dropKey: 'map99', stageGrowth: 0.10,
             enemies: [...BASE_LIST],
-            boss: MONSTERS_DATA.brynhildValkyrieQueen,
+            boss: MONSTERS_DATA.voidColossus,
             miniBoss: makeMiniBoss(BASE_15.iceRaider, 99),
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }, { pos: 4, role: 'healer' }]
         },
