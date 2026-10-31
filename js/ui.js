@@ -2403,11 +2403,7 @@ function updateUI() {
     el = document.getElementById('player-armor-text');
     if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
     el = document.getElementById('player-resurrection-state');
-    if (el) { // combat page button: shows OFF when auto-revive is off, nothing when on
-        const off = player.resurrectionOn === false;
-        el.innerText = off ? 'OFF' : '';
-        el.className = off ? 'font-bold text-red-400' : 'font-bold';
-    }
+    if (el) el.innerText = 'OFF'; // only visible while auto-revive is off (see #combat-elixir-btn.off)
     el = document.getElementById('player-armor-bar');
     if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
 
@@ -2449,7 +2445,10 @@ function updateUI() {
         potionBtn.disabled = !hasPotion; // clicking the empty slot does nothing
     }
     const elixirBtn = document.getElementById('combat-elixir-btn');
-    if (elixirBtn) elixirBtn.classList.toggle('on', player.resurrectionOn !== false);
+    if (elixirBtn) {
+        elixirBtn.classList.toggle('on', player.resurrectionOn !== false);
+        elixirBtn.classList.toggle('off', player.resurrectionOn === false);
+    }
     el = document.getElementById('player-resurrection');
     if (el) el.innerText = `${player.resurrectionPotions || 0} left`;
 

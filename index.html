@@ -205,6 +205,9 @@
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
         #combat-elixir-btn span { display: none; }
+        /* Auto-revive off: show "Resurrection OFF" on the button */
+        #combat-elixir-btn.off > span { display: inline; font-weight: bold; color: #f87171; text-shadow: 0 1px 2px #000; }
+        #combat-elixir-btn.off #player-resurrection-state { display: inline; color: #f87171; }
         /* Keep HUD, enemy cards and buttons above the foreground layer */
         #combat-stage .combat-box, #combat-stage button, #combat-stage .ui, #combat-hp-under, #combat-player-sprite, #monsters-lineup-container, #combat-rune-list { z-index: 4; }
         .combat-box.minimized { height: auto !important; }
