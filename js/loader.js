@@ -4,11 +4,11 @@
 // ==========================================
 
 const LOADING_SOUNDS = [
-    'sound/bgm.wav',
-    'sound/critical.wav',
-    'sound/hit.wav',
-    'sound/lvup.wav',
-    'sound/mvp.wav',
+    'sound/bgm.mp3',
+    'sound/critical.mp3',
+    'sound/hit.mp3',
+    'sound/lvup.mp3',
+    'sound/mvp.mp3',
     'sound/slime_dead.mp3'
 ];
 

@@ -811,7 +811,7 @@ function awardKill(m) {
         player.baseMaxExp = Math.floor(player.baseMaxExp * 1.35);
         player.statPoints += 3;
         logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points`, 'levelup');
-        playSound('sound/lvup.wav');
+        playSound('sound/lvup.mp3');
     }
 
     if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
@@ -1098,7 +1098,7 @@ function runCombatTick() {
         if (isCrit) {
             pDmg = Math.floor(pDmg * (1.5 + (skillBonus('critDmgPct') + setStat('critDmgPct')) / 100));
             updateQuestProgress('crit', 1);
-            playSound('sound/critical.wav');
+            playSound('sound/critical.mp3');
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
             critStreak++;
             if (runeN('critSplash') > 0) {
@@ -1120,7 +1120,7 @@ function runCombatTick() {
             }
         } else {
             critStreak = 0;
-            playSound('sound/hit.wav');
+            playSound('sound/hit.mp3');
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
         }
         if (runeN('sharedDamage') > 0 && alive.length > 1) {
@@ -1254,7 +1254,7 @@ function onStageCleared() {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
                 showModal("Event Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
-                playSound('sound/mvp.wav');
+                playSound('sound/mvp.mp3');
                 updateUI();
                 saveGame();
                 return;
@@ -1277,7 +1277,7 @@ function onStageCleared() {
                 addItemToInventory(reward);
 
                 showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
-                playSound('sound/mvp.wav');
+                playSound('sound/mvp.mp3');
                 return;
             }
 
@@ -1286,7 +1286,7 @@ function onStageCleared() {
                 getEventState().dailyCleared = true;
                 updateUI();
                 saveGame();
-                playSound('sound/mvp.wav');
+                playSound('sound/mvp.mp3');
                 openChest('gold');
                 switchView('town');
                 return;
