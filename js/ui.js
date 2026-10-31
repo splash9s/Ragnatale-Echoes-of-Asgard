@@ -385,6 +385,10 @@ function showCombatText(selector, text, variant) {
     setTimeout(() => d.remove(), 900);
 }
 
+// Green number floating over a healed combat sprite (monster or player)
+function showHealNumber(selector, amount) {
+    if (amount > 0 && selector) showCombatText(selector, '+' + amount, 'heal');
+}
 // Green aura over a combat sprite when it is healed (monster or player). Same placement as the damage numbers.
 function showHealAura(selector) {
     const view = document.getElementById('view-combat');
@@ -2702,7 +2706,8 @@ function updateUI() {
                 setTimeout(() => lungeEl(monsterCardImg(m), COMBAT_MONSTER_LUNGE_PX, ago), 0);
             }
             if (m._prevHp !== undefined && m.hp > m._prevHp) {
-                setTimeout(() => showHealAura(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`), 0);
+                const healSel = `#monsters-lineup-container > div:nth-child(${idx + 1}) img`;
+                setTimeout(() => { showHealAura(healSel); showHealNumber(healSel, m.hp - m._prevHp); }, 0);
             }
             m._prevHp = m.hp;
             let isDead = m.hp <= 0;

@@ -877,7 +877,7 @@ function healPlayer(amount, source) {
     const before = player.hp;
     player.hp = Math.min(maxHp, player.hp + amount);
     const gained = player.hp - before;
-    if (gained > 0) showHealAura('#combat-player-sprite');
+    if (gained > 0) { showHealAura('#combat-player-sprite'); showHealNumber('#combat-player-sprite', gained); }
     const over = amount - Math.max(0, gained); // only the part of the heal above full HP
     if (over > 0 && runeN('overflow') > 0) {
         const alive = getAliveMonsters();
@@ -914,12 +914,13 @@ function checkStageClearAfterHeal() {
 // Called by manual potion use: Retribution rune strikes a random monster
 
 
-// Tank hits: 10% chance to stun the player. 1 second at VIT 1, shorter with VIT, and 0 (no stun) at VIT 70.
+// Tank hits: 10% chance to stun the player for at least 2 seconds. Shorter with VIT, and no stun at VIT 70.
 function tankStunPlayer(m) {
     if (Math.random() >= 0.10) return;
     const vit = Math.max(1, player.stats.vit);
-    const ms = Math.round(1000 * Math.max(0, 1 - vit / 70));
-    if (ms <= 0) return;
+    const raw = Math.round(1000 * Math.max(0, 1 - vit / 70));
+    if (raw <= 0) return;
+    const ms = Math.max(2000, raw); // a player stun always lasts at least 2 seconds
     playerStunUntil = Math.max(playerStunUntil, Date.now() + ms);
     setTimeout(() => showCombatText('#combat-player-sprite', 'STUNNED', 'stun'), 0);
     logMessage(`[Stun] ${m.name} stuns you for ${(ms / 1000).toFixed(2)} seconds!`, 'winlose');
@@ -1100,7 +1101,7 @@ function monsterAct(m, derived, position = 0) {
         }
         if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'lightningSpear') {
             ignoreArmor = true; // the spear goes through armor
-            if (Math.random() < 0.2) stunPlayerFor(1500, m, 'Lightning Spear');
+            if (Math.random() < 0.2) stunPlayerFor(2000, m, 'Lightning Spear');
         }
         if (m.spell) {
             const def = SPELL_DEFS[m.spell];
