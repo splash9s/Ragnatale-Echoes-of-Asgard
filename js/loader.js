@@ -131,6 +131,7 @@ const LOADING_IMAGES = [
     "assets/page01/articanbuttonpress.png",
     "assets/page01/bgmain.png",
     "assets/page01/mainbg.png",
+    "assets/page01/mainbg3.png",
     "assets/cha/chabase.png",
     "assets/cha/chashadow.png",
     "assets/cha/chaattack.png",
