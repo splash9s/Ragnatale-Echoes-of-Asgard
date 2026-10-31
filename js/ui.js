@@ -307,13 +307,15 @@ const MONSTER_SPRITES = {
 function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
 function monsterDeathFrames(m) { const s = monsterSpriteOf(m); return s ? s.dead : COMBAT_SLIME_DEATH_FRAMES; }
 // Bosses (and mini-bosses) stay on screen BOSS_DEATH_STAY_MS after they fall: first the damaged pose, then the death frames.
-const BOSS_DEATH_STAY_MS = 2500;
+const BOSS_DEATH_STAY_MS = 3000;
 const BOSS_HURT_MS = 600;
 function monsterIsBoss(m) { return !!(m && (m.isBoss || m.isMiniBoss)); }
+// Only full bosses get the slow-motion death (mini-bosses play the normal death speed, no fade)
+function monsterIsSlowDeath(m) { return !!(m && m.isBoss); }
 function monsterDeathHurtMs(m) { return monsterIsBoss(m) && monsterHurtFrames(m).length ? BOSS_HURT_MS : 0; }
 function monsterDeathMs(m) {
     const s = monsterSpriteOf(m);
-    if (monsterIsBoss(m)) return Math.round((BOSS_DEATH_STAY_MS - monsterDeathHurtMs(m)) / Math.max(1, monsterDeathFrames(m).length));
+    if (monsterIsSlowDeath(m)) return Math.round((BOSS_DEATH_STAY_MS - monsterDeathHurtMs(m)) / Math.max(1, monsterDeathFrames(m).length));
     return s ? s.deathMs : COMBAT_DEATH_FRAME_MS;
 }
 function monsterDeathTotalMs(m) { return monsterDeathHurtMs(m) + monsterDeathFrames(m).length * monsterDeathMs(m); }
@@ -327,8 +329,10 @@ function miniEmbersHTML(m) {
     if (!m.isMiniBoss || m.hp <= 0) return '';
     const el = m.element || (typeof currentPath !== 'undefined' && CAMPAIGN_PATHS[currentPath] ? CAMPAIGN_PATHS[currentPath].element : 'fire');
     const c = MINI_EMBER_COLOR[el] || '#ffd46b';
-    return [[30, -10, 0], [38, 14, 0.5], [62, -16, 1], [68, 8, 1.5], [50, -4, 0.25]]
+    const glow = `<span class="mini-aura" style="--ember:${c}"></span>`;
+    const embers = [[30, -10, 0], [38, 14, 0.5], [62, -16, 1], [68, 8, 1.5], [50, -4, 0.25]]
         .map(([l, dx, d]) => `<span class="mini-ember" style="left:${l}%; --dx:${dx}px; --ember:${c}; animation-delay:${d}s"></span>`).join('');
+    return glow + embers;
 }
 function stunFxHTML(m) {
     if (!(m.status && m.status.kind === 'stun' && m.hp > 0)) return '';
@@ -580,7 +584,7 @@ setInterval(() => {
                 return;
             }
             img.style.filter = '';
-            if (hurtMs) {
+            if (img.dataset.slowDeath === '1') {
                 // Boss death in slow motion: the death frames step slowly while the body fades out
                 const p = Math.min(1, (e - hurtMs) / Math.max(1, total - hurtMs));
                 img.style.opacity = String(1 - 0.75 * p * p);
@@ -2712,7 +2716,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${miniEmbersHTML(m)}${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-hurt-ms="${monsterDeathHurtMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;">`; })()}${stunFxHTML(m)}</div>
+                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${miniEmbersHTML(m)}${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-hurt-ms="${monsterDeathHurtMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" data-slow-death="${monsterIsSlowDeath(m) ? 1 : 0}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;">`; })()}${stunFxHTML(m)}</div>
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
