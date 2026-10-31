@@ -110,6 +110,7 @@ const GEAR_POOL = {
     ],
     map60: [
         { id: "G031", name: "Jotun Ice Axe (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
+        { id: "kd60", name: "Jotun Frost Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 60, stats: { atk: 419, crit: 5 }, desc: "Atk +419, CRIT +5% (2H knuckle, takes Shield slot)" },
         { id: "G032", name: "Jotun Rime Shield", slot: "shield", levelReq: 60, stats: { def: 65, block: 45 }, desc: "DEF +65, Block +45%" },
         { id: "G033", name: "Jotun Fur Armor", slot: "armor", levelReq: 60, stats: { hp: 1900, def: 115 }, desc: "HP +1900, DEF +115" },
         { id: "G034", name: "Jotun Snow Cloak", slot: "garment", levelReq: 60, stats: { flee: 65, def: 30 }, desc: "FLEE +65, DEF +30" },
@@ -117,6 +118,7 @@ const GEAR_POOL = {
     ],
     map70: [
         { id: "G036", name: "Einherjar Blade (1H)", slot: "weapon", levelReq: 70, stats: { atk: 340, crit: 9 }, desc: "Atk +340, CRIT +9%" },
+        { id: "kd70", name: "Einherjar Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 70, stats: { atk: 527, crit: 5 }, desc: "Atk +527, CRIT +5% (2H knuckle, takes Shield slot)" },
         { id: "G037", name: "Valkyrie Bulwark", slot: "shield", levelReq: 70, stats: { def: 80, block: 50 }, desc: "DEF +80, Block +50%" },
         { id: "G038", name: "Valkyrie Plate", slot: "armor", levelReq: 70, stats: { hp: 2400, def: 140 }, desc: "HP +2400, DEF +140" },
         { id: "G039", name: "Valkyrie Wing Mantle", slot: "garment", levelReq: 70, stats: { flee: 80, def: 38 }, desc: "FLEE +80, DEF +38" },
@@ -124,6 +126,7 @@ const GEAR_POOL = {
     ],
     map80: [
         { id: "G041", name: "Muspel Flame Blade (1H)", slot: "weapon", levelReq: 80, stats: { atk: 420, crit: 10 }, desc: "Atk +420, CRIT +10%" },
+        { id: "kd80", name: "Muspel Ember Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 80, stats: { atk: 651, crit: 6 }, desc: "Atk +651, CRIT +6% (2H knuckle, takes Shield slot)" },
         { id: "G042", name: "Muspel Ember Shield", slot: "shield", levelReq: 80, stats: { def: 100, block: 55 }, desc: "DEF +100, Block +55%" },
         { id: "G043", name: "Muspel Forged Plate", slot: "armor", levelReq: 80, stats: { hp: 3000, def: 170 }, desc: "HP +3000, DEF +170" },
         { id: "G044", name: "Muspel Ash Cloak", slot: "garment", levelReq: 80, stats: { flee: 95, def: 45 }, desc: "FLEE +95, DEF +45" },
@@ -131,6 +134,7 @@ const GEAR_POOL = {
     ],
     map90: [
         { id: "G046", name: "Hel Bone Blade (1H)", slot: "weapon", levelReq: 90, stats: { atk: 520, crit: 12 }, desc: "Atk +520, CRIT +12%" },
+        { id: "kd90", name: "Hel Bone Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 90, stats: { atk: 806, crit: 7 }, desc: "Atk +806, CRIT +7% (2H knuckle, takes Shield slot)" },
         { id: "G047", name: "Hel Grave Shield", slot: "shield", levelReq: 90, stats: { def: 125, block: 60 }, desc: "DEF +125, Block +60%" },
         { id: "G048", name: "Hel Death Plate", slot: "armor", levelReq: 90, stats: { hp: 3800, def: 210 }, desc: "HP +3800, DEF +210" },
         { id: "G049", name: "Hel Shroud", slot: "garment", levelReq: 90, stats: { flee: 115, def: 55 }, desc: "FLEE +115, DEF +55" },
@@ -138,6 +142,7 @@ const GEAR_POOL = {
     ],
     map99: [
         { id: "G051", name: "Dusk Reaper Blade (1H)", slot: "weapon", levelReq: 99, stats: { atk: 680, crit: 14 }, desc: "Atk +680, CRIT +14%" },
+        { id: "kd99", name: "Dusk Reaper Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 99, stats: { atk: 1054, crit: 8 }, desc: "Atk +1054, CRIT +8% (2H knuckle, takes Shield slot)" },
         { id: "G052", name: "Dusk Ward Shield", slot: "shield", levelReq: 99, stats: { def: 160, block: 65 }, desc: "DEF +160, Block +65%" },
         { id: "G053", name: "Dusk Titan Plate", slot: "armor", levelReq: 99, stats: { hp: 5000, def: 260 }, desc: "HP +5000, DEF +260" },
         { id: "G054", name: "Dusk Veil Cloak", slot: "garment", levelReq: 99, stats: { flee: 140, def: 65 }, desc: "FLEE +140, DEF +65" },
