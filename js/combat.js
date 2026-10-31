@@ -1162,6 +1162,7 @@ function runCombatTick() {
         if (runeN('vampire') > 0) healPlayer(Math.floor(pDmg * runeN('vampire') / 100), 'Vampire');
     } else {
         critStreak = 0;
+        if (!stunned) playPlayerAttackAnim(false); // the swing plays on a miss too
         logMessage(`[Miss] Attack on ${targetEnemy.name} missed!`, 'combat');
         if (runeN('focus') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('focus') / 100), 'Focus');
         if (runeN('shieldRecovery') > 0) player.armor = Math.min(derived.maxArmor, player.armor + Math.floor(derived.maxArmor * runeN('shieldRecovery') / 100));
