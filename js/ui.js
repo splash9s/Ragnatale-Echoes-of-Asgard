@@ -706,12 +706,12 @@ function preloadCombatImage(src) {
 }
 // Move the monster cards already on screen to the current layout (no waiting for the next redraw)
 function applyCombatEarthPositions() {
-    // Shadow: the character's left foot sits on the shadow's dark spot (spot at 78,29 in the 102x41 shadow;
-    // left foot at 10.9,162 in the 90x187 combat sprite, whose bottom edge is the feet anchor)
+    // Shadow: the character's right foot sits on the shadow's dark spot (spot at 78,29 in the 102x41 shadow;
+    // right foot at 67,186 in the 90x187 combat sprite, whose bottom edge is the feet anchor)
     const shadow = document.getElementById('combat-player-shadow');
     if (shadow) {
-        shadow.style.left = (combatPlayerAnchor.x - 113) + 'px';
-        shadow.style.top = (combatPlayerAnchor.y - 49 - combatShadowLift) + 'px';
+        shadow.style.left = (combatPlayerAnchor.x - 56) + 'px';
+        shadow.style.top = (combatPlayerAnchor.y - 30 - combatShadowLift) + 'px';
     }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
         const pos = Number(card.dataset.pos);
