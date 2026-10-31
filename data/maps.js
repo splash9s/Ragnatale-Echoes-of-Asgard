@@ -232,6 +232,26 @@ const PATH_ROSTERS = {
     ]
 };
 
+// Non-earth paths are balanced to the Earth roster: each slot uses the same level as its Earth monster,
+// and its HP, ATK, heal and rewards are scaled so the fight is as tough as the Earth one at every map level.
+function balanceToEarth(t, e) {
+    const atk = m => (m.atkMin + m.atkMax) / 2;
+    const hpK = e.maxHp / t.maxHp;
+    const atkK = atk(e) / atk(t);
+    const sc = (v, k) => Math.max(1, Math.round(v * k));
+    const out = {
+        ...t, lv: e.lv,
+        hp: sc(t.hp, hpK), maxHp: sc(t.maxHp, hpK),
+        atkMin: sc(t.atkMin, atkK), atkMax: sc(t.atkMax, atkK),
+        baseExp: sc(t.baseExp, hpK), jobExp: sc(t.jobExp, hpK), gold: sc(t.gold, hpK)
+    };
+    if (t.heal && e.heal) out.heal = e.heal;
+    return out;
+}
+['fire', 'water', 'wind'].forEach(pk => {
+    PATH_ROSTERS[pk] = PATH_ROSTERS[pk].map((t, i) => balanceToEarth(t, PATH_ROSTERS.earth[i]));
+});
+
 // Every monster, mini boss and boss on a path takes that path's element
 Object.keys(CAMPAIGN_PATHS).forEach(pk => {
     const path = CAMPAIGN_PATHS[pk];
