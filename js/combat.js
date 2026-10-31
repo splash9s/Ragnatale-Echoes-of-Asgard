@@ -495,6 +495,7 @@ function spawnStageMonsters() {
     critStreak = 0;
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
     playerDebuffs = { curse: 0, frost: 0, stun: 0 };
+    playerStunUntil = 0;
     const derived = getDerivedStats();
     monstersList = [];
     const dailyScale = currentMode === 'daily' ? 0.7 : 1;
@@ -552,6 +553,8 @@ function spawnStageMonsters() {
 // ---------- WAVES, ROLES AND SUPPORT ----------
 // Player debuffs caused by enemy spells (turns left)
 let playerDebuffs = { curse: 0, frost: 0, stun: 0 };
+// Player stun from tank attacks: the time (ms) until which the player cannot attack
+let playerStunUntil = 0;
 
 const SPELL_DEFS = {
     fireBolt:    { label: "Fire Bolt",    mult: 1.2 },
@@ -892,6 +895,16 @@ function checkStageClearAfterHeal() {
 // Called by manual potion use: Retribution rune strikes a random monster
 
 
+// Tank hits: 10% chance to stun the player. 1 second at VIT 1, shorter with VIT, and 0 (no stun) at VIT 70.
+function tankStunPlayer(m) {
+    if (Math.random() >= 0.10) return;
+    const vit = Math.max(1, player.stats.vit);
+    const ms = Math.round(1000 * Math.max(0, 1 - vit / 70));
+    if (ms <= 0) return;
+    playerStunUntil = Math.max(playerStunUntil, Date.now() + ms);
+    setTimeout(() => showCombatText('#combat-player-sprite', 'STUNNED', 'stun'), 0);
+    logMessage(`[Stun] ${m.name} stuns you for ${(ms / 1000).toFixed(2)} seconds!`, 'winlose');
+}
 function onPlayerDodged(m, source) {
     setTimeout(() => showCombatText('#combat-player-sprite', 'DODGE', 'miss'), 0);
     playPlayerReactAnim('dodge');
@@ -1003,6 +1016,7 @@ function monsterAct(m, derived, position = 0) {
         }
         if (player.runes.zeroArmor && derived.maxArmor > 0) eDmg = Math.floor(eDmg * 0.9);
         takePlayerDamage(eDmg, m);
+        if (roleOf(m) === 'tank') tankStunPlayer(m);
         dodgeStreak = 0;
         monsterHitStreak++;
         if (runeN('lastResort') > 0 && monsterHitStreak >= 10) {
@@ -1064,8 +1078,8 @@ function runCombatTick() {
         logMessage(`[Ignite] ${targetEnemy.name} burns for ${iDmg} fire damage.`, 'combat');
     }
 
-    const stunned = playerDebuffs.stun > 0;
-    if (stunned) { playerDebuffs.stun--; logMessage('[Stun] You are stunned and cannot attack this turn!', 'winlose'); }
+    const stunned = Date.now() < playerStunUntil;
+    if (stunned) logMessage('[Stun] You are stunned and cannot attack!', 'winlose');
     const hitChance = Math.min(0.95, Math.max(0.2, (derived.hit - (playerDebuffs.frost > 0 ? 20 : 0) - targetEnemy.flee + 50) / 100));
     if (!stunned && (runeN('hawkEye') > 0 || !!targetEnemy.status || Math.random() <= hitChance)) {
         const bonusDmg = (isFirstHitOfBattle ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
@@ -1164,6 +1178,10 @@ function runCombatTick() {
     } else {
         critStreak = 0;
         if (!stunned) playPlayerAttackAnim(false); // the swing plays on a miss too
+        if (!stunned) {
+            const di = monstersList.indexOf(targetEnemy);
+            if (di >= 0) setTimeout(() => showCombatText(`#monsters-lineup-container > div:nth-child(${di + 1}) img`, 'DODGE', 'miss'), 0);
+        }
         logMessage(`[Miss] Attack on ${targetEnemy.name} missed!`, 'combat');
         if (runeN('focus') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('focus') / 100), 'Focus');
         if (runeN('shieldRecovery') > 0) player.armor = Math.min(derived.maxArmor, player.armor + Math.floor(derived.maxArmor * runeN('shieldRecovery') / 100));
