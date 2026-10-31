@@ -384,13 +384,16 @@ function showHealAura(selector) {
     setTimeout(() => d.remove(), 900);
 }
 
-// Player battle sprite. Every frame is shown at its exact file size, placed by its feet point (bottom centre).
-// Each frame is shown at its exact file size. fx,fy = its feet point (bottom centre of the art), placed on the feet anchor.
-const COMBAT_PLAYER_IDLE = { src: 'assets/cha/chabase.png', w: 95, h: 193, fx: 48, fy: 190 };
-const COMBAT_PLAYER_ATTACK = { src: 'assets/cha/chaattack.png', w: 169, h: 170, fx: 85, fy: 167 };
-const COMBAT_PLAYER_CRI = { src: 'assets/cha/chacritical.png', w: 178, h: 222, fx: 88.5, fy: 211 };
-const COMBAT_PLAYER_DEAD1 = { src: 'assets/cha/chadead1.png', w: 162, h: 137, fx: 81, fy: 132 }; // falling
-const COMBAT_PLAYER_DEAD2 = { src: 'assets/cha/chadead2.png', w: 166, h: 99, fx: 84, fy: 97 }; // on the ground
+// Player battle sprite. Every frame is shown at its exact file size (no scaling).
+// fx,fy = the frame's feet point (lowest opaque row of the art, x = mean of the bottom rows), tracked per frame.
+// Each frame's feet point is placed at COMBAT_PLAYER_FOOT relative to the anchor.
+// That offset is the idle frame's feet point, so the idle pose stays where it was.
+const COMBAT_PLAYER_FOOT = { x: 23.5, y: -1 };
+const COMBAT_PLAYER_IDLE = { src: 'assets/cha/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 };
+const COMBAT_PLAYER_ATTACK = { src: 'assets/cha/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 };
+const COMBAT_PLAYER_CRI = { src: 'assets/cha/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 };
+const COMBAT_PLAYER_DEAD1 = { src: 'assets/cha/chadead1.png', w: 162, h: 137, fx: 110.56, fy: 129 }; // falling
+const COMBAT_PLAYER_DEAD2 = { src: 'assets/cha/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 }; // on the ground
 const COMBAT_PLAYER_FALL_MS = 2000; // fall time (6 fps steps from COMBAT_PLAYER_FALL_PX above the ground)
 const COMBAT_PLAYER_FALL_PX = 120;
 const COMBAT_PLAYER_FALL_FPS = 6;
@@ -407,17 +410,16 @@ function playPlayerAttackAnim(isCrit) {
     applyPlayerFrame(el, combatPlayerAttack.crit ? COMBAT_PLAYER_CRI : COMBAT_PLAYER_ATTACK);
     playPlayerLunge(el, COMBAT_PLAYER_LUNGE_PX);
 }
-// Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one 256x256 frame for a short time.
-// Reaction frames are 256x256 (original size). w/h = frame size on screen; fx/fy = feet point inside the frame (placed on the player's anchor).
+// Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
 const COMBAT_PLAYER_REACT_FRAMES = {
-    block: { src: 'assets/cha/chablock.png', w: 520, h: 710, fx: 259.5, fy: 695 },
-    dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 73, fy: 138 }
+    block: { src: 'assets/cha/chablock.png', w: 520, h: 710, fx: 257.01, fy: 695 },
+    dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 111.33, fy: 138 }
 };
-// Place a battle frame on the player's feet point (exact size)
+// Place a battle frame so its feet point sits on the player's feet (exact size)
 function applyPlayerFrame(img, f, dy = 0) {
     img.src = f.src;
-    img.style.left = (combatPlayerAnchor.x - (f.fx !== undefined ? f.fx : f.w / 2)) + 'px';
-    img.style.top = (combatPlayerAnchor.y - (f.fy !== undefined ? f.fy : f.h) + dy) + 'px';
+    img.style.left = (combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - (f.fx !== undefined ? f.fx : f.w / 2)) + 'px';
+    img.style.top = (combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y - (f.fy !== undefined ? f.fy : f.h) + dy) + 'px';
     img.style.width = f.w + 'px';
     img.style.height = f.h + 'px';
 }
@@ -475,11 +477,7 @@ function applyPlayerDeathFrame(img, t) {
 }
 function startPlayerDeathAnim() { combatPlayerDeath.at = Date.now(); }
 function applyPlayerReactFrame(img, f) {
-    img.src = f.src;
-    img.style.left = (combatPlayerAnchor.x - f.fx) + 'px';
-    img.style.top = (combatPlayerAnchor.y - f.fy) + 'px';
-    img.style.width = f.w + 'px';
-    img.style.height = f.h + 'px';
+    applyPlayerFrame(img, f);
 }
 const COMBAT_PLAYER_REACT_MS = 600;
 let combatPlayerReact = { at: 0, kind: null };
