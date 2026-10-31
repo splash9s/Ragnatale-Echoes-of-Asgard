@@ -2012,6 +2012,18 @@ function sellInventoryItem(index) {
     return true;
 }
 
+// Two-handed weapons (knuckles, and older saved two-handed swords named "(2H)") take the shield slot
+function isTwoHanded(item) {
+    return !!(item && item.slot === 'weapon' && (item.twoHanded || /\(2H\)/.test(item.name || '')));
+}
+// The battle sprite's pose set also drives the hero art on the town and character pages
+function syncHeroSprites() {
+    const src = combatPose().IDLE.src;
+    ['town-hero', 'char-hero'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.getAttribute('src') !== src) el.src = src;
+    });
+}
 function executeEquipItem(index) {
     let item = player.inventory[index];
     if (!item) return false;
@@ -2020,6 +2032,21 @@ function executeEquipItem(index) {
         return false;
     }
     const slotKey = item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot;
+    // Two-handed weapons take the shield slot: a shield cannot be worn with one, so equipping one moves the shield to the bag
+    if (slotKey === 'shield' && isTwoHanded(player.equipped.weapon)) {
+        alert("A two-handed weapon is equipped. Unequip it first.");
+        return false;
+    }
+    if (slotKey === 'weapon' && isTwoHanded(item) && player.equipped.shield) {
+        const free = player.inventory.findIndex((s, i) => s === null && i !== index);
+        if (free === -1) {
+            alert("Inventory is full! Make room for your shield first.");
+            return false;
+        }
+        player.inventory[free] = { ...player.equipped.shield };
+        player.equipped.shield = null;
+        logMessage(`[Equipment] Shield moved to bag (two-handed weapon)`, 'drop');
+    }
     let currentEquipped = player.equipped[slotKey];
     player.equipped[slotKey] = item;
     player.inventory[index] = currentEquipped ? { ...currentEquipped } : null;
@@ -2474,6 +2501,7 @@ function renderElementStats() {
 }
 
 function updateUI() {
+    syncHeroSprites();
     if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
     if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();
     renderInventoryFilters();
