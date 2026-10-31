@@ -197,6 +197,62 @@ const MONSTER_SPRITES = {
             'assets/combat/mossyboulder/mossyboulderdamaged.png': [3, 1],
             'assets/combat/mossyboulder/mossyboulderdead.png': [3, -2]
         }
+    },
+    M040: { // Ice Golem: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/icegolem/icegolem.png'],
+        attack: ['assets/combat/icegolem/icegolemattack.png'],
+        hurt: ['assets/combat/icegolem/icegolemdamaged.png'],
+        dead: ['assets/combat/icegolem/icegolemdead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/icegolem/icegolemattack.png': [0, -12], 'assets/combat/icegolem/icegolemdamaged.png': [9, -5], 'assets/combat/icegolem/icegolemdead.png': [0, -4] }
+    },
+    M041: { // Frost Archer: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/frostarcher/frostarcher.png'],
+        attack: ['assets/combat/frostarcher/frostarcherattack.png'],
+        hurt: ['assets/combat/frostarcher/frostarcherdamaged.png'],
+        dead: ['assets/combat/frostarcher/frostarcherdead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/frostarcher/frostarcherattack.png': [-27, -3], 'assets/combat/frostarcher/frostarcherdamaged.png': [13, -2], 'assets/combat/frostarcher/frostarcherdead.png': [0, -1] }
+    },
+    M043: { // Frost Shaman: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/frostshaman/frostshaman.png'],
+        attack: ['assets/combat/frostshaman/frostshamanattack.png'],
+        hurt: ['assets/combat/frostshaman/frostshamandamaged.png'],
+        dead: ['assets/combat/frostshaman/frostshamandead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/frostshaman/frostshamanattack.png': [-23, 2], 'assets/combat/frostshaman/frostshamandamaged.png': [0, -2], 'assets/combat/frostshaman/frostshamandead.png': [0, -2] }
+    },
+    M046: { // Jotun Frost Mage: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/jotunfrostmage/jotunfrostmage.png'],
+        attack: ['assets/combat/jotunfrostmage/jotunfrostmageattack.png'],
+        hurt: ['assets/combat/jotunfrostmage/jotunfrostmagedamaged.png'],
+        dead: ['assets/combat/jotunfrostmage/jotunfrostmagedead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/jotunfrostmage/jotunfrostmageattack.png': [0, 2], 'assets/combat/jotunfrostmage/jotunfrostmagedamaged.png': [-18, 3], 'assets/combat/jotunfrostmage/jotunfrostmagedead.png': [0, 0] }
+    },
+    M067: { // Flame Archer: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/flamearcher/flamearcher.png'],
+        attack: ['assets/combat/flamearcher/flamearcherattack.png'],
+        hurt: ['assets/combat/flamearcher/flamearcherdamaged.png'],
+        dead: ['assets/combat/flamearcher/flamearcherdead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/flamearcher/flamearcherattack.png': [6, 4], 'assets/combat/flamearcher/flamearcherdamaged.png': [0, 5], 'assets/combat/flamearcher/flamearcherdead.png': [0, 2] }
+    },
+    M069: { // Ember Priest: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/emberpriest/emberpriest.png'],
+        attack: ['assets/combat/emberpriest/emberpriestattack.png'],
+        hurt: ['assets/combat/emberpriest/emberpriestdamaged.png'],
+        dead: ['assets/combat/emberpriest/emberpriestdead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/emberpriest/emberpriestattack.png': [0, -1], 'assets/combat/emberpriest/emberpriestdamaged.png': [25, -4], 'assets/combat/emberpriest/emberpriestdead.png': [0, -12] }
+    },
+    M070: { // Muspel Flame Mage: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/muspelflamemage/muspelflamemage.png'],
+        attack: ['assets/combat/muspelflamemage/muspelflamemageattack.png'],
+        hurt: ['assets/combat/muspelflamemage/muspelflamemagedamaged.png'],
+        dead: ['assets/combat/muspelflamemage/muspelflamemagedead.png'],
+        deathMs: 600,
+        shift: { 'assets/combat/muspelflamemage/muspelflamemageattack.png': [0, 0], 'assets/combat/muspelflamemage/muspelflamemagedamaged.png': [-11, -6], 'assets/combat/muspelflamemage/muspelflamemagedead.png': [17, -3] }
     }
 };
 function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
@@ -405,22 +461,27 @@ setInterval(() => {
             else if (img.parentElement) img.parentElement.style.display = 'none';
             return;
         }
+        // Hurt and attack: whichever started later plays and overrides the other (idle is the fallback)
         const hitAt = Number(img.dataset.hitAt) || 0;
         const elapsed = now - hitAt;
-        if (hitAt && elapsed >= 0 && elapsed < COMBAT_SLIME_DAMAGE_FRAMES.length * COMBAT_DAMAGE_FRAME_MS) {
-            const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
+        const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
+        const hurtLen = Math.max(1, hurt.length) * COMBAT_DAMAGE_FRAME_MS;
+        const hurtOn = hitAt && elapsed >= 0 && elapsed < hurtLen;
+        const atkAt = Number(img.dataset.attackAt) || 0;
+        const ae = now - atkAt;
+        const attackOn = atkAt && ae >= 0 && ae < COMBAT_MONSTER_ATTACK_MS;
+        if (hurtOn && (!attackOn || hitAt >= atkAt)) {
             if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
-            // Same red flash as the player's battle sprite (first 300ms of the hit)
+            // Same red flash as the player's battle sprite (first 150ms of the hit)
             img.style.filter = elapsed < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             return;
         }
-        if (img.style.filter) img.style.filter = '';
-        const atkAt = Number(img.dataset.attackAt) || 0;
-        const ae = now - atkAt;
-        if (atkAt && ae >= 0 && ae < COMBAT_MONSTER_ATTACK_MS) {
+        if (attackOn) {
+            if (img.style.filter) img.style.filter = '';
             setMonsterFrame(img, img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME);
             return;
         }
+        if (img.style.filter) img.style.filter = '';
         if (img.dataset.stunned === '1') return; // stunned: idle animation stops on its current frame
         const frames = img.dataset.frames.split(',');
         setMonsterFrame(img, frames[Math.floor(now / 500) % frames.length]); // idle: one frame every 500ms
