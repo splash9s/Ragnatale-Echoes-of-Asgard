@@ -385,9 +385,17 @@ function showHealAura(selector) {
 }
 
 // Player battle sprite. Every frame is shown at its exact file size, placed by its feet point (bottom centre).
-const COMBAT_PLAYER_IDLE = { src: 'assets/cha/chabase.png', w: 88, h: 183 }; // same character art as the main page
-const COMBAT_PLAYER_ATTACK = { src: 'assets/combat/cha/cha_hit_0001.png', w: 161, h: 192 };
-const COMBAT_PLAYER_CRI = { src: 'assets/combat/cha/cha_cri0001.png', w: 138, h: 199 };
+// Each frame is shown at its exact file size. fx,fy = its feet point (bottom centre of the art), placed on the feet anchor.
+const COMBAT_PLAYER_IDLE = { src: 'assets/cha/chabase.png', w: 95, h: 193, fx: 48, fy: 190 };
+const COMBAT_PLAYER_ATTACK = { src: 'assets/cha/chaattack.png', w: 169, h: 170, fx: 85, fy: 167 };
+const COMBAT_PLAYER_CRI = { src: 'assets/cha/chacritical.png', w: 178, h: 222, fx: 88.5, fy: 211 };
+const COMBAT_PLAYER_DEAD1 = { src: 'assets/cha/chadead1.png', w: 162, h: 137, fx: 81, fy: 132 }; // falling
+const COMBAT_PLAYER_DEAD2 = { src: 'assets/cha/chadead2.png', w: 166, h: 99, fx: 84, fy: 97 }; // on the ground
+const COMBAT_PLAYER_FALL_MS = 2000; // fall time (6 fps steps from COMBAT_PLAYER_FALL_PX above the ground)
+const COMBAT_PLAYER_FALL_PX = 120;
+const COMBAT_PLAYER_FALL_FPS = 6;
+const COMBAT_PLAYER_GROUND_MS = 1000; // then chadead2 for 1 second
+let combatPlayerDeath = { at: 0 }; // when the player fell (0 = not dead)
 const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
 const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
@@ -402,14 +410,14 @@ function playPlayerAttackAnim(isCrit) {
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one 256x256 frame for a short time.
 // Reaction frames are 256x256 (original size). w/h = frame size on screen; fx/fy = feet point inside the frame (placed on the player's anchor).
 const COMBAT_PLAYER_REACT_FRAMES = {
-    block: { src: 'assets/combat/cha/cha_block1.png', w: 124, h: 149, fx: 62, fy: 149 },
-    dodge: { src: 'assets/combat/cha/cha_dodge1.png', w: 115, h: 189, fx: 57.5, fy: 189 }
+    block: { src: 'assets/cha/chablock.png', w: 520, h: 710, fx: 259.5, fy: 695 },
+    dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 73, fy: 138 }
 };
 // Place a battle frame on the player's feet point (exact size)
-function applyPlayerFrame(img, f) {
+function applyPlayerFrame(img, f, dy = 0) {
     img.src = f.src;
-    img.style.left = (combatPlayerAnchor.x - f.w / 2) + 'px';
-    img.style.top = (combatPlayerAnchor.y - f.h) + 'px';
+    img.style.left = (combatPlayerAnchor.x - (f.fx !== undefined ? f.fx : f.w / 2)) + 'px';
+    img.style.top = (combatPlayerAnchor.y - (f.fy !== undefined ? f.fy : f.h) + dy) + 'px';
     img.style.width = f.w + 'px';
     img.style.height = f.h + 'px';
 }
@@ -454,6 +462,18 @@ function playPlayerLunge(el, dx) {
     ], { duration: 200, easing: 'ease-in-out' });
 }
 // Place a reaction frame on the player's feet point
+// Death: chadead1 falls 6 steps per second onto the ground, then chadead2 lies there
+function applyPlayerDeathFrame(img, t) {
+    img.style.animation = 'none'; // stop the idle bob
+    if (t < COMBAT_PLAYER_FALL_MS) {
+        const steps = COMBAT_PLAYER_FALL_MS * COMBAT_PLAYER_FALL_FPS / 1000;
+        const step = Math.min(steps, Math.floor(t * COMBAT_PLAYER_FALL_FPS / 1000));
+        applyPlayerFrame(img, COMBAT_PLAYER_DEAD1, -COMBAT_PLAYER_FALL_PX * (1 - step / steps));
+    } else {
+        applyPlayerFrame(img, COMBAT_PLAYER_DEAD2);
+    }
+}
+function startPlayerDeathAnim() { combatPlayerDeath.at = Date.now(); }
 function applyPlayerReactFrame(img, f) {
     img.src = f.src;
     img.style.left = (combatPlayerAnchor.x - f.fx) + 'px';
@@ -502,6 +522,10 @@ const LINEUP_DEFAULT_POS = [[914, 784], [1065, 784], [1218, 769], [1358, 721], [
 setInterval(() => {
     const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
+        if (img.id === 'combat-player-sprite' && combatPlayerDeath.at) {
+            applyPlayerDeathFrame(img, now - combatPlayerDeath.at);
+            return;
+        }
         if (img.id === 'combat-player-sprite') {
             const ae = now - combatPlayerAttack.at;
             if (combatPlayerAttack.at && ae >= 0 && ae < COMBAT_PLAYER_ATTACK_MS) {
@@ -518,6 +542,7 @@ setInterval(() => {
                 applyPlayerReactFrame(img, COMBAT_PLAYER_REACT_FRAMES[combatPlayerReact.kind]);
                 return;
             }
+            if (img.style.animation) img.style.animation = ''; // back from the death fall
             applyPlayerFrame(img, COMBAT_PLAYER_IDLE);
             return;
         }
@@ -670,7 +695,7 @@ function closeModal() {
 const COMBAT_TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 function flatLayout(feet, monsterFeet) {
     return {
-        player: { x: feet[0], y: feet[1], left: feet[0] - COMBAT_PLAYER_IDLE.w / 2, top: feet[1] - COMBAT_PLAYER_IDLE.h },
+        player: { x: feet[0], y: feet[1], left: feet[0] - COMBAT_PLAYER_IDLE.fx, top: feet[1] - COMBAT_PLAYER_IDLE.fy },
         hud: { left: feet[0] - 102, top: feet[1] + 20 }, // HP and armor below the character
         monsters: monsterFeet.map(([x, y]) => [x - 100, y - 100]) // card: 200px wide, sprite bottom at the card's 100px sprite box
     };
@@ -700,12 +725,11 @@ function preloadCombatImage(src) {
 }
 // Move the monster cards already on screen to the current layout (no waiting for the next redraw)
 function applyCombatEarthPositions() {
-    // Shadow: the character's right foot sits on the shadow's dark spot (spot at 78,29 in the 102x41 shadow;
-    // right foot at 67.5,182 in the 88x183 sprite, whose bottom edge is the feet anchor). Same as the main page.
+    // Shadow: the character's right foot (71.5,188 in the 95x193 art) sits on the shadow's dark spot (78,29 in the 102x41 shadow).
     const shadow = document.getElementById('combat-player-shadow');
     if (shadow) {
-        shadow.style.left = (combatPlayerAnchor.x - 55) + 'px';
-        shadow.style.top = (combatPlayerAnchor.y - 33 - combatShadowLift) + 'px';
+        shadow.style.left = (combatPlayerAnchor.x - 54.5) + 'px';
+        shadow.style.top = (combatPlayerAnchor.y - 34 - combatShadowLift) + 'px';
     }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {
         const pos = Number(card.dataset.pos);

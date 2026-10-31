@@ -505,6 +505,7 @@ function spawnStageMonsters() {
     playerStunUntil = 0;
     playerTimedDebuffs = {};
     playerAspdToggle = false;
+    combatPlayerDeath.at = 0;
     const derived = getDerivedStats();
     monstersList = [];
     const dailyScale = currentMode === 'daily' ? 0.7 : 1;
@@ -1365,8 +1366,12 @@ function runCombatTick() {
         clearInterval(combatInterval); combatRunId++;
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
-        player.hp = derived.maxHp;
-        showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
+        startPlayerDeathAnim(); // the fall plays first
+        setTimeout(() => { // the result waits 3 seconds
+            player.hp = getDerivedStats().maxHp;
+            updateUI();
+            showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
+        }, 3000);
     }
     updateUI();
 }

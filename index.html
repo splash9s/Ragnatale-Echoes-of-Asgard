@@ -87,8 +87,8 @@
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
         #town-shadow { position: absolute; left: 910px; top: 830px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; }
-        #town-hero-wrap { position: absolute; left: 921px; top: 680px; width: 88px; height: 183px; pointer-events: auto; cursor: pointer; z-index: 2; }
-        #town-hero { position: absolute; left: 0; top: 0; width: 88px; height: 183px; image-rendering: pixelated; }
+        #town-hero-wrap { position: absolute; left: 917px; top: 674px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
+        #town-hero { position: absolute; left: 0; top: 0; width: 95px; height: 193px; image-rendering: pixelated; }
         .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
@@ -566,7 +566,7 @@
                     <img class="ts-bg" src="assets/pages/character/bg.png" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
                     <img class="art-frame" src="assets/pages/character/window.png" alt="" style="left:25px; top:70px; width:1870px; height:1003px;">
                     <img class="art-frame pointer-events-none" src="assets/cha/chashadow.png" alt="" style="left:905px; top:642px; width:102px; height:41px;">
-                    <img class="art-frame pointer-events-none" src="assets/cha/chabase.png" alt="" style="left:916px; top:492px; width:88px; height:183px;">
+                    <img class="art-frame pointer-events-none" src="assets/cha/chabase.png" alt="" style="left:912px; top:486px; width:95px; height:193px;">
                     <div class="ui" style="left:1806px; top:6px; width:106px; height:60px;" onclick="switchView('town')">
                         <img src="assets/compaign/smallretunbutton.png" alt="">
                     </div>
@@ -827,7 +827,7 @@
                     <img id="combat-player-shadow" src="assets/cha/chashadow.png" alt="" style="position:absolute; left:403px; top:839px; width:102px; height:41px; pointer-events:none; z-index:3;">
 
                     <!-- Character sprite (centre 488, 590) -->
-                    <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase.png" alt="" style="position:absolute; left:470px; top:688px; width:88px; height:183px; image-rendering:pixelated; pointer-events:none;">
+                    <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase.png" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
 
                     <!-- Player HP and armor, below the character -->
                     <div id="combat-hp-under" style="position:absolute; left:413px; top:896px; width:204px; display:flex; flex-direction:column; gap:4px;">
