@@ -224,7 +224,7 @@ const SET_PIECE_NAMES = {
     windrunner: { armor: "Windrunner Harness", garment: "Windrunner Cloak", footgear: "Windrunner Boots", hat: "Windrunner Hood" },
 };
 
-const STAT_TEXT = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block' };
+const STAT_TEXT = { atk: 'ATK', def: 'DEF', hp: 'HP', flee: 'FLEE', hit: 'HIT', aspd: 'ASPD', crit: 'CRIT', block: 'Block', armor: 'Armor' };
 function statText(stats) {
     return Object.keys(stats).map(k => `${STAT_TEXT[k] || k} +${stats[k]}`).join(', ');
 }
@@ -238,28 +238,37 @@ Object.keys(HAT_BY_LEVEL).forEach(lv => {
 });
 
 
-// Each map drops gear of its own level only.
-// Every pool gets: its level's ring, and one set piece per set per set slot (helmets excluded: see HELMET_DROP_POOL).
+// Shop source per level: the base gear and rings of that level (the shop reads this, not the drop pools).
+const GEAR_SHOP_SOURCE = {};
+// Drop pools: each map drops gear of its own level only.
+// Weapon and shield (base), the level's rings, and for armor, garment and footgear a Heavy and a Light version:
+//   Heavy = +Armor (the base item's DEF), Light = +HP (the base item's HP; garment uses the armor's HP).
+// Drop-only pieces get their set buff when they drop (see rollSetForDrop in combat.js).
+const HEAVY_LIGHT_SLOTS = ['armor', 'garment', 'footgear'];
 Object.keys(GEAR_POOL).forEach(k => {
     const lv = parseInt(k.replace('map', ''), 10);
-    GEAR_POOL[k].push(...RING_ITEMS.filter(r => r.levelReq === lv));
-    GEAR_POOL[k].push(...HIGH_RING_ITEMS.filter(r => r.levelReq === lv));
-    Object.keys(SET_PIECE_NAMES).forEach(setKey => {
-        SET_SLOTS.filter(slot => slot !== 'hat').forEach(slot => {
-            const base = GEAR_POOL[k].find(i => i.slot === slot && !i.setName);
-            if (!base) return;
-            GEAR_POOL[k].push({ id: `set_${setKey}_${slot}_${lv}`, name: `${SET_PIECE_NAMES[setKey][slot]} (Lv ${lv})`, slot, levelReq: lv, setName: setKey, stats: { ...base.stats }, desc: statText(base.stats) });
-        });
+    const base = GEAR_POOL[k].filter(i => !i.setName);
+    const rings = [...RING_ITEMS, ...HIGH_RING_ITEMS].filter(r => r.levelReq === lv);
+    GEAR_SHOP_SOURCE[k] = [...base, ...rings];
+    const armorBase = base.find(i => i.slot === 'armor');
+    const drops = base.filter(i => i.slot === 'weapon' || i.slot === 'shield');
+    drops.push(...rings);
+    HEAVY_LIGHT_SLOTS.forEach(slot => {
+        const b = base.find(i => i.slot === slot);
+        if (!b) return;
+        const heavyArmor = b.stats.def || b.stats.mdef || 1;
+        const lightHp = slot === 'garment' ? ((armorBase && armorBase.stats.hp) || 0) : (b.stats.hp || 0);
+        drops.push({ id: `heavy_${slot}_${lv}`, name: `Heavy ${b.name}`, slot, levelReq: lv, dropOnly: true, stats: { armor: heavyArmor }, desc: statText({ armor: heavyArmor }) });
+        drops.push({ id: `light_${slot}_${lv}`, name: `Light ${b.name}`, slot, levelReq: lv, dropOnly: true, stats: { hp: lightHp }, desc: statText({ hp: lightHp }) });
     });
+    GEAR_POOL[k] = drops;
 });
 
-// Helmets (hat slot) drop only from campaign bosses. Per helmet level: the base helm and one set helm per set.
+// Helmets (hat slot) drop only from campaign bosses. Per helmet level: the base helm.
 const HELMET_DROP_POOL = {};
 Object.keys(HAT_BY_LEVEL).forEach(lv => {
     const L = Number(lv), h = HAT_BY_LEVEL[lv];
-    const list = [{ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: L, stats: h.stats, desc: statText(h.stats) }];
-    Object.keys(SET_PIECE_NAMES).forEach(setKey => list.push({ id: `set_${setKey}_hat_${lv}`, name: `${SET_PIECE_NAMES[setKey].hat} (Lv ${lv})`, slot: "hat", levelReq: L, setName: setKey, stats: { ...h.stats }, desc: statText(h.stats) }));
-    HELMET_DROP_POOL[lv] = list;
+    HELMET_DROP_POOL[lv] = [{ id: `hat${lv}`, name: h.name, slot: "hat", levelReq: L, stats: h.stats, desc: statText(h.stats) }];
 });
 // Boss helmet chance by the boss's map level: 1-30 5%, 40-60 2.5%, 70-99 1.5%
 function bossHelmetChance(levelReq) {
@@ -278,8 +287,8 @@ function bossHelmetLevel(levelReq) {
 const SHOP_TIER50_PRICE = { weapon: 5000, shield: 4500, armor: 6500, garment: 3800, footgear: 3800, ring: 5000 };
 [60, 70, 80, 90].forEach(lv => {
     const mult = Math.pow(2, (lv - 50) / 10);
-    (GEAR_POOL[`map${lv}`] || []).forEach(i => {
-        if (i.setName || SHOP_TIER50_PRICE[i.slot] === undefined) return;
+    (GEAR_SHOP_SOURCE[`map${lv}`] || []).forEach(i => {
+        if (SHOP_TIER50_PRICE[i.slot] === undefined) return;
         SHOP_ITEMS.push({ id: `shop_${i.id}`, name: i.name, slot: i.slot, levelReq: lv, price: Math.round(SHOP_TIER50_PRICE[i.slot] * mult), stats: i.stats, desc: statText(i.stats) });
     });
 });

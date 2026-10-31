@@ -854,19 +854,19 @@ function awardKill(m) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template);
         logMessage(`[Monster Drop] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(droppedItem);
+        addItemToInventory(rollSetForDrop(droppedItem));
     }
     if (m.isMiniBoss && pool.length > 0 && Math.random() < (isVoidTest ? 1 : 0.5)) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template, rollMiniBossDropRarity(), 1);
         logMessage(`[Mini Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(droppedItem);
+        addItemToInventory(rollSetForDrop(droppedItem));
     }
     for (let bd = 0; bd < (m.isFinalBoss ? 2 : 1); bd++) if (m.isBoss && pool.length > 0) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
         logMessage(`[Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(droppedItem);
+        addItemToInventory(rollSetForDrop(droppedItem));
     }
     // Helmet: only from campaign bosses, chance by the map level (see bossHelmetChance)
     if (m.isBoss && activeMap && Math.random() < (isVoidTest ? 1 : bossHelmetChance(activeMap.levelReq))) {
@@ -874,8 +874,17 @@ function awardKill(m) {
         const template = list[Math.floor(Math.random() * list.length)];
         const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
         logMessage(`[Helmet Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(droppedItem);
+        addItemToInventory(rollSetForDrop(droppedItem));
     }
+}
+
+// Set buffs now come from monster drops only: every armor, garment or footgear drop gets one of the sets
+function rollSetForDrop(item) {
+    if (item && item.dropOnly && HEAVY_LIGHT_SLOTS.includes(item.slot)) {
+        const keys = Object.keys(SET_DATA);
+        item.setName = keys[Math.floor(Math.random() * keys.length)];
+    }
+    return item;
 }
 
 // ---------- HEALING / DAMAGE HELPERS ----------
@@ -1435,7 +1444,7 @@ function onStageCleared() {
                 const pool = typeof GEAR_POOL !== 'undefined' ? (GEAR_POOL[activeMap.dropKey || 'map1'] || GEAR_POOL.map1) : [];
                 const template = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : { name: "Explorer's Blade", slot: "weapon", levelReq: 1, stats: { atk: 15 } };
                 const reward = generatePoEItem(template, 3, 1);
-                addItemToInventory(reward);
+                addItemToInventory(rollSetForDrop(reward));
 
                 showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
                 playSound('sound/mvp.mp3');
