@@ -1741,6 +1741,6 @@ function grantVipDailyMail() {
     if (player.vipLastMail === todayKey()) return false;
     player.vipLastMail = todayKey();
     if (!player.mailBox) player.mailBox = [];
-    player.mailBox.unshift({ id: Date.now(), title: "VIP Daily Reward", sender: "VIP Office", message: "Your VIP Pass grants 1 Resurrection Potion today.", rewards: { resurrection: 1 }, claimed: false });
+    player.mailBox.unshift({ id: Date.now(), title: "VIP Daily Reward", sender: "VIP Office", message: "Your VIP Pass grants 1 Resurrection Potion today.", rewards: { resurrection: 1 }, claimed: false, sentAt: Date.now() });
     return true;
 }

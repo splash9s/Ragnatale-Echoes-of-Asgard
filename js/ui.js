@@ -2610,13 +2610,21 @@ function sendPlayerMail() {
         sender: val('mail-sender').trim() || 'System',
         message: val('mail-message'),
         rewards,
-        claimed: false
+        claimed: false,
+        sentAt: Date.now()
     });
     closeModal();
     logMessage('[Mail] Sent a mail to your mailbox', 'drop');
     renderMailBox();
     updateUI();
     saveGame();
+}
+
+// Sent time shown on a mail: sentAt if stored, else the id when it is a timestamp (VIP mails), else blank (welcome mail)
+function mailTimeText(m) {
+    const t = m.sentAt || (m.id > 1e12 ? m.id : 0);
+    if (!t) return '';
+    return new Date(t).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function renderMailBox() {
@@ -2633,6 +2641,7 @@ function renderMailBox() {
                     <span class="font-bold text-amber-400 block">${m.title}</span>
                     <span class="text-[10px] text-slate-400 block">${m.message}</span>
                     <span class="text-[9px] text-purple-300 block mt-1">From: ${m.sender}</span>
+                    ${mailTimeText(m) ? `<span class="text-[9px] text-slate-400 block">${mailTimeText(m)}</span>` : ''}
                 </div>
                 ${!m.claimed ? `
                     <button onclick="claimMail(${m.id})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer transition">Claim</button>
