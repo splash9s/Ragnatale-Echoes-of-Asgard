@@ -724,11 +724,24 @@ function pickPlayerAvatar(av) {
 }
 
 // Click a rune window in combat to see the rune's full detail
+// Click a rune in the combat rune row: show it as a big rune card with its full detail
 function showRuneDetail(index) {
     const r = (player.currentRunRunes || [])[index];
     if (!r) return;
     const def = RUNE_DEFS[r.id];
-    showModal(r.name, def ? def.text(runeN(r.id)) : r.desc);
+    const rarity = def ? def.rarity : 1;
+    const detail = def ? def.text(runeN(r.id)) : r.desc;
+    const html = `<div id="rune-card-view" class="flex flex-col items-center gap-4">
+            <div class="rune-pick-card rune-acq-card">
+                <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
+                <span class="rune-pick-text">
+                    <span class="rune-pick-name">${escapeHtml(r.name)}</span>
+                    <span class="rune-pick-desc">${runeHighlightHtml(detail)}</span>
+                </span>
+            </div>
+            <button onclick="closeModal()" class="mx-auto w-40 py-2 border border-slate-700 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer transition">Close</button>
+        </div>`;
+    showModal(r.name, '', html);
 }
 
 function showModal(title, message, customHTML = '', onCloseCallback = null) {
@@ -748,7 +761,7 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     window.modalCallback = onCloseCallback;
     if (modalEl) modalEl.classList.remove('hidden');
     // Rune pick: no background blur, no title text
-    const isRune = !!document.getElementById('rune-pick-root');
+    const isRune = !!document.getElementById('rune-pick-root') || !!document.getElementById('rune-card-view');
     if (titleEl) titleEl.style.display = isRune ? 'none' : '';
     if (modalEl) modalEl.style.backdropFilter = isRune ? 'none' : '';
     fitModalPanel(!!customHTML);
@@ -761,6 +774,16 @@ function fitModalPanel(isSummary) {
     if (!panel) return;
     if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; panel.style.maxHeight = ''; panel.style.overflowY = ''; panel.style.background = ''; return; }
     // Rune pick: a wide panel at true size (three cards side by side), no scaling, half-transparent window
+    // Rune card view: a narrow panel around one big rune card
+    if (document.getElementById('rune-card-view')) {
+        panel.style.width = '380px';
+        panel.style.maxWidth = '94vw';
+        panel.style.transform = '';
+        panel.style.maxHeight = '92vh';
+        panel.style.overflowY = 'auto';
+        panel.style.background = 'rgba(15, 23, 42, 0.5)';
+        return;
+    }
     if (document.getElementById('rune-pick-root')) {
         panel.style.width = '1000px';
         panel.style.maxWidth = '94vw';
