@@ -259,7 +259,7 @@ function showRuneChoices(isNew) {
     const canRefresh = runeRefreshLeft > 0;
     html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button>`;
     // Edge tab on the right side of the window: opens the list of runes acquired
-    html += `<button id="rune-acq-tab" onclick="toggleRuneAcquired(true)">Acquired (${acquired.length})</button>`;
+    html += `<button id="rune-acq-tab" onclick="toggleRuneAcquired(true)">Runes (${acquired.length})</button>`;
     // Slide-out list of acquired runes, overlaying the pick window
     html += `<div id="rune-acq-panel">
             <div class="rune-acq-head"><span>Runes acquired (${acquired.length})</span><button onclick="toggleRuneAcquired(false)" class="rune-acq-close">×</button></div>
