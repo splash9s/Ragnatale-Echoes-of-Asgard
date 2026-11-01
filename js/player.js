@@ -385,6 +385,8 @@ function getDerivedStats() {
 function saveGame() {
     try {
         localStorage.setItem('ragnatale_save', JSON.stringify(player));
+        localStorage.setItem('ragnatale_save_at', String(Date.now()));
+        if (typeof cloudSaveSoon === 'function') cloudSaveSoon();
     } catch (e) {
         console.error("Failed to save game:", e);
     }

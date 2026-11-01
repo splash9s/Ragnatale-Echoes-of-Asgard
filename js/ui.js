@@ -57,7 +57,9 @@ function manualSaveGame() {
 function resetSaveGame() {
     if (confirm("Are you sure you want to reset all save data?")) {
         localStorage.removeItem('ragnatale_save');
-        location.reload();
+        localStorage.removeItem('ragnatale_save_at');
+        const done = typeof cloudDeleteSave === 'function' ? cloudDeleteSave() : Promise.resolve();
+        done.finally(() => location.reload());
     }
 }
 
