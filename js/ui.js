@@ -756,6 +756,15 @@ function fitModalPanel(isSummary) {
     const panel = document.querySelector('#game-modal > div');
     if (!panel) return;
     if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; panel.style.maxHeight = ''; panel.style.overflowY = ''; return; }
+    // Rune pick: a wide panel at true size (three cards side by side), no scaling
+    if (document.getElementById('rune-pick-root')) {
+        panel.style.width = '1000px';
+        panel.style.maxWidth = '94vw';
+        panel.style.transform = '';
+        panel.style.maxHeight = '92vh';
+        panel.style.overflowY = 'auto';
+        return;
+    }
     // Scale by width (about 90% of the window), then cap the height and scroll inside the panel if the log is long
     panel.style.width = SUMMARY_PANEL_W + 'px';
     panel.style.maxWidth = 'none';

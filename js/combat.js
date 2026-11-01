@@ -212,24 +212,45 @@ function upgradeRuneChoice(id, pool, taken) {
     return cands[Math.floor(Math.random() * cands.length)];
 }
 
+// Colour of a rune's effect text on the pick card. Default is white.
+function runeEffectColor(def) {
+    const d = (def.desc || '').toLowerCase();
+    if (/crit/.test(d)) return '#facc15';                  // critical: yellow
+    if (/armor/.test(d)) return '#cbd5e1';                 // armor: grey
+    if (/dodge|flee/.test(d)) return '#60a5fa';            // dodge: blue
+    if (/\bhp\b|heal|restore|max hp/.test(d)) return '#4ade80'; // HP: green
+    if (/damage|atk|bolt/.test(d)) return '#fb923c';       // damage: orange
+    return '#ffffff';
+}
+
 function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
     const choices = pickWeightedRunes(pool, 3).reduce((acc, id) => { acc.push(upgradeRuneChoice(id, pool, acc)); return acc; }, []);
-    let html = `<div class="flex flex-col gap-2">`;
+    // Runes already picked this run, as small cards in the top right
+    const picked = (player.currentRunRunes || []).map(pr => {
+        const rarity = Math.min(5, Math.max(1, RUNE_DEFS[pr.id] ? RUNE_DEFS[pr.id].rarity : 1));
+        return `<div class="combat-rune-slot" title="${escapeHtml(pr.name)}" style="cursor:default;"><img src="assets/combat/runes/r${rarity}.png" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
+    }).join('');
+    let html = `<div id="rune-pick-root" class="flex flex-col gap-4">`;
+    html += `<div class="flex justify-end flex-wrap gap-2" style="min-height:101px;">${picked}</div>`;
+    html += `<div class="flex justify-center items-start flex-wrap gap-5">`;
     choices.forEach(id => {
         const r = RUNE_DEFS[id];
-        const rar = RARITY_INFO[r.rarity] || RARITY_INFO[1];
         const n = getRuneOwnedCount(id);
-        const owned = (!r.flag && n > 0) ? ` <span class="text-amber-400 font-bold">(owned x${n})</span>` : '';
+        const owned = (!r.flag && n > 0) ? ` <span style="color:#fbbf24;">x${n}</span>` : '';
+        const fx = runeEffectColor(r);
         html += `
-            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="p-3 bg-slate-950 hover:bg-slate-800 border ${rar.border} rounded-xl text-left transition cursor-pointer flex flex-col gap-1">
-                <span class="font-bold ${rar.text} text-xs">✨ ${r.name}${owned}</span>
-                <span class="text-[9px] uppercase tracking-wider ${rar.text}">${rar.name} · Rarity ${r.rarity}</span>
-                <span class="text-[10px] text-slate-300">${r.desc}</span>
+            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card" style="position:relative; width:270px; max-width:100%; padding:0; border:0; background:none; cursor:pointer;">
+                <img src="assets/combat/runes/bigr${r.rarity}.png" alt="" style="display:block; width:100%; height:auto; pointer-events:none;">
+                <span style="position:absolute; left:12%; right:12%; top:66%; bottom:7%; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; text-align:center; color:#ffffff; font-weight:900; text-shadow:0 0 3px #000, 0 0 6px #000, 0 1px 2px #000; pointer-events:none;">
+                    <span style="font-size:17px; line-height:1.1;">${r.name}${owned}</span>
+                    <span style="font-size:13px; line-height:1.2; color:${fx};">${r.desc}</span>
+                </span>
             </button>`;
     });
+    html += `</div>`;
     const canRefresh = runeRefreshLeft > 0;
-    html += `</div><button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mt-3 w-full py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button>`;
+    html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button></div>`;
     if (isNew) {
         showModal("Rune Blessing", "", html);
     } else {
