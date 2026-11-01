@@ -94,13 +94,15 @@
         .town-ico { width: 22px; height: 22px; object-fit: contain; display: block; }
         .town-panel .town-info { left: 12px; top: 12px; width: auto; height: auto; right: 12px; bottom: 12px; padding: 0; flex-direction: row; gap: 18px; justify-content: flex-start; align-items: stretch; }
         .town-panel .town-avatar { width: 290px; height: 290px; background: rgba(0, 0, 0, 0.25); }
-        .town-panel .town-id { flex: 0 0 430px; width: 430px; justify-content: center; gap: 6px; }
-        .town-panel .town-name { font-size: 28px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .town-panel .town-lv { font-size: 20px; }
-        .town-panel .town-exp { width: 100%; gap: 3px; }
-        .town-panel .town-money { position: static; margin-top: auto; }
-        .town-panel .town-money > div { padding: 4px 10px; font-size: 16px; }
-        .ts-inner .town-money .town-ico { width: 26px; height: 26px; }
+        .town-panel .town-id { flex: 0 0 430px; width: 430px; height: 290px; justify-content: space-between; gap: 0; }
+        .town-panel .town-name { font-size: 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .town-panel .town-lv { font-size: 30px; }
+        .town-panel .town-exp { width: 100%; gap: 6px; }
+        .town-panel .town-exp .row { font-size: 20px; }
+        .town-panel .town-exp .bar { height: 12px; }
+        .town-panel .town-money { position: static; margin-top: auto; gap: 12px; }
+        .town-panel .town-money > div { padding: 8px 16px; font-size: 26px; border-radius: 12px; }
+        .ts-inner .town-money .town-ico { width: 40px; height: 40px; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
         .town-avatar { width: 60px; height: 60px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
