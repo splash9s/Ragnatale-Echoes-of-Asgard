@@ -2211,7 +2211,10 @@ function skillApplyView() {
 
 function skillZoomAt(px, py, factor) {
     if (!skillView) return;
-    const ns = Math.min(SKILL_MAP.maxS, Math.max(SKILL_MAP.minS, skillView.s * factor));
+    const vp = document.getElementById('skill-viewport');
+    // Max zoom out: the background still covers the whole view
+    const coverS = vp && vp.offsetWidth ? Math.max(vp.offsetWidth / SKILL_MAP.w, vp.offsetHeight / SKILL_MAP.h) : SKILL_MAP.minS;
+    const ns = Math.min(SKILL_MAP.maxS, Math.max(coverS, skillView.s * factor));
     const wx = (px - skillView.x) / skillView.s, wy = (py - skillView.y) / skillView.s;
     skillView.s = ns;
     skillView.x = px - wx * ns;
