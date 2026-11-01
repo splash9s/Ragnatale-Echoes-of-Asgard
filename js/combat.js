@@ -227,9 +227,9 @@ function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
     const choices = pickWeightedRunes(pool, 3).reduce((acc, id) => { acc.push(upgradeRuneChoice(id, pool, acc)); return acc; }, []);
     // Runes already picked this run, as small cards in the top right
-    const picked = (player.currentRunRunes || []).map(pr => {
+    const picked = (player.currentRunRunes || []).map((pr, i) => {
         const rarity = Math.min(5, Math.max(1, RUNE_DEFS[pr.id] ? RUNE_DEFS[pr.id].rarity : 1));
-        return `<div class="combat-rune-slot" title="${escapeHtml(pr.name)}" style="cursor:default;"><img src="assets/combat/runes/r${rarity}.png" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
+        return `<div class="combat-rune-slot" title="${escapeHtml(pr.name)}" onclick="showPickedRuneDetail(${i})"><img src="assets/combat/runes/r${rarity}.png" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
     }).join('');
     let html = `<div id="rune-pick-root" class="flex flex-col gap-4">`;
     html += `<div class="flex justify-end flex-wrap gap-2" style="min-height:101px;">${picked}</div>`;
@@ -249,6 +249,8 @@ function showRuneChoices(isNew) {
             </button>`;
     });
     html += `</div>`;
+    // Detail of a picked rune, shown here when its small card is clicked
+    html += `<div id="rune-pick-detail" data-idx="" class="flex flex-col items-center gap-1" style="min-height:40px;"></div>`;
     const canRefresh = runeRefreshLeft > 0;
     html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button></div>`;
     if (isNew) {
@@ -257,6 +259,19 @@ function showRuneChoices(isNew) {
         const area = document.getElementById('modal-content-area');
         if (area) area.innerHTML = html;
     }
+}
+
+// Click a picked rune card in the pick window: show its name and full detail. Click again to hide.
+function showPickedRuneDetail(index) {
+    const pr = (player.currentRunRunes || [])[index];
+    const box = document.getElementById('rune-pick-detail');
+    if (!pr || !box) return;
+    if (box.dataset.idx === String(index)) { box.dataset.idx = ''; box.innerHTML = ''; return; }
+    const def = RUNE_DEFS[pr.id];
+    const text = def ? def.text(runeN(pr.id)) : pr.desc;
+    box.dataset.idx = String(index);
+    box.innerHTML = `<div style="font-size:17px; font-weight:900; color:#ffffff; text-shadow:0 0 3px #000, 0 1px 2px #000;">${escapeHtml(pr.name)}</div>` +
+        `<div style="font-size:14px; font-weight:700; color:${def ? runeEffectColor(def) : '#ffffff'}; text-shadow:0 0 3px #000, 0 1px 2px #000;">${escapeHtml(text)}</div>`;
 }
 
 function refreshRuneChoices() {

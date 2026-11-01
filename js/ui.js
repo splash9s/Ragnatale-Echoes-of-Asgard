@@ -747,6 +747,10 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     }
     window.modalCallback = onCloseCallback;
     if (modalEl) modalEl.classList.remove('hidden');
+    // Rune pick: no background blur, title moved down
+    const isRune = !!document.getElementById('rune-pick-root');
+    if (titleEl) titleEl.style.marginTop = isRune ? '70px' : '';
+    if (modalEl) modalEl.style.backdropFilter = isRune ? 'none' : '';
     fitModalPanel(!!customHTML);
 }
 // The summary panel is laid out at a fixed design width and scaled to fill the window.
@@ -755,16 +759,18 @@ const SUMMARY_PANEL_W = 1000;
 function fitModalPanel(isSummary) {
     const panel = document.querySelector('#game-modal > div');
     if (!panel) return;
-    if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; panel.style.maxHeight = ''; panel.style.overflowY = ''; return; }
-    // Rune pick: a wide panel at true size (three cards side by side), no scaling
+    if (!isSummary) { panel.style.width = ''; panel.style.maxWidth = ''; panel.style.transform = ''; panel.style.maxHeight = ''; panel.style.overflowY = ''; panel.style.background = ''; return; }
+    // Rune pick: a wide panel at true size (three cards side by side), no scaling, half-transparent window
     if (document.getElementById('rune-pick-root')) {
         panel.style.width = '1000px';
         panel.style.maxWidth = '94vw';
         panel.style.transform = '';
         panel.style.maxHeight = '92vh';
         panel.style.overflowY = 'auto';
+        panel.style.background = 'rgba(15, 23, 42, 0.5)';
         return;
     }
+    panel.style.background = '';
     // Scale by width (about 90% of the window), then cap the height and scroll inside the panel if the log is long
     panel.style.width = SUMMARY_PANEL_W + 'px';
     panel.style.maxWidth = 'none';
