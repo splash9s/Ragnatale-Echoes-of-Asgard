@@ -3,7 +3,7 @@
 // ==========================================
 
 const MAX_POTION_SLOT = 5;
-const BAG_SLOTS = 45;
+const BAG_SLOTS = 50;
 
 let player = {
     name: "Hero",
@@ -404,7 +404,7 @@ function loadGame() {
             if (!player.equipped.potionSlot) {
                 player.equipped.potionSlot = { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" };
             }
-            // Bag is 45 slots. The stash was removed: any old stash items move into free bag slots.
+            // Bag is 50 open slots. The stash was removed: any old stash items move into free bag slots.
             const oldBag = Array.isArray(player.inventory) ? player.inventory : [];
             const oldStash = Array.isArray(player.stash) ? player.stash : [];
             player.inventory = new Array(BAG_SLOTS).fill(null);

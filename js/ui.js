@@ -2603,6 +2603,7 @@ function updateUI() {
     if (invGrid) {
         invGrid.innerHTML = '';
         if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
+        while (player.inventory.length < BAG_SLOTS) player.inventory.push(null);
         let filledSlots = 0;
         player.inventory.forEach((item, index) => {
             if (item) filledSlots++;
@@ -2620,6 +2621,11 @@ function updateUI() {
                 </div>
             `;
         });
+        // Closed cells after the open bag slots, shown with the grey slot graphic (not usable)
+        const INVENTORY_CELLS = 100;
+        for (let i = BAG_SLOTS; i < INVENTORY_CELLS; i++) {
+            invGrid.innerHTML += `<div class="w-[77px] h-[79px]" style="width:77px; height:79px; background-image:url('assets/pages/character/inventoryslotgrey.png'); background-size:100% 100%;"></div>`;
+        }
         let invCountEl = document.getElementById('inventory-count');
         if (invCountEl) invCountEl.innerText = `${filledSlots} / ${BAG_SLOTS} slots`;
     }
