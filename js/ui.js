@@ -51,6 +51,7 @@ function toggleLanguage() {
 
 function manualSaveGame() {
     saveGame();
+    if (typeof cloudFlush === 'function') cloudFlush();
     showModal("Notice", "Your game progress has been successfully saved!");
 }
 
