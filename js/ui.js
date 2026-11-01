@@ -3018,6 +3018,18 @@ function updateUI() {
     }
 }
 
+// Battle log: collapse / expand. The button label always shows the action it will do.
+function toggleBattleLog(btn) {
+    const box = btn.closest('.combat-box');
+    if (!box) return;
+    const collapsed = box.classList.toggle('minimized');
+    btn.textContent = collapsed ? '▸ Expand' : '▾ Minimize';
+    if (!collapsed) {
+        const log = document.getElementById('combat-activity-log');
+        if (log) log.scrollTop = log.scrollHeight;
+    }
+}
+
 function logMessage(msg, type = 'combat') {
     recordStageLog(msg, type);
     ['town-activity-log', 'combat-activity-log'].forEach(id => {
