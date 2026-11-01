@@ -96,9 +96,10 @@ function handleCustomAvatarUpload(event) {
     }
 }
 
+const MAX_NAME_LENGTH = 13;
 function startGameWithName() {
     let nameInputEl = document.getElementById('input-player-name');
-    let nameInput = nameInputEl ? nameInputEl.value.trim() : "VanguardHero";
+    let nameInput = nameInputEl ? nameInputEl.value.trim().slice(0, MAX_NAME_LENGTH) : "VanguardHero";
     
     if (nameInput) player.name = nameInput;
     player.avatar = selectedAvatarChoice;
@@ -2524,9 +2525,9 @@ function updateUI() {
     player.hp = Math.min(player.hp, derived.maxHp);
 
     let el = document.getElementById('header-player-name');
-    if (el) el.innerText = player.name;
+    if (el) el.innerText = (player.name || '').slice(0, MAX_NAME_LENGTH);
     el = document.getElementById('combat-player-name');
-    if (el) el.innerText = player.name;
+    if (el) el.innerText = (player.name || '').slice(0, MAX_NAME_LENGTH);
     const vipBadge = document.getElementById('header-vip-badge');
     if (vipBadge) {
         if (isVipActive()) {

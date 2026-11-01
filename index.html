@@ -89,7 +89,18 @@
         #town-shadow { position: absolute; left: 906px; top: 716px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; }
         #town-hero-wrap { position: absolute; left: 913px; top: 562px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
         #town-hero { position: absolute; left: 0; top: 0; width: 95px; height: 193px; image-rendering: pixelated; }
-        .town-info { position: absolute; left: 11%; top: 17%; width: 78%; height: 70%; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
+        .town-panel { position: absolute; background: rgba(12, 24, 52, 0.78); border: 1px solid rgba(201, 162, 39, 0.55); border-radius: 14px; box-sizing: border-box; }
+        .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
+        .town-ico { width: 22px; height: 22px; object-fit: contain; display: block; }
+        .town-panel .town-info { left: 12px; top: 12px; width: auto; height: auto; right: 12px; bottom: 12px; padding: 0; flex-direction: row; gap: 18px; justify-content: flex-start; align-items: stretch; }
+        .town-panel .town-avatar { width: 290px; height: 290px; background: rgba(0, 0, 0, 0.25); }
+        .town-panel .town-id { flex: 0 0 490px; width: 490px; justify-content: center; gap: 6px; }
+        .town-panel .town-name { font-size: 28px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .town-panel .town-lv { font-size: 20px; }
+        .town-panel .town-exp { width: 100%; gap: 3px; }
+        .town-panel .town-money { position: static; margin-top: auto; }
+        .town-panel .town-money > div { padding: 4px 10px; font-size: 16px; }
+        .ts-inner .town-money .town-ico { width: 26px; height: 26px; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
         .town-avatar { width: 60px; height: 60px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
@@ -98,7 +109,7 @@
         .town-name { display: flex; align-items: center; gap: 6px; font-size: 24px; line-height: 1.1; font-weight: 700; color: #f5c451; margin: 0; }
         .town-lv { font-size: 17px; line-height: 1.2; color: #bfae85; }
         .town-lv strong { color: #f5e6c0; }
-        .town-exp { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+        .town-exp { display: flex; flex-direction: column; gap: 4px; width: 300px; }
         .town-exp .row { display: flex; justify-content: space-between; font-size: 14px; line-height: 1.2; color: #bfae85; font-family: monospace; }
         .town-exp .bar { height: 7px; background: #0f1a2b; border: 1px solid #2a3a55; border-radius: 999px; overflow: hidden; }
         .town-exp .fill { height: 100%; transition: width .3s; }
@@ -313,7 +324,7 @@
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold text-slate-300">Hero Name</label>
-                    <input type="text" id="input-player-name" value="VanguardHero" class="px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-400 text-slate-100">
+                    <input type="text" id="input-player-name" maxlength="13" value="VanguardHero" class="px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-400 text-slate-100">
                 </div>
                 <button onclick="startGameWithName()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
                     Begin Journey
@@ -326,25 +337,25 @@
             <div id="town-stage" class="town-stage">
                 <div class="ts-inner">
                     <img class="ts-bg" src="assets/page01/mainbg5_q85.jpg" alt="" onerror="townSwap(this,'mainbg5.png')">
-                    <div class="ui" style="left:20px; top:9px; width:631px; height:317px; cursor:default;">
-                        <img src="assets/page01/characterinfo_q85.webp" alt="" onerror="townSwap(this,'characterinfo.png')">
+                    <div class="ui town-panel" style="left:24px; top:13px; width:824px; height:315px; cursor:default;">
                         <div class="town-info">
-                            <div class="town-top">
-                                <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime.png" alt="" /></div>
-                                <div class="town-id">
-                                    <h1 class="town-name"><span id="header-player-name">Hero</span><span id="header-vip-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
-                                    <div class="town-lv">Base Lv. <strong id="header-base-lv">1</strong> • Class Lv. <strong id="header-job-lv">1</strong></div>
-                                    <div class="town-exp">
-                                        <div class="row"><span>Base EXP</span><span id="top-base-exp-text">0 / 50 (0%)</span></div>
-                                        <div class="bar"><div id="top-base-exp-bar" class="fill" style="width: 0%; background:#e0a526"></div></div>
-                                        <div class="row"><span>Class EXP</span><span id="top-job-exp-text">0 / 40 (0%)</span></div>
-                                        <div class="bar"><div id="top-job-exp-bar" class="fill" style="width: 0%; background:#a06bd6"></div></div>
-                                    </div>
+                            <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime.png" alt="" /></div>
+                            <div class="town-id">
+                                <h1 class="town-name"><span id="header-player-name">Hero</span><span id="header-vip-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
+                                <div class="town-lv">Base Lv. <strong id="header-base-lv">1</strong></div>
+                                <div class="town-exp">
+                                    <div class="bar"><div id="top-base-exp-bar" class="fill" style="width: 0%; background:#e0a526"></div></div>
+                                    <div class="row"><span>Base EXP</span><span id="top-base-exp-text">0 / 50 (0%)</span></div>
                                 </div>
-                            </div>
-                            <div class="town-money">
-                                <div>💰 <span id="town-gold">1000 Gold</span></div>
-                                <div id="town-diamond-pill" onclick="switchView('diamond')">💎 <span id="town-diamonds">1000</span></div>
+                                <div class="town-lv">Class Lv. <strong id="header-job-lv">1</strong></div>
+                                <div class="town-exp">
+                                    <div class="bar"><div id="top-job-exp-bar" class="fill" style="width: 0%; background:#a06bd6"></div></div>
+                                    <div class="row"><span>Class EXP</span><span id="top-job-exp-text">0 / 40 (0%)</span></div>
+                                </div>
+                                <div class="town-money">
+                                    <div><img src="assets/icons/goldicon.png" alt="" class="town-ico"><span id="town-gold">1000 Gold</span></div>
+                                    <div id="town-diamond-pill" onclick="switchView('diamond')"><img src="assets/icons/diamondicon.png" alt="" class="town-ico"><span id="town-diamonds">1000</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -793,6 +804,7 @@
                             <div class="town-money">
                                 <div>💰 <span id="town-gold-c">1000 Gold</span></div>
                                 <div>💎 <span id="town-diamonds-c">1000</span></div>
+
                             </div>
                         </div>
                     </div>
