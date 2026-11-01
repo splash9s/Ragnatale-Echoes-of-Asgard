@@ -232,9 +232,8 @@ function showRuneChoices(isNew) {
         const def = RUNE_DEFS[pr.id];
         const rarity = def ? def.rarity : 1;
         const detail = def ? def.text(runeN(pr.id)) : pr.desc;
-        // Three card sizes by rarity: 1-2 small, 3-4 medium, 5 big
-        const sizeTier = rarity >= 5 ? "big" : rarity >= 3 ? "medium" : "small";
-        const cardW = sizeTier === "big" ? 270 : sizeTier === "medium" ? 220 : 170;
+        // Every acquired rune uses the same big card size as the pick cards
+        const cardW = 270;
         return `<div class="rune-pick-card rune-acq-card" style="width:${cardW}px;">
                 <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
                 <span class="rune-pick-text">
