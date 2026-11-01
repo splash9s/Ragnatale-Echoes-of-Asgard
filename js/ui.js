@@ -2622,7 +2622,7 @@ function updateUI() {
             `;
         });
         // Closed cells after the open bag slots, shown with the grey slot graphic (not usable)
-        const INVENTORY_CELLS = 100;
+        const INVENTORY_CELLS = 130; // 50 open slots, the rest shown unavailable
         for (let i = BAG_SLOTS; i < INVENTORY_CELLS; i++) {
             invGrid.innerHTML += `<div class="w-[77px] h-[79px]" style="width:77px; height:79px; background-image:url('assets/pages/character/inventoryslotgrey.png'); background-size:100% 100%;"></div>`;
         }
