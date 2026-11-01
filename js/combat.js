@@ -1180,13 +1180,6 @@ function monsterAct(m, derived, position = 0) {
             ignoreArmor = true; // the spear goes through armor
             if (Math.random() < 0.2) stunPlayerFor(2000, m, 'Lightning Spear');
         }
-        if (m.spell) {
-            const def = SPELL_DEFS[m.spell];
-            eDmg = Math.floor(eDmg * def.mult);
-            logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
-            if (m.spell === 'rockCurse') { playerDebuffs.curseUntil = Date.now() + 3000; logMessage('[Curse] Your attacks are weaker for 3 seconds', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 seconds)'); }
-            if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
-        }
         if (player.runes.zeroArmor && player.armor > 0) eDmg = Math.floor(eDmg * 0.9);
         takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
@@ -1217,6 +1210,21 @@ function monsterAct(m, derived, position = 0) {
     } else {
         onPlayerDodged(m, 'Evade');
     }
+    tryMageSpellCast(m);
+}
+
+// Mages roll a 10% chance to cast their spell after every attack (hit or miss).
+const MAGE_SPELL_CAST_CHANCE = 0.10;
+function tryMageSpellCast(m) {
+    if (!m.spell || player.hp <= 0 || m.hp <= 0) return;
+    if (Math.random() >= MAGE_SPELL_CAST_CHANCE) return;
+    const def = SPELL_DEFS[m.spell];
+    let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + getDerivedStats().def)));
+    eDmg = Math.max(1, Math.floor(eDmg * def.mult));
+    logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
+    if (m.spell === 'rockCurse') { playerDebuffs.curseUntil = Date.now() + 3000; logMessage('[Curse] Your attacks are weaker for 3 seconds', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 seconds)'); }
+    if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
+    takePlayerDamage(eDmg, m);
 }
 
 // ---------- MAIN LOOP ----------
