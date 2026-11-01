@@ -2576,6 +2576,49 @@ function claimMail(mailId) {
     saveGame();
 }
 
+// In-game mail sender (for testing): writes a mail into the player's own mailbox
+function openSendMailForm() {
+    const opt = (v, l) => `<option value="${v}">${l}</option>`;
+    const field = 'px-2 py-1 bg-slate-950 border border-slate-700 rounded text-slate-100 w-full';
+    showModal('Send Mail', '', `
+        <div class="flex flex-col gap-2 text-left text-sm">
+            <label>Title <input id="mail-title" value="Test Mail" class="${field}"></label>
+            <label>Sender <input id="mail-sender" value="Game Master" class="${field}"></label>
+            <label>Message <textarea id="mail-message" rows="2" class="${field}">A gift for you.</textarea></label>
+            <div class="grid grid-cols-3 gap-2">
+                <label>Gold <input id="mail-gold" type="number" min="0" value="0" class="${field}"></label>
+                <label>Diamonds <input id="mail-diamonds" type="number" min="0" value="0" class="${field}"></label>
+                <label>Resurrection <input id="mail-res" type="number" min="0" value="0" class="${field}"></label>
+            </div>
+            <label>Chest <select id="mail-chest" class="${field}">${opt('', 'None')}${opt('copper', 'Copper')}${opt('silver', 'Silver')}${opt('gold', 'Gold')}</select></label>
+            <button onclick="sendPlayerMail()" class="mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Send to Mailbox</button>
+        </div>`);
+}
+
+function sendPlayerMail() {
+    const val = id => document.getElementById(id)?.value ?? '';
+    const num = id => Math.max(0, Math.floor(Number(val(id)) || 0));
+    const rewards = {};
+    if (num('mail-gold')) rewards.gold = num('mail-gold');
+    if (num('mail-diamonds')) rewards.diamonds = num('mail-diamonds');
+    if (num('mail-res')) rewards.resurrection = num('mail-res');
+    if (val('mail-chest')) rewards.chest = val('mail-chest');
+    if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
+    player.mailBox.unshift({
+        id: Date.now(),
+        title: val('mail-title').trim() || 'Mail',
+        sender: val('mail-sender').trim() || 'System',
+        message: val('mail-message'),
+        rewards,
+        claimed: false
+    });
+    closeModal();
+    logMessage('[Mail] Sent a mail to your mailbox', 'drop');
+    renderMailBox();
+    updateUI();
+    saveGame();
+}
+
 function renderMailBox() {
     let container = document.getElementById('mailbox-container');
     if (!container) return;
