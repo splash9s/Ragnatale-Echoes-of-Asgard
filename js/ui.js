@@ -2631,9 +2631,47 @@ function openChest(chestType) {
         }
     }
 
-    showModal("Chest Opened!", `You received:\n• ` + rewardNames.join('\n• '));
+    const showRewards = () => showModal("Chest Opened!", `You received:\n• ` + rewardNames.join('\n• '));
+    if (chestType === 'copper') playCopperChestOpen(showRewards);
+    else showRewards();
     updateUI();
     saveGame();
+}
+
+// Copper chest opening animation (total 3.0 s). Frame 1 holds with a shake; the final frame gets a light burst.
+const CHEST_COPPER_FRAMES = [
+    { src: 'assets/chest/copper/copperc0.png', ms: 500 },
+    { src: 'assets/chest/copper/copperc1.png', ms: 1000, shake: true },
+    { src: 'assets/chest/copper/copperc2.png', ms: 400 },
+    { src: 'assets/chest/copper/copperc3.png', ms: 400 },
+    { src: 'assets/chest/copper/copperc4.png', ms: 700, burst: true }
+];
+function playCopperChestOpen(onDone) {
+    const overlay = document.createElement('div');
+    overlay.id = 'chest-open-overlay';
+    const img = document.createElement('img');
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+    let i = 0;
+    const showFrame = () => {
+        const f = CHEST_COPPER_FRAMES[i];
+        img.src = f.src;
+        img.classList.toggle('chest-shake', !!f.shake);
+        if (f.burst) {
+            const burst = document.createElement('div');
+            burst.className = 'chest-burst';
+            overlay.appendChild(burst);
+        }
+        setTimeout(() => {
+            i++;
+            if (i < CHEST_COPPER_FRAMES.length) showFrame();
+            else {
+                overlay.remove();
+                if (onDone) onDone();
+            }
+        }, f.ms);
+    };
+    showFrame();
 }
 
 function renderQuestsView() {
@@ -2657,7 +2695,7 @@ function renderQuestsView() {
             <div class="grid grid-cols-3 gap-2 mt-1">
                 <button onclick="claimQuestMilestone(1)" ${completedCount < 1 || player.questMilestoneClaimed[1] ? 'disabled' : ''} class="p-2 bg-slate-900 border border-amber-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
                     <span class="block font-bold text-amber-400">1 Quest</span>
-                    <span class="text-slate-300">Copper Chest</span>
+                    <img src="assets/chest/copper/coppercsmall.png" alt="Copper Chest" class="block mx-auto" style="width:90px; height:72px;">
                     ${player.questMilestoneClaimed[1] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
                 </button>
                 <button onclick="claimQuestMilestone(2)" ${completedCount < 2 || player.questMilestoneClaimed[2] ? 'disabled' : ''} class="p-2 bg-slate-900 border-slate-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
