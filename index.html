@@ -163,14 +163,14 @@
         #view-character:not(.stats-hidden) #char-panel-mid { visibility: hidden; }
         #view-character .char-stats-close { position: absolute; right: 24px; top: 20px; z-index: 9; padding: 6px 12px; background: #3b2716; color: #fff !important; border-radius: 8px; font-weight: 700; cursor: pointer; }
         /* Character page: bigger text everywhere, and spacing between stacked blocks */
-        #view-character { font-size: 18px; }
-        #view-character .text-\[9px\] { font-size: 15px !important; }
-        #view-character .text-\[10px\] { font-size: 16px !important; }
-        #view-character .text-\[11px\] { font-size: 17px !important; }
-        #view-character .text-xs { font-size: 19px !important; }
-        #view-character .text-sm { font-size: 21px !important; }
-        #view-character .text-base { font-size: 23px !important; }
-        #view-character .text-lg { font-size: 25px !important; }
+        #view-character { font-size: 36px; }
+        #view-character .text-\[9px\] { font-size: 30px !important; }
+        #view-character .text-\[10px\] { font-size: 32px !important; }
+        #view-character .text-\[11px\] { font-size: 34px !important; }
+        #view-character .text-xs { font-size: 38px !important; }
+        #view-character .text-sm { font-size: 42px !important; }
+        #view-character .text-base { font-size: 46px !important; }
+        #view-character .text-lg { font-size: 50px !important; }
         #view-character .char-stats-panel > div { margin-bottom: 30px; }
         #view-character .char-stats-panel > div:last-child { margin-bottom: 0; }
         /* Shop windows: left has no border, right border is transparent */
@@ -238,6 +238,10 @@
         #view-setting [style*="font-size:11px"], #view-quests [style*="font-size:11px"], #view-events [style*="font-size:11px"], #view-shop [style*="font-size:11px"], #view-blacksmith [style*="font-size:11px"] { font-size: 22px !important; }
         #view-setting [style*="font-size:12px"], #view-quests [style*="font-size:12px"], #view-events [style*="font-size:12px"], #view-shop [style*="font-size:12px"], #view-blacksmith [style*="font-size:12px"] { font-size: 24px !important; }
         #view-setting [style*="font-size:13px"], #view-quests [style*="font-size:13px"], #view-events [style*="font-size:13px"], #view-shop [style*="font-size:13px"], #view-blacksmith [style*="font-size:13px"] { font-size: 26px !important; }
+        /* Mail page: 2x the mailbox sizes (22px text, 19px small, 18px tiny) */
+        #view-quests #mailbox-container [class*="text-xs"], #view-quests #mailbox-container button { font-size: 44px !important; }
+        #view-quests #mailbox-container [class*="text-[10px]"] { font-size: 38px !important; }
+        #view-quests #mailbox-container [class*="text-[9px]"] { font-size: 36px !important; }
         /* Campaign Dungeons: all content sits inside the frame's inner window */
         .expo-inner { position: absolute; left: 88px; top: 114px; width: 542px; height: 643px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 6px; }
         /* Campaign Dungeons: each node shows only its own element's maps, so the element tabs are hidden */
