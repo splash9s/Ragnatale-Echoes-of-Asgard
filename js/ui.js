@@ -1985,7 +1985,7 @@ function showEquippedDetail(slot) {
 
     let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
-        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? 'R' + item.rarity + (item.levelReq ? ', Requires Base Lv. ' + item.levelReq : '') : (isPotion ? 'Consumable' : 'Equipped')}</span>
+        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? 'R' + item.rarity + (item.levelReq ? ', Requires Base Lv. ' + item.levelReq : '') : ''}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}Equipped · ${slot}</span></div>`;
     if (item.desc && !isPotion) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
