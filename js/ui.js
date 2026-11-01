@@ -1305,8 +1305,8 @@ function renderShop() {
             armoryContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
                     <div onclick="showArmoryItemDetail(${idx})" class="cursor-pointer flex-1">
-                        <span class="font-bold text-amber-300 block text-xs">${item.name}</span>
-                        <span class="text-[10px] text-slate-400">LV${lvOf(item)}: ${price} Gold</span>
+                        <span class="font-bold text-amber-300 block text-xs">${shopGearLabel(item).base}</span>
+                        <span class="text-[10px] text-slate-400">[${shopGearLabel(item).tag}] LV${lvOf(item)}: ${price} Gold</span>
                     </div>
                     <button onclick="buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
                 </div>
@@ -1335,34 +1335,42 @@ function buyGoldConsumable(itemId) {
     saveGame();
 }
 
+function shopGearLabel(item) {
+    const m = (item.name || '').match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+    const base = m ? m[1] : (item.name || '');
+    const noun = base.split(' ').slice(-1)[0];
+    const tag = m ? `${m[2]} ${noun}` : (item.slot ? item.slot.charAt(0).toUpperCase() + item.slot.slice(1) : 'Gear');
+    return { base, tag };
+}
+
 function showArmoryItemDetail(itemIndex) {
     const template = SHOP_ARMORY_ITEMS[itemIndex];
     if (!template) return;
     const price = template.price || 300;
     const kind = template.slot || 'Gear';
 
-    let body = '<div class="flex flex-col gap-2 text-left text-xs">';
+    let body = '<div class="flex flex-col gap-2 text-left" style="font-size:24px">';
     body += `<div class="flex justify-between items-center">
-        <span class="text-slate-300 font-bold text-[11px]">Shop Gear</span>
-        <span class="text-[10px] text-slate-400 capitalize">${kind}</span></div>`;
-    body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${template.levelReq || 1}</span>`;
-    body += `<span class="text-[11px] text-amber-200">Price: ${price} Gold</span>`;
-    body += `<span class="text-[10px] text-slate-500">Rarity and bonus buffs are rolled when purchased.</span>`;
-    if (template.element) body += `<span class="text-[11px]">${elementDetailHTML(template.element)}</span>`;
-    if (template.desc) body += `<p class="text-[11px] text-slate-400">${template.desc}</p>`;
+        <span style="font-size:22px" class="text-slate-300 font-bold">Shop Gear</span>
+        <span style="font-size:20px" class="text-slate-400 capitalize">${kind}</span></div>`;
+    body += `<span style="font-size:20px" class="text-slate-400">Requires Base Lv. ${template.levelReq || 1}</span>`;
+    body += `<span style="font-size:22px" class="text-amber-200">Price: ${price} Gold</span>`;
+    body += `<span style="font-size:20px" class="text-slate-500">Rarity and bonus buffs are rolled when purchased.</span>`;
+    if (template.element) body += `<span style="font-size:22px">${elementDetailHTML(template.element)}</span>`;
+    if (template.desc) body += `<p style="font-size:22px" class="text-slate-400">${template.desc}</p>`;
     if (template.stats) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-            Object.entries(template.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
+            Object.entries(template.stats).map(([k, v]) => `<span class="text-slate-200" style="font-size:24px">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
     }
     body += '</div>';
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
-    actions += `<button onclick="closeModal(); buyArmoryItem(${itemIndex})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`;
+    actions += `<button onclick="closeModal(); buyArmoryItem(${itemIndex})" style="font-size:24px" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`;
     actions += '</div>';
-    actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
+    actions += `<button onclick="closeModal()" style="font-size:24px" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition cursor-pointer">Close</button></div>`;
 
-    showModal(template.name, '', body + actions);
+    showModal(shopGearLabel(template).base, '', body + actions);
 }
 
 function buyArmoryItem(itemIndex) {
