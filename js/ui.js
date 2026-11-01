@@ -286,7 +286,7 @@ const MONSTER_SPRITES = {
         hurt: ['assets/combat/flamearcher/flamearcherdamaged.png'],
         dead: ['assets/combat/flamearcher/flamearcherdead.png'],
         deathMs: 600,
-        shift: { 'assets/combat/flamearcher/flamearcherattack.png': [6, 4], 'assets/combat/flamearcher/flamearcherdamaged.png': [0, 5], 'assets/combat/flamearcher/flamearcherdead.png': [0, 2] }
+        shift: { 'assets/combat/flamearcher/flamearcherattack.png': [-6, 4], 'assets/combat/flamearcher/flamearcherdamaged.png': [0, 5], 'assets/combat/flamearcher/flamearcherdead.png': [0, 2] }
     },
     M069: { // Ember Priest: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
         idle: ['assets/combat/emberpriest/emberpriest.png'],
