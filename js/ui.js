@@ -1945,7 +1945,7 @@ function showItemDetail(index) {
         <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? 'R' + item.rarity + (isEquip && item.levelReq ? ', Requires Base Lv. ' + item.levelReq : '') : kind}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}${kind}</span></div>`;
     if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
-    if (!isEquip && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
+    if (!isEquip && !isPotion && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
     if (item.setName) body += setInfoHTML(item.setName);
     if (isEquip && item.slot !== 'pet') {
@@ -1987,7 +1987,7 @@ function showEquippedDetail(slot) {
     body += `<div class="flex justify-between items-center">
         <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? 'R' + item.rarity + (item.levelReq ? ', Requires Base Lv. ' + item.levelReq : '') : (isPotion ? 'Consumable' : 'Equipped')}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}Equipped · ${slot}</span></div>`;
-    if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
+    if (item.desc && !isPotion) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (item.stats && Object.keys(item.stats).length) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
