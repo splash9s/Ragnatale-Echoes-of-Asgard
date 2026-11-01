@@ -239,11 +239,11 @@ function showRuneChoices(isNew) {
         const n = getRuneOwnedCount(id);
         const owned = (!r.flag && n > 0) ? ` <span style="color:#fbbf24;">x${n}</span>` : '';
         html += `
-            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card" style="position:relative; width:270px; height:366px; max-width:100%; padding:0; border:0; background:none; cursor:pointer; text-decoration:none;">
-                <img src="assets/combat/runes/bigr${r.rarity}.png" alt="" style="display:block; width:100%; height:100%; object-fit:fill; pointer-events:none;">
-                <span style="position:absolute; left:12%; right:12%; top:66%; bottom:7%; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; text-align:center; color:#ffffff; font-weight:900; text-decoration:none; text-shadow:0 0 3px #000, 0 0 6px #000, 0 1px 2px #000; pointer-events:none;">
-                    <span style="font-size:17px; line-height:1.1; text-decoration:none;">${escapeHtml(r.name)}${owned}</span>
-                    <span style="font-size:13px; line-height:1.2; color:#ffffff; text-decoration:none;">${runeHighlightHtml(r.desc)}</span>
+            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card">
+                <img class="rune-pick-art" src="assets/combat/runes/bigr${r.rarity}.png" alt="">
+                <span class="rune-pick-text">
+                    <span class="rune-pick-name">${escapeHtml(r.name)}${owned}</span>
+                    <span class="rune-pick-desc">${runeHighlightHtml(r.desc)}</span>
                 </span>
             </button>`;
     });

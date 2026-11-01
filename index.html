@@ -39,8 +39,10 @@
         #skill-detail { position: absolute; right: 0; top: 90px; width: 460px; box-sizing: border-box; padding: 28px; background: #e7d1aa; border: 3px solid #b8945a; border-right: none; border-radius: 24px 0 0 24px; color: #2a1a0e; box-shadow: -10px 0 30px rgba(0,0,0,.45); transform: translateX(105%); transition: transform .35s ease; z-index: 7; }
         #skill-detail.open { transform: translateX(0); }
         #skill-detail * { color: #2a1a0e; }
-        #skill-zoom { position: absolute; right: 20px; bottom: 20px; z-index: 6; display: flex; flex-direction: column; gap: 8px; }
-        #skill-zoom button { width: 56px; height: 56px; border-radius: 12px; background: rgba(231,209,170,.85); border: 2px solid #b8945a; color: #2a1a0e; font-size: 30px; font-weight: 800; cursor: pointer; }
+        #skill-zoom { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 6; display: flex; flex-direction: column; gap: 14px; }
+        #skill-zoom button { width: 84px; height: 84px; border-radius: 16px; background: rgba(231,209,170,.85); border: 3px solid #b8945a; color: #2a1a0e; font-size: 48px; font-weight: 800; line-height: 1; cursor: pointer; }
+        /* Slide-out detail panel is open: keep the zoom buttons clear of it */
+        #skill-viewport:has(#skill-detail.open) #skill-zoom { right: 490px; }
         /* Skill confirm bar: parchment and gold like the page, behind the SP badge */
         #skill-pending-bar { border: 0 !important; box-shadow: none !important; background: transparent !important; }
         #skill-pending-bar > div { background-color: #dbc5a0 !important; border: 2px solid #c09e6a !important; margin-left: 0; height: 47px; padding: 3px !important; box-sizing: border-box; }
@@ -271,9 +273,14 @@
         .combat-dmg.heal { color: #4ade80; }
         @keyframes combatDmgUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -70px; } }
         .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
-        .rune-pick-card { transition: transform .15s ease, filter .15s ease; }
+        /* Rune pick card: fixed proportions; text scales with the card (container units), so it stays adaptive on phones */
+        .rune-pick-card { position: relative; display: block; width: 270px; max-width: 100%; aspect-ratio: 270 / 366; padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none; container-type: inline-size; transition: transform .15s ease, filter .15s ease; }
         .rune-pick-card:hover { transform: translateY(-6px); filter: brightness(1.08); }
         .rune-pick-card:active { transform: translateY(-2px); }
+        .rune-pick-art { display: block; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+        .rune-pick-text { position: absolute; left: 12%; right: 12%; top: 66%; bottom: 7%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4cqw; text-align: center; color: #ffffff; font-weight: 900; text-decoration: none; text-shadow: 0 0 3px #000, 0 0 6px #000, 0 1px 2px #000; pointer-events: none; }
+        .rune-pick-name { font-size: 6.3cqw; line-height: 1.1; text-decoration: none; }
+        .rune-pick-desc { font-size: 4.8cqw; line-height: 1.2; color: #ffffff; text-decoration: none; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
         #combat-elixir-btn span { display: none; }
