@@ -212,15 +212,15 @@ function upgradeRuneChoice(id, pool, taken) {
     return cands[Math.floor(Math.random() * cands.length)];
 }
 
-// Colour of a rune's effect text on the pick card. Default is white.
-function runeEffectColor(def) {
-    const d = (def.desc || '').toLowerCase();
-    if (/crit/.test(d)) return '#facc15';                  // critical: yellow
-    if (/armor/.test(d)) return '#cbd5e1';                 // armor: grey
-    if (/dodge|flee/.test(d)) return '#60a5fa';            // dodge: blue
-    if (/\bhp\b|heal|restore|max hp/.test(d)) return '#4ade80'; // HP: green
-    if (/damage|atk|bolt/.test(d)) return '#fb923c';       // damage: orange
-    return '#ffffff';
+// Rune detail text is white. Only the key words are coloured by effect:
+// crit yellow, HP/heal green, armor grey, dodge/flee blue, damage orange.
+function runeHighlightHtml(text) {
+    return escapeHtml(String(text)).replace(
+        /\b(crit\w*)\b|\b(armor)\b|\b(dodge\w*|flee\w*)\b|\b(max hp|hp|heal\w*|restore\w*)\b|\b(damage|atk)\b/gi,
+        (m, crit, armor, dodge, hp) => {
+            const col = crit ? '#facc15' : armor ? '#cbd5e1' : dodge ? '#60a5fa' : hp ? '#4ade80' : '#fb923c';
+            return `<span style="color:${col};">${m}</span>`;
+        });
 }
 
 function showRuneChoices(isNew) {
@@ -238,13 +238,12 @@ function showRuneChoices(isNew) {
         const r = RUNE_DEFS[id];
         const n = getRuneOwnedCount(id);
         const owned = (!r.flag && n > 0) ? ` <span style="color:#fbbf24;">x${n}</span>` : '';
-        const fx = runeEffectColor(r);
         html += `
-            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card" style="position:relative; width:270px; max-width:100%; padding:0; border:0; background:none; cursor:pointer;">
-                <img src="assets/combat/runes/bigr${r.rarity}.png" alt="" style="display:block; width:100%; height:auto; pointer-events:none;">
-                <span style="position:absolute; left:12%; right:12%; top:66%; bottom:7%; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; text-align:center; color:#ffffff; font-weight:900; text-shadow:0 0 3px #000, 0 0 6px #000, 0 1px 2px #000; pointer-events:none;">
-                    <span style="font-size:17px; line-height:1.1;">${r.name}${owned}</span>
-                    <span style="font-size:13px; line-height:1.2; color:${fx};">${r.desc}</span>
+            <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card" style="position:relative; width:270px; height:366px; max-width:100%; padding:0; border:0; background:none; cursor:pointer; text-decoration:none;">
+                <img src="assets/combat/runes/bigr${r.rarity}.png" alt="" style="display:block; width:100%; height:100%; object-fit:fill; pointer-events:none;">
+                <span style="position:absolute; left:12%; right:12%; top:66%; bottom:7%; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; text-align:center; color:#ffffff; font-weight:900; text-decoration:none; text-shadow:0 0 3px #000, 0 0 6px #000, 0 1px 2px #000; pointer-events:none;">
+                    <span style="font-size:17px; line-height:1.1; text-decoration:none;">${escapeHtml(r.name)}${owned}</span>
+                    <span style="font-size:13px; line-height:1.2; color:#ffffff; text-decoration:none;">${runeHighlightHtml(r.desc)}</span>
                 </span>
             </button>`;
     });
@@ -270,8 +269,8 @@ function showPickedRuneDetail(index) {
     const def = RUNE_DEFS[pr.id];
     const text = def ? def.text(runeN(pr.id)) : pr.desc;
     box.dataset.idx = String(index);
-    box.innerHTML = `<div style="font-size:17px; font-weight:900; color:#ffffff; text-shadow:0 0 3px #000, 0 1px 2px #000;">${escapeHtml(pr.name)}</div>` +
-        `<div style="font-size:14px; font-weight:700; color:${def ? runeEffectColor(def) : '#ffffff'}; text-shadow:0 0 3px #000, 0 1px 2px #000;">${escapeHtml(text)}</div>`;
+    box.innerHTML = `<div style="font-size:17px; font-weight:900; color:#ffffff; text-decoration:none; text-shadow:0 0 3px #000, 0 1px 2px #000;">${escapeHtml(pr.name)}</div>` +
+        `<div style="font-size:14px; font-weight:700; color:#ffffff; text-decoration:none; text-shadow:0 0 3px #000, 0 1px 2px #000;">${runeHighlightHtml(text)}</div>`;
 }
 
 function refreshRuneChoices() {
