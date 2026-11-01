@@ -144,12 +144,12 @@
         .art-screen .char-return:active .ret-normal { display: none; }
         /* Character page: inventory window, white transparent */
         #view-character #char-panel-right { background-color: rgba(255,255,255,.72) !important; }
-        /* Character page: stats window (chawindow frame) on the left side; slides in from the left edge, tab minimizes it */
-        #view-character .char-stats-panel { left: 25px !important; top: 70px !important; width: 560px !important; height: 922px !important; padding: 150px 80px 40px 80px !important; background: url('assets/pages/character/chawindow.png') center / 100% 100% no-repeat !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; transition: transform .35s ease, opacity .35s ease; transform: translateX(-640px); opacity: 0; visibility: hidden; pointer-events: none; z-index: 8; }
-        #view-character.stats-open .char-stats-panel { transform: translateX(0); opacity: 1; visibility: visible; pointer-events: auto; }
+        /* Character page: stats window (chawindow frame) on the left side, shown by default; the STATS tab minimizes it to the left edge */
+        #view-character .char-stats-panel { left: 25px !important; top: 70px !important; width: 560px !important; height: 922px !important; padding: 150px 80px 40px 80px !important; background: url('assets/pages/character/chawindow.png') center / 100% 100% no-repeat !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; transition: transform .35s ease, opacity .35s ease; z-index: 8; }
         #view-character .char-stats-panel .rounded-2xl.border { background-color: rgba(255,255,255,.55) !important; }
-        #view-character .char-stats-tab { position: absolute; left: 0; top: 330px; width: 40px; height: 170px; z-index: 6; background: rgba(255,255,255,.85); border: 2px solid #c9a227; border-left: none; border-radius: 0 12px 12px 0; color: #3b2716; font-weight: 700; font-size: 16px; letter-spacing: 2px; writing-mode: vertical-rl; cursor: pointer; }
-        #view-character.stats-open .char-stats-tab { display: none; }
+        #view-character .char-stats-tab { position: absolute; left: 0; top: 330px; width: 40px; height: 170px; z-index: 6; display: none; background: rgba(255,255,255,.85); border: 2px solid #c9a227; border-left: none; border-radius: 0 12px 12px 0; color: #3b2716; font-weight: 700; font-size: 16px; letter-spacing: 2px; writing-mode: vertical-rl; cursor: pointer; }
+        #view-character.stats-hidden .char-stats-panel { transform: translateX(-640px); opacity: 0; visibility: hidden; pointer-events: none; }
+        #view-character.stats-hidden .char-stats-tab { display: block; }
         #view-character .char-stats-close { position: absolute; right: 92px; top: 96px; z-index: 9; padding: 6px 12px; background: #3b2716; color: #fff !important; border-radius: 8px; font-weight: 700; cursor: pointer; }
         /* Shop windows: left has no border, right border is transparent */
         #shop-panel-left { border: none; }
@@ -619,7 +619,7 @@
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/character/bg_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
-                    <img class="art-frame" src="assets/pages/character/window_q85.webp" alt="" style="left:25px; top:70px; width:1870px; height:1003px;">
+                    
                     <img class="art-frame pointer-events-none" src="assets/cha/chashadow.png" alt="" style="left:905px; top:642px; width:102px; height:41px;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="assets/cha/chabase.png" alt="" style="left:912px; top:486px; width:95px; height:193px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>

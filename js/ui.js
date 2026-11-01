@@ -3006,9 +3006,9 @@ function renderLibraryRules() {
         </div>`;
 }
 
-// Character page: stats panel slides in over the gear area / minimizes to the left tab
+// Character page: stats window slides in from the left edge / minimizes to the left tab
 function toggleCharStats(open) {
     const view = document.getElementById('view-character');
     if (!view) return;
-    view.classList.toggle('stats-open', !!open);
+    view.classList.toggle('stats-hidden', !open);
 }
