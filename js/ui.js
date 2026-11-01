@@ -2180,36 +2180,143 @@ function renderCharacterSkills() {
     root.innerHTML = html || '<span class="text-[10px] text-slate-500">No skill points invested yet.</span>';
 }
 
-// Dedicated Skills page: four build chains, each skill gated by the one before it
+// Dedicated Skills page: skill nodes placed on the star map (04_psd/pageskill/skilllayout.png marker positions, map 4000x2233).
+// Each build chain runs along its node list; a node needs the one before it (req) at the required level.
+const SKILL_MAP = { w: 4000, h: 2233, minS: 0.3, maxS: 1.6 };
+const SKILL_NODE_POS = {
+    gold:    [[563, 849], [374, 1122], [650, 1116], [389, 1427], [1199, 1116], [1601, 1116]],
+    exp:     [[2003, 1779], [2237, 1646], [2192, 1899], [2003, 1994], [1823, 1994], [1600, 1890]],
+    attack:  [[1807, 327], [1922, 274], [2124, 274], [2222, 416], [2003, 530], [2003, 1106]],
+    defense: [[3658, 948], [3769, 1247], [3370, 1358], [3200, 1106], [2756, 1106], [2405, 1106]]
+};
+let skillView = null;
+
+function skillApplyView() {
+    if (!skillView) return;
+    const vp = document.getElementById('skill-viewport');
+    if (!vp) return;
+    const vw = vp.offsetWidth, vh = vp.offsetHeight;
+    const sw = SKILL_MAP.w * skillView.s, sh = SKILL_MAP.h * skillView.s;
+    skillView.x = sw >= vw ? Math.min(0, Math.max(vw - sw, skillView.x)) : (vw - sw) / 2;
+    skillView.y = sh >= vh ? Math.min(0, Math.max(vh - sh, skillView.y)) : (vh - sh) / 2;
+    const world = document.getElementById('skill-world');
+    if (world) world.style.transform = `translate(${skillView.x}px, ${skillView.y}px) scale(${skillView.s})`;
+}
+
+function skillZoomAt(px, py, factor) {
+    if (!skillView) return;
+    const ns = Math.min(SKILL_MAP.maxS, Math.max(SKILL_MAP.minS, skillView.s * factor));
+    const wx = (px - skillView.x) / skillView.s, wy = (py - skillView.y) / skillView.s;
+    skillView.s = ns;
+    skillView.x = px - wx * ns;
+    skillView.y = py - wy * ns;
+    skillApplyView();
+}
+
+function skillZoomStep(factor) {
+    const vp = document.getElementById('skill-viewport');
+    if (!vp || !skillView) return;
+    skillZoomAt(vp.offsetWidth / 2, vp.offsetHeight / 2, factor);
+}
+
+function initSkillView() {
+    const vp = document.getElementById('skill-viewport');
+    if (!vp || skillView) return;
+    const vw = vp.offsetWidth, vh = vp.offsetHeight;
+    if (!vw || !vh) return; // page hidden: set up when shown
+    // Default: zoomed to fill the view, as in the layout
+    const s0 = Math.max(vw / SKILL_MAP.w, vh / SKILL_MAP.h);
+    skillView = { s: s0, x: 0, y: 0, drag: null, suppressClick: false };
+    skillView.x = (vw - SKILL_MAP.w * s0) / 2;
+    skillView.y = (vh - SKILL_MAP.h * s0) / 2;
+    // Map coordinates from pointer events (page may be scaled by the stage)
+    const local = (e) => {
+        const r = vp.getBoundingClientRect();
+        const k = r.width / vp.offsetWidth || 1;
+        return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k };
+    };
+    vp.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const p = local(e);
+        skillZoomAt(p.x, p.y, e.deltaY < 0 ? 1.12 : 1 / 1.12);
+    }, { passive: false });
+    vp.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        const p = local(e);
+        skillView.drag = { ox: p.x - skillView.x, oy: p.y - skillView.y, sx: p.x, sy: p.y, moved: false };
+        vp.setPointerCapture(e.pointerId);
+    });
+    vp.addEventListener('pointermove', (e) => {
+        const d = skillView && skillView.drag;
+        if (!d) return;
+        const p = local(e);
+        if (!d.moved && Math.hypot(p.x - d.sx, p.y - d.sy) > 5) { d.moved = true; vp.classList.add('dragging'); }
+        if (d.moved) {
+            skillView.x = p.x - d.ox;
+            skillView.y = p.y - d.oy;
+            skillApplyView();
+        }
+    });
+    const endDrag = () => {
+        const d = skillView && skillView.drag;
+        if (!d) return;
+        skillView.suppressClick = d.moved;
+        skillView.drag = null;
+        vp.classList.remove('dragging');
+        setTimeout(() => { if (skillView) skillView.suppressClick = false; }, 0);
+    };
+    vp.addEventListener('pointerup', endDrag);
+    vp.addEventListener('pointercancel', endDrag);
+    skillApplyView();
+}
+
+function skillNodeClick(e, skillKey) {
+    if (skillView && skillView.suppressClick) return;
+    upgradeSkill(skillKey);
+}
+
 function renderSkillPage() {
-    const root = document.getElementById('skill-build-columns');
-    if (!root) return;
+    const nodes = document.getElementById('skill-nodes');
+    if (!nodes) return;
     const spEl = document.getElementById('skill-page-sp');
     const spLeft = player.jobSp - pendingSkillTotal();
     if (spEl) spEl.innerText = spLeft;
-    root.innerHTML = SKILL_BUILDS.map(b => {
-        const skills = Object.entries(player.skills).filter(([, s]) => s.build === b.key);
-        const invested = skills.reduce((a, [k, s]) => a + s.level + (pendingAlloc.skills[k] || 0), 0);
-        const cards = skills.map(([k, s]) => {
+
+    // Star map image, added once
+    const mapSlot = document.getElementById('skill-map-slot');
+    if (mapSlot && !mapSlot.firstChild) {
+        mapSlot.innerHTML = '<img class="skill-map" src="assets/pages/skill/skillbg.webp" alt="">';
+    }
+
+    let html = '';
+    let labels = '';
+    SKILL_BUILDS.forEach(b => {
+        const chain = Object.entries(player.skills).filter(([, s]) => s.build === b.key);
+        const pos = SKILL_NODE_POS[b.key] || [];
+        chain.forEach(([k, s], i) => {
+            const p = pos[i];
+            if (!p) return;
             const prev = s.req ? player.skills[s.req] : null;
             const prevLevel = prev ? prev.level + (pendingAlloc.skills[s.req] || 0) : 0;
             const locked = !!prev && prevLevel < s.reqLv;
             const lvl = s.level + (pendingAlloc.skills[k] || 0);
-            const gate = prev
-                ? `<div class="text-[9px] text-slate-500 text-center">▼ needs ${prev.name} Lv. ${s.reqLv}</div>`
-                : '<div class="text-[9px] text-slate-500 text-center">▼ start</div>';
-            const disabled = locked || lvl >= s.maxLv || spLeft <= 0;
-            return `${gate}<div class="p-2 rounded-lg border ${locked ? 'border-slate-800' : b.border + ' bg-slate-950/60'} flex flex-col gap-1">
-                <div class="flex justify-between items-center gap-2"><span class="font-bold text-xs ${b.color}">${s.name}</span><span class="text-[10px] text-slate-300">Lv. ${lvl}/${s.maxLv}</span></div>
-                <p class="text-[10px] text-slate-400">${s.desc}</p>
-                <button onclick="upgradeSkill('${k}')" ${disabled ? 'disabled' : ''} class="self-end px-2 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded text-[10px] cursor-pointer disabled:opacity-40">+1 SP</button>
+            const maxed = lvl >= s.maxLv;
+            const clickable = !locked && !maxed && spLeft > 0;
+            const img = lvl > 0 ? 'assets/pages/skill/skillbuttonup.gif'
+                : (locked ? 'assets/pages/skill/skillbuttonlock.png' : 'assets/pages/skill/skillbutton.png');
+            const title = locked && prev ? `Needs ${prev.name} Lv. ${s.reqLv}` : s.desc;
+            html += `<div class="skill-node ${clickable ? '' : 'is-off'}" title="${title}" style="left:${p[0] - 60}px; top:${p[1] - 61}px;"${clickable ? ` onclick="skillNodeClick(event,'${k}')"` : ''}>
+                <img src="${img}" alt="">
+                <div class="skill-node-label">${s.name}<br>Lv ${lvl}/${s.maxLv}</div>
             </div>`;
-        }).join('');
-        return `<div class="flex flex-col gap-2 min-w-0">
-            <div class="p-2 rounded-xl border ${b.border} bg-slate-950/60 flex items-baseline gap-2"><h3 class="font-bold text-sm ${b.color}">${b.name.replace(/\s*\(.*\)$/, '')}</h3><p class="text-[10px] text-slate-400">${invested}/${SKILL_BUILD_MAX_SP} SP</p></div>
-            ${cards}
-        </div>`;
-    }).join('');
+        });
+        if (pos[0] && chain.length) {
+            labels += `<div class="skill-build-label" style="left:${pos[0][0]}px; top:${pos[0][1] - 150}px;">${b.name}</div>`;
+        }
+    });
+    nodes.innerHTML = labels + html;
+    initSkillView();
+    skillApplyView();
 }
 
 function addStat(statKey) {
