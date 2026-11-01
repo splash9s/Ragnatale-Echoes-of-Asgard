@@ -232,7 +232,9 @@ function showRuneChoices(isNew) {
         const def = RUNE_DEFS[pr.id];
         const rarity = def ? def.rarity : 1;
         const detail = def ? def.text(runeN(pr.id)) : pr.desc;
-        return `<div class="rune-pick-card rune-acq-card">
+        // Three card sizes by rarity: 1-2 small, 3-4 medium, 5 big
+        const sizeTier = rarity >= 5 ? "big" : rarity >= 3 ? "medium" : "small";
+        return `<div class="rune-pick-card rune-acq-card rune-acq-${sizeTier}">
                 <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
                 <span class="rune-pick-text">
                     <span class="rune-pick-name">${escapeHtml(pr.name)}</span>
