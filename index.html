@@ -295,6 +295,13 @@
         .rune-acq-medium { width: 220px; }
         .rune-acq-big { width: 270px; }
         .rune-acq-card:hover { transform: none; filter: none; }
+        /* Events page: left menu side, right content side, navy section lines */
+        #view-events .events-label, #view-events .events-title { position: absolute; color: #2a1a0e; font-family: Georgia, 'Times New Roman', serif; font-size: 56px; line-height: 1; transform: translateY(-50%); white-space: nowrap; }
+        #view-events .events-label { left: 0; width: 430px; text-align: center; }
+        #view-events .events-title { left: 0; width: 1490px; text-align: center; }
+        #view-events .events-line { position: absolute; height: 5px; background: #000080; }
+        #view-events .events-item { position: absolute; left: 23px; width: 1000px; }
+        #view-events #events-content #quests-container * { color: #2a1a0e; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
         #combat-elixir-btn span { display: none; }
@@ -602,36 +609,42 @@
             <div id="events-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/events/bg_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
-                    <img class="art-frame" src="assets/pages/frame/c_q85.webp" alt="" style="left:614px; top:78px; width:803px; height:953px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
                     </div>
-                    <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
-            <div class="flex gap-2 mb-4">
-                <button id="events-tab-btn-events" onclick="switchEventsTab('events')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Events</button>
-                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests</button>
-            </div>
-            <div id="events-tab-quests" class="hidden flex flex-col gap-3">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daily Quests</h3>
-                    <div id="quests-container" class="flex flex-col gap-2"></div>
-                </div>
-            </div>
-            <div id="events-tab-events" class="grid grid-cols-1 gap-3">
-                    <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                    <div id="void-tower-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-                        <div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
-                            <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower <span class="text-[10px] text-amber-300">(100x rewards, test only)</span></h3>
-                        </div>
-                        <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
+
+                    <!-- Left menu side: section names, each level with its section on the right -->
+                    <div id="events-menu" style="position:absolute; left:0px; top:70px; width:430px; height:1010px; background:rgba(202,163,94,.7); z-index:2;">
+                        <div class="events-label" style="top:80px;">daily quest</div>
+                        <div class="events-label" style="top:430px;">events</div>
+                        <div class="events-label" style="top:960px;">Void Tower</div>
                     </div>
-            </div>
-        </div>
+
+                    <!-- Right content side -->
+                    <div id="events-content" style="position:absolute; left:430px; top:70px; width:1490px; height:1010px; background:rgba(231,209,170,.7); z-index:2;">
+                        <!-- Section 1: daily quest milestone -->
+                        <div class="events-title" style="top:80px;">daily quest milestone</div>
+                        <div id="events-tab-quests" style="position:absolute; left:23px; top:130px; width:1200px;">
+                            <div id="quests-container" class="flex flex-col gap-2"></div>
+                        </div>
+                        <div class="events-line" style="top:368px; left:46px; width:1381px;"></div>
+
+                        <!-- Section 2: events -->
+                        <div id="event-gold" class="events-item" style="top:400px;"></div>
+                        <div id="event-xp" class="events-item" style="top:665px;"></div>
+                        <div class="events-line" style="top:915px; left:50px; width:1378px;"></div>
+
+                        <!-- Section 3: Void Tower -->
+                        <div id="void-tower-card" class="events-item" style="top:930px; display:flex; align-items:center; gap:16px;">
+                            <div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
+                                <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower <span class="text-[10px] text-amber-300">(test: rising rewards)</span></h3>
+                            </div>
+                            <button onclick="startExpedition('endless')" class="py-3 px-6 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Enter Void Tower</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

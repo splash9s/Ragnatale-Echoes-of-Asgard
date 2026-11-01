@@ -937,7 +937,8 @@ function switchView(viewName) {
     if (viewName === 'events') {
         document.getElementById('view-events')?.classList.remove('hidden');
         renderEventsView();
-        switchEventsTab(currentEventsTab);
+        renderQuestsView();
+        updateQuestTabButton();
     }
     if (viewName === 'shop') {
         document.getElementById('view-shop')?.classList.remove('hidden');
