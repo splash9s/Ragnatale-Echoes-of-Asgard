@@ -89,7 +89,7 @@
         #town-shadow { position: absolute; left: 906px; top: 716px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; }
         #town-hero-wrap { position: absolute; left: 913px; top: 562px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
         #town-hero { position: absolute; left: 0; top: 0; width: 95px; height: 193px; image-rendering: pixelated; }
-        .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
+        .town-info { position: absolute; left: 11%; top: 17%; width: 78%; height: 70%; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
         .town-info > * { pointer-events: auto; }
         .town-top { display: flex; gap: 10px; align-items: flex-start; }
         .town-avatar { width: 60px; height: 60px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
@@ -98,7 +98,7 @@
         .town-name { display: flex; align-items: center; gap: 6px; font-size: 24px; line-height: 1.1; font-weight: 700; color: #f5c451; margin: 0; }
         .town-lv { font-size: 17px; line-height: 1.2; color: #bfae85; }
         .town-lv strong { color: #f5e6c0; }
-        .town-exp { display: flex; flex-direction: column; gap: 4px; width: 300px; }
+        .town-exp { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .town-exp .row { display: flex; justify-content: space-between; font-size: 14px; line-height: 1.2; color: #bfae85; font-family: monospace; }
         .town-exp .bar { height: 7px; background: #0f1a2b; border: 1px solid #2a3a55; border-radius: 999px; overflow: hidden; }
         .town-exp .fill { height: 100%; transition: width .3s; }
@@ -326,7 +326,7 @@
             <div id="town-stage" class="town-stage">
                 <div class="ts-inner">
                     <img class="ts-bg" src="assets/page01/mainbg5_q85.jpg" alt="" onerror="townSwap(this,'mainbg5.png')">
-                    <div class="ui" style="left:20px; top:9px; width:681px; height:342px; cursor:default;">
+                    <div class="ui" style="left:20px; top:9px; width:631px; height:317px; cursor:default;">
                         <img src="assets/page01/characterinfo_q85.webp" alt="" onerror="townSwap(this,'characterinfo.png')">
                         <div class="town-info">
                             <div class="town-top">
@@ -348,25 +348,25 @@
                             </div>
                         </div>
                     </div>
-            <div class="ui" data-action="events" style="left:1159px; top:14px; width:228px; height:231px;">
+            <div class="ui" data-action="events" style="left:1247px; top:13px; width:206px; height:209px;">
                 <img src="assets/page01/eventsbutton.png" alt="" onerror="townSwap(this,'eventsbutton.png')">
                 <img id="alert-events" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
-            <div class="ui" data-action="mail" style="left:1417px; top:14px; width:228px; height:231px;">
+            <div class="ui" data-action="mail" style="left:1473px; top:13px; width:206px; height:209px;">
                 <img src="assets/page01/mailbutton.png" alt="" onerror="townSwap(this,'mailbutton.png')">
                 <img id="alert-mail" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
-            <div class="ui" data-action="setting" style="left:1675px; top:14px; width:228px; height:231px;">
+            <div class="ui" data-action="setting" style="left:1699px; top:13px; width:206px; height:209px;">
                 <img src="assets/page01/setting.png" alt="" onerror="townSwap(this,'setting.png')">
             </div>
-            <div class="ui" data-action="character" style="left:13px; top:836px; width:228px; height:231px;">
+            <div class="ui" data-action="character" style="left:13px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/characterbutton.png" alt="" onerror="townSwap(this,'characterbutton.png')">
             </div>
-            <div class="ui" data-action="shop" style="left:269px; top:836px; width:228px; height:231px;">
+            <div class="ui" data-action="shop" style="left:239px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/shoppagebutton.png" alt="" onerror="townSwap(this,'shoppagebutton.png')">
                 <img id="alert-shop" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
-            <div class="ui" data-action="blacksmith" style="left:525px; top:836px; width:228px; height:231px;">
+            <div class="ui" data-action="blacksmith" style="left:465px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/articanbutton.png" alt="" onerror="townSwap(this,'articanbutton.png')">
             </div>
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
