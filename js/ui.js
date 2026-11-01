@@ -3005,3 +3005,10 @@ function renderLibraryRules() {
             <p class="text-[10px] text-slate-500 mt-2">Gold shop: Copper 1000, Silver 4000, Gold 8000 Gold. Diamond shop: Copper 1, Silver 3, Gold 5 Diamond.</p>
         </div>`;
 }
+
+// Character page: stats panel slides in over the gear area / minimizes to the left tab
+function toggleCharStats(open) {
+    const view = document.getElementById('view-character');
+    if (!view) return;
+    view.classList.toggle('stats-open', !!open);
+}
