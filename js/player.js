@@ -293,6 +293,27 @@ function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
     return { ...baseTemplate, element, rarity, refineLevel: 0, buffs, debuffs, qty: 1 };
 }
 
+// Snapshot of the counters the Max HP runes use, taken at the start of each stage
+function maxHpCounts() {
+    return {
+        vit: runeN('maxHpBonus') / 50,
+        fort: runeN('fortitudeStacks'),
+        kill: runeN('killCount'),
+        runes: (player.currentRunRunes || []).length
+    };
+}
+
+// Extra Max HP gained in the current stage, as a fraction of the Max HP at the stage start
+function stageMaxHpAdd() {
+    const st = player.mhpStart;
+    if (!st) return 0;
+    let add = 0.5 * (runeN('maxHpBonus') / 50 - st.vit);                        // Vitality: +50% per pick
+    add += (runeN('fortitude') / 100) * (runeN('fortitudeStacks') - st.fort);      // Fortitude: per proc
+    add += (runeN('bloodlust') / 100) * (runeN('killCount') - st.kill);            // Bloodlust: per kill
+    if (runeN('runeScholar') > 0) add += 0.05 * ((player.currentRunRunes || []).length - st.runes); // Scholar: per rune picked
+    return add;
+}
+
 function getDerivedStats() {
     // Daily Challenge: an empty run. Level, base stats, skills and gear have no effect; runes picked in the run still apply.
     const daily = typeof currentMode !== 'undefined' && currentMode === 'daily';
@@ -301,16 +322,9 @@ function getDerivedStats() {
     const ST = daily ? { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 } : player.stats;
     const skl = name => daily ? 0 : (player.skills[name]?.level || 0);
 
-    // Max HP runes: Vitality adds +50% of the Max HP at the start of the stage per pick
-    // (vitCarry = bonus from earlier stages, vitStagePicks = picks made in the current stage). Fortitude +2% per proc, Bloodlust +2% per kill
+    // Max HP runes (Vitality, Fortitude, Bloodlust, Scholar) add a % of the Max HP at the start of the stage
     const baseMaxHp = 100 + (ST.vit * 15) + (lvl * 10);
-    const vitCarry = player.vitCarry || 1;
-    const vitStage = 1 + 0.5 * (player.vitStagePicks || 0);
-    let maxHp = Math.floor(baseMaxHp
-        * vitCarry * vitStage
-        * Math.pow(1 + rn('fortitude') / 100, rn('fortitudeStacks'))
-        * Math.pow(1 + rn('bloodlust') / 100, rn('killCount'))
-        * (rn('runeScholar') > 0 ? 1 + 0.05 * (player.currentRunRunes || []).length : 1));
+    let maxHp = Math.floor(baseMaxHp * (player.mhpCarry || 1) * (1 + stageMaxHpAdd()));
     let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3) + (!daily && player.baseLv === 1 ? 5 : 0); // base level 1: +5 ATK
     let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;

@@ -112,12 +112,12 @@ const RUNE_DEFS = {
     ironGuard: { name: "Iron Guard Rune", rarity: 2, add: 5, once: true, desc: "Crit restores 5% armor", text: v => `Crit restores ${v}% armor` },
     overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "Overheal damages a random enemy", text: () => "Overheal damages a random enemy" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a crit", text: () => "Every attack is a crit" },
-    bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 2, once: true, desc: "Kill: +2% Max HP (from current Max HP)", text: v => `Kill: +${v}% Max HP (from current Max HP)` },
+    bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 2, once: true, desc: "Kill: +2% Max HP (from Max HP at stage start)", text: v => `Kill: +${v}% Max HP (from Max HP at stage start)` },
     shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Kill: +0.5 Flee", text: v => `Kill: +${v} Flee` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Kill restores 10% HP", text: v => `Kill restores ${v}% HP` },
-    fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from current Max HP)", text: v => `Crit: 50% chance to add +${v}% Max HP (from current Max HP)` },
+    fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from Max HP at stage start)", text: v => `Crit: 50% chance to add +${v}% Max HP (from Max HP at stage start)` },
     glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 20, once: true, desc: "Max armor 0, +20% crit chance", text: v => `Max armor 0, +${v}% crit chance` },
-    runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% Max HP for each rune you own", text: () => "+5% Max HP for each rune you own" },
+    runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% Max HP per rune picked (from Max HP at stage start)", text: () => "+5% Max HP per rune picked (from Max HP at stage start)" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each rune you own", text: () => "+20% damage for each rune you own" },
     powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "+50% damage", text: v => `+${v}% damage` },
     giantSlayer: { name: "Giant Slayer Rune", rarity: 3, add: 25, once: true, desc: "+25% damage vs bosses and mini-bosses", text: v => `+${v}% damage vs bosses and mini-bosses` },
@@ -168,7 +168,6 @@ function applyRune(id) {
     const def = RUNE_DEFS[id];
     if (def.flag) player.runes[id] = true;
     else player.runes[id] = (player.runes[id] || 0) + def.add;
-    if (id === 'maxHpBonus') player.vitStagePicks = (player.vitStagePicks || 0) + 1;
     if (stageSummary) {
         stageSummary.runes.push({ rarity: def.rarity, text: `${def.name}: ${typeof def.text === 'function' ? def.text(def.add) : def.desc}` });
     }
@@ -329,8 +328,8 @@ function startExpedition(mode, opts = {}) {
 
     resetMapRunes();
     player.currentRunRunes = [];
-    player.vitCarry = 1;      // Vitality bonus carried over from earlier stages of this run
-    player.vitStagePicks = 0; // Vitality picks made in the current stage
+    player.mhpCarry = 1;                 // Max HP bonus carried over from earlier stages of this run
+    player.mhpStart = maxHpCounts();     // counters at the start of the current stage
     player.angelUsedThisRun = false;
     currentMode = mode;
     currentEvent = mode === 'event' ? opts.kind : null;
@@ -542,10 +541,10 @@ function makeBoss(t) {
 }
 
 function spawnStageMonsters() {
-    // A new stage starts: fold the Vitality picks of the last stage into the carried bonus,
-    // so the next +50% is taken from the Max HP at this stage's start
-    player.vitCarry = (player.vitCarry || 1) * (1 + 0.5 * (player.vitStagePicks || 0));
-    player.vitStagePicks = 0;
+    // A new stage starts: fold the Max HP gained last stage into the carried bonus,
+    // so later gains are a % of the Max HP at this stage's start
+    player.mhpCarry = (player.mhpCarry || 1) * (1 + stageMaxHpAdd());
+    player.mhpStart = maxHpCounts();
     isFirstHitOfBattle = true;
     battlePlayerHits = 0;
     battleFirstDamageTaken = false;
