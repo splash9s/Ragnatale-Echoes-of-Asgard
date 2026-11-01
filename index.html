@@ -154,7 +154,7 @@
         /* Character page (mock layout): gear window, inventory, and the stats window that replaces the gear window when opened */
         #view-character #char-panel-mid { background: url('assets/pages/character/chawindow.png') center / 100% 100% no-repeat !important; border: none !important; box-shadow: none !important; z-index: 3; }
         #view-character #char-panel-right { background-color: rgba(231,209,170,.5) !important; border: none !important; border-radius: 18px; box-shadow: none !important; }
-        #view-character .char-stats-panel { left: 93px !important; top: 77px !important; width: 602px !important; height: 992px !important; padding: 70px 50px 40px 50px !important; background: rgba(231,209,170,.8) !important; border: 3px solid #b8945a !important; border-radius: 40px !important; box-shadow: none !important; transition: transform .35s ease, opacity .35s ease; z-index: 8; }
+        #view-character .char-stats-panel { left: 93px !important; top: 77px !important; width: 602px !important; height: 992px !important; padding: 120px 50px 40px 50px !important; background: rgba(231,209,170,.8) !important; border: 3px solid #b8945a !important; border-radius: 40px !important; box-shadow: none !important; transition: transform .35s ease, opacity .35s ease; z-index: 8; }
         #view-character .char-stats-panel .rounded-2xl.border, #view-character .char-stats-panel #char-element-stats { background-color: rgba(96, 66, 34, .72) !important; border: 1px solid #5a3d1e !important; border-radius: 16px; }
         #view-character .char-stats-panel .rounded-2xl.border *, #view-character .char-stats-panel #char-element-stats * { color: #f5e9cf !important; }
         #view-character .char-stats-tab { position: absolute; left: 0; top: 330px; width: 40px; height: 170px; z-index: 6; display: none; background: rgba(231,209,170,.5); border: 2px solid #c9a227; border-left: none; border-radius: 0 12px 12px 0; color: #3b2716; font-weight: 700; font-size: 16px; letter-spacing: 2px; writing-mode: vertical-rl; cursor: pointer; }
@@ -162,6 +162,15 @@
         #view-character.stats-hidden .char-stats-tab { display: block; }
         #view-character:not(.stats-hidden) #char-panel-mid { visibility: hidden; }
         #view-character .char-stats-close { position: absolute; right: 24px; top: 20px; z-index: 9; padding: 6px 12px; background: #3b2716; color: #fff !important; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        /* Character page: HP/Armor text fits its card; stats text and buttons bigger; Close sits above the stats content */
+        #view-character #char-hp-card { gap: 2px !important; }
+        #view-character #char-hp-card .text-\[10px\] { font-size: 15px !important; line-height: 1.2; }
+        #view-character .char-stats-panel .char-stats-close { top: 14px; }
+        #view-character .char-stats-panel [class*="text-xs"] { font-size: 52px !important; }
+        #view-character .char-stats-panel [class*="text-sm"] { font-size: 56px !important; }
+        #view-character .char-stats-panel [class*="text-base"] { font-size: 60px !important; }
+        #view-character .char-stats-panel [class*="text-lg"] { font-size: 66px !important; }
+        #view-character .char-stats-panel button:not(.char-stats-close) { font-size: 48px !important; padding: 6px 24px !important; border-radius: 12px !important; }
         /* Character page: bigger text everywhere, and spacing between stacked blocks */
         #view-character { font-size: 36px; }
         #view-character .text-\[9px\] { font-size: 30px !important; }
@@ -679,7 +688,7 @@
                     
                     <img class="art-frame pointer-events-none" src="assets/cha/chashadow.png" alt="" style="left:338px; top:688px; width:102px; height:41px; z-index:4;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="assets/cha/chabase.png" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
-                    <button onclick="switchView('skills')" style="position:absolute; left:287px; top:163px; width:213px; height:43px; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills</button>
+                    <button onclick="switchView('skills')" style="position:absolute; left:263px; top:138px; width:260px; height:84px; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills</button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
@@ -763,10 +772,10 @@
                             <option value="rarity_asc">Rarity ↑</option>
                             <option value="rarity_desc">Rarity ↓</option>
                         </select>
+                        <div id="inventory-filter" class="flex items-center"></div>
                         <button onclick="salvageAllEquipment()" class="px-2 py-1 bg-red-600/60 hover:bg-red-600 text-red-100 text-[10px] font-bold rounded cursor-pointer transition">Salvage All</button>
                         <button onclick="sellAllEquipment()" class="px-2 py-1 bg-amber-700 hover:bg-amber-600 text-amber-100 text-[10px] font-bold rounded cursor-pointer transition">Sell All</button>
                     </div>
-                    <div id="inventory-filter" class="flex flex-wrap gap-1"></div>
                     <div id="inventory-grid" class="grid justify-start" style="justify-content:center; margin-top:-10px; grid-template-columns:repeat(13,77px); grid-auto-rows:79px; column-gap:4px; row-gap:2px;"></div>
                 </div>
                     </div>
