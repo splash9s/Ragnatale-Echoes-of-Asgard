@@ -747,9 +747,9 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     }
     window.modalCallback = onCloseCallback;
     if (modalEl) modalEl.classList.remove('hidden');
-    // Rune pick: no background blur, title moved down
+    // Rune pick: no background blur, no title text
     const isRune = !!document.getElementById('rune-pick-root');
-    if (titleEl) titleEl.style.marginTop = isRune ? '70px' : '';
+    if (titleEl) titleEl.style.display = isRune ? 'none' : '';
     if (modalEl) modalEl.style.backdropFilter = isRune ? 'none' : '';
     fitModalPanel(!!customHTML);
 }
