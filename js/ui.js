@@ -889,6 +889,7 @@ function switchView(viewName) {
     if (viewName === 'skills') {
         document.getElementById('view-skills')?.classList.remove('hidden');
         renderSkillPage();
+        skillFocusHub();
     }
     if (viewName === 'setting') document.getElementById('view-setting')?.classList.remove('hidden');
     if (viewName === 'library') {
@@ -2183,12 +2184,16 @@ function renderCharacterSkills() {
 // Dedicated Skills page: skill nodes placed on the star map (04_psd/pageskill/skilllayout.png marker positions, map 4000x2233).
 // Each build chain runs along its node list; a node needs the one before it (req) at the required level.
 const SKILL_MAP = { w: 4000, h: 2233, minS: 0.3, maxS: 1.6 };
+// Center hub node: always on (upgraded look), not clickable. Every build chain starts from a node next to it.
+const SKILL_HUB = [2003, 1106];
+// Map positions (layout markers, 4000x2233). Each chain runs in order; a node needs the one before it.
 const SKILL_NODE_POS = {
-    gold:    [[563, 849], [374, 1122], [650, 1116], [389, 1427], [1199, 1116], [1601, 1116]],
-    exp:     [[2003, 1779], [2237, 1646], [2192, 1899], [2003, 1994], [1823, 1994], [1600, 1890]],
-    attack:  [[1807, 327], [1922, 274], [2124, 274], [2222, 416], [2003, 530], [2003, 1106]],
-    defense: [[3658, 948], [3769, 1247], [3370, 1358], [3200, 1106], [2756, 1106], [2405, 1106]]
+    gold:    [[1601, 1116], [1199, 1116], [650, 1116], [374, 1122], [563, 849], [389, 1427]],
+    exp:     [[2003, 1428], [2003, 1779], [2237, 1646], [2192, 1899], [2003, 1994], [1823, 1994]],
+    attack:  [[2003, 818], [2003, 530], [2222, 416], [2124, 274], [1922, 274], [1807, 327]],
+    defense: [[2405, 1106], [2756, 1106], [3200, 1106], [3658, 948], [3769, 1247], [3370, 1358]]
 };
+const SKILL_NODE_SIZE = { normal: [120, 122], locked: [110, 112] };
 let skillView = null;
 
 function skillApplyView() {
@@ -2219,17 +2224,12 @@ function skillZoomStep(factor) {
     skillZoomAt(vp.offsetWidth / 2, vp.offsetHeight / 2, factor);
 }
 
-function initSkillView() {
+// Attach pan and zoom once
+function skillEnsureView() {
     const vp = document.getElementById('skill-viewport');
-    if (!vp || skillView) return;
-    const vw = vp.offsetWidth, vh = vp.offsetHeight;
-    if (!vw || !vh) return; // page hidden: set up when shown
-    // Default: zoomed to fill the view, as in the layout
-    const s0 = Math.max(vw / SKILL_MAP.w, vh / SKILL_MAP.h);
-    skillView = { s: s0, x: 0, y: 0, drag: null, suppressClick: false };
-    skillView.x = (vw - SKILL_MAP.w * s0) / 2;
-    skillView.y = (vh - SKILL_MAP.h * s0) / 2;
-    // Map coordinates from pointer events (page may be scaled by the stage)
+    if (!vp || vp.dataset.ready || !vp.offsetWidth) return;
+    vp.dataset.ready = '1';
+    skillView = { s: 1, x: 0, y: 0, drag: null, suppressClick: false };
     const local = (e) => {
         const r = vp.getBoundingClientRect();
         const k = r.width / vp.offsetWidth || 1;
@@ -2267,6 +2267,17 @@ function initSkillView() {
     };
     vp.addEventListener('pointerup', endDrag);
     vp.addEventListener('pointercancel', endDrag);
+}
+
+// Default camera: fill the view, centered on the middle (hub) node
+function skillFocusHub() {
+    const vp = document.getElementById('skill-viewport');
+    if (!vp || !skillView || !vp.offsetWidth) return;
+    const vw = vp.offsetWidth, vh = vp.offsetHeight;
+    const s0 = Math.max(vw / SKILL_MAP.w, vh / SKILL_MAP.h);
+    skillView.s = s0;
+    skillView.x = vw / 2 - SKILL_HUB[0] * s0;
+    skillView.y = vh / 2 - SKILL_HUB[1] * s0;
     skillApplyView();
 }
 
@@ -2282,17 +2293,22 @@ function renderSkillPage() {
     const spLeft = player.jobSp - pendingSkillTotal();
     if (spEl) spEl.innerText = spLeft;
 
-    // Star map image, added once
     const mapSlot = document.getElementById('skill-map-slot');
     if (mapSlot && !mapSlot.firstChild) {
         mapSlot.innerHTML = '<img class="skill-map" src="assets/pages/skill/skillmap.jpg" alt="">';
     }
 
-    let html = '';
+    // Node centers per skill key, and lit state of each link (parent -> child)
+    const centers = {};
+    const links = [];
+    let nodesHtml = '';
     let labels = '';
+    const hubLevel = 1; // hub is always on
     SKILL_BUILDS.forEach(b => {
         const chain = Object.entries(player.skills).filter(([, s]) => s.build === b.key);
         const pos = SKILL_NODE_POS[b.key] || [];
+        let parentPos = SKILL_HUB;
+        let parentOn = hubLevel > 0;
         chain.forEach(([k, s], i) => {
             const p = pos[i];
             if (!p) return;
@@ -2302,20 +2318,34 @@ function renderSkillPage() {
             const lvl = s.level + (pendingAlloc.skills[k] || 0);
             const maxed = lvl >= s.maxLv;
             const clickable = !locked && !maxed && spLeft > 0;
+            const isLocked = locked;
             const img = lvl > 0 ? 'assets/pages/skill/skillbuttonup.gif'
-                : (locked ? 'assets/pages/skill/skillbuttonlock.png' : 'assets/pages/skill/skillbutton.png');
+                : (isLocked ? 'assets/pages/skill/skillbuttonlock.png' : 'assets/pages/skill/skillbutton.png');
+            const [w, h] = isLocked ? SKILL_NODE_SIZE.locked : SKILL_NODE_SIZE.normal;
             const title = locked && prev ? `Needs ${prev.name} Lv. ${s.reqLv}` : s.desc;
-            html += `<div class="skill-node ${clickable ? '' : 'is-off'}" title="${title}" style="left:${p[0] - 60}px; top:${p[1] - 61}px;"${clickable ? ` onclick="skillNodeClick(event,'${k}')"` : ''}>
-                <img src="${img}" alt="">
+            centers[k] = p;
+            links.push({ a: parentPos, b: p, lit: lvl > 0 && parentOn });
+            nodesHtml += `<div class="skill-node ${clickable ? '' : 'is-off'}" title="${title}" style="left:${p[0] - w / 2}px; top:${p[1] - h / 2}px; width:${w}px; height:${h}px;"${clickable ? ` onclick="skillNodeClick(event,'${k}')"` : ''}>
+                <img src="${img}" alt="" style="width:${w}px; height:${h}px;">
                 <div class="skill-node-label">${s.name}<br>Lv ${lvl}/${s.maxLv}</div>
             </div>`;
+            parentPos = p;
+            parentOn = lvl > 0;
         });
         if (pos[0] && chain.length) {
             labels += `<div class="skill-build-label" style="left:${pos[0][0]}px; top:${pos[0][1] - 150}px;">${b.name}</div>`;
         }
     });
-    nodes.innerHTML = labels + html;
-    initSkillView();
+
+    // Center hub: upgraded look, not clickable
+    const hubHtml = `<div class="skill-node is-hub" style="left:${SKILL_HUB[0] - 60}px; top:${SKILL_HUB[1] - 61}px; width:120px; height:122px;"><img src="assets/pages/skill/skillbuttonup.gif" alt=""></div>`;
+
+    // Light paths between linked nodes; lit when the node at the far end is upgraded
+    const lines = links.map(l => `<line x1="${l.a[0]}" y1="${l.a[1]}" x2="${l.b[0]}" y2="${l.b[1]}" class="${l.lit ? 'skill-path-lit' : 'skill-path'}"/>`).join('');
+    const svg = `<svg id="skill-paths" width="4000" height="2233" viewBox="0 0 4000 2233"><defs><filter id="skill-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${lines}</svg>`;
+
+    nodes.innerHTML = svg + labels + hubHtml + nodesHtml;
+    skillEnsureView();
     skillApplyView();
 }
 
