@@ -2186,6 +2186,7 @@ function renderCharacterSkills() {
 const SKILL_MAP = { w: 4000, h: 2233, minS: 0.3, maxS: 1.6 };
 // Center hub node: always on (upgraded look), not clickable. Every build chain starts from a node next to it.
 const SKILL_HUB = [2003, 1106];
+const SKILL_DEFAULT_ZOOM = 1.5;
 // Map positions (layout markers, 4000x2233). Each chain runs in order; a node needs the one before it.
 const SKILL_NODE_POS = {
     gold:    [[1601, 1116], [1199, 1116], [650, 1116], [374, 1122], [563, 849], [389, 1427]],
@@ -2278,7 +2279,7 @@ function skillFocusHub() {
     const vp = document.getElementById('skill-viewport');
     if (!vp || !skillView || !vp.offsetWidth) return;
     const vw = vp.offsetWidth, vh = vp.offsetHeight;
-    const s0 = Math.max(vw / SKILL_MAP.w, vh / SKILL_MAP.h);
+    const s0 = SKILL_DEFAULT_ZOOM; // close enough to show the hub and about one node each way
     skillView.s = s0;
     skillView.x = vw / 2 - SKILL_HUB[0] * s0;
     skillView.y = vh / 2 - SKILL_HUB[1] * s0;
