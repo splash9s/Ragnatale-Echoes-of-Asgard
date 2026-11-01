@@ -1925,9 +1925,8 @@ function compareHTML(selected, equipped) {
         return `<div class="${d > 0 ? 'text-emerald-300' : 'text-red-300'}">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
     }).join('');
     return `<div class="flex flex-col gap-2">
-        <span class="text-[10px] font-bold text-amber-300 uppercase">Compare with equipped</span>
         <div class="flex gap-2 items-stretch">${gearCardHTML(selected, 'Selected')}${gearCardHTML(equipped, 'Equipped')}</div>
-        ${rows ? `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change if you equip it (total stats):</span>${rows}</div>` : ''}
+        ${rows ? `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change if equip:</span>${rows}</div>` : ''}
     </div>`;
 }
 
@@ -1941,12 +1940,10 @@ function showItemDetail(index) {
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
 
-    let body = '<div class="flex flex-col gap-2 text-left text-xs">';
+    let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
-        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : kind}</span>
+        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? 'R' + item.rarity + (isEquip && item.levelReq ? ', Requires Base Lv. ' + item.levelReq : '') : kind}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}${kind}</span></div>`;
-    if (isEquip && item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
-    if (isGearItem(item) && item.slot !== 'pet') body += `<span class="text-[11px] text-amber-200">Gear Tier ${gearTier(item)} (Rarity ${item.rarity} + ${(item.buffs || []).length} buffs = ${gearTierScore(item)})</span>`;
     if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (!isEquip && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
@@ -1986,12 +1983,11 @@ function showEquippedDetail(slot) {
     const rarity = RARITY_INFO[item.rarity];
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
 
-    let body = '<div class="flex flex-col gap-2 text-left text-xs">';
+    let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
-        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? rarity.name + ' (Rarity ' + item.rarity + ')' : (isPotion ? 'Consumable' : 'Equipped')}</span>
+        <span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">${rarity ? 'R' + item.rarity + (item.levelReq ? ', Requires Base Lv. ' + item.levelReq : '') : (isPotion ? 'Consumable' : 'Equipped')}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}Equipped · ${slot}</span></div>`;
     if (item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
-    if (item.levelReq) body += `<span class="text-[10px] text-slate-400">Requires Base Lv. ${item.levelReq}</span>`;
     if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (item.stats && Object.keys(item.stats).length) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
