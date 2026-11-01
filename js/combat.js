@@ -90,7 +90,7 @@ const RUNE_DEFS = {
     zeroArmor: { name: "Zero Armor Rune", rarity: 2, flag: true, desc: "No armor: +10 Flee. Armor above 0: take 10% less damage", text: () => "No armor: +10 Flee. Armor above 0: take 10% less damage" },
     swiftRun: { name: "Swift Feet Rune", rarity: 1, flag: true, desc: "Move to the next stage automatically when a stage ends", text: () => "Move to the next stage automatically when a stage ends" },
     focus: { name: "Focus Rune", rarity: 1, add: 10, desc: "Missing restores 10% HP", text: v => `Missing restores ${v}% HP` },
-    maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% Max HP (from current Max HP)", text: v => `+${v}% Max HP (from current Max HP)` },
+    maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% Max HP per pick (from Max HP at stage start)", text: () => "+50% Max HP per pick (from Max HP at stage start)" },
     firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "First hit on each enemy: +50% damage", text: v => `First hit on each enemy: +${v}% damage` },
     randomHitCount: { name: "Chaos Rune", rarity: 2, add: 1, once: true, desc: "50% of attacks hit a random enemy", text: () => "50% of attacks hit a random enemy" },
     thorn: { name: "Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage", text: v => `Reflect ${v}% of melee damage` },
@@ -168,6 +168,7 @@ function applyRune(id) {
     const def = RUNE_DEFS[id];
     if (def.flag) player.runes[id] = true;
     else player.runes[id] = (player.runes[id] || 0) + def.add;
+    if (id === 'maxHpBonus') player.vitStagePicks = (player.vitStagePicks || 0) + 1;
     if (stageSummary) {
         stageSummary.runes.push({ rarity: def.rarity, text: `${def.name}: ${typeof def.text === 'function' ? def.text(def.add) : def.desc}` });
     }
@@ -328,6 +329,8 @@ function startExpedition(mode, opts = {}) {
 
     resetMapRunes();
     player.currentRunRunes = [];
+    player.vitCarry = 1;      // Vitality bonus carried over from earlier stages of this run
+    player.vitStagePicks = 0; // Vitality picks made in the current stage
     player.angelUsedThisRun = false;
     currentMode = mode;
     currentEvent = mode === 'event' ? opts.kind : null;
@@ -539,6 +542,10 @@ function makeBoss(t) {
 }
 
 function spawnStageMonsters() {
+    // A new stage starts: fold the Vitality picks of the last stage into the carried bonus,
+    // so the next +50% is taken from the Max HP at this stage's start
+    player.vitCarry = (player.vitCarry || 1) * (1 + 0.5 * (player.vitStagePicks || 0));
+    player.vitStagePicks = 0;
     isFirstHitOfBattle = true;
     battlePlayerHits = 0;
     battleFirstDamageTaken = false;
