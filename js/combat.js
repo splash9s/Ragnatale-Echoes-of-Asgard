@@ -387,7 +387,7 @@ function startExpedition(mode, opts = {}) {
         };
         currentStage = 1;
         maxStages = 999;
-        if (tagEl) tagEl.innerText = "Endless Mode (Test: 100x rewards)";
+        if (tagEl) tagEl.innerText = "Endless Mode (Test)";
         if (titleEl) titleEl.innerText = `Void Tower — Wave ${currentStage}`;
         logMessage(`[Expedition] Entering Endless Void Tower...`, 'winlose');
     }
@@ -586,13 +586,13 @@ function spawnStageMonsters() {
     } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
         spawnWaveFromSet(dailyScale, scaled);
     } else {
-        const pool = currentMode === 'daily' ? getDailyEnemyPool() : (activeMap && activeMap.enemies) || [];
+        const pool = currentMode === 'daily' ? getDailyEnemyPool() : currentMode === 'endless' ? [MONSTERS_DATA.slime] : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
-            const count = Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
-            const mult = currentMode === 'endless' ? Math.pow(1.5, currentStage - 1) : stageMultiplier();
+            const count = currentMode === 'endless' ? 1 : Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
+            const mult = currentMode === 'endless' ? 1 : stageMultiplier(); // Void Tower: one level 1 slime per stage
             for (let i = 0; i < count; i++) {
                 const picked = pool[Math.floor(Math.random() * pool.length)];
-                const template = currentMode === 'daily' ? picked : levelScaled(picked, activeMap && activeMap.levelReq);
+                const template = currentMode === 'daily' ? picked : levelScaled(picked, currentMode === 'endless' ? 1 : (activeMap && activeMap.levelReq));
                 const base = {
                     ...template,
                     hp: Math.floor(template.hp * mult),
@@ -791,7 +791,9 @@ function tickPlayerDebuffs() {
 const STATUS_MS = 2000;
 const MAX_BASE_LV = 99;
 const MAX_CLASS_LV = 50;
-const VOID_TEST_MULT = 100; // Void Tower is a test mode: 100x EXP, gold, and item chance
+// Void Tower (test mode): EXP starts at x100 and gold at x10 on stage 1, each rising by 10 more every stage
+function voidExpMult(stage) { return 100 + 10 * (stage - 1); }
+function voidGoldMult(stage) { return 10 + 10 * (stage - 1); }
 const STATUS_DEFS = {
     freeze: { label: "Freeze", element: 'water' },
     rock:   { label: "Rock",   element: 'earth' },
@@ -866,7 +868,7 @@ function awardKill(m) {
     const bossExp = bossKill ? skillBonus('bossExpPct') : 0;
     baseExpGain = Math.floor(baseExpGain * (1 + (skillBonus('baseExpPct') + skillBonus('allExpPct') + bossExp) / 100));
     jobExpGain = Math.floor(jobExpGain * (1 + (skillBonus('classExpPct') + skillBonus('allExpPct') + bossExp) / 100));
-    if (isVoidTest) { baseExpGain *= VOID_TEST_MULT; jobExpGain *= VOID_TEST_MULT; finalGold *= VOID_TEST_MULT; }
+    if (isVoidTest) { const em = voidExpMult(currentStage); baseExpGain *= em; jobExpGain *= em; finalGold *= voidGoldMult(currentStage); }
     if (player.baseLv >= MAX_BASE_LV) baseExpGain = 0;
     if (player.jobLv >= MAX_CLASS_LV) jobExpGain = 0;
 
