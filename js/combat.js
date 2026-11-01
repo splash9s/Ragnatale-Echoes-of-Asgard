@@ -701,13 +701,18 @@ function tankDamageMult(t) {
     return roleOf(t) === 'tank' ? 0.7 : 1;
 }
 
+// Mages on level 1 maps deal half base damage (their spells use the same attack value)
+function mageLv1DamageMult(t) {
+    return roleOf(t) === 'mage' && activeMap && activeMap.levelReq === 1 ? 0.5 : 1;
+}
+
 function makeUnit(t, mult) {
     const unit = {
         ...t,
         hp: Math.floor(t.hp * mult),
         maxHp: Math.floor(t.maxHp * mult),
-        atkMin: Math.floor(t.atkMin * mult * tankDamageMult(t)),
-        atkMax: Math.floor(t.atkMax * mult * tankDamageMult(t)),
+        atkMin: Math.floor(t.atkMin * mult * tankDamageMult(t) * mageLv1DamageMult(t)),
+        atkMax: Math.floor(t.atkMax * mult * tankDamageMult(t) * mageLv1DamageMult(t)),
         hit: combatHitFlee(t).hit,
         flee: combatHitFlee(t).flee,
         isBoss: false, rewarded: false, ailments: {}
