@@ -2715,10 +2715,17 @@ function setInventoryFilter(key) {
 function renderInventoryFilters() {
     const el = document.getElementById('inventory-filter');
     if (!el) return;
-    el.innerHTML = INVENTORY_FILTERS.map(f => {
-        const active = f.key === inventoryFilter;
-        return `<button onclick="setInventoryFilter('${f.key}')" class="px-2 py-1 text-[10px] font-bold rounded border transition cursor-pointer ${active ? 'bg-amber-600 border-amber-500 text-slate-950' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}">${f.label}</button>`;
-    }).join('');
+    // Built once; later refreshes only update the selected value, so an open dropdown is not reset
+    let sel = document.getElementById('inventory-gear-filter');
+    if (!sel) {
+        sel = document.createElement('select');
+        sel.id = 'inventory-gear-filter';
+        sel.className = 'px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold rounded cursor-pointer transition border border-slate-700';
+        sel.innerHTML = INVENTORY_FILTERS.map(f => `<option value="${f.key}">${f.label}</option>`).join('');
+        sel.onchange = () => setInventoryFilter(sel.value);
+        el.appendChild(sel);
+    }
+    if (sel.value !== inventoryFilter) sel.value = inventoryFilter;
 }
 
 // Element resistance: positive = takes less damage from that element, negative = weakness
