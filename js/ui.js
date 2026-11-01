@@ -2243,14 +2243,17 @@ function skillEnsureView() {
     vp.addEventListener('pointerdown', (e) => {
         if (e.button !== 0) return;
         const p = local(e);
-        skillView.drag = { ox: p.x - skillView.x, oy: p.y - skillView.y, sx: p.x, sy: p.y, moved: false };
-        vp.setPointerCapture(e.pointerId);
+        skillView.drag = { ox: p.x - skillView.x, oy: p.y - skillView.y, sx: p.x, sy: p.y, moved: false, id: e.pointerId };
     });
     vp.addEventListener('pointermove', (e) => {
         const d = skillView && skillView.drag;
         if (!d) return;
         const p = local(e);
-        if (!d.moved && Math.hypot(p.x - d.sx, p.y - d.sy) > 5) { d.moved = true; vp.classList.add('dragging'); }
+        if (!d.moved && Math.hypot(p.x - d.sx, p.y - d.sy) > 5) {
+            d.moved = true;
+            vp.classList.add('dragging');
+            try { vp.setPointerCapture(d.id); } catch (err) {}
+        }
         if (d.moved) {
             skillView.x = p.x - d.ox;
             skillView.y = p.y - d.oy;
@@ -2271,6 +2274,7 @@ function skillEnsureView() {
 
 // Default camera: fill the view, centered on the middle (hub) node
 function skillFocusHub() {
+    skillCloseDetail();
     const vp = document.getElementById('skill-viewport');
     if (!vp || !skillView || !vp.offsetWidth) return;
     const vw = vp.offsetWidth, vh = vp.offsetHeight;
@@ -2283,7 +2287,58 @@ function skillFocusHub() {
 
 function skillNodeClick(e, skillKey) {
     if (skillView && skillView.suppressClick) return;
-    upgradeSkill(skillKey);
+    skillOpenDetail(skillKey);
+}
+
+// Skill detail panel: slides out from the right; closes when clicking outside it and outside the nodes
+let skillDetailKey = null;
+function skillOpenDetail(k) {
+    skillDetailKey = k;
+    renderSkillDetail();
+    document.getElementById('skill-detail')?.classList.add('open');
+}
+function skillCloseDetail() {
+    skillDetailKey = null;
+    document.getElementById('skill-detail')?.classList.remove('open');
+}
+document.addEventListener('pointerdown', (e) => {
+    if (!skillDetailKey) return;
+    const tgt = e.target && e.target.closest ? e.target : null;
+    if (tgt && (tgt.closest('#skill-detail') || tgt.closest('.skill-node'))) return;
+    skillCloseDetail();
+}, true);
+
+function renderSkillDetail() {
+    const el = document.getElementById('skill-detail');
+    if (!el || !skillDetailKey) return;
+    const k = skillDetailKey;
+    const s = player.skills[k];
+    if (!s) return;
+    const build = SKILL_BUILDS.find(b => b.key === s.build);
+    const prev = s.req ? player.skills[s.req] : null;
+    const prevLevel = prev ? prev.level + (pendingAlloc.skills[s.req] || 0) : 0;
+    const locked = !!prev && prevLevel < s.reqLv;
+    const lvl = s.level + (pendingAlloc.skills[k] || 0);
+    const spLeft = player.jobSp - pendingSkillTotal();
+    const canUp = !locked && lvl < s.maxLv && spLeft > 0;
+    const reason = locked ? `Requires ${prev.name} Lv. ${s.reqLv}`
+        : lvl >= s.maxLv ? 'Max level'
+        : spLeft <= 0 ? 'No skill points available' : '';
+    el.innerHTML = `
+        <div class="flex justify-between items-start gap-3">
+            <div>
+                <h3 class="text-2xl font-bold mt-1">${s.name}</h3>
+            </div>
+            <button onclick="skillCloseDetail()" class="px-3 py-1 rounded-lg font-bold cursor-pointer" style="background:#3b2716; color:#fff;">&#10005;</button>
+        </div>
+        <p class="mt-4 text-lg">${s.desc}</p>
+        <div class="mt-5 text-base flex flex-col gap-2">
+            <div class="flex justify-between"><span>Level</span><strong>${lvl} / ${s.maxLv}</strong></div>
+            <div class="flex justify-between"><span>Requires</span><strong>${prev ? `${prev.name} Lv. ${s.reqLv}` : 'None (start)'}</strong></div>
+            <div class="flex justify-between"><span>Skill points left</span><strong>${spLeft}</strong></div>
+        </div>
+        <button onclick="upgradeSkill('${k}'); renderSkillDetail();" ${canUp ? '' : 'disabled'} class="mt-6 w-full py-3 rounded-xl font-bold text-lg cursor-pointer disabled:opacity-40" style="background:#b45309; color:#fff8e7;">+1 SP</button>
+        ${reason ? `<p class="mt-2 text-sm text-center">${reason}</p>` : ''}`;
 }
 
 function renderSkillPage() {
@@ -2302,7 +2357,6 @@ function renderSkillPage() {
     const centers = {};
     const links = [];
     let nodesHtml = '';
-    let labels = '';
     const hubLevel = 1; // hub is always on
     SKILL_BUILDS.forEach(b => {
         const chain = Object.entries(player.skills).filter(([, s]) => s.build === b.key);
@@ -2317,7 +2371,7 @@ function renderSkillPage() {
             const locked = !!prev && prevLevel < s.reqLv;
             const lvl = s.level + (pendingAlloc.skills[k] || 0);
             const maxed = lvl >= s.maxLv;
-            const clickable = !locked && !maxed && spLeft > 0;
+            const clickable = true;
             const isLocked = locked;
             const img = lvl > 0 ? 'assets/pages/skill/skillbuttonup.gif'
                 : (isLocked ? 'assets/pages/skill/skillbuttonlock.png' : 'assets/pages/skill/skillbutton.png');
@@ -2325,16 +2379,13 @@ function renderSkillPage() {
             const title = locked && prev ? `Needs ${prev.name} Lv. ${s.reqLv}` : s.desc;
             centers[k] = p;
             links.push({ a: parentPos, b: p, lit: lvl > 0 && parentOn });
-            nodesHtml += `<div class="skill-node ${clickable ? '' : 'is-off'}" title="${title}" style="left:${p[0] - w / 2}px; top:${p[1] - h / 2}px; width:${w}px; height:${h}px;"${clickable ? ` onclick="skillNodeClick(event,'${k}')"` : ''}>
+            nodesHtml += `<div class="skill-node ${locked ? 'is-off' : ''}" title="${title}" style="left:${p[0] - w / 2}px; top:${p[1] - h / 2}px; width:${w}px; height:${h}px;" onclick="skillNodeClick(event,'${k}')">
                 <img src="${img}" alt="" style="width:${w}px; height:${h}px;">
                 <div class="skill-node-label">${s.name}<br>Lv ${lvl}/${s.maxLv}</div>
             </div>`;
             parentPos = p;
             parentOn = lvl > 0;
         });
-        if (pos[0] && chain.length) {
-            labels += `<div class="skill-build-label" style="left:${pos[0][0]}px; top:${pos[0][1] - 150}px;">${b.name}</div>`;
-        }
     });
 
     // Center hub: upgraded look, not clickable
@@ -2344,9 +2395,10 @@ function renderSkillPage() {
     const lines = links.map(l => `<line x1="${l.a[0]}" y1="${l.a[1]}" x2="${l.b[0]}" y2="${l.b[1]}" class="${l.lit ? 'skill-path-lit' : 'skill-path'}"/>`).join('');
     const svg = `<svg id="skill-paths" width="4000" height="2233" viewBox="0 0 4000 2233"><defs><filter id="skill-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${lines}</svg>`;
 
-    nodes.innerHTML = svg + labels + hubHtml + nodesHtml;
+    nodes.innerHTML = svg + hubHtml + nodesHtml;
     skillEnsureView();
     skillApplyView();
+    renderSkillDetail();
 }
 
 function addStat(statKey) {
