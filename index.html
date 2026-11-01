@@ -895,10 +895,10 @@
                     </div>
 
                     <!-- Battle log (left) -->
-                    <div id="combat-log-box" class="combat-box minimized" style="left:23px; top:215px; width:355px; height:492px;">
-                        <div class="flex items-center justify-between gap-2">
+                    <div id="combat-log-box" class="combat-box minimized" style="left:23px; top:215px; width:355px; height:492px; z-index:8; pointer-events:auto;">
+                        <div class="flex items-center justify-between gap-2 cursor-pointer" onclick="toggleBattleLog(this.querySelector('button'))">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Battle Log</h3>
-                            <button onclick="toggleBattleLog(this)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded cursor-pointer transition">▸ Expand</button>
+                            <button type="button" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded cursor-pointer transition">▸ Expand</button>
                         </div>
                         <div id="combat-activity-log" class="flex flex-col gap-1 font-mono text-[11px] text-slate-300 pr-2 overflow-y-auto">
                             <div>[Combat] Battle started...</div>
