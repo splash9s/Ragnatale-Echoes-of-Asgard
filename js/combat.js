@@ -226,13 +226,21 @@ function runeHighlightHtml(text) {
 function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
     const choices = pickWeightedRunes(pool, 3).reduce((acc, id) => { acc.push(upgradeRuneChoice(id, pool, acc)); return acc; }, []);
-    // Runes already picked this run, as small cards in the top right
-    const picked = (player.currentRunRunes || []).map((pr, i) => {
-        const rarity = Math.min(5, Math.max(1, RUNE_DEFS[pr.id] ? RUNE_DEFS[pr.id].rarity : 1));
-        return `<div class="combat-rune-slot" title="${escapeHtml(pr.name)}" onclick="showPickedRuneDetail(${i})"><img src="assets/combat/runes/r${rarity}.png" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
-    }).join('');
+    // Runes acquired this run, shown in the slide-out list on the right edge
+    const acquired = player.currentRunRunes || [];
+    const acquiredHtml = acquired.map(pr => {
+        const def = RUNE_DEFS[pr.id];
+        const rarity = def ? def.rarity : 1;
+        const detail = def ? def.text(runeN(pr.id)) : pr.desc;
+        return `<div class="rune-pick-card rune-acq-card">
+                <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
+                <span class="rune-pick-text">
+                    <span class="rune-pick-name">${escapeHtml(pr.name)}</span>
+                    <span class="rune-pick-desc">${runeHighlightHtml(detail)}</span>
+                </span>
+            </div>`;
+    }).join('') || '<div style="color:#cbd5e1; font-size:14px;">No rune acquired yet</div>';
     let html = `<div id="rune-pick-root" class="flex flex-col gap-4">`;
-    html += `<div class="flex justify-end flex-wrap gap-2" style="min-height:101px;">${picked}</div>`;
     html += `<div class="flex justify-center items-start flex-wrap gap-5">`;
     choices.forEach(id => {
         const r = RUNE_DEFS[id];
@@ -248,10 +256,15 @@ function showRuneChoices(isNew) {
             </button>`;
     });
     html += `</div>`;
-    // Detail of a picked rune, shown here when its small card is clicked
-    html += `<div id="rune-pick-detail" data-idx="" class="flex flex-col items-center gap-1" style="min-height:40px;"></div>`;
     const canRefresh = runeRefreshLeft > 0;
-    html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button></div>`;
+    html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button>`;
+    // Edge tab on the right side of the window: opens the list of runes acquired
+    html += `<button id="rune-acq-tab" onclick="toggleRuneAcquired(true)">Acquired (${acquired.length})</button>`;
+    // Slide-out list of acquired runes, overlaying the pick window
+    html += `<div id="rune-acq-panel">
+            <div class="rune-acq-head"><span>Runes acquired (${acquired.length})</span><button onclick="toggleRuneAcquired(false)" class="rune-acq-close">×</button></div>
+            <div class="rune-acq-list">${acquiredHtml}</div>
+        </div></div>`;
     if (isNew) {
         showModal("Rune Blessing", "", html);
     } else {
@@ -260,17 +273,10 @@ function showRuneChoices(isNew) {
     }
 }
 
-// Click a picked rune card in the pick window: show its name and full detail. Click again to hide.
-function showPickedRuneDetail(index) {
-    const pr = (player.currentRunRunes || [])[index];
-    const box = document.getElementById('rune-pick-detail');
-    if (!pr || !box) return;
-    if (box.dataset.idx === String(index)) { box.dataset.idx = ''; box.innerHTML = ''; return; }
-    const def = RUNE_DEFS[pr.id];
-    const text = def ? def.text(runeN(pr.id)) : pr.desc;
-    box.dataset.idx = String(index);
-    box.innerHTML = `<div style="font-size:17px; font-weight:900; color:#ffffff; text-decoration:none; text-shadow:0 0 3px #000, 0 1px 2px #000;">${escapeHtml(pr.name)}</div>` +
-        `<div style="font-size:14px; font-weight:700; color:#ffffff; text-decoration:none; text-shadow:0 0 3px #000, 0 1px 2px #000;">${runeHighlightHtml(text)}</div>`;
+// Opens or closes the slide-out list of acquired runes over the rune pick window
+function toggleRuneAcquired(open) {
+    const panel = document.getElementById('rune-acq-panel');
+    if (panel) panel.classList.toggle('open', !!open);
 }
 
 function refreshRuneChoices() {
