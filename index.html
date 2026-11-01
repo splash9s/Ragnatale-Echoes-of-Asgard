@@ -305,6 +305,25 @@
         #view-events #events-content { display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; padding: 20px 23px; overflow-y: auto; }
         #view-events #events-content .events-title { position: relative; transform: none; left: auto; width: auto; white-space: normal; text-align: center; margin: 8px 0 4px; font-size: 44px; line-height: 1.1; }
         #view-events #events-tab-quests { position: relative; left: auto; top: auto; width: auto; }
+        /* Events page readability pass: solid light panel, dark text, navy buttons, text 2x */
+        #view-events #events-content { background: #f7efd9 !important; color: #1b1408; font-size: 32px; box-sizing: border-box; padding: 24px 40px; overflow-y: auto; }
+        #view-events #events-content, #view-events #events-content * { color: #1b1408 !important; }
+        #view-events #events-content [class*="text-xs"] { font-size: 24px !important; }
+        #view-events #events-content [class*="text-sm"] { font-size: 28px !important; }
+        #view-events #events-content [class*="text-[10px]"] { font-size: 20px !important; }
+        #view-events #events-content [class*="text-[9px]"] { font-size: 18px !important; }
+        #view-events #events-content .events-title { font-size: 88px !important; font-weight: 800; color: #1b1408 !important; text-align: center; margin: 4px 0 8px; line-height: 1.15; }
+        #view-events #events-content .events-main { color: #2f3266 !important; }
+        #view-events #events-content .events-line { height: 6px; background: #494d87 !important; margin: 14px 0; }
+        #view-events #events-content #event-gold, #view-events #events-content #event-xp, #view-events #events-content #void-tower-card, #view-events #events-content #quests-container > div, #view-events #events-content #quests-container .bg-slate-900, #view-events #events-content #quests-container .bg-slate-950 { background-color: #fffaf0 !important; border: 2px solid #8b6d3d !important; border-radius: 16px; }
+        #view-events #events-content #event-gold, #view-events #events-content #event-xp, #view-events #events-content #void-tower-card { width: 100%; box-sizing: border-box; padding: 24px; }
+        #view-events #events-content button:not([onclick^="claimQuestMilestone"]) { background-color: #494d87 !important; color: #ffffff !important; border: 2px solid #2f3266 !important; border-radius: 12px !important; font-weight: 700; white-space: normal; text-align: left; padding: 12px 18px !important; }
+        #view-events #events-content button:not([onclick^="claimQuestMilestone"]):hover:not(:disabled) { background-color: #3a3d70 !important; }
+        #view-events #events-content button:disabled { background-color: #c9c3ae !important; color: #2b2619 !important; border-color: #8c866f !important; }
+        #view-events #events-content #void-tower-card button { background-color: #5b3fa0 !important; border-color: #3d2870 !important; color: #ffffff !important; }
+        #view-events #events-content button:not([onclick^="claimQuestMilestone"]), #view-events #events-content button:not([onclick^="claimQuestMilestone"]) * { color: #ffffff !important; }
+        #view-events #events-content button:disabled, #view-events #events-content button:disabled * { color: #2b2619 !important; }
+        #view-events #events-content h3 { background-color: #fffaf0 !important; border: 2px solid #8b6d3d !important; color: #1b1408 !important; }
         #view-events #events-content, #view-events #events-content #quests-container * { color: #2a1a0e; }
         #view-events #events-content h3 { display: inline-block; background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; border-radius: 8px; padding: 4px 10px; color: #2a1a0e; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
@@ -620,15 +639,9 @@
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
                     </div>
 
-                    <!-- Left menu side: section names, each level with its section on the right -->
-                    <div id="events-menu" style="position:absolute; left:0px; top:70px; width:430px; height:1010px; background:rgba(202,163,94,.7); z-index:2;">
-                        <div class="events-label" style="top:80px;">daily quest</div>
-                        <div class="events-label" style="top:430px;">events</div>
-                        <div class="events-label" style="top:960px;">Void Tower</div>
-                    </div>
-
                     <!-- Right content side -->
-                    <div id="events-content" style="position:absolute; left:430px; top:70px; width:1490px; height:1010px; background:rgba(231,209,170,.7); z-index:2;">
+                    <div id="events-content" style="position:absolute; left:0px; top:70px; width:1920px; height:1010px; z-index:2;">
+                        <div class="events-title events-main">Events</div>
                         <!-- Section 1: daily quest milestone -->
                         <div class="events-title">daily quest milestone</div>
                         <div id="events-tab-quests">
@@ -642,6 +655,7 @@
                         <div class="events-line"></div>
 
                         <!-- Section 3: Void Tower -->
+                        <div class="events-title">Void Tower</div>
                         <div id="void-tower-card" class="events-item" style="display:flex; align-items:center; gap:16px;">
                             <div>
                                 <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
