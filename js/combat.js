@@ -234,7 +234,8 @@ function showRuneChoices(isNew) {
         const detail = def ? def.text(runeN(pr.id)) : pr.desc;
         // Three card sizes by rarity: 1-2 small, 3-4 medium, 5 big
         const sizeTier = rarity >= 5 ? "big" : rarity >= 3 ? "medium" : "small";
-        return `<div class="rune-pick-card rune-acq-card rune-acq-${sizeTier}">
+        const cardW = sizeTier === "big" ? 270 : sizeTier === "medium" ? 220 : 170;
+        return `<div class="rune-pick-card rune-acq-card" style="width:${cardW}px;">
                 <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
                 <span class="rune-pick-text">
                     <span class="rune-pick-name">${escapeHtml(pr.name)}</span>
@@ -263,9 +264,9 @@ function showRuneChoices(isNew) {
     // Edge tab on the right side of the window: opens the list of runes acquired
     html += `<button id="rune-acq-tab" onclick="toggleRuneAcquired(true)">Runes (${acquired.length})</button>`;
     // Slide-out list of acquired runes, overlaying the pick window
-    html += `<div id="rune-acq-panel">
+    html += `<div id="rune-acq-panel" style="display:flex; flex-direction:column; gap:12px;">
             <div class="rune-acq-head"><span>Runes acquired (${acquired.length})</span><button onclick="toggleRuneAcquired(false)" class="rune-acq-close">×</button></div>
-            <div class="rune-acq-list">${acquiredHtml}</div>
+            <div class="rune-acq-list" style="display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:flex-start; gap:14px; flex:1; min-height:0; overflow-x:auto; overflow-y:hidden; padding:0 4px 6px;">${acquiredHtml}</div>
         </div></div>`;
     if (isNew) {
         showModal("Rune Blessing", "", html);
