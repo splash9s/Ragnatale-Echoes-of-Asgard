@@ -2285,7 +2285,7 @@ function renderSkillPage() {
     // Star map image, added once
     const mapSlot = document.getElementById('skill-map-slot');
     if (mapSlot && !mapSlot.firstChild) {
-        mapSlot.innerHTML = '<img class="skill-map" src="assets/pages/skill/skillbg.webp" alt="">';
+        mapSlot.innerHTML = '<img class="skill-map" src="assets/pages/skill/skillmap.webp" alt="">';
     }
 
     let html = '';
