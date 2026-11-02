@@ -2072,7 +2072,17 @@ const ITEM_ICON_RULES = [
     [/Resurrection Potion/, 'potion_res'],
     [/Refining Stone/, 'mat_refining'],
     [/Iron Scraps/, 'mat_scrap'],
-    [/Skill Reset/, 'scroll_skillreset']
+    [/Skill Reset/, 'scroll_skillreset'],
+    [/Worn Iron Sword/, 'gear_sword'],
+    [/Rookie Dagger/, 'gear_dagger'],
+    [/Leather Boots/, 'gear_boots'],
+    [/Apprentice Ring/, 'gear_ring'],
+    [/Iron Knuckles/, 'gear_knuckles'],
+    [/Wooden Buckler/, 'gear_buckler'],
+    [/Cloth Cap/, 'gear_clothcap'],
+    [/Iron Cuirass/, 'gear_cuirass'],
+    [/Mossbloom Cap/, 'gear_mossbloomcap'],
+    [/Cotton Cloak/, 'gear_cloak']
 ];
 function itemIconHTML(item) {
     const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
