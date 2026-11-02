@@ -540,7 +540,16 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 gap-3">
                 <button onclick="switchView('library')" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">📚 Library</button>
                 <button onclick="manualSaveGame()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">💾 Save Game</button>
-                <button id="bgm-toggle-btn" onclick="toggleBgm()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🎵 BGM</button>
+                <div class="px-5 py-3 bg-slate-800 rounded-xl text-slate-200 flex items-center gap-4">
+                    <button id="music-toggle-btn" onclick="toggleMusicOn()" class="w-56 py-2 px-3 bg-slate-700 hover:bg-slate-600 font-bold rounded-lg text-left cursor-pointer text-xl">🎵 Music: On</button>
+                    <input id="music-volume" type="range" min="0" max="100" step="5" value="20" class="flex-1 cursor-pointer" oninput="setMusicVolume(this.value)" onchange="saveAudioSettings()">
+                    <span id="music-volume-text" class="w-12 text-right font-mono text-xl">20</span>
+                </div>
+                <div class="px-5 py-3 bg-slate-800 rounded-xl text-slate-200 flex items-center gap-4">
+                    <button id="sfx-toggle-btn" onclick="toggleSfxOn()" class="w-56 py-2 px-3 bg-slate-700 hover:bg-slate-600 font-bold rounded-lg text-left cursor-pointer text-xl">🔊 Effects: On</button>
+                    <input id="sfx-volume" type="range" min="0" max="100" step="5" value="20" class="flex-1 cursor-pointer" oninput="setSfxVolume(this.value)" onchange="saveAudioSettings(); previewSfx()">
+                    <span id="sfx-volume-text" class="w-12 text-right font-mono text-xl">20</span>
+                </div>
                 <button onclick="toggleLanguage()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
                 <button onclick="openSendMailForm()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Send Mail</button>
                 <button onclick="resetSaveGame()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left !text-red-300 hover:!bg-red-950/40">♻️ Reset Save Data</button>
@@ -1063,54 +1072,17 @@
     <script src="data/maps.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="js/player.js"></script>
+    <script src="js/audio.js"></script>
     <script src="js/cloud.js"></script>
     <script src="js/combat.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/town.js"></script>
     <script src="js/loader.js"></script>
-    <audio id="game-bgm" src="sound/bgm.mp3" loop preload="auto"></audio>
 
 <script>
-    // BGM: loops at low volume. Browsers may block autoplay until the first click or key press,
-    // so the music also starts on the first interaction unless the player turned it off.
-    let bgmPaused = false;
-    function setBgmButton(playing) {
-        const btn = document.getElementById('bgm-toggle-btn');
-        if (btn) btn.innerText = playing ? '🎵 BGM On' : '🎵 BGM Off';
-    }
-    function playBgm() {
-        const bgm = document.getElementById('game-bgm');
-        if (!bgm) return;
-        bgm.loop = true;
-        bgm.volume = 0.2;
-        bgm.play().then(() => setBgmButton(true)).catch(() => setBgmButton(false));
-    }
-    function toggleBgm() {
-        const bgm = document.getElementById('game-bgm');
-        if (!bgm) return;
-        if (!bgm.paused) {
-            bgm.pause();
-            bgmPaused = true;
-            setBgmButton(false);
-        } else {
-            bgmPaused = false;
-            playBgm();
-        }
-    }
-    function initBgm() {
-        playBgm();
-        const onInteraction = (e) => {
-            if (e.target && e.target.id === 'bgm-toggle-btn') return;
-            const bgm = document.getElementById('game-bgm');
-            if (!bgmPaused && bgm && bgm.paused) playBgm();
-        };
-        document.addEventListener('pointerdown', onInteraction);
-        document.addEventListener('keydown', onInteraction);
-    }
-
     // Called by js/loader.js once the loading screen has finished preloading
     function startGame() {
-        initBgm();
+        initAudio();
         renderAvatarSelection();
         if (loadGame()) {
             let nameSelectModal = document.getElementById('view-name-select');
@@ -1121,6 +1093,7 @@
             updateUI();
             logMessage("[System] Game loaded successfully!", "winlose");
         }
+        setMusicTrack('town');
         if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();
         if (typeof cloudStart === 'function') cloudStart();
     }

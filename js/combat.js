@@ -44,8 +44,10 @@ const BOSS_ATK_MULT = 2.4; // 2x the old 1.2
 // Helper to play audio effects safely
 function playSound(path) {
     try {
+        const vol = sfxVolumeNow();
+        if (vol <= 0) return; // Effects off
         const audio = new Audio(path);
-        audio.volume = 0.2;
+        audio.volume = vol;
         audio.play().catch(e => console.log("Audio play prevented:", e));
     } catch (err) {
         console.log("Audio error:", err);
@@ -554,6 +556,8 @@ function spawnStageMonsters() {
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
     playerDebuffs = { curseUntil: 0, frost: 0, stun: 0 };
     playerStunUntil = 0;
+    // Background music: boss stage or normal stage
+    setMusicTrack(isBossStage() ? 'boss' : 'battle');
     // Stasis Rune: the player is stunned for 5 seconds at the start of every stage
     if (runeN('turnStun') > 0) { playerStunUntil = Date.now() + 5000; logMessage('[Stasis] You are stunned for 5 seconds', 'winlose'); }
     playerTimedDebuffs = {};

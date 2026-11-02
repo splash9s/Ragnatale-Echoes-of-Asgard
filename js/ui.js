@@ -1028,6 +1028,8 @@ function switchView(viewName) {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
+    // Music: town theme everywhere except combat (combat sets its own track when a stage starts)
+    if (viewName !== 'combat') setMusicTrack('town');
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
     document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
@@ -1047,7 +1049,7 @@ function switchView(viewName) {
         renderSkillPage();
         skillFocusHub();
     }
-    if (viewName === 'setting') document.getElementById('view-setting')?.classList.remove('hidden');
+    if (viewName === 'setting') { document.getElementById('view-setting')?.classList.remove('hidden'); refreshAudioUI(); }
     if (viewName === 'library') {
         document.getElementById('view-library')?.classList.remove('hidden');
         renderLibraryView();
