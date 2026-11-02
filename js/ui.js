@@ -2820,12 +2820,12 @@ function renderQuestsView() {
                 </button>
                 <button onclick="claimQuestMilestone(2)" ${completedCount < 2 || player.questMilestoneClaimed[2] ? 'disabled' : ''} class="p-2 bg-slate-900 border-slate-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
                     <span class="block font-bold text-slate-300">2 Quests</span>
-                    <span class="text-slate-300">Silver Chest</span>
+                    <img src="assets/chest/silver/silvercsmall.png" alt="Silver Chest" class="block mx-auto" style="width:90px; height:72px;">
                     ${player.questMilestoneClaimed[2] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
                 </button>
                 <button onclick="claimQuestMilestone(3)" ${completedCount < 3 || player.questMilestoneClaimed[3] ? 'disabled' : ''} class="p-2 bg-slate-900 border-purple-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
                     <span class="block font-bold text-purple-300">3 Quests</span>
-                    <span class="text-slate-300">Gold Chest</span>
+                    <img src="assets/chest/gold/goldcsmall.png" alt="Gold Chest" class="block mx-auto" style="width:90px; height:72px;">
                     ${player.questMilestoneClaimed[3] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
                 </button>
             </div>
