@@ -3239,7 +3239,7 @@ function updateUI() {
                 <div onclick="showItemDetail(${index})" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
                     <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
-                    ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[10px] font-bold text-white leading-tight pointer-events-none" style="text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
+                    ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[11px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
                 </div>
             `;
         });
