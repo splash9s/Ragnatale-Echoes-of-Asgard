@@ -1030,6 +1030,8 @@ function switchView(viewName) {
     });
     // Music: town theme everywhere except combat (combat sets its own track when a stage starts)
     if (viewName !== 'combat') setMusicTrack('town');
+    // Refresh badges on every screen change, so the character page shows current point alerts
+    if (typeof updateTownAlerts === 'function') updateTownAlerts();
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
     document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
@@ -1351,6 +1353,7 @@ function updateTownAlerts() {
     setAlert('alert-char', statPts || skillPts);
     setAlert('alert-stat-pts', statPts, 'inline-block');
     setAlert('alert-char-stats', statPts); // STATS tab on the character page
+    setAlert('alert-char-skills', skillPts); // SKILLS button on the character page
     setAlert('alert-skill-sp', skillPts);
 }
 
