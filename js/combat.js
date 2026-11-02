@@ -112,7 +112,8 @@ const RUNE_DEFS = {
     ironGuard: { name: "Iron Guard Rune", rarity: 2, add: 5, once: true, desc: "Crit restores 5% armor", text: v => `Crit restores ${v}% armor` },
     overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "Overheal damages a random enemy", text: () => "Overheal damages a random enemy" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a crit", text: () => "Every attack is a crit" },
-    bloodlust: { name: "Bloodlust Rune", rarity: 2, add: 2, once: true, desc: "Kill: +2% Max HP (from Max HP at stage start)", text: v => `Kill: +${v}% Max HP (from Max HP at stage start)` },
+    bloodlust: { name: "Bloodlust Rune", rarity: 3, add: 2, once: true, desc: "Kill: +2% Max HP (from Max HP at stage start)", text: v => `Kill: +${v}% Max HP (from Max HP at stage start)` },
+    turnStun: { name: "Stasis Rune", rarity: 2, flag: true, desc: "Every turn: enemies are stunned for 3s. Enemy ATK +10% for the rest of the map, stacking each turn", text: () => "Every turn: enemies are stunned for 3s. Enemy ATK +10% for the rest of the map, stacking each turn" },
     shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Kill: +0.5 Flee", text: v => `Kill: +${v} Flee` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Kill restores 10% HP", text: v => `Kill restores ${v}% HP` },
     fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from Max HP at stage start)", text: v => `Crit: 50% chance to add +${v}% Max HP (from Max HP at stage start)` },
@@ -269,6 +270,7 @@ function showRuneChoices(isNew) {
         </div></div>`;
     if (isNew) {
         showModal("Rune Blessing", "", html);
+        scheduleVipAutoRune(choices);
     } else {
         const area = document.getElementById('modal-content-area');
         if (area) area.innerHTML = html;
@@ -532,8 +534,8 @@ function makeBoss(t) {
     return {
         ...t,
         ...combatHitFlee(t),
-        hp: Math.floor(t.hp * BOSS_HP_MULT),
-        maxHp: Math.floor(t.maxHp * BOSS_HP_MULT),
+        hp: Math.floor(t.hp * (t.bossHpMult || BOSS_HP_MULT)),
+        maxHp: Math.floor(t.maxHp * (t.bossHpMult || BOSS_HP_MULT)),
         atkMin: Math.floor(t.atkMin * BOSS_ATK_MULT),
         atkMax: Math.floor(t.atkMax * BOSS_ATK_MULT),
         isBoss: true, rewarded: false, ailments: {}, attackCount: 0, enraged: false
@@ -1186,6 +1188,7 @@ function monsterAct(m, derived, position = 0) {
     const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
+        eDmg = Math.max(1, Math.floor(eDmg * (1 + 0.1 * (player.enemyAtkStacks || 0)))); // Stasis Rune ATK stacks
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
         if (m.isBoss && !m.noHeavyStrike && m.attackCount % 4 === 0) {
             eDmg = Math.floor(eDmg * 2);
@@ -1242,6 +1245,7 @@ function tryMageSpellCast(m) {
     const def = SPELL_DEFS[m.spell];
     let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + getDerivedStats().def)));
     eDmg = Math.max(1, Math.floor(eDmg * def.mult));
+    eDmg = Math.max(1, Math.floor(eDmg * (1 + 0.1 * (player.enemyAtkStacks || 0)))); // Stasis Rune ATK stacks
     logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
     if (m.spell === 'rockCurse') { playerDebuffs.curseUntil = Date.now() + 3000; logMessage('[Curse] Your attacks are weaker for 3 seconds', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 seconds)'); }
     if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
@@ -1250,7 +1254,6 @@ function tryMageSpellCast(m) {
 
 // ---------- MAIN LOOP ----------
 function runCombatTick() {
-    renderCombatStatus();
     if (combatPaused) {
         if (isVipActive()) return;
         combatPaused = false;
@@ -1443,6 +1446,12 @@ function runCombatTick() {
         return;
     }
 
+    // Stasis Rune: at the start of every turn all enemies are stunned for 3s; their ATK grows 10% each turn for the rest of the map
+    if (runeN('turnStun') > 0 && alive.length > 0) {
+        player.enemyAtkStacks = (player.enemyAtkStacks || 0) + 1;
+        alive.forEach(m => { if (!m.status || m.status.kind === 'stun') m.status = { kind: 'stun', ms: 3000 }; });
+        logMessage(`[Stasis] Enemies stunned for 3 seconds. Enemy ATK +${10 * player.enemyAtkStacks}%`, 'winlose');
+    }
     // ---- Monster turn (every living monster attacks) ----
     tickPlayerDebuffs();
     alive.forEach((m, i) => monsterAct(m, derived, i));
@@ -1497,6 +1506,8 @@ function onStageCleared() {
     stageClearing = true;
     clearInterval(combatInterval); combatRunId++;
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
+    // Every stage end restores 10% of Max HP
+    healPlayer(Math.ceil(getDerivedStats().maxHp * 0.1), 'stage');
     const sid = combatSessionId;
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
@@ -1642,6 +1653,19 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
     return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
+// VIP auto-rune: when the rune window opens, a random offered rune is picked for the player
+function scheduleVipAutoRune(choices) {
+    if (!player.vipAutoRune || !isVipActive() || !choices || choices.length === 0) return;
+    const pick = choices[Math.floor(Math.random() * choices.length)];
+    setTimeout(() => { if (isRuneOffered(pick)) selectRuneChoice(pick, window.runeCallback); }, 400);
+}
+function toggleVipAutoRune() {
+    if (!isVipActive()) return;
+    player.vipAutoRune = !player.vipAutoRune;
+    updatePauseButton();
+    saveGame();
+}
+
 function toggleCombatPause() {
     if (!isVipActive()) return;
     combatPaused = !combatPaused;
@@ -1656,6 +1680,13 @@ function updatePauseButton() {
     btn.innerText = combatPaused ? 'Resume' : 'Pause';
     btn.classList.toggle('bg-amber-600', combatPaused);
     btn.classList.toggle('text-slate-950', combatPaused);
+    const ar = document.getElementById('combat-auto-rune-btn');
+    if (ar) {
+        ar.classList.toggle('hidden', !isVipActive());
+        ar.innerText = player.vipAutoRune ? 'Auto Rune: On' : 'Auto Rune: Off';
+        ar.classList.toggle('bg-amber-600', !!player.vipAutoRune);
+        ar.classList.toggle('text-slate-950', !!player.vipAutoRune);
+    }
 }
 
 // ---------- EVENTS ----------

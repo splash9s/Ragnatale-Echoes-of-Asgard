@@ -506,6 +506,7 @@
             </div>
             <div class="ui" data-action="character" style="left:13px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/characterbutton_q85.webp" alt="" onerror="townSwap(this,'characterbutton.png')">
+                <img id="alert-char" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
             <div class="ui" data-action="shop" style="left:239px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/shoppagebutton_q85.webp" alt="" onerror="townSwap(this,'shoppagebutton.png')">
@@ -703,7 +704,7 @@
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
-                    <div id="skill-sp-badge" class="art-panel" style="left:895px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;">
+                    <div id="skill-sp-badge" class="art-panel" style="left:895px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;"><img id="alert-skill-sp" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:38px; height:38px; z-index:10; pointer-events:none;">
                         <span class="text-xs font-bold">SP: <strong id="skill-page-sp">0</strong></span>
                     </div>
                     
@@ -738,7 +739,7 @@
                         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Attributes</h3>
-                            <span class="text-xs text-amber-400">Pts: <strong id="stat-points">5</strong></span>
+                            <span class="text-xs text-amber-400">Pts: <strong id="stat-points">5</strong> <img id="alert-stat-pts" src="assets/page01/alert_q85.webp" alt="" style="display:none; width:24px; height:24px; vertical-align:middle;"></span>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
@@ -1032,15 +1033,10 @@
 
                     <!-- Pause (bottom right); Next Stage takes its place once the stage is cleared -->
                     <button id="combat-pause-btn" onclick="toggleCombatPause()" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer">Pause</button>
+                    <button id="combat-auto-rune-btn" onclick="toggleVipAutoRune()" title="VIP: auto-pick a random rune" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer" style="position:absolute; left:1541px; top:694px; width:175px; height:178px;"></button>
                     <button id="next-stage-btn" onclick="proceedToNextStage()" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="hidden bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-sm transition cursor-pointer shadow">Next Stage</button>
 
                     <!-- Return (top right) -->
-                    <div id="combat-status-box" class="combat-box" style="left:1541px; top:250px; width:367px; height:420px; z-index:8; overflow-y:auto;">
-            <div class="text-xs font-bold text-emerald-300 uppercase">Buffs</div>
-            <div id="combat-buff-list" class="flex flex-col gap-1 text-[11px] font-mono mb-3"></div>
-            <div class="text-xs font-bold text-red-300 uppercase">Debuffs</div>
-            <div id="combat-debuff-list" class="flex flex-col gap-1 text-[11px] font-mono"></div>
-        </div>
         <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="returnToTown()">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">

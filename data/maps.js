@@ -112,7 +112,7 @@ const GAME_DATA = {
         map10: {
             title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, stageGrowth: 0.08, dropKey: 'map10',
             enemies: [...BASE_LIST],
-            boss: MONSTERS_DATA.bossCavernBehemoth,
+            boss: { ...MONSTERS_DATA.bossCavernBehemoth, bossHpMult: 1.5 }, // Lv 10 boss: 1.5x base HP (other bosses use BOSS_HP_MULT)
             miniBoss: makeMiniBoss(BASE_15.rockGolem, 10)
         },
         map20: {

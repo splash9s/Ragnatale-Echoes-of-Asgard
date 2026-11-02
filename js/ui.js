@@ -778,7 +778,7 @@ function openAvatarPicker() {
             ${avatarMarkup(av, 'w-full h-full object-cover')}
         </button>`;
     }).join('');
-    showModal("Choose Avatar", "", `<div id="avatar-picker-host" class="relative"><div class="grid grid-cols-2 gap-3 justify-items-center max-h-[70vh] overflow-y-auto p-1">${options}</div></div>`);
+    showModal("Choose Avatar", "", closeCornerHTML() + `<div id="avatar-picker-host" class="relative"><div class="grid grid-cols-2 gap-3 justify-items-center max-h-[70vh] overflow-y-auto p-1">${options}</div></div>`);
     // The picker needs room for two 256px columns
     const box = document.querySelector('#game-modal > div');
     if (box) box.style.maxWidth = '760px';
@@ -1294,6 +1294,18 @@ function switchShopTab(tabName) {
 }
 
 // Town alerts: quests not complete (Events button); free gold or free diamond unclaimed (Shop button); unclaimed mail (Mail button)
+// Floating red text at the click position (used for purchase errors)
+function floatNoticeAt(text, ev) {
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+    if (ev && (ev.clientX || ev.clientY)) { x = ev.clientX; y = ev.clientY; }
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#f87171; font-weight:bold; font-size:24px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform 1s ease-out, opacity 1s ease-out;`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-150%)'; el.style.opacity = '0'; }));
+    setTimeout(() => el.remove(), 1100);
+}
+
 function updateTownAlerts() {
     const questOpen = (player.dailyQuests || []).some(q => !q.completed);
     const shopFree = isFreeGoldAvailable() || isFreeDiamondAvailable();
@@ -1311,6 +1323,12 @@ function updateTownAlerts() {
     if (tabDia) tabDia.style.display = isFreeDiamondAvailable() ? 'block' : 'none';
     if (tabShop) tabShop.style.display = isFreeGoldAvailable() ? 'block' : 'none';
     if (tabQuest) tabQuest.style.display = questOpen ? 'block' : 'none';
+    // Stat and skill points waiting to be spent: Character button, stat points and skill points
+    const statPts = (player.statPoints || 0) > 0, skillPts = (player.jobSp || 0) > 0;
+    const setAlert = (id, on, disp = 'block') => { const el = document.getElementById(id); if (el) el.style.display = on ? disp : 'none'; };
+    setAlert('alert-char', statPts || skillPts);
+    setAlert('alert-stat-pts', statPts, 'inline-block');
+    setAlert('alert-skill-sp', skillPts);
 }
 
 // Refresh everything on the shop row and the town alerts
@@ -1422,7 +1440,7 @@ function buyGoldConsumable(itemId) {
     if (!item) return;
 
     if (player.gold < item.price) {
-        showModal("Purchase Failed", "Insufficient Gold!");
+        floatNoticeAt("Not enough Gold", window.event);
         return;
     }
     if (!placeItemInInventory({ ...item, qty: 1 })) {
@@ -1481,7 +1499,7 @@ function buyArmoryItem(itemIndex) {
     let price = template.price || 300;
 
     if (player.gold < price) {
-        showModal("Purchase Failed", "Insufficient Gold!");
+        floatNoticeAt("Not enough Gold", window.event);
         return;
     }
     if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
@@ -1539,7 +1557,7 @@ function buyDiamondItem(itemId) {
     }
 
     if (player.diamonds < item.price) {
-        showModal("Purchase Failed", "Insufficient Diamonds!");
+        floatNoticeAt("Not enough Diamonds", window.event);
         return;
     }
     if (item.type === 'chest' && countFreeCapacity({ name: item.name, type: 'chest', qty: 1 }) < 1) {
@@ -2245,7 +2263,7 @@ function executeEquipItem(index) {
     let item = player.inventory[index];
     if (!item) return false;
     if (player.baseLv < (item.levelReq || 1)) {
-        alert(`Requires Base Level ${item.levelReq || 1}!`);
+        showModal("Cannot Equip", `This gear requires Base Level ${item.levelReq || 1}. Your Base Level is ${player.baseLv}.`);
         return false;
     }
     const slotKey = item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot;
