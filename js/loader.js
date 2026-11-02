@@ -215,6 +215,7 @@ const LOADING_IMAGES = [
     "assets/pages/character/cha_idle_q85.webp",
     "assets/pages/character/idle_q85.webp",
     "assets/pages/character/inventoryslot_q85.webp",
+    "assets/pages/character/inventoryslot2.png",
     "assets/pages/character/shadow_q85.webp",
     "assets/pages/character/shadow_clean_q85.webp",
     "assets/pages/character/slots/armorslot_q85.webp",
