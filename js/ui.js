@@ -1952,6 +1952,32 @@ function invDrop(e, to) {
     saveGame();
 }
 function invDragEnd() { invDragFrom = null; }
+// Drag an inventory item onto a gear slot to equip it (rings go to the slot dropped on; potions go to the potion slot)
+function eqDragOver(e) {
+    if (invDragFrom === null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+function eqDrop(e, slot) {
+    e.preventDefault();
+    const from = invDragFrom;
+    invDragFrom = null;
+    if (from === null) return;
+    const item = player.inventory[from];
+    if (!item) return;
+    if (slot === 'potionSlot') {
+        if (item.type === 'potion') useInventoryPotion(from);
+        else logMessage(`[Equipment] ${item.name} cannot go in the potion slot`, 'winlose');
+        return;
+    }
+    const fits = item.slot === slot || (item.slot === 'ring' && (slot === 'ringLeft' || slot === 'ringRight'));
+    if (!fits) {
+        logMessage(`[Equipment] ${item.name} cannot be equipped in this slot`, 'winlose');
+        return;
+    }
+    if (executeEquipItem(from, slot)) closeInvDetail();
+}
+
 
 function sortInventory(key) {
     const [field, dir] = String(key || 'type_asc').split('_');
@@ -2356,14 +2382,14 @@ function syncHeroSprites() {
         if (el && el.getAttribute('src') !== src) el.src = src;
     });
 }
-function executeEquipItem(index) {
+function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
     if (player.baseLv < (item.levelReq || 1)) {
         showModal("Cannot Equip", `This gear requires Base Level ${item.levelReq || 1}. Your Base Level is ${player.baseLv}.`);
         return false;
     }
-    const slotKey = item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot;
+    const slotKey = targetSlot || (item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot);
     // Two-handed weapons take the shield slot: a shield cannot be worn with one, so equipping one moves the shield to the bag
     if (slotKey === 'shield' && isTwoHanded(player.equipped.weapon)) {
         alert("A two-handed weapon is equipped. Unequip it first.");
@@ -3270,7 +3296,7 @@ function updateUI() {
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
             const base = `assets/pages/character/slots/${img.replace(/\.png$/, '_q85.webp')}`;
             const src = has && gear.img && VISUAL_EQUIP_SLOTS.includes(slot) ? gear.img : base;
-            return `<div ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
+            return `<div ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
                 <img src="${src}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='${base}'">
             </div>`;
         };
