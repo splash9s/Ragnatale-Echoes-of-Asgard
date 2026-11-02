@@ -116,6 +116,7 @@ const RUNE_DEFS = {
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a crit", text: () => "Every attack is a crit" },
     bloodlust: { name: "Bloodlust Rune", rarity: 3, add: 2, once: true, desc: "Kill: +2% Max HP (from Max HP at stage start)", text: v => `Kill: +${v}% Max HP (from Max HP at stage start)` },
     turnStun: { name: "Stasis Rune", rarity: 2, flag: true, desc: "At the start of every stage: stunned for 5s, +15% ATK during the stage", text: () => "At the start of every stage: stunned for 5s, +15% ATK during the stage" },
+    sameTarget: { name: "Same Target Rune", rarity: 3, flag: true, desc: "Each hit on the same target: +10% damage, stacking. Restarts when the target dies", text: () => "Each hit on the same target: +10% damage, stacking. Restarts when the target dies" },
     shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Kill: +0.5 Flee", text: v => `Kill: +${v} Flee` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Kill restores 10% HP", text: v => `Kill restores ${v}% HP` },
     fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from Max HP at stage start)", text: v => `Crit: 50% chance to add +${v}% Max HP (from Max HP at stage start)` },
@@ -1258,6 +1259,15 @@ function tryMageSpellCast(m) {
     takePlayerDamage(eDmg, m);
 }
 
+// Same Target Rune: each landed hit on the same enemy adds 10% more damage. Switching to another enemy (or the target dying) restarts it
+let sameTargetRef = null;
+let sameTargetCount = 0;
+function sameTargetStreak(m) {
+    if (m !== sameTargetRef) { sameTargetRef = m; sameTargetCount = 0; }
+    sameTargetCount++;
+    return sameTargetCount;
+}
+
 // ---------- MAIN LOOP ----------
 function runCombatTick() {
     if (combatPaused) {
@@ -1328,6 +1338,7 @@ function runCombatTick() {
         if (targetEnemy.hp > 0 && targetEnemy.hp <= targetEnemy.maxHp * 0.5) pDmg = Math.floor(pDmg * (1 + skillBonus('lowHpDmgPct') / 100));
         if (runeN('giantSlayer') > 0 && (targetEnemy.isBoss || targetEnemy.isMiniBoss)) pDmg = Math.floor(pDmg * (1 + runeN('giantSlayer') / 100));
         if (runeN('monsterHunter') > 0 && !targetEnemy.isBoss && !targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + runeN('monsterHunter') / 100));
+        if (runeN('sameTarget') > 0) pDmg = Math.floor(pDmg * (1 + 0.1 * sameTargetStreak(targetEnemy))); // Same Target Rune
         if (runeN('ironFortress') > 0 && player.armor > 0) pDmg = Math.floor(pDmg * 3);
         if (player.runes.patientReady) { pDmg = pDmg * 4; player.runes.patientReady = false; }
         if (attackCount % 3 === 0 && runeN('divineLight') > 0) {
