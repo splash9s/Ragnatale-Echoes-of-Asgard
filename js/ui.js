@@ -1913,6 +1913,46 @@ function itemTypeRank(item) {
     return 70;
 }
 
+// Inventory drag and drop: drag an item onto another cell to swap them (same stackable items merge)
+let invDragFrom = null;
+function invDragStart(e, index) {
+    if (!player.inventory[index]) { e.preventDefault(); return; }
+    invDragFrom = index;
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', String(index)); } catch (_) {}
+}
+function invDragOver(e) {
+    if (invDragFrom === null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+function invDrop(e, to) {
+    e.preventDefault();
+    const from = invDragFrom;
+    invDragFrom = null;
+    if (from === null || from === to || !Array.isArray(player.inventory)) return;
+    const a = player.inventory[from];
+    const b = player.inventory[to];
+    if (!a) return;
+    if (b && a.name === b.name && isStackable(a) && isStackable(b)) {
+        const lim = stackLimit(a);
+        const total = (a.qty || 1) + (b.qty || 1);
+        if (total <= lim) {
+            player.inventory[to] = { ...b, qty: total };
+            player.inventory[from] = null;
+        } else {
+            player.inventory[to] = { ...b, qty: lim };
+            player.inventory[from] = { ...a, qty: total - lim };
+        }
+    } else {
+        player.inventory[from] = b || null;
+        player.inventory[to] = a;
+    }
+    updateUI();
+    saveGame();
+}
+function invDragEnd() { invDragFrom = null; }
+
 function sortInventory(key) {
     const [field, dir] = String(key || 'type_asc').split('_');
     const sign = dir === 'desc' ? -1 : 1;
@@ -3236,7 +3276,7 @@ function updateUI() {
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
-                <div onclick="showItemDetail(${index})" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
+                <div onclick="showItemDetail(${index})" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
                     <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[11px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
