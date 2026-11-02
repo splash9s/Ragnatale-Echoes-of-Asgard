@@ -772,16 +772,16 @@ function updateAvatarDisplay() {
 function openAvatarPicker() {
     const options = AVATARS.map(av => {
         if (!isAvatarUnlocked(av)) return `
-        <div title="${avatarLockTitle(av)}" class="relative h-16 w-16 rounded-xl border border-slate-700 bg-slate-900 overflow-hidden cursor-not-allowed">
+        <div title="${avatarLockTitle(av)}" class="relative h-32 w-32 rounded-xl border border-slate-700 bg-slate-900 overflow-hidden cursor-not-allowed">
             <div class="w-full h-full grayscale opacity-40">${avatarMarkup(av, 'w-full h-full object-cover')}</div>
-            <span class="absolute bottom-0 left-0 right-0 text-center text-[9px] font-bold bg-slate-950/85 text-amber-200">${avatarLockText(av)}</span>
+            <span class="absolute bottom-0 left-0 right-0 text-center text-[18px] font-bold bg-slate-950/85 text-amber-200">${avatarLockText(av)}</span>
         </div>`;
         return `
-        <button onclick="pickPlayerAvatar('${av}')" class="h-16 w-16 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 cursor-pointer overflow-hidden">
+        <button onclick="pickPlayerAvatar('${av}')" class="h-32 w-32 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 cursor-pointer overflow-hidden">
             ${avatarMarkup(av, 'w-full h-full object-cover')}
         </button>`;
     }).join('');
-    showModal("Choose Avatar", "", `<div class="grid grid-cols-4 gap-3 justify-items-center">${options}</div>`);
+    showModal("Choose Avatar", "", `<div class="grid grid-cols-3 gap-3 justify-items-center max-h-[60vh] overflow-y-auto p-1">${options}</div>`);
 }
 function pickPlayerAvatar(av) {
     player.avatar = av;
