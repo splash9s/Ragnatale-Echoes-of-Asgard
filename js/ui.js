@@ -29,6 +29,20 @@ const AVATAR_SET = [
     { path: "assets/avatars/bosslv80_q85.webp", boss: 80 },
     { path: "assets/avatars/bosslv90_q85.webp", boss: 90 },
     { path: "assets/avatars/bosslv99_q85.webp", boss: 99 },
+    { path: "assets/avatars/man4_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/man5_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/man6_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/man7_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/woman5_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/woman56_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/cat14_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/dog1_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/dog2_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/dog3_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/money1_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/money2_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/money3_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/girlmeme_q85.webp" }, // new: no condition yet
 ];
 const AVATARS = AVATAR_SET.map(a => a.path);
 // Avatar value is either an emoji or an image path (assets/avatars/... or data:image...)
