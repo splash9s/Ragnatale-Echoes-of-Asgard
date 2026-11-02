@@ -1136,24 +1136,13 @@ function dailyFreeCardHTML(key) {
         </div>
     `;
     }
-    if (key === 'diamond') {
-        return `
+    return `
         <div class="free-reward-card p-3 rounded border flex justify-between items-center">
             <div>
                 <span class="font-bold block text-xs">${item.name}</span>
                 <span class="text-[10px]">${item.desc}</span>
             </div>
             <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>
-        </div>
-    `;
-    }
-    return `
-        <div class="p-3 rounded border flex justify-between items-center">
-            <div>
-                <span class="font-bold block text-xs">${item.name}</span>
-                <span class="text-[10px]">${item.desc}</span>
-            </div>
-            <img src="assets/page01/alert.png" alt="Claim" title="Claim" onclick="claimDailyFree('${key}')" class="cursor-pointer hover:brightness-110 transition" style="width:56px;height:56px;">
         </div>
     `;
 }
@@ -1190,11 +1179,11 @@ function updateShopTabButtons() {
     const inactive = 'border: 1px solid #a593c4';
     const inactiveShop = 'border: 1px solid #b8945a';
     if (btnDiamond) {
-        const colors = isFreeDiamondAvailable() ? RED : diamondBase;
+        const colors = diamondBase; // original background; the alert badge shows the free reward
         btnDiamond.setAttribute('style', `${colors} ${isDiamond ? active : inactive}`);
     }
     if (btnShop) {
-        const colors = isFreeGoldAvailable() ? RED : shopBase;
+        const colors = shopBase; // original background; the alert badge shows the free reward
         btnShop.setAttribute('style', `${colors} ${!isDiamond ? active : inactiveShop}`);
     }
 }
