@@ -960,7 +960,7 @@ const COMBAT_ART = {
     fire: flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
     wind: flatArt('wind', [500, 625], [[800, 620], [950, 630], [1150, 620], [1350, 630], [1550, 620], [1700, 615]]),
     water: flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
-    final: flatArt('yggdrasil', [460, 592], [[820, 598], [970, 598], [1120, 592], [1270, 588], [1420, 584], [1570, 580]])
+    final: flatArt('yggdrasil', [460, 600], [[800, 598], [950, 598], [1150, 592], [1350, 580], [1550, 580], [1700, 570]])
 };
 // Each stage picks a new background, base layer and foreground.
 // New images are loaded and decoded first, then all of them swap in the same step (no fade).
