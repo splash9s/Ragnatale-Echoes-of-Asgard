@@ -2,6 +2,8 @@
 // Settings are stored in player.audio so they save with the game.
 const MUSIC_TRACKS = { town: 'sound/bgm_town.mp3', battle: 'sound/bgm_battle.mp3', boss: 'sound/bgm_boss.mp3' };
 const AUDIO_DEFAULTS = { musicOn: true, musicVol: 20, sfxOn: true, sfxVol: 20 };
+// Per-track level: the battle track is mixed louder, so it plays at 60% of the chosen volume
+const MUSIC_GAIN = { town: 1, battle: 0.6, boss: 1 };
 let musicEl = null;
 let musicTrack = null; // key of the track currently loaded
 
@@ -11,6 +13,7 @@ function audioSettings() {
     return player.audio;
 }
 function musicVolumeNow() { const a = audioSettings(); return a.musicOn ? a.musicVol / 100 : 0; }
+function trackVolumeNow() { return musicVolumeNow() * (MUSIC_GAIN[musicTrack] ?? 1); }
 function sfxVolumeNow() { const a = audioSettings(); return a.sfxOn ? a.sfxVol / 100 : 0; }
 
 function getMusicEl() {
@@ -26,7 +29,7 @@ function setMusicTrack(key) {
         musicTrack = key;
         el.src = MUSIC_TRACKS[key];
     }
-    el.volume = musicVolumeNow();
+    el.volume = trackVolumeNow();
     if (audioSettings().musicOn) el.play().catch(() => {}); // blocked until the first click or key press (see initAudio)
 }
 
@@ -53,7 +56,7 @@ function toggleMusicOn() {
 }
 function setMusicVolume(v) {
     audioSettings().musicVol = Number(v);
-    getMusicEl().volume = musicVolumeNow();
+    getMusicEl().volume = trackVolumeNow();
     refreshAudioUI();
 }
 function toggleSfxOn() {
