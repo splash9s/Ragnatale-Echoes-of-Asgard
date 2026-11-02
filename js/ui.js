@@ -2199,10 +2199,10 @@ function showItemDetail(index) {
     const panel = document.getElementById('inv-detail-panel');
     if (!panel) return;
     panel.innerHTML = `
-        <button onclick="closeInvDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-sm">✕</button>
-        <div class="flex items-center gap-3 pr-12 mb-3">
-            <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
-            <div class="flex flex-col gap-1"><span class="font-bold text-base">${title}</span>${favBtn}</div>
+        <button id="inv-detail-close" onclick="closeInvDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
+        <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
+            <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(item)}</span>
+            <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span>${favBtn}</div>
         </div>
         ${body}${actions}`;
     panel.style.display = 'block';
