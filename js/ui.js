@@ -1686,7 +1686,7 @@ function renderBlacksmithSlot() {
         return;
     }
     const lv = gear.refineLevel || 0;
-    slotEl.innerHTML = `<span style="font-size:20px; line-height:1">${itemEmoji(gear)}</span><span>${lv > 0 ? '+' + lv : ''}</span>`;
+    slotEl.innerHTML = `${itemIconHTML(gear, 60)}<span>${lv > 0 ? '+' + lv : ''}</span>`;
     const isMax = lv >= 10;
     const cost = (lv + 1) * 100;
     const rateEl = document.getElementById('bs-success-rate');
@@ -1728,7 +1728,7 @@ function renderRefiningUI() {
         container.innerHTML += `
             <div onclick="blacksmithSelect('${slot}')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900/80 border-slate-700 hover:border-amber-600'}">
                 <div>
-                    <span class="font-bold text-amber-300 text-xs">${itemEmoji(gear)} ${gear.name} ${currentRefine > 0 ? '+' + currentRefine : ''}</span>
+                    <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(gear, 36)} ${gear.name} ${currentRefine > 0 ? '+' + currentRefine : ''}</span>
                     <span class="text-[10px] text-slate-400 block capitalize">Slot: ${slot} | Success Rate: ${isMax ? 'MAX' : successRate + '%'}</span>
                 </div>
                 <span class="text-[10px] text-slate-300 whitespace-nowrap">${isMax ? 'MAX LEVEL' : costGold + ' Gold + 1 Stone'}</span>
@@ -2189,10 +2189,10 @@ const ITEM_ICON_RULES = [
     [/Dusk Crown/, 'gear_lv99_helm'],
     [/Starlight Void Crown/, 'gear_lv99_boss']
 ];
-function itemIconHTML(item) {
+function itemIconHTML(item, size = 70) {
     const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
-    if (rule) return `<img src="assets/items/${rule[1]}.png" alt="" style="width:70px;height:70px;object-fit:contain;" />`;
-    return `<span style="font-size:44px;line-height:1;">${itemEmoji(item)}</span>`;
+    if (rule) return `<img src="assets/items/${rule[1]}.png" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
+    return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
     if (!item) return '';
