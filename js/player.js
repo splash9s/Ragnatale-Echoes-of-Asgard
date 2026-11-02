@@ -401,6 +401,8 @@ function loadGame() {
             player = Object.assign(player, parsed);
             migrateSkills();
             migrateGear();
+            if (typeof baseExpNeed === 'function') player.baseMaxExp = baseExpNeed(player.baseLv || 1);
+            if (typeof jobExpNeed === 'function') player.jobMaxExp = jobExpNeed(player.jobLv || 1);
             if (!Array.isArray(player.mailBox)) {
                 player.mailBox = createWelcomeMail();
             }
