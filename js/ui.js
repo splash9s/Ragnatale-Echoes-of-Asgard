@@ -1231,7 +1231,7 @@ function claimDailyFree(key) {
     if (item.reward.gold) player.gold += item.reward.gold;
     if (item.reward.diamonds) player.diamonds += item.reward.diamonds;
     logMessage(`[Free] Received ${item.name}!`, 'levelup');
-    showModal("Free Reward", `You received ${item.name}. Come back tomorrow for another.`);
+    showModal("Free Reward", '', rewardPopupHTML('You received:', rewardCellHTML(item), '<div class="text-slate-400 text-xs">Come back tomorrow for another.</div>'));
     updateUI();
     renderShop();
     renderDiamondShop();
@@ -3038,11 +3038,28 @@ const CHEST_REWARDS = {
     gold:   { goldMin: 1501, goldMax: 2000, rarities: [3, 4], items: 2 }
 };
 
+// Reward popups show item icons (gold shows the coin icon and amount)
+const REWARD_SLOT_BG = "background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;";
+function rewardCellHTML(item) {
+    return `<div title="${item.name}" class="flex items-center justify-center" style="width:96px;height:92px;${REWARD_SLOT_BG}">${itemIconHTML(item)}</div>`;
+}
+function rewardPopupHTML(title, cells, extra = '') {
+    return `<div class="flex flex-col items-center gap-3 text-center">
+        <div class="text-slate-300 text-sm">${title}</div>
+        <div class="flex flex-wrap justify-center items-center gap-3">${cells}</div>
+        ${extra}
+        <button onclick="closeModal()" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl">Confirm</button>
+    </div>`;
+}
+function goldCellHTML(amount) {
+    return `<div class="flex flex-col items-center gap-1"><img src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;"><span class="text-amber-300 font-bold text-sm">${amount} Gold</span></div>`;
+}
+
 function openChest(chestType) {
     const cfg = CHEST_REWARDS[chestType] || CHEST_REWARDS.copper;
     const goldReward = cfg.goldMin + Math.floor(Math.random() * (cfg.goldMax - cfg.goldMin + 1));
     player.gold += goldReward;
-    const rewardNames = [`${goldReward} Gold`];
+    const rewardCells = [goldCellHTML(goldReward)];
 
     const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
     if (pool.length > 0) {
@@ -3051,11 +3068,11 @@ function openChest(chestType) {
             const template = pool[Math.floor(Math.random() * pool.length)];
             const gear = generatePoEItem(template, rarity, 1);
             addItemToInventory(gear);
-            rewardNames.push(`${gear.name} (Rarity ${gear.rarity})`);
+            rewardCells.push(rewardCellHTML(gear));
         }
     }
 
-    const showRewards = () => showModal("Chest Opened!", `You received:\n• ` + rewardNames.join('\n• '));
+    const showRewards = () => showModal("Chest Opened!", '', rewardPopupHTML('You received:', rewardCells.join('')));
     if (CHEST_OPEN_FRAMES[chestType]) playChestOpen(chestType, showRewards);
     else showRewards();
     updateUI();
