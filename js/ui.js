@@ -1412,10 +1412,13 @@ function renderShop() {
         consumablesContainer.innerHTML = dailyFreeCardHTML('gold');
         GOLD_SHOP_CONSUMABLES.forEach(item => {
             consumablesContainer.innerHTML += `
-                <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
-                    <div>
+                <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center gap-3">
+                    <div class="flex items-center gap-3 flex-1">
+                        ${itemIconHTML(item, 48)}
+                        <div>
                         <span class="font-bold text-amber-300 block text-xs">${item.name}</span>
                         <span class="text-[10px] text-slate-400">${item.desc} — Price: ${item.price} Gold</span>
+                        </div>
                     </div>
                     <button onclick="buyGoldConsumable('${item.id}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
                 </div>
@@ -1450,9 +1453,12 @@ function renderShop() {
             const price = priceOf(item);
             armoryContainer.innerHTML += `
                 <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
-                    <div onclick="showArmoryItemDetail(${idx})" class="cursor-pointer flex-1">
+                    <div onclick="showArmoryItemDetail(${idx})" class="cursor-pointer flex-1 flex items-center gap-3">
+                        ${itemIconHTML(item, 48)}
+                        <div>
                         <span class="font-bold text-amber-300 block text-xs">${shopGearLabel(item).base}</span>
                         <span class="text-[10px] text-slate-400">[${shopGearLabel(item).tag}] LV${lvOf(item)}: ${price} Gold</span>
+                        </div>
                     </div>
                     <button onclick="buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
                 </div>
