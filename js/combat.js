@@ -115,7 +115,7 @@ const RUNE_DEFS = {
     overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "Overheal damages a random enemy", text: () => "Overheal damages a random enemy" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a crit", text: () => "Every attack is a crit" },
     bloodlust: { name: "Bloodlust Rune", rarity: 3, add: 2, once: true, desc: "Kill: +2% Max HP (from Max HP at stage start)", text: v => `Kill: +${v}% Max HP (from Max HP at stage start)` },
-    turnStun: { name: "Stasis Rune", rarity: 2, flag: true, desc: "At the start of every stage: you are stunned for 5s", text: () => "At the start of every stage: you are stunned for 5s" },
+    turnStun: { name: "Stasis Rune", rarity: 2, flag: true, desc: "At the start of every stage: stunned for 5s, +15% ATK during the stage", text: () => "At the start of every stage: stunned for 5s, +15% ATK during the stage" },
     shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Kill: +0.5 Flee", text: v => `Kill: +${v} Flee` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Kill restores 10% HP", text: v => `Kill restores ${v}% HP` },
     fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from Max HP at stage start)", text: v => `Crit: 50% chance to add +${v}% Max HP (from Max HP at stage start)` },
@@ -559,6 +559,7 @@ function spawnStageMonsters() {
     // Background music: boss stage or normal stage
     setMusicTrack(isBossStage() ? 'boss' : 'battle');
     // Stasis Rune: the player is stunned for 5 seconds at the start of every stage
+    stasisAtkPct = runeN('turnStun') > 0 ? 15 : 0;
     if (runeN('turnStun') > 0) { playerStunUntil = Date.now() + 5000; logMessage('[Stasis] You are stunned for 5 seconds', 'winlose'); }
     playerTimedDebuffs = {};
     playerAspdToggle = false;
@@ -629,6 +630,7 @@ function spawnStageMonsters() {
 let playerDebuffs = { curseUntil: 0, frost: 0, stun: 0 };
 // Player stun from tank attacks: the time (ms) until which the player cannot attack
 let playerStunUntil = 0;
+let stasisAtkPct = 0; // Stasis Rune: ATK bonus (%) for the current stage
 // Timed debuffs on the player from boss skills: { atk | hit | flee | aspd: { until, pct } }
 let playerTimedDebuffs = {};
 let playerAspdToggle = false; // Devour: every other player attack tick is skipped while ASPD is down
@@ -1503,6 +1505,7 @@ function stageDelay() {
 function onStageCleared() {
     if (stageClearing) return;
     stageClearing = true;
+    stasisAtkPct = 0; // the stage bonus ends with the stage
     clearInterval(combatInterval); combatRunId++;
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     // Every stage end restores 10% of Max HP

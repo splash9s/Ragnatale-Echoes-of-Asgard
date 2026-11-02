@@ -1029,7 +1029,7 @@ function switchView(viewName) {
         if (el) el.classList.add('hidden');
     });
     // Music: town theme everywhere except combat (combat sets its own track when a stage starts)
-    if (viewName !== 'combat') setMusicTrack('town');
+    if (viewName !== 'combat') { setMusicTrack('town'); stasisAtkPct = 0; }
     // Refresh badges on every screen change, so the character page shows current point alerts
     if (typeof updateTownAlerts === 'function') updateTownAlerts();
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.

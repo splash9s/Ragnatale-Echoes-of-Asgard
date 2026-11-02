@@ -357,6 +357,7 @@ function getDerivedStats() {
 
     atk += extra.atk;
     extra.atkPct += skillBonus('atkPct');
+    extra.atkPct += (typeof stasisAtkPct === 'number' ? stasisAtkPct : 0); // Stasis Rune: +15% ATK during the stage
     atk = Math.floor(atk * (1 + extra.atkPct / 100));
     def = Math.floor(def * (1 + (skillBonus('defPct') + extra.defPct) / 100));
     def += extra.def;
