@@ -102,6 +102,9 @@
         #quests-container [class*="text-xs"], #mailbox-container [class*="text-xs"], #quests-container button, #mailbox-container button { font-size: 22px !important; }
         #quests-container [class*="text-[10px]"], #mailbox-container [class*="text-[10px]"] { font-size: 19px !important; }
         #quests-container [class*="text-[9px]"], #mailbox-container [class*="text-[9px]"] { font-size: 18px !important; }
+/* Gear detail corner close button: press swaps to the pressed graphic */
+.gear-close:active .ret-press { display: block !important; }
+.gear-close:active .ret-normal { display: none !important; }
 /* Character page item / equipped detail: 2x text */
 .char-detail-2x { font-size: 24px !important; }
 .char-detail-2x .text-xs { font-size: 24px !important; }
@@ -247,10 +250,7 @@
         #view-diamond button.bg-purple-600:hover { background-color: #c8bbe2 !important; }
         #view-diamond .bg-purple-950\/60 { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
         #diamond-shop-items-container > div { background-color: rgba(190, 178, 214, .45) !important; border-color: #a593c4 !important; }
-        /* Free rewards (shop): red card until claimed, white button with red text */
-        #shop-panel-left .free-reward-card { background-color: #dc2626 !important; border-color: #991b1b !important; }
-        #shop-panel-left .free-reward-card, #shop-panel-left .free-reward-card * { color: #ffffff !important; }
-        #shop-panel-left .free-reward-card button { background-color: #ffffff !important; color: #b91c1c !important; }
+        /* Free rewards (shop): unclaimed reward shows the alert graphic instead of a red card and button */
         #shop-panel-left .free-reward-claimed { background-color: #9ca3af !important; border-color: #6b7280 !important; }
         #shop-panel-left .free-reward-claimed, #shop-panel-left .free-reward-claimed * { color: #f9fafb !important; }
         #shop-panel-left .free-reward-claimed button { background-color: #d1d5db !important; color: #4b5563 !important; }
@@ -1029,7 +1029,13 @@
                     <button id="next-stage-btn" onclick="proceedToNextStage()" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="hidden bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-sm transition cursor-pointer shadow">Next Stage</button>
 
                     <!-- Return (top right) -->
-                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="returnToTown()">
+                    <div id="combat-status-box" class="combat-box" style="left:1541px; top:250px; width:367px; height:420px; z-index:8; overflow-y:auto;">
+            <div class="text-xs font-bold text-emerald-300 uppercase">Buffs</div>
+            <div id="combat-buff-list" class="flex flex-col gap-1 text-[11px] font-mono mb-3"></div>
+            <div class="text-xs font-bold text-red-300 uppercase">Debuffs</div>
+            <div id="combat-debuff-list" class="flex flex-col gap-1 text-[11px] font-mono"></div>
+        </div>
+        <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="returnToTown()">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
                     </div>

@@ -29,6 +29,8 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear." },
+    { id: 'exp_2x_1h', name: "2x EXP (1 hour)", price: 10, type: 'boost', boost: 'exp', ms: 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 1 hour." },
+    { id: 'gold_2x_1h', name: "2x Gold (1 hour)", price: 10, type: 'boost', boost: 'gold', ms: 60 * 60 * 1000, desc: "Double gold from kills for 1 hour." },
     { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "" },
     { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "" },
     { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "" },
@@ -757,6 +759,7 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     if (titleEl) titleEl.innerText = title;
     if (msgEl) msgEl.innerText = message;
     if (area) area.innerHTML = customHTML;
+    if (modalEl && modalEl.firstElementChild) modalEl.firstElementChild.classList.add('relative');
     if (btn) {
         if (customHTML) btn.classList.add('hidden');
         else btn.classList.remove('hidden');
@@ -1134,12 +1137,12 @@ function dailyFreeCardHTML(key) {
     `;
     }
     return `
-        <div class="free-reward-card p-3 rounded border flex justify-between items-center">
+        <div class="p-3 rounded border flex justify-between items-center">
             <div>
                 <span class="font-bold block text-xs">${item.name}</span>
                 <span class="text-[10px]">${item.desc}</span>
             </div>
-            <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>
+            <img src="assets/page01/alert.png" alt="Claim" title="Claim" onclick="claimDailyFree('${key}')" class="cursor-pointer hover:brightness-110 transition" style="width:56px;height:56px;">
         </div>
     `;
 }
@@ -1420,6 +1423,14 @@ function renderDiamondShop() {
     });
 }
 
+// Timed boosts (real time): player.boosts[kind] = timestamp when the boost ends
+function boostLeftMs(kind) { return Math.max(0, ((player.boosts || {})[kind] || 0) - Date.now()); }
+function boostActive(kind) { return boostLeftMs(kind) > 0; }
+function startBoost(kind, ms) {
+    if (!player.boosts) player.boosts = {};
+    player.boosts[kind] = Math.max(Date.now(), player.boosts[kind] || 0) + ms; // buying again adds time
+}
+
 function buyDiamondItem(itemId) {
     let item = DIAMOND_SHOP_ITEMS.find(i => i.id === itemId);
     if (!item) return;
@@ -1467,6 +1478,9 @@ function buyDiamondItem(itemId) {
         player.vipUntil = Date.now() + item.days * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
         showModal("VIP Activated", `${item.name} active. Check your mailbox for today's Resurrection Potion.`);
+    } else if (item.type === 'boost') {
+        startBoost(item.boost, item.ms);
+        showModal("Boost Active", `${item.name} started. It lasts 1 hour from now.`);
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
         showModal("Purchase Successful", `You adopted a ${item.name}!`);
@@ -1930,6 +1944,14 @@ function compareHTML(selected, equipped) {
     </div>`;
 }
 
+// Close button in the top-right corner of gear detail windows, same graphic as the character page return button
+function closeCornerHTML() {
+    return `<button onclick="closeModal()" class="gear-close absolute top-3 right-3 p-0 border-0 bg-transparent cursor-pointer" style="width:66px;height:67px;">`
+        + `<img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="Close" style="width:66px;height:67px;">`
+        + `<img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="" style="display:none;width:66px;height:67px;">`
+        + `</button>`;
+}
+
 // Equipment: only the header, requirements, set info and the comparison window (no duplicate stat list)
 function showItemDetail(index) {
     const item = player.inventory[index];
@@ -1964,9 +1986,12 @@ function showItemDetail(index) {
     if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
     if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Gold</button>`;
     actions += '</div>';
-    actions += `<button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
+    actions += '</div>';
 
-    showModal(title, '', body + actions);
+    const favBtn = isGearItem(item) && item.slot !== 'pet'
+        ? `<button onclick="toggleFavorite(${index})" class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`
+        : '';
+    showModal(title, '', closeCornerHTML() + favBtn + body + actions);
 }
 
 function equipFromDetail(index) { if (executeEquipItem(index)) closeModal(); }
@@ -2005,10 +2030,12 @@ function showEquippedDetail(slot) {
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
     if (!isPotion) actions += `<button onclick="unequipFromDetail('${slot}')" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
-    if (!isPotion) actions += `<button onclick="toggleEquippedFavorite('${slot}')" class="${btn} bg-slate-800 hover:bg-slate-700 text-amber-300">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`;
-    actions += `</div><button onclick="closeModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Close</button></div>`;
+    actions += '</div>';
 
-    showModal(title, '', body + actions);
+    const favBtn = !isPotion && slot !== 'pet'
+        ? `<button onclick="toggleEquippedFavorite('${slot}')" class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`
+        : '';
+    showModal(title, '', closeCornerHTML() + favBtn + body + actions);
 }
 
 function unequipFromDetail(slot) {
@@ -2981,7 +3008,7 @@ function updateUI() {
                 <div onclick="showItemDetail(${index})" class="w-[77px] h-[79px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot.png'); background-size:100% 100%;">
                     <span class="text-base leading-none">${itemEmoji(item)}</span>
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
-                    ${isGearItem(item) ? `<button onclick="event.stopPropagation(); toggleFavorite(${index})" title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 ${item.favorite ? 'text-amber-300' : 'text-slate-600 hover:text-amber-300'}">${item.favorite ? '★' : '☆'}</button>` : ''}
+                    ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
                 </div>
             `;

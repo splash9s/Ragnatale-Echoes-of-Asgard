@@ -787,6 +787,25 @@ function addBossSupport(boss) {
     if (names) logMessage(`[Support] ${names} stand behind ${boss.name}.`, 'winlose');
 }
 
+// Combat right panel: active buffs (boosts) and debuffs with time left
+function boostTimeText(ms) { const s = Math.ceil(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+function renderCombatStatus() {
+    const bl = document.getElementById('combat-buff-list');
+    const dl = document.getElementById('combat-debuff-list');
+    if (!bl || !dl) return;
+    const now = Date.now();
+    const buffs = [];
+    if (boostActive('exp')) buffs.push(`2x EXP · ${boostTimeText(boostLeftMs('exp'))}`);
+    if (boostActive('gold')) buffs.push(`2x Gold · ${boostTimeText(boostLeftMs('gold'))}`);
+    const debuffs = [];
+    Object.entries(playerTimedDebuffs).forEach(([k, d]) => { if (now < d.until) debuffs.push(`${k.toUpperCase()} -${d.pct}% · ${boostTimeText(d.until - now)}`); });
+    if (now < playerDebuffs.curseUntil) debuffs.push(`Curse: ATK -20% · ${boostTimeText(playerDebuffs.curseUntil - now)}`);
+    if (playerDebuffs.frost > 0) debuffs.push(`Freeze: HIT -20 · ${playerDebuffs.frost} turn(s)`);
+    if (now < playerStunUntil) debuffs.push(`Stunned · ${boostTimeText(playerStunUntil - now)}`);
+    bl.innerHTML = buffs.length ? buffs.map(t => `<div class="text-emerald-300">▴ ${t}</div>`).join('') : '<div class="text-slate-500">None</div>';
+    dl.innerHTML = debuffs.length ? debuffs.map(t => `<div class="text-red-300">▾ ${t}</div>`).join('') : '<div class="text-slate-500">None</div>';
+}
+
 // Curse and frost wear off one turn at a time
 function tickPlayerDebuffs() {
     if (playerDebuffs.frost > 0) playerDebuffs.frost--;
@@ -869,6 +888,8 @@ function awardKill(m) {
     let jobExpGain = Math.max(1, Math.floor(m.jobExp / 3));
     if (isEvent && currentEvent === 'gold') { finalGold *= 2; baseExpGain = 0; jobExpGain = 0; }
     if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; finalGold = 0; }
+    if (boostActive('exp')) { baseExpGain *= 2; jobExpGain *= 2; } // 2x EXP diamond boost
+    if (boostActive('gold')) finalGold *= 2; // 2x Gold diamond boost
     const bossKill = !!(m.isBoss || m.isMiniBoss);
     const bossExp = bossKill ? skillBonus('bossExpPct') : 0;
     baseExpGain = Math.floor(baseExpGain * (1 + (skillBonus('baseExpPct') + skillBonus('allExpPct') + bossExp) / 100));
@@ -1229,6 +1250,7 @@ function tryMageSpellCast(m) {
 
 // ---------- MAIN LOOP ----------
 function runCombatTick() {
+    renderCombatStatus();
     if (combatPaused) {
         if (isVipActive()) return;
         combatPaused = false;
