@@ -34,7 +34,7 @@ const AVATAR_SET = [
     { path: "assets/avatars/man6_q85.webp" }, // new: no condition yet
     { path: "assets/avatars/man7_q85.webp" }, // new: no condition yet
     { path: "assets/avatars/woman5_q85.webp" }, // new: no condition yet
-    { path: "assets/avatars/woman56_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/woman6_q85.webp" }, // new: no condition yet
     { path: "assets/avatars/cat14_q85.webp" }, // new: no condition yet
     { path: "assets/avatars/dog1_q85.webp" }, // new: no condition yet
     { path: "assets/avatars/dog2_q85.webp" }, // new: no condition yet

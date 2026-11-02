@@ -57,7 +57,7 @@ const LOADING_IMAGES = [
     "assets/avatars/man6_q85.webp",
     "assets/avatars/man7_q85.webp",
     "assets/avatars/woman5_q85.webp",
-    "assets/avatars/woman56_q85.webp",
+    "assets/avatars/woman6_q85.webp",
     "assets/avatars/cat14_q85.webp",
     "assets/avatars/dog1_q85.webp",
     "assets/avatars/dog2_q85.webp",
