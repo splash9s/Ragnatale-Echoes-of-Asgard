@@ -2748,21 +2748,25 @@ function openChest(chestType) {
     }
 
     const showRewards = () => showModal("Chest Opened!", `You received:\n• ` + rewardNames.join('\n• '));
-    if (chestType === 'copper') playCopperChestOpen(showRewards);
+    if (CHEST_OPEN_FRAMES[chestType]) playChestOpen(chestType, showRewards);
     else showRewards();
     updateUI();
     saveGame();
 }
 
-// Copper chest opening animation (total 3.0 s). Frame 1 holds with a shake; the final frame gets a light burst.
-const CHEST_COPPER_FRAMES = [
-    { src: 'assets/chest/copper/copperc0.png', ms: 500 },
-    { src: 'assets/chest/copper/copperc1.png', ms: 1000, shake: true },
-    { src: 'assets/chest/copper/copperc2.png', ms: 400 },
-    { src: 'assets/chest/copper/copperc3.png', ms: 400 },
-    { src: 'assets/chest/copper/copperc4.png', ms: 700, burst: true }
-];
-function playCopperChestOpen(onDone) {
+// Chest opening animation for copper, silver and gold (total 3.0 s each). Frame 2 holds with a shake; the final frame gets a light burst.
+function chestFrames(type) {
+    return [
+        { src: `assets/chest/${type}/${type}c0.png`, ms: 500 },
+        { src: `assets/chest/${type}/${type}c1.png`, ms: 1000, shake: true },
+        { src: `assets/chest/${type}/${type}c2.png`, ms: 400 },
+        { src: `assets/chest/${type}/${type}c3.png`, ms: 400 },
+        { src: `assets/chest/${type}/${type}c4.png`, ms: 700, burst: true }
+    ];
+}
+const CHEST_OPEN_FRAMES = { copper: chestFrames('copper'), silver: chestFrames('silver'), gold: chestFrames('gold') };
+function playChestOpen(chestType, onDone) {
+    const frames = CHEST_OPEN_FRAMES[chestType] || CHEST_OPEN_FRAMES.copper;
     const overlay = document.createElement('div');
     overlay.id = 'chest-open-overlay';
     const img = document.createElement('img');
@@ -2770,7 +2774,7 @@ function playCopperChestOpen(onDone) {
     document.body.appendChild(overlay);
     let i = 0;
     const showFrame = () => {
-        const f = CHEST_COPPER_FRAMES[i];
+        const f = frames[i];
         img.src = f.src;
         img.classList.toggle('chest-shake', !!f.shake);
         if (f.burst) {
@@ -2780,7 +2784,7 @@ function playCopperChestOpen(onDone) {
         }
         setTimeout(() => {
             i++;
-            if (i < CHEST_COPPER_FRAMES.length) showFrame();
+            if (i < frames.length) showFrame();
             else {
                 overlay.remove();
                 if (onDone) onDone();
