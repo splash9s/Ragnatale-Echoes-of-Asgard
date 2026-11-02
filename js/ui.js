@@ -3323,7 +3323,8 @@ function updateUI() {
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
             const base = `assets/pages/character/slots/${img.replace(/\.png$/, '_q85.webp')}`;
             const useVisual = has && gear.img && VISUAL_EQUIP_SLOTS.includes(slot);
-            const src = useVisual ? gear.img : base;
+            // Equipped gear sits on the inventory slot frame; empty slots keep their own frame
+            const src = useVisual ? gear.img : (has ? 'assets/pages/character/inventoryslot2.png' : base);
             // Equipped gear shows its item icon on top of the slot frame (visual slots keep their own picture)
             const iconLayer = has && !useVisual
                 ? `<div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; transform:scale(.8); pointer-events:none;">${itemIconHTML(gear)}</div>`
