@@ -1998,6 +1998,21 @@ function elemIconText(item) {
 // Inventory picture: gear by slot, consumables by type
 const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', garment: '🧣', footgear: '👢', hat: '🎩', ring: '💍', pet: '🐾' };
 const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
+// Inventory icons (PNG, transparent) for consumables and materials; other items keep the emoji
+const ITEM_ICON_RULES = [
+    [/Minor Healing Potion/, 'potion_minor'],
+    [/Medium Healing Potion/, 'potion_med'],
+    [/Large Healing Potion/, 'potion_large'],
+    [/Resurrection Potion/, 'potion_res'],
+    [/Refining Stone/, 'mat_refining'],
+    [/Iron Scraps/, 'mat_scrap'],
+    [/Skill Reset/, 'scroll_skillreset']
+];
+function itemIconHTML(item) {
+    const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
+    if (rule) return `<img src="assets/items/${rule[1]}.png" alt="" style="width:40px;height:40px;object-fit:contain;margin:0 auto;" />`;
+    return itemEmoji(item);
+}
 function itemEmoji(item) {
     if (!item) return '';
     if (item.slot && ITEM_SLOT_EMOJI[item.slot]) return ITEM_SLOT_EMOJI[item.slot];
@@ -3222,7 +3237,7 @@ function updateUI() {
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="w-[77px] h-[79px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot_q85.webp'); background-size:100% 100%;">
-                    <span class="text-base leading-none">${itemEmoji(item)}</span>
+                    <span class="leading-none">${itemIconHTML(item)}</span>
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
