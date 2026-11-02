@@ -2771,7 +2771,13 @@ function claimMail(mailId) {
     let mail = player.mailBox.find(m => m.id === mailId);
     if (!mail || mail.claimed) return;
     // A gear reward needs a free bag slot; keep the mail unclaimed if the bag is full
-    if (mail.rewards.gear && Array.isArray(player.inventory) && !player.inventory.some(s => s === null)) {
+    // Build the gear first: if it cannot be made, the mail stays unclaimed
+    const gear = mail.rewards.gear ? makeMailGear(mail.rewards.gear.slot, mail.rewards.gear.lv) : null;
+    if (mail.rewards.gear && !gear) {
+        showModal('Mail Error', 'This gear reward cannot be created. The mail is kept.');
+        return;
+    }
+    if (gear && Array.isArray(player.inventory) && !player.inventory.some(s => s === null)) {
         showModal('Inventory Full', 'Make room in your bag to claim this mail.');
         return;
     }
@@ -2786,11 +2792,7 @@ function claimMail(mailId) {
         player.jobExp += mail.rewards.classExp || 0;
         checkLevelUps();
     }
-    if (mail.rewards.gear) {
-        const gear = makeMailGear(mail.rewards.gear.slot, mail.rewards.gear.lv);
-        if (gear) addItemToInventory(gear);
-        else logMessage(`[Mail] No gear found for that slot and level`, 'combat');
-    }
+    if (gear) addItemToInventory(gear);
     if (mail.rewards.chest) openChest(mail.rewards.chest);
 
     logMessage(`[Mail] Claimed rewards from "${mail.title}"`, 'drop');
@@ -2799,19 +2801,43 @@ function claimMail(mailId) {
     saveGame();
 }
 
-// Random R5 gear for a mail reward: the shop gear of that slot at the requested level (or the nearest lower level)
+// Random R5 gear for a mail reward: a drop template of that slot at exactly that level. Returns null if none exists.
 function makeMailGear(slot, lv) {
-    const pool = (typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : []).filter(i => i.slot === slot);
-    if (pool.length === 0) return null;
-    const req = i => i.levelReq || 1;
-    let cands = pool.filter(i => req(i) === lv);
-    if (cands.length === 0) {
-        const lower = pool.filter(i => req(i) <= lv);
-        const level = lower.length ? Math.max(...lower.map(req)) : Math.min(...pool.map(req));
-        cands = pool.filter(i => req(i) === level);
-    }
+    const cands = [];
+    Object.values(GEAR_POOL).forEach(list => list.forEach(i => { if (i.slot === slot && (i.levelReq || 1) === lv) cands.push(i); }));
+    if (cands.length === 0) return null;
     const template = cands[Math.floor(Math.random() * cands.length)];
     return generatePoEItem(template, 5);
+}
+
+// Short reward summary shown under a mail's message
+function mailRewardText(r) {
+    const parts = [];
+    if (r.gold) parts.push(`${r.gold} Gold`);
+    if (r.diamonds) parts.push(`${r.diamonds} Diamonds`);
+    if (r.refiningStones) parts.push(`${r.refiningStones} Refining Stones`);
+    if (r.resurrection) parts.push(`${r.resurrection} Resurrection Potion`);
+    if (r.baseExp) parts.push(`${r.baseExp} Base EXP`);
+    if (r.classExp) parts.push(`${r.classExp} Class EXP`);
+    if (r.chest) parts.push(`${r.chest[0].toUpperCase() + r.chest.slice(1)} Chest`);
+    if (r.gear) parts.push(`${(MAIL_GEAR_SLOTS.find(s => s[0] === r.gear.slot) || [0, r.gear.slot])[1]} Lv ${r.gear.lv} (R5)`);
+    return parts.join(', ');
+}
+
+// Gear slots that have drop templates (GEAR_POOL), with the levels each slot has
+const MAIL_GEAR_SLOTS = [['weapon', 'Weapon'], ['shield', 'Shield'], ['armor', 'Armor'], ['garment', 'Garment'], ['footgear', 'Boots'], ['ring', 'Ring']];
+function mailGearLevels(slot) {
+    const lv = new Set();
+    Object.values(GEAR_POOL).forEach(list => list.forEach(i => { if (i.slot === slot) lv.add(i.levelReq || 1); }));
+    return [...lv].sort((a, b) => a - b);
+}
+// Fills the level dropdown with the levels that exist for the chosen slot
+function refreshMailGearLevels() {
+    const slot = document.getElementById('mail-gear-slot')?.value;
+    const sel = document.getElementById('mail-gear-lv');
+    if (!sel) return;
+    const levels = slot ? mailGearLevels(slot) : [];
+    sel.innerHTML = levels.length ? levels.map(l => `<option value="${l}">Lv ${l}</option>`).join('') : '<option value="">-</option>';
 }
 
 // In-game mail sender (for testing): writes a mail into the player's own mailbox
@@ -2834,8 +2860,8 @@ function openSendMailForm() {
                 <label>Class EXP <input id="mail-class-exp" type="number" min="0" value="0" class="${field}"></label>
             </div>
             <div class="grid grid-cols-2 gap-2">
-                <label>Gear (R5) <select id="mail-gear-slot" class="${field}">${opt('', 'None')}${[['weapon','Weapon'],['shield','Shield'],['hat','Hat'],['midHead','Mid Head'],['mouth','Mouth'],['armor','Armor'],['garment','Garment'],['footgear','Boots'],['ring','Ring']].map(([v, l]) => opt(v, l)).join('')}</select></label>
-                <label>Gear Lv <input id="mail-gear-lv" type="number" min="1" max="99" value="1" class="${field}"></label>
+                <label>Gear (R5) <select id="mail-gear-slot" onchange="refreshMailGearLevels()" class="${field}">${opt('', 'None')}${MAIL_GEAR_SLOTS.map(([v, l]) => opt(v, l)).join('')}</select></label>
+                <label>Gear Lv <select id="mail-gear-lv" class="${field}"><option value="">-</option></select></label>
             </div>
             <button onclick="sendPlayerMail()" class="mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Send to Mailbox</button>
         </div>`);
@@ -2851,7 +2877,7 @@ function sendPlayerMail() {
     if (val('mail-chest')) rewards.chest = val('mail-chest');
     if (num('mail-base-exp')) rewards.baseExp = num('mail-base-exp');
     if (num('mail-class-exp')) rewards.classExp = num('mail-class-exp');
-    if (val('mail-gear-slot') && num('mail-gear-lv') >= 1) rewards.gear = { slot: val('mail-gear-slot'), lv: Math.min(99, num('mail-gear-lv')) };
+    if (val('mail-gear-slot') && val('mail-gear-lv')) rewards.gear = { slot: val('mail-gear-slot'), lv: Number(val('mail-gear-lv')) };
     if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
     player.mailBox.unshift({
         id: Date.now(),
@@ -2889,6 +2915,7 @@ function renderMailBox() {
                 <div>
                     <span class="font-bold text-amber-400 block">${m.title}</span>
                     <span class="text-[10px] text-slate-400 block">${m.message}</span>
+                    ${mailRewardText(m.rewards || {}) ? `<span class="text-[10px] text-emerald-300 block">Rewards: ${mailRewardText(m.rewards || {})}</span>` : ''}
                     <span class="text-[9px] text-purple-300 block mt-1">From: ${m.sender}</span>
                     ${mailTimeText(m) ? `<span class="text-[9px] text-slate-400 block">${mailTimeText(m)}</span>` : ''}
                 </div>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earth Monster Position Editor</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; }
+  header { padding: 10px 16px; border-bottom: 1px solid #1e293b; font-weight: 700; }
+  .wrap { display: flex; gap: 16px; padding: 16px; flex-wrap: wrap; }
+  #stage-box { flex: 1 1 760px; min-width: 0; }
+  #stage { position: relative; width: 100%; aspect-ratio: 1920 / 1080; background: #000; overflow: hidden; border: 1px solid #334155; user-select: none; }
+  #stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+  .marker { position: absolute; width: 0; height: 0; }
+  .marker .dot { position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(0,0,0,.6); cursor: grab; }
+  .marker.player .dot { background: #f97316; }
+  .marker.mon .dot { background: #22c55e; }
+  .marker.sel .dot { outline: 3px solid #facc15; }
+  .marker .tag { position: absolute; left: 12px; top: -26px; white-space: nowrap; font: 700 13px/1.2 monospace; color: #fff; background: rgba(0,0,0,.7); padding: 2px 6px; border-radius: 4px; pointer-events: none; }
+  .marker .card { position: absolute; left: -100px; top: -100px; width: 200px; height: 200px; border: 1px dashed rgba(250,204,21,.35); pointer-events: none; display: none; }
+  .marker.sel .card { display: block; }
+  #panel { flex: 0 1 380px; min-width: 300px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid #1e293b; text-align: left; }
+  tr.sel { background: #1e293b; }
+  tr { cursor: pointer; }
+  input[type=number] { width: 84px; background: #020617; color: #e2e8f0; border: 1px solid #334155; border-radius: 4px; padding: 4px; font: 14px monospace; }
+  button { background: #334155; color: #e2e8f0; border: 0; border-radius: 6px; padding: 8px 12px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+  button:hover { background: #475569; }
+  textarea { width: 100%; height: 110px; margin-top: 10px; background: #020617; color: #a7f3d0; border: 1px solid #334155; border-radius: 6px; padding: 8px; font: 13px monospace; box-sizing: border-box; }
+  .note { font-size: 12px; color: #94a3b8; line-height: 1.5; margin-top: 10px; }
+</style>
+</head>
+<body>
+<header>Earth map: monster positions (feet points, 1920 × 1080 stage)</header>
+<div class="wrap">
+  <div id="stage-box">
+    <div id="stage"><img id="bg" src="../assets/combat/flat/earth_flat_q85.webp" alt=""></div>
+    <div class="note">Drag a dot, or type X/Y in the table. Arrow keys nudge the selected point by 1px (Shift = 10px). Dashed box = the monster card in game (200 × 200, feet at its bottom centre).</div>
+  </div>
+  <div id="panel">
+    <table>
+      <thead><tr><th>Point</th><th>X</th><th>Y</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <button id="reset">Reset to current game values</button>
+    <div class="note">Copy this into <b>js/ui.js</b>, replacing the <code>earth:</code> line of <code>COMBAT_ART</code>:</div>
+    <textarea id="out" readonly></textarea>
+    <button id="copy">Copy code</button>
+  </div>
+</div>
+<script>
+  const DEFAULT = { player: [560, 690], monsters: [[900, 700], [1050, 700], [1200, 690], [1350, 680], [1500, 670], [1650, 660]] };
+  const W = 1920, H = 1080;
+  let pts = []; // [{name, kind, x, y}]
+  let sel = 0;
+  const stage = document.getElementById('stage');
+  const rows = document.getElementById('rows');
+  const out = document.getElementById('out');
+
+  function reset() {
+    pts = [{ name: 'Player', kind: 'player', x: DEFAULT.player[0], y: DEFAULT.player[1] }];
+    DEFAULT.monsters.forEach((m, i) => pts.push({ name: 'Monster ' + (i + 1), kind: 'mon', x: m[0], y: m[1] }));
+    sel = 0;
+    build();
+  }
+
+  function build() {
+    stage.querySelectorAll('.marker').forEach(el => el.remove());
+    pts.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'marker ' + p.kind + (i === sel ? ' sel' : '');
+      el.dataset.i = i;
+      el.innerHTML = '<div class="card"></div><div class="dot"></div><div class="tag"></div>';
+      stage.appendChild(el);
+      el.querySelector('.dot').addEventListener('pointerdown', e => startDrag(e, i));
+    });
+    draw();
+  }
+
+  function draw() {
+    pts.forEach((p, i) => {
+      const el = stage.querySelector(`.marker[data-i="${i}"]`);
+      if (!el) return;
+      el.style.left = (p.x / W * 100) + '%';
+      el.style.top = (p.y / H * 100) + '%';
+      el.querySelector('.tag').textContent = `${p.name}  X ${p.x}  Y ${p.y}`;
+      el.classList.toggle('sel', i === sel);
+    });
+    rows.innerHTML = pts.map((p, i) => `
+      <tr class="${i === sel ? 'sel' : ''}" data-i="${i}">
+        <td>${p.name}</td>
+        <td><input type="number" data-i="${i}" data-k="x" value="${p.x}"></td>
+        <td><input type="number" data-i="${i}" data-k="y" value="${p.y}"></td>
+      </tr>`).join('');
+    out.value = codeLine();
+  }
+
+  function codeLine() {
+    const p = pts[0];
+    const mons = pts.slice(1).map(m => `[${m.x}, ${m.y}]`).join(', ');
+    return `earth: flatArt('earth', [${p.x}, ${p.y}], [${mons}]),`;
+  }
+
+  function clamp(v, max) { return Math.max(0, Math.min(max, Math.round(v))); }
+
+  let drag = null;
+  function startDrag(e, i) {
+    e.preventDefault();
+    sel = i;
+    drag = i;
+    e.target.setPointerCapture(e.pointerId);
+    draw();
+  }
+  stage.addEventListener('pointermove', e => {
+    if (drag === null) return;
+    const r = stage.getBoundingClientRect();
+    pts[drag].x = clamp((e.clientX - r.left) / r.width * W, W);
+    pts[drag].y = clamp((e.clientY - r.top) / r.height * H, H);
+    draw();
+  });
+  stage.addEventListener('pointerup', () => { drag = null; });
+  stage.addEventListener('pointercancel', () => { drag = null; });
+
+  rows.addEventListener('click', e => {
+    const tr = e.target.closest('tr');
+    if (tr && !e.target.matches('input')) { sel = Number(tr.dataset.i); draw(); }
+  });
+  rows.addEventListener('input', e => {
+    const i = Number(e.target.dataset.i), k = e.target.dataset.k;
+    if (isNaN(i) || !k) return;
+    const max = k === 'x' ? W : H;
+    const v = Number(e.target.value);
+    if (!isNaN(v)) pts[i][k] = clamp(v, max);
+    draw();
+  });
+
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    const step = e.shiftKey ? 10 : 1;
+    const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+    if (!d || !pts[sel]) return;
+    e.preventDefault();
+    pts[sel].x = clamp(pts[sel].x + d[0], W);
+    pts[sel].y = clamp(pts[sel].y + d[1], H);
+    draw();
+  });
+
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('copy').addEventListener('click', () => {
+    out.select();
+    try { navigator.clipboard.writeText(out.value); } catch (err) { document.execCommand('copy'); }
+  });
+
+  reset();
+</script>
+</body>
+</html>
