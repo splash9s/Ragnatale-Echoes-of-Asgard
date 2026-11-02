@@ -16,7 +16,7 @@ let player = {
     jobMaxExp: 40,
     hp: 120,
     gold: 0,
-    diamonds: 0, 
+    diamonds: 0, diamondsSpent: 0, 
     statPoints: 5,
     jobSp: 0,
     potions: 3,
