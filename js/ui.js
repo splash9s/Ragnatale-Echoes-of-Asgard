@@ -770,7 +770,7 @@ function openAvatarPicker() {
     const options = AVATARS.map(av => {
         // Locked avatars are grey; their requirement shows only when clicked
         if (!isAvatarUnlocked(av)) return `
-        <button onclick="showAvatarLockInfo('${av}')" class="h-64 w-64 rounded-xl border border-slate-700 bg-slate-900 cursor-pointer overflow-hidden">
+        <button onclick="showAvatarLockInfo('${av}', this)" class="h-64 w-64 rounded-xl border border-slate-700 bg-slate-900 cursor-pointer overflow-hidden">
             <div class="w-full h-full grayscale opacity-40">${avatarMarkup(av, 'w-full h-full object-cover')}</div>
         </button>`;
         return `
@@ -778,13 +778,38 @@ function openAvatarPicker() {
             ${avatarMarkup(av, 'w-full h-full object-cover')}
         </button>`;
     }).join('');
-    showModal("Choose Avatar", "", `<div class="grid grid-cols-2 gap-3 justify-items-center max-h-[70vh] overflow-y-auto p-1">${options}</div>`);
+    showModal("Choose Avatar", "", `<div id="avatar-picker-host" class="relative"><div class="grid grid-cols-2 gap-3 justify-items-center max-h-[70vh] overflow-y-auto p-1">${options}</div></div>`);
     // The picker needs room for two 256px columns
     const box = document.querySelector('#game-modal > div');
     if (box) box.style.maxWidth = '760px';
 }
-function showAvatarLockInfo(av) {
-    showModal("Avatar Locked", avatarLockTitle(av) || 'This avatar is locked.');
+// Locked avatar: a panel slides out on the right of the tile. Clicking outside slides it back.
+function showAvatarLockInfo(av, tileEl) {
+    closeAvatarLockInfo();
+    const host = document.getElementById('avatar-picker-host');
+    if (!host || !tileEl) return;
+    const panel = document.createElement('div');
+    panel.id = 'avatar-lock-panel';
+    panel.innerHTML = `<div class="font-bold text-amber-300">Locked</div><div class="mt-1">${avatarLockTitle(av) || 'This avatar is locked.'}</div>`;
+    const hostRect = host.getBoundingClientRect();
+    const tileRect = tileEl.getBoundingClientRect();
+    panel.style.left = (tileRect.right - hostRect.left + 12) + 'px';
+    panel.style.top = (tileRect.top - hostRect.top) + 'px';
+    host.appendChild(panel);
+    requestAnimationFrame(() => panel.classList.add('open'));
+    // Listen after this click finishes, so the opening click does not close it
+    setTimeout(() => document.addEventListener('pointerdown', avatarLockOutsideClick, true), 0);
+}
+function avatarLockOutsideClick(e) {
+    if (e.target.closest && e.target.closest('#avatar-lock-panel')) return;
+    closeAvatarLockInfo();
+}
+function closeAvatarLockInfo() {
+    document.removeEventListener('pointerdown', avatarLockOutsideClick, true);
+    const panel = document.getElementById('avatar-lock-panel');
+    if (!panel) return;
+    panel.classList.remove('open'); // slide back
+    setTimeout(() => panel.remove(), 250);
 }
 
 function pickPlayerAvatar(av) {

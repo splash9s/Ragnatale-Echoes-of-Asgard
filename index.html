@@ -110,6 +110,9 @@
 .char-detail-2x .text-xs { font-size: 24px !important; }
 .char-detail-2x .text-\[11px\] { font-size: 22px !important; }
 .char-detail-2x .text-\[10px\] { font-size: 20px !important; }
+/* Locked avatar info: slides out on the right of the tile in the Choose Avatar picker */
+#avatar-lock-panel { position: absolute; width: 300px; padding: 14px; border-radius: 12px; background: #0f172a; border: 2px solid #b8945a; color: #e2e8f0; font-size: 18px; line-height: 1.35; z-index: 60; transform: translateX(24px); opacity: 0; transition: transform .25s ease, opacity .25s ease; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+#avatar-lock-panel.open { transform: translateX(0); opacity: 1; }
 </style>
     <style>
         .town-stage { position: relative; width: 100%; overflow: hidden; }
