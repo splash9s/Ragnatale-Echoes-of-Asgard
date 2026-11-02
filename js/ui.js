@@ -1350,6 +1350,7 @@ function updateTownAlerts() {
     const setAlert = (id, on, disp = 'block') => { const el = document.getElementById(id); if (el) el.style.display = on ? disp : 'none'; };
     setAlert('alert-char', statPts || skillPts);
     setAlert('alert-stat-pts', statPts, 'inline-block');
+    setAlert('alert-char-stats', statPts); // STATS tab on the character page
     setAlert('alert-skill-sp', skillPts);
 }
 

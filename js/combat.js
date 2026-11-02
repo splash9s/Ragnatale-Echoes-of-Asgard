@@ -1507,6 +1507,7 @@ function onStageCleared() {
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     // Every stage end restores 10% of Max HP
     healPlayer(Math.ceil(getDerivedStats().maxHp * 0.1), 'stage');
+    showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
     const sid = combatSessionId;
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
