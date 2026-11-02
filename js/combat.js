@@ -1477,6 +1477,7 @@ function runCombatTick() {
         clearInterval(combatInterval); combatRunId++;
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
+        player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
         startPlayerDeathAnim(); // the fall plays first
         setTimeout(() => { // the result waits 3 seconds
             player.hp = getDerivedStats().maxHp;

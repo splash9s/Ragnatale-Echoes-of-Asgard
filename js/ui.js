@@ -32,7 +32,7 @@ const AVATAR_SET = [
     { path: "assets/avatars/man4_q85.webp", lv: 40 },
     { path: "assets/avatars/man5_q85.webp", lv: 60 },
     { path: "assets/avatars/man6_q85.webp", lv: 80 },
-    { path: "assets/avatars/man7_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/man7_q85.webp", die: 100 },
     { path: "assets/avatars/woman5_q85.webp", lv: 50 },
     { path: "assets/avatars/woman6_q85.webp", lv: 60 },
     { path: "assets/avatars/cat14_q85.webp" }, // new: no condition yet
@@ -115,6 +115,7 @@ function isAvatarUnlocked(av) {
     if (!rule) return true;
     if (rule.lv && (player.baseLv || 1) < rule.lv) return false;
     if (rule.spend && (player.diamondsSpent || 0) <= rule.spend) return false;
+    if (rule.die && (player.deathCount || 0) < rule.die) return false;
     if (rule.boss) return FINAL_PATH_KEYS.every(pk => !!(player.clearedMaps && player.clearedMaps[`${pk}:map${rule.boss}`]));
     return true;
 }
@@ -124,6 +125,7 @@ function avatarLockText(av) {
     if (rule.lv) return `Lv. ${rule.lv}`;
     if (rule.boss) return `Boss Lv. ${rule.boss}`;
     if (rule.spend) return `Diamonds bought over ${rule.spend}`;
+    if (rule.die) return `Died ${rule.die} times`;
     return '';
 }
 function avatarLockTitle(av) {
@@ -132,6 +134,7 @@ function avatarLockTitle(av) {
     if (rule.lv) return `Unlocks at Base Lv. ${rule.lv}`;
     if (rule.boss) return `Defeat the Map Lv. ${rule.boss} boss on all 4 elements`;
     if (rule.spend) return `Buy more than ${rule.spend} diamonds in total`;
+    if (rule.die) return `Die ${rule.die} times in total`;
     return '';
 }
 
