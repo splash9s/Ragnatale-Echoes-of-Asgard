@@ -113,7 +113,7 @@ const RUNE_DEFS = {
     overflow: { name: "Overflow Rune", rarity: 2, add: 100, once: true, desc: "Overheal damages a random enemy", text: () => "Overheal damages a random enemy" },
     relentless: { name: "Relentless Rune", rarity: 5, flag: true, desc: "Every attack is a crit", text: () => "Every attack is a crit" },
     bloodlust: { name: "Bloodlust Rune", rarity: 3, add: 2, once: true, desc: "Kill: +2% Max HP (from Max HP at stage start)", text: v => `Kill: +${v}% Max HP (from Max HP at stage start)` },
-    turnStun: { name: "Stasis Rune", rarity: 2, flag: true, desc: "Every turn: enemies are stunned for 3s. Enemy ATK +10% for the rest of the map, stacking each turn", text: () => "Every turn: enemies are stunned for 3s. Enemy ATK +10% for the rest of the map, stacking each turn" },
+    turnStun: { name: "Stasis Rune", rarity: 2, flag: true, desc: "At the start of every stage: you are stunned for 5s", text: () => "At the start of every stage: you are stunned for 5s" },
     shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Kill: +0.5 Flee", text: v => `Kill: +${v} Flee` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Kill restores 10% HP", text: v => `Kill restores ${v}% HP` },
     fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from Max HP at stage start)", text: v => `Crit: 50% chance to add +${v}% Max HP (from Max HP at stage start)` },
@@ -554,6 +554,8 @@ function spawnStageMonsters() {
     stageRuneUses = { fullHeal: 0, fullArmor: 0 };
     playerDebuffs = { curseUntil: 0, frost: 0, stun: 0 };
     playerStunUntil = 0;
+    // Stasis Rune: the player is stunned for 5 seconds at the start of every stage
+    if (runeN('turnStun') > 0) { playerStunUntil = Date.now() + 5000; logMessage('[Stasis] You are stunned for 5 seconds', 'winlose'); }
     playerTimedDebuffs = {};
     playerAspdToggle = false;
     combatPlayerDeath.at = 0;
@@ -1188,7 +1190,6 @@ function monsterAct(m, derived, position = 0) {
     const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
-        eDmg = Math.max(1, Math.floor(eDmg * (1 + 0.1 * (player.enemyAtkStacks || 0)))); // Stasis Rune ATK stacks
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
         if (m.isBoss && !m.noHeavyStrike && m.attackCount % 4 === 0) {
             eDmg = Math.floor(eDmg * 2);
@@ -1245,7 +1246,6 @@ function tryMageSpellCast(m) {
     const def = SPELL_DEFS[m.spell];
     let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + getDerivedStats().def)));
     eDmg = Math.max(1, Math.floor(eDmg * def.mult));
-    eDmg = Math.max(1, Math.floor(eDmg * (1 + 0.1 * (player.enemyAtkStacks || 0)))); // Stasis Rune ATK stacks
     logMessage(`[Spell] ${m.name} casts ${def.label} for ${eDmg} damage`, 'combat');
     if (m.spell === 'rockCurse') { playerDebuffs.curseUntil = Date.now() + 3000; logMessage('[Curse] Your attacks are weaker for 3 seconds', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Curse! ATK -20% (3 seconds)'); }
     if (m.spell === 'freezeTouch') { playerDebuffs.frost = 3; logMessage('[Freeze] Your aim is worse for 3 turns', 'winlose'); if (typeof showBossBalloon === 'function') showBossBalloon('Freeze! HIT -20 (3 turns)'); }
@@ -1446,12 +1446,6 @@ function runCombatTick() {
         return;
     }
 
-    // Stasis Rune: at the start of every turn all enemies are stunned for 3s; their ATK grows 10% each turn for the rest of the map
-    if (runeN('turnStun') > 0 && alive.length > 0) {
-        player.enemyAtkStacks = (player.enemyAtkStacks || 0) + 1;
-        alive.forEach(m => { if (!m.status || m.status.kind === 'stun') m.status = { kind: 'stun', ms: 3000 }; });
-        logMessage(`[Stasis] Enemies stunned for 3 seconds. Enemy ATK +${10 * player.enemyAtkStacks}%`, 'winlose');
-    }
     // ---- Monster turn (every living monster attacks) ----
     tickPlayerDebuffs();
     alive.forEach((m, i) => monsterAct(m, derived, i));

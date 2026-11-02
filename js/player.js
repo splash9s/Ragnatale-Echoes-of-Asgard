@@ -259,7 +259,6 @@ function defaultRunes() {
 
 function resetMapRunes() {
     player.runes = defaultRunes();
-    player.enemyAtkStacks = 0; // Stasis Rune: enemy ATK stacks for the rest of the map
 }
 
 function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
