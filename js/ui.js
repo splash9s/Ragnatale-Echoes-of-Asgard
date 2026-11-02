@@ -32,7 +32,7 @@ const AVATAR_SET = [
     { path: "assets/avatars/man4_q85.webp", lv: 40 },
     { path: "assets/avatars/man5_q85.webp", lv: 60 },
     { path: "assets/avatars/man6_q85.webp", lv: 80 },
-    { path: "assets/avatars/man7_q85.webp", die: 100 },
+    { path: "assets/avatars/man7_q85.webp", die: 1000 },
     { path: "assets/avatars/woman5_q85.webp", lv: 50 },
     { path: "assets/avatars/woman6_q85.webp", lv: 60 },
     { path: "assets/avatars/cat14_q85.webp" }, // new: no condition yet
