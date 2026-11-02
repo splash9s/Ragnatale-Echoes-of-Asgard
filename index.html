@@ -250,7 +250,10 @@
         #view-diamond button.bg-purple-600:hover { background-color: #c8bbe2 !important; }
         #view-diamond .bg-purple-950\/60 { background-color: rgba(183, 166, 214, .6) !important; border-color: #a593c4 !important; }
         #diamond-shop-items-container > div { background-color: rgba(190, 178, 214, .45) !important; border-color: #a593c4 !important; }
-        /* Free rewards (shop): unclaimed reward shows the alert graphic instead of a red card and button */
+        /* Free rewards (shop): red card until claimed, white button with red text (diamond reward) */
+        #shop-panel-left .free-reward-card { background-color: #dc2626 !important; border-color: #991b1b !important; }
+        #shop-panel-left .free-reward-card, #shop-panel-left .free-reward-card * { color: #ffffff !important; }
+        #shop-panel-left .free-reward-card button { background-color: #ffffff !important; color: #b91c1c !important; }
         #shop-panel-left .free-reward-claimed { background-color: #9ca3af !important; border-color: #6b7280 !important; }
         #shop-panel-left .free-reward-claimed, #shop-panel-left .free-reward-claimed * { color: #f9fafb !important; }
         #shop-panel-left .free-reward-claimed button { background-color: #d1d5db !important; color: #4b5563 !important; }
@@ -663,7 +666,7 @@
                     <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
             <div class="flex gap-2 mb-4">
                 <button id="events-tab-btn-events" onclick="switchEventsTab('events')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Events</button>
-                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests</button>
+                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests<img id="alert-tab-quests" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
             </div>
             <div id="events-tab-quests" class="hidden flex flex-col gap-3">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
@@ -830,8 +833,8 @@
                     </div>
                     <div id="shop-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
                         <div class="flex items-center gap-2 mb-4">
-                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Diamond</button>
-                            <button id="shop-tab-btn-shop" onclick="switchShopTab('shop')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Shop</button>
+                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Diamond<img id="alert-tab-diamond" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
+                            <button id="shop-tab-btn-shop" onclick="switchShopTab('shop')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Shop<img id="alert-tab-shop" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
                             <span class="ml-auto text-xs font-bold text-slate-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-700/40 whitespace-nowrap"><span id="shop-balance-label">💎 Balance:</span> <strong id="shop-balance-value">0</strong></span>
                         </div>
                         <div id="shop-diamond-section" class="flex flex-col gap-3">

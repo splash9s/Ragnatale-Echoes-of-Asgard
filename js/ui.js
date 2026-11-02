@@ -1136,6 +1136,17 @@ function dailyFreeCardHTML(key) {
         </div>
     `;
     }
+    if (key === 'diamond') {
+        return `
+        <div class="free-reward-card p-3 rounded border flex justify-between items-center">
+            <div>
+                <span class="font-bold block text-xs">${item.name}</span>
+                <span class="text-[10px]">${item.desc}</span>
+            </div>
+            <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>
+        </div>
+    `;
+    }
     return `
         <div class="p-3 rounded border flex justify-between items-center">
             <div>
@@ -1212,6 +1223,13 @@ function updateTownAlerts() {
     if (ev) ev.style.display = questOpen ? 'block' : 'none';
     if (sh) sh.style.display = shopFree ? 'block' : 'none';
     if (ml) ml.style.display = mailOpen ? 'block' : 'none';
+    // Tab badges: Diamond tab (free diamond unclaimed), Shop tab (free gold unclaimed), Events > Daily Quests (quest open)
+    const tabDia = document.getElementById('alert-tab-diamond');
+    const tabShop = document.getElementById('alert-tab-shop');
+    const tabQuest = document.getElementById('alert-tab-quests');
+    if (tabDia) tabDia.style.display = isFreeDiamondAvailable() ? 'block' : 'none';
+    if (tabShop) tabShop.style.display = isFreeGoldAvailable() ? 'block' : 'none';
+    if (tabQuest) tabQuest.style.display = questOpen ? 'block' : 'none';
 }
 
 // Refresh everything on the shop row and the town alerts
@@ -1234,7 +1252,7 @@ function refreshShopAndAlerts() {
 }
 
 // ---------- EVENTS PAGE TABS ----------
-let currentEventsTab = 'events';
+let currentEventsTab = 'quests'; // Events page opens on Daily Quests
 
 function switchEventsTab(tabName) {
     if (tabName !== 'events' && tabName !== 'quests') tabName = 'events';
@@ -1257,9 +1275,9 @@ function switchEventsTab(tabName) {
 function updateQuestTabButton() {
     const btnQuests = document.getElementById('events-tab-btn-quests');
     if (!btnQuests) return;
-    const hasOpenQuest = (player.dailyQuests || []).some(q => !q.completed);
     const active = currentEventsTab === 'quests' ? 'border: 2px solid #c9a227' : 'border: 1px solid #b8945a';
-    const colors = hasOpenQuest ? 'background-color: #dc2626; color: #ffffff;' : 'background-color: rgba(214, 190, 140, .5); color: #2a1a0e;';
+    // Open quests show the alert graphic (tab badge in the markup), not a red button
+    const colors = 'background-color: rgba(214, 190, 140, .5); color: #2a1a0e;';
     btnQuests.setAttribute('style', `${colors} ${active}`);
 }
 
