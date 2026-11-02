@@ -3322,9 +3322,15 @@ function updateUI() {
             const gear = player.equipped[slot];
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
             const base = `assets/pages/character/slots/${img.replace(/\.png$/, '_q85.webp')}`;
-            const src = has && gear.img && VISUAL_EQUIP_SLOTS.includes(slot) ? gear.img : base;
+            const useVisual = has && gear.img && VISUAL_EQUIP_SLOTS.includes(slot);
+            const src = useVisual ? gear.img : base;
+            // Equipped gear shows its item icon on top of the slot frame (visual slots keep their own picture)
+            const iconLayer = has && !useVisual
+                ? `<div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; transform:scale(.8); pointer-events:none;">${itemIconHTML(gear)}</div>`
+                : '';
             return `<div ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
                 <img src="${src}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='${base}'">
+                ${iconLayer}
             </div>`;
         };
         eqContainer.innerHTML = EQUIP_SLOTS.map(eqSlot).join('');
