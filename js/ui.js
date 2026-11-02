@@ -2,13 +2,41 @@
 // RAGNATALE - UI.JS
 // ==========================================
 
-const AVATARS = ["assets/avatars/abyssalimp.png", "assets/avatars/cavebat.png", "assets/avatars/farbo.png", "assets/avatars/leafspritemage.png", "assets/avatars/mossyboulder.png", "assets/avatars/slime.png", "assets/avatars/snowwolf.png", "assets/avatars/starlightmender.png"];
+// Avatar set. Each entry has an unlock rule; an entry with no rule is open to everyone.
+//   lv:   Base Lv. needed
+//   boss: defeat the Map Lv. N boss on all four element paths (fire, water, earth, wind)
+const AVATAR_SET = [
+    { path: "assets/avatars/man1.png" },
+    { path: "assets/avatars/man2.png" },
+    { path: "assets/avatars/man3.png", lv: 50 },
+    { path: "assets/avatars/woman1.png" },
+    { path: "assets/avatars/woman2.png" },
+    { path: "assets/avatars/woman3.png" },
+    { path: "assets/avatars/woman4.png", lv: 50 },
+    { path: "assets/avatars/cat1.png", lv: 10 },
+    { path: "assets/avatars/cat2.png", lv: 10 },
+    { path: "assets/avatars/cat3.png", lv: 20 },
+    { path: "assets/avatars/cat4.png", lv: 20 },
+    { path: "assets/avatars/cat5.png", lv: 30 },
+    { path: "assets/avatars/bosslv1.png", boss: 1 },
+    { path: "assets/avatars/bosslv10.png", boss: 10 },
+    { path: "assets/avatars/bosslv20.png", boss: 20 },
+    { path: "assets/avatars/bosslv30.png", boss: 30 },
+    { path: "assets/avatars/bosslv40.png", boss: 40 },
+    { path: "assets/avatars/bosslv50.png", boss: 50 },
+    { path: "assets/avatars/bosslv60.png", boss: 60 },
+    { path: "assets/avatars/bosslv70.png", boss: 70 },
+    { path: "assets/avatars/bosslv80.png", boss: 80 },
+    { path: "assets/avatars/bosslv90.png", boss: 90 },
+    { path: "assets/avatars/bosslv99.png", boss: 99 },
+];
+const AVATARS = AVATAR_SET.map(a => a.path);
 // Avatar value is either an emoji or an image path (assets/avatars/... or data:image...)
 function avatarMarkup(av, cls) {
     if (av && (av.startsWith("assets/") || av.startsWith("data:image"))) return `<img src="${av}" class="${cls}" />`;
     return `<img src="assets/avatars/slime.png" class="${cls}" />`;
 }
-let selectedAvatarChoice = "assets/avatars/slime.png";
+let selectedAvatarChoice = "assets/avatars/man1.png";
 let currentLanguage = 'en';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
@@ -66,16 +94,44 @@ function resetSaveGame() {
     }
 }
 
+// Unlock check for an avatar path. Custom uploads and unknown paths are always open.
+function avatarRule(av) { return AVATAR_SET.find(a => a.path === av) || null; }
+function isAvatarUnlocked(av) {
+    const rule = avatarRule(av);
+    if (!rule) return true;
+    if (rule.lv && (player.baseLv || 1) < rule.lv) return false;
+    if (rule.boss) return FINAL_PATH_KEYS.every(pk => !!(player.clearedMaps && player.clearedMaps[`${pk}:map${rule.boss}`]));
+    return true;
+}
+function avatarLockText(av) {
+    const rule = avatarRule(av);
+    if (!rule) return '';
+    if (rule.lv) return `Lv. ${rule.lv}`;
+    if (rule.boss) return `Boss Lv. ${rule.boss}`;
+    return '';
+}
+function avatarLockTitle(av) {
+    const rule = avatarRule(av);
+    if (!rule) return '';
+    if (rule.lv) return `Unlocks at Base Lv. ${rule.lv}`;
+    if (rule.boss) return `Defeat the Map Lv. ${rule.boss} boss on all 4 elements`;
+    return '';
+}
+
 function renderAvatarSelection() {
     let grid = document.getElementById('avatar-selection-grid');
     if (!grid) return;
     grid.innerHTML = '';
     AVATARS.forEach((av) => {
+        const unlocked = isAvatarUnlocked(av);
         let isSelected = (av === selectedAvatarChoice);
         let borderClass = isSelected ? 'border-amber-400 bg-amber-500/20' : 'border-slate-700 bg-slate-900';
+        const clickAttr = unlocked ? `onclick="selectAvatar('${av}')" class="relative aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-pointer hover:border-amber-400 transition"`
+                                   : `title="${avatarLockTitle(av)}" class="relative aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-not-allowed"`;
         grid.innerHTML += `
-            <div onclick="selectAvatar('${av}')" class="aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-pointer hover:border-amber-400 transition">
-                ${avatarMarkup(av, 'w-full h-full object-contain')}
+            <div ${clickAttr}>
+                <div class="w-full h-full ${unlocked ? '' : 'grayscale opacity-40'}">${avatarMarkup(av, 'w-full h-full object-contain')}</div>
+                ${unlocked ? '' : `<span class="absolute bottom-0 left-0 right-0 text-center text-[10px] font-bold bg-slate-950/85 text-amber-200 py-0.5">${avatarLockText(av)}</span>`}
             </div>
         `;
     });
@@ -714,10 +770,17 @@ function updateAvatarDisplay() {
 
 // Player stat avatar: click to choose a monster avatar
 function openAvatarPicker() {
-    const options = AVATARS.map(av => `
+    const options = AVATARS.map(av => {
+        if (!isAvatarUnlocked(av)) return `
+        <div title="${avatarLockTitle(av)}" class="relative h-16 w-16 rounded-xl border border-slate-700 bg-slate-900 overflow-hidden cursor-not-allowed">
+            <div class="w-full h-full grayscale opacity-40">${avatarMarkup(av, 'w-full h-full object-cover')}</div>
+            <span class="absolute bottom-0 left-0 right-0 text-center text-[9px] font-bold bg-slate-950/85 text-amber-200">${avatarLockText(av)}</span>
+        </div>`;
+        return `
         <button onclick="pickPlayerAvatar('${av}')" class="h-16 w-16 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 cursor-pointer overflow-hidden">
             ${avatarMarkup(av, 'w-full h-full object-cover')}
-        </button>`).join('');
+        </button>`;
+    }).join('');
     showModal("Choose Avatar", "", `<div class="grid grid-cols-4 gap-3 justify-items-center">${options}</div>`);
 }
 function pickPlayerAvatar(av) {
