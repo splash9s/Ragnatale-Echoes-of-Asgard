@@ -2152,9 +2152,15 @@ function closeCornerHTML() {
 }
 
 // Equipment: only the header, requirements, set info and the comparison window (no duplicate stat list)
+function closeInvDetail() {
+    const panel = document.getElementById('inv-detail-panel');
+    if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
+    window.invDetailIndex = null;
+}
 function showItemDetail(index) {
     const item = player.inventory[index];
-    if (!item) return;
+    if (!item) { closeInvDetail(); return; }
+    window.invDetailIndex = index;
     const isEquip = !!item.slot;
     const isPotion = item.type === 'potion';
     const rarity = RARITY_INFO[item.rarity];
@@ -2188,15 +2194,24 @@ function showItemDetail(index) {
     actions += '</div>';
 
     const favBtn = isGearItem(item) && item.slot !== 'pet'
-        ? `<button onclick="toggleFavorite(${index})" class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`
+        ? `<button onclick="toggleFavorite(${index})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`
         : '';
-    showModal(title, '', closeCornerHTML() + favBtn + body + actions);
+    const panel = document.getElementById('inv-detail-panel');
+    if (!panel) return;
+    panel.innerHTML = `
+        <button onclick="closeInvDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-sm">✕</button>
+        <div class="flex items-center gap-3 pr-12 mb-3">
+            <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
+            <div class="flex flex-col gap-1"><span class="font-bold text-base">${title}</span>${favBtn}</div>
+        </div>
+        ${body}${actions}`;
+    panel.style.display = 'block';
 }
 
-function equipFromDetail(index) { if (executeEquipItem(index)) closeModal(); }
-function usePotionFromDetail(index) { if (useInventoryPotion(index)) closeModal(); }
-function salvageFromDetail(index) { salvageEquipmentItem(index); closeModal(); }
-function sellFromDetail(index) { if (sellInventoryItem(index)) closeModal(); }
+function equipFromDetail(index) { if (executeEquipItem(index)) closeInvDetail(); }
+function usePotionFromDetail(index) { if (useInventoryPotion(index)) closeInvDetail(); }
+function salvageFromDetail(index) { salvageEquipmentItem(index); closeInvDetail(); }
+function sellFromDetail(index) { if (sellInventoryItem(index)) closeInvDetail(); }
 
 function useOrEquipItem(index) { showItemDetail(index); }
 
@@ -3276,7 +3291,7 @@ function updateUI() {
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
-                <div onclick="showItemDetail(${index})" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
+                <div onclick="event.stopPropagation(); showItemDetail(${index})" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
                     <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[9px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
@@ -3580,6 +3595,7 @@ function toggleEquippedFavorite(slot) {
 function openChestFromDetail(index) {
     const item = player.inventory[index];
     if (!item || item.type !== 'chest') return;
+    closeInvDetail();
     if ((item.qty || 1) > 1) item.qty--;
     else player.inventory[index] = null;
     openChest(item.chestType);

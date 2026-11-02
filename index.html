@@ -806,6 +806,7 @@
                         <div id="equipment-slots-container" class="absolute" style="left:0; top:0; width:400px; height:700px;"></div>
                         <div id="set-bonus-panel" class="hidden"></div>
                     </div>
+                    <div id="inv-detail-panel" class="art-panel" style="left:0px; top:69px; width:756px; height:1007px; overflow-y:auto; display:none; z-index:6; background-color:rgba(231,209,170,.5) !important; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
                     <div id="char-panel-right" class="art-panel" style="left:762px; top:80px; width:1131px; height:980px; overflow:hidden;">
                         <div class="flex flex-col" style="position:absolute; left:20px; top:14px; width:1091px; gap:22px;">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -826,7 +827,7 @@
                         <button onclick="salvageAllEquipment()" class="px-2 py-1 bg-red-600/60 hover:bg-red-600 text-red-100 text-[10px] font-bold rounded cursor-pointer transition">Salvage All</button>
                         <button onclick="sellAllEquipment()" class="px-2 py-1 bg-amber-700 hover:bg-amber-600 text-amber-100 text-[10px] font-bold rounded cursor-pointer transition">Sell All</button>
                     </div>
-                    <div id="inventory-grid" class="grid justify-start" style="justify-content:center; margin-top:-10px; grid-template-columns:repeat(9,108px); grid-auto-rows:104px; column-gap:5px; row-gap:5px;"></div>
+                    <div id="inventory-grid" onclick="closeInvDetail()" class="grid justify-start" style="justify-content:center; margin-top:-10px; grid-template-columns:repeat(9,108px); grid-auto-rows:104px; column-gap:5px; row-gap:5px;"></div>
                 </div>
                     </div>
                 </div>
