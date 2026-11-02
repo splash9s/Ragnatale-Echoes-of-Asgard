@@ -184,7 +184,7 @@
         .art-screen .char-return:active .ret-press { display: block; }
         .art-screen .char-return:active .ret-normal { display: none; }
         /* Character page (mock layout): gear window, inventory, and the stats window that replaces the gear window when opened */
-        #view-character #char-panel-mid { background: url('assets/pages/character/chawindow.png') center / 100% 100% no-repeat !important; border: none !important; box-shadow: none !important; z-index: 3; }
+        #view-character #char-panel-mid { background: url('assets/pages/character/chawindow_q85.webp') center / 100% 100% no-repeat !important; border: none !important; box-shadow: none !important; z-index: 3; }
         #view-character #char-panel-right { background-color: rgba(231,209,170,.5) !important; border: none !important; border-radius: 18px; box-shadow: none !important; }
         #view-character .char-stats-panel { left: 93px !important; top: 77px !important; width: 602px !important; height: 992px !important; padding: 120px 50px 40px 50px !important; background: rgba(231,209,170,.8) !important; border: 3px solid #b8945a !important; border-radius: 40px !important; box-shadow: none !important; transition: transform .35s ease, opacity .35s ease; z-index: 8; }
         #view-character .char-stats-panel .rounded-2xl.border, #view-character .char-stats-panel #char-element-stats { background-color: rgba(96, 66, 34, .72) !important; border: 1px solid #5a3d1e !important; border-radius: 16px; }
@@ -304,9 +304,9 @@
         #view-combat .combat-slot-btn .text-\[10px\] { font-size: 16px !important; }
         #node-title { font-size: 20px !important; }
         .combat-slot-btn { position: absolute; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; border: 0; background-color: transparent; background-size: 100% 100%; background-repeat: no-repeat; color: #f5e6c0; font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px #000; cursor: pointer; }
-        #combat-potion-btn { background-image: url('assets/combat/potionslot.png'); }
-        #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress.png'); }
-        #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion.png'); }
+        #combat-potion-btn { background-image: url('assets/combat/potionslot_q85.webp'); }
+        #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress_q85.webp'); }
+        #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion_q85.webp'); }
         #combat-potion-btn.no-potion span { display: none; }
         /* Damage numbers: white for normal, red for critical */
         .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 26px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
@@ -358,8 +358,8 @@
         .rune-acq-medium { width: 220px; }
         .rune-acq-big { width: 270px; }
         .rune-acq-card:hover { transform: none; filter: none; }
-        #combat-elixir-btn { background-image: url('assets/combat/elixirslot.png'); }
-        #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress.png'); }
+        #combat-elixir-btn { background-image: url('assets/combat/elixirslot_q85.webp'); }
+        #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress_q85.webp'); }
         #combat-elixir-btn span { display: none; }
         /* Auto-revive off: show "Resurrection OFF" on the button */
         #combat-elixir-btn.off > span { display: inline; font-weight: bold; color: #f87171; text-shadow: 0 1px 2px #000; }
@@ -416,7 +416,7 @@
 
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
     <!-- LOADING SCREEN: shown while images and sounds are preloaded (see js/loader.js) -->
-    <div id="loading-screen" style="position:fixed; inset:0; z-index:200; background:linear-gradient(rgba(5,10,20,.35), rgba(5,10,20,.55)), url(assets/page/loadscreen_q85.jpg) center / cover no-repeat #050a14; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#e2e8f0; font-family:sans-serif; transition:opacity .4s;">
+    <div id="loading-screen" style="position:fixed; inset:0; z-index:200; background:linear-gradient(rgba(5,10,20,.35), rgba(5,10,20,.55)), url(assets/page/loadscreen_q85.webp) center / cover no-repeat #050a14; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#e2e8f0; font-family:sans-serif; transition:opacity .4s;">
         <div style="font-size:30px; font-weight:800; color:#c9a227; letter-spacing:3px;">RAGNATALE</div>
         <div style="font-size:12px; color:#94a3b8; letter-spacing:1px;">Echoes of Asgard</div>
         <div style="width:min(420px,80vw); height:14px; background:#0f172a; border:1px solid #334155; border-radius:999px; overflow:hidden; margin-top:12px;">
@@ -467,10 +467,10 @@
         <div id="view-town" class="flex flex-col flex-1">
             <div id="town-stage" class="town-stage">
                 <div class="ts-inner">
-                    <img class="ts-bg" src="assets/page01/mainbg5_q85.jpg" alt="" onerror="townSwap(this,'mainbg5.png')">
+                    <img class="ts-bg" src="assets/page01/mainbg5_q85.webp" alt="" onerror="townSwap(this,'mainbg5.png')">
                     <div class="ui town-panel" style="left:24px; top:13px; width:824px; height:315px; cursor:default;">
                         <div class="town-info">
-                            <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime.png" alt="" /></div>
+                            <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime_q85.webp" alt="" /></div>
                             <div class="town-id">
                                 <h1 class="town-name"><span id="header-player-name">Hero</span><span id="header-vip-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
                                 <div class="town-lv">Base Lv. <strong id="header-base-lv">1</strong></div>
@@ -484,39 +484,39 @@
                                     <div class="row"><span>Class EXP</span><span id="top-job-exp-text">0 / 40 (0%)</span></div>
                                 </div>
                                 <div class="town-money">
-                                    <div><img src="assets/icons/goldiconsmall.png" alt="" class="town-ico"><span id="town-gold">1000 Gold</span></div>
-                                    <div id="town-diamond-pill" onclick="switchView('diamond')"><img src="assets/icons/diamondiconsmall.png" alt="" class="town-ico"><span id="town-diamonds">1000</span></div>
+                                    <div><img src="assets/icons/goldiconsmall_q85.webp" alt="" class="town-ico"><span id="town-gold">1000 Gold</span></div>
+                                    <div id="town-diamond-pill" onclick="switchView('diamond')"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" class="town-ico"><span id="town-diamonds">1000</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
             <div class="ui" data-action="events" style="left:1247px; top:13px; width:206px; height:209px;">
-                <img src="assets/page01/eventsbutton.png" alt="" onerror="townSwap(this,'eventsbutton.png')">
-                <img id="alert-events" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
+                <img src="assets/page01/eventsbutton_q85.webp" alt="" onerror="townSwap(this,'eventsbutton.png')">
+                <img id="alert-events" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
             <div class="ui" data-action="mail" style="left:1473px; top:13px; width:206px; height:209px;">
-                <img src="assets/page01/mailbutton.png" alt="" onerror="townSwap(this,'mailbutton.png')">
-                <img id="alert-mail" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
+                <img src="assets/page01/mailbutton_q85.webp" alt="" onerror="townSwap(this,'mailbutton.png')">
+                <img id="alert-mail" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
             <div class="ui" data-action="setting" style="left:1699px; top:13px; width:206px; height:209px;">
-                <img src="assets/page01/setting.png" alt="" onerror="townSwap(this,'setting.png')">
+                <img src="assets/page01/setting_q85.webp" alt="" onerror="townSwap(this,'setting.png')">
             </div>
             <div class="ui" data-action="character" style="left:13px; top:858px; width:206px; height:209px;">
-                <img src="assets/page01/characterbutton.png" alt="" onerror="townSwap(this,'characterbutton.png')">
+                <img src="assets/page01/characterbutton_q85.webp" alt="" onerror="townSwap(this,'characterbutton.png')">
             </div>
             <div class="ui" data-action="shop" style="left:239px; top:858px; width:206px; height:209px;">
-                <img src="assets/page01/shoppagebutton.png" alt="" onerror="townSwap(this,'shoppagebutton.png')">
-                <img id="alert-shop" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
+                <img src="assets/page01/shoppagebutton_q85.webp" alt="" onerror="townSwap(this,'shoppagebutton.png')">
+                <img id="alert-shop" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
             <div class="ui" data-action="blacksmith" style="left:465px; top:858px; width:206px; height:209px;">
-                <img src="assets/page01/articanbutton.png" alt="" onerror="townSwap(this,'articanbutton.png')">
+                <img src="assets/page01/articanbutton_q85.webp" alt="" onerror="townSwap(this,'articanbutton.png')">
             </div>
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
                 <img src="assets/page01/expeditionbutton_q85.webp" alt="" onerror="townSwap(this,'expeditionbutton.png')">
             </div>
-                    <img id="town-shadow" alt="" src="assets/cha/chashadow.png">
+                    <img id="town-shadow" alt="" src="assets/cha/chashadow_q85.webp">
                     <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
-                        <img id="town-hero" class="player-idle" alt="" src="assets/cha/chabase.png">
+                        <img id="town-hero" class="player-idle" alt="" src="assets/cha/chabase_q85.webp">
                     </div>
                 </div>
             </div>
@@ -526,11 +526,11 @@
         <div id="view-setting" class="hidden art-screen">
             <div id="setting-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/setting/settingpage_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'setting bg')">
+                    <img class="ts-bg" src="assets/pages/setting/settingpage_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'setting bg')">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div class="art-panel" style="left:441px; top:182px; width:1038px; height:707px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 gap-3">
@@ -550,13 +550,13 @@
         <div id="view-expeditions" class="hidden art-dark">
             <div id="expo-stage" class="town-stage">
                 <div class="ts-inner">
-                    <img class="ts-bg" src="assets/compaign/compaign2_q85.jpg" alt="" style="width:1920px; height:1080px; object-fit:fill;" onerror="townSwap(this,'compaign2.png')">
-                    <div class="expo-node" id="expo-node-earth" style="left:532px; top:390px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img src="assets/compaign/mapbutton.png" alt=""></div>
-                    <div class="expo-node" id="expo-node-final" style="left:939px; top:132px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img src="assets/compaign/mapbutton.png" alt=""></div>
-                    <div class="expo-node" id="expo-node-fire" style="left:1351px; top:388px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img src="assets/compaign/mapbutton.png" alt=""></div>
-                    <div class="expo-node" id="expo-node-water" style="left:443px; top:712px;" onclick="openCampaignPath('water')" title="Water Path (Teal Cave)"><img src="assets/compaign/mapbutton.png" alt=""></div>
-                    <div class="expo-node" id="expo-node-wind" style="left:1406px; top:670px;" onclick="openCampaignPath('wind')" title="Wind Path (Storm)"><img src="assets/compaign/mapbutton.png" alt=""></div>
-                    <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton.png" alt=""></div>
+                    <img class="ts-bg" src="assets/compaign/compaign2_q85.webp" alt="" style="width:1920px; height:1080px; object-fit:fill;" onerror="townSwap(this,'compaign2.png')">
+                    <div class="expo-node" id="expo-node-earth" style="left:532px; top:390px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-final" style="left:939px; top:132px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-fire" style="left:1351px; top:388px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-water" style="left:443px; top:712px;" onclick="openCampaignPath('water')" title="Water Path (Teal Cave)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-wind" style="left:1406px; top:670px;" onclick="openCampaignPath('wind')" title="Wind Path (Storm)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div id="campaign-panel" class="expo-panel hidden">
                         <div class="expo-inner">
                         <div class="flex justify-between items-center mb-3">
@@ -658,15 +658,15 @@
         <div id="view-events" class="hidden art-screen art-dark">
             <div id="events-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/events/bg_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
+                    <img class="ts-bg" src="assets/pages/events/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
                     <img class="art-frame" src="assets/pages/frame/c_q85.webp" alt="" style="left:614px; top:78px; width:803px; height:953px;">
                     <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
-                        <img src="assets/compaign/returnbutton.png" alt="">
+                        <img src="assets/compaign/returnbutton_q85.webp" alt="">
                     </div>
                     <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
             <div class="flex gap-2 mb-4">
                 <button id="events-tab-btn-events" onclick="switchEventsTab('events')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Events</button>
-                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests<img id="alert-tab-quests" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
+                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests<img id="alert-tab-quests" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
             </div>
             <div id="events-tab-quests" class="hidden flex flex-col gap-3">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
@@ -697,8 +697,8 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div id="skill-sp-badge" class="art-panel" style="left:895px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;">
                         <span class="text-xs font-bold">SP: <strong id="skill-page-sp">0</strong></span>
@@ -719,15 +719,15 @@
         <div id="view-character" class="hidden art-screen art-dark stats-hidden">
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/character/bg_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
+                    <img class="ts-bg" src="assets/pages/character/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
                     
-                    <img class="art-frame pointer-events-none" src="assets/cha/chashadow.png" alt="" style="left:338px; top:688px; width:102px; height:41px; z-index:4;">
-                    <img id="char-hero" class="art-frame pointer-events-none" src="assets/cha/chabase.png" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
+                    <img class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:338px; top:688px; width:102px; height:41px; z-index:4;">
+                    <img id="char-hero" class="art-frame pointer-events-none" src="assets/cha/chabase_q85.webp" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
                     <button onclick="switchView('skills')" style="position:absolute; left:263px; top:138px; width:260px; height:84px; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills</button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <button id="char-stats-tab" class="char-stats-tab" onclick="toggleCharStats(true)">STATS</button>
                     <div id="char-panel-left" class="art-panel char-stats-panel" style="overflow-y:auto;">
@@ -823,18 +823,18 @@
         <div id="view-shop" class="hidden art-screen art-dark">
             <div id="shop-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/artisan/bg_q85.jpg" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
+                    <img class="ts-bg" src="assets/pages/artisan/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
                     <img class="art-frame" src="assets/pages/artisan/window_q85.webp" alt="" style="left:109px; top:95px; width:803px; height:953px;">
                     <img id="shop-frame-right" class="art-frame" src="assets/pages/artisan/window_q85.webp" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div id="shop-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
                         <div class="flex items-center gap-2 mb-4">
-                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Diamond<img id="alert-tab-diamond" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
-                            <button id="shop-tab-btn-shop" onclick="switchShopTab('shop')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Shop<img id="alert-tab-shop" src="assets/page01/alert.png" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
+                            <button id="shop-tab-btn-diamond" onclick="switchShopTab('diamond')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Diamond<img id="alert-tab-diamond" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
+                            <button id="shop-tab-btn-shop" onclick="switchShopTab('shop')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); color: #2a1a0e; border: 1px solid #b8945a;">Shop<img id="alert-tab-shop" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
                             <span class="ml-auto text-xs font-bold text-slate-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-700/40 whitespace-nowrap"><span id="shop-balance-label">💎 Balance:</span> <strong id="shop-balance-value">0</strong></span>
                         </div>
                         <div id="shop-diamond-section" class="flex flex-col gap-3">
@@ -863,8 +863,8 @@
                     <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:1007px; top:102px; width:803px; height:953px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <!-- Left window: list of equipped gear -->
                     <div id="blacksmith-panel-left" class="art-panel" style="left:194px; top:203px; width:614px; height:766px;">
@@ -898,11 +898,11 @@
         <div id="view-quests" class="hidden art-screen">
             <div id="mail-stage" class="town-stage" data-w="2752" data-h="1536">
                 <div class="ts-inner" style="width:2752px; height:1536px;">
-                    <img class="ts-bg" src="assets/pages/mail/bg.jpg" alt="" style="width:2752px; height:1536px;" onerror="townSwap(this,'mail bg')">
+                    <img class="ts-bg" src="assets/pages/mail/bg_q85.webp" alt="" style="width:2752px; height:1536px;" onerror="townSwap(this,'mail bg')">
                     <div class="char-header-bar" style="left:0px; top:0px; width:2752px; height:100px;"></div>
                     <div class="ui char-return" style="left:2620px; top:3px; width:94px; height:95px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div class="art-panel" style="left:513px; top:326px; width:1727px; height:658px;">
             <div class="grid grid-cols-1 gap-4">
@@ -920,7 +920,7 @@
         <div id="view-combat" class="hidden art-screen">
             <div id="combat-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img id="earth-bg" class="ts-bg" src="assets/combat/earthbg1_q85.jpg" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;">
+                    <img id="earth-bg" class="ts-bg" src="assets/combat/earthbg1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;">
                     <img id="earth-base" src="assets/combat/earthbase1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
 
                     <!-- Stage title (top centre) -->
@@ -932,7 +932,7 @@
                     <div style="position:absolute; left:20px; top:8px; width:502px; height:254px; z-index:5;">
                         <div class="town-panel" style="left:0; top:0; width:824px; height:315px; transform:scale(0.6093); transform-origin:0 0;">
                     <div class="town-info">
-                                        <div id="combat-avatar-c" class="town-avatar"><img src="assets/avatars/slime.png" alt="" /></div>
+                                        <div id="combat-avatar-c" class="town-avatar"><img src="assets/avatars/slime_q85.webp" alt="" /></div>
                                         <div class="town-id">
                                             <h1 class="town-name"><span id="header-player-name-c">Hero</span><span id="header-vip-badge-c" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
                                             <div class="town-lv">Base Lv. <strong id="header-base-lv-c">1</strong></div>
@@ -946,8 +946,8 @@
                                                 <div class="row"><span>Class EXP</span><span id="top-job-exp-text-c">0 / 40 (0%)</span></div>
                                             </div>
                                             <div class="town-money">
-                                                <div><img src="assets/icons/goldiconsmall.png" alt="" class="town-ico"><span id="town-gold-c">1000 Gold</span></div>
-                                                <div ><img src="assets/icons/diamondiconsmall.png" alt="" class="town-ico"><span id="town-diamonds-c">1000</span></div>
+                                                <div><img src="assets/icons/goldiconsmall_q85.webp" alt="" class="town-ico"><span id="town-gold-c">1000 Gold</span></div>
+                                                <div ><img src="assets/icons/diamondiconsmall_q85.webp" alt="" class="town-ico"><span id="town-diamonds-c">1000</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -988,13 +988,13 @@
                     </div>
 
                     <!-- Player shadow: placed under the player's feet by applyCombatEarthPositions() for each base layout -->
-                    <img id="combat-player-shadow" src="assets/cha/chashadow.png" alt="" style="position:absolute; left:403px; top:839px; width:102px; height:41px; pointer-events:none; z-index:3;">
+                    <img id="combat-player-shadow" src="assets/cha/chashadow_q85.webp" alt="" style="position:absolute; left:403px; top:839px; width:102px; height:41px; pointer-events:none; z-index:3;">
 
                     <!-- Character sprite (centre 488, 590) -->
-                    <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase.png" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
+                    <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase_q85.webp" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
 
                     <!-- Player stun effect: shown over the head while stunned (see the 60ms loop in ui.js) -->
-                    <img id="combat-player-stun-fx" src="assets/combat/stun/stuneffect.png" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; display:none; max-width:none; pointer-events:none; image-rendering:pixelated; z-index:5;">
+                    <img id="combat-player-stun-fx" src="assets/combat/stun/stuneffect_q85.webp" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; display:none; max-width:none; pointer-events:none; image-rendering:pixelated; z-index:5;">
 
                     <!-- Player HP and armor, below the character -->
                     <div id="combat-hp-under" style="position:absolute; left:413px; top:896px; width:204px; display:flex; flex-direction:column; gap:4px;">
@@ -1039,8 +1039,8 @@
             <div id="combat-debuff-list" class="flex flex-col gap-1 text-[11px] font-mono"></div>
         </div>
         <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="returnToTown()">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                 </div>
             </div>

@@ -6,37 +6,37 @@
 //   lv:   Base Lv. needed
 //   boss: defeat the Map Lv. N boss on all four element paths (fire, water, earth, wind)
 const AVATAR_SET = [
-    { path: "assets/avatars/man1.png" },
-    { path: "assets/avatars/man2.png" },
-    { path: "assets/avatars/man3.png", lv: 50 },
-    { path: "assets/avatars/woman1.png" },
-    { path: "assets/avatars/woman2.png" },
-    { path: "assets/avatars/woman3.png" },
-    { path: "assets/avatars/woman4.png", lv: 50 },
-    { path: "assets/avatars/cat1.png", lv: 10 },
-    { path: "assets/avatars/cat2.png", lv: 10 },
-    { path: "assets/avatars/cat3.png", lv: 20 },
-    { path: "assets/avatars/cat4.png", lv: 20 },
-    { path: "assets/avatars/cat5.png", lv: 30 },
-    { path: "assets/avatars/bosslv1.png", boss: 1 },
-    { path: "assets/avatars/bosslv10.png", boss: 10 },
-    { path: "assets/avatars/bosslv20.png", boss: 20 },
-    { path: "assets/avatars/bosslv30.png", boss: 30 },
-    { path: "assets/avatars/bosslv40.png", boss: 40 },
-    { path: "assets/avatars/bosslv50.png", boss: 50 },
-    { path: "assets/avatars/bosslv60.png", boss: 60 },
-    { path: "assets/avatars/bosslv70.png", boss: 70 },
-    { path: "assets/avatars/bosslv80.png", boss: 80 },
-    { path: "assets/avatars/bosslv90.png", boss: 90 },
-    { path: "assets/avatars/bosslv99.png", boss: 99 },
+    { path: "assets/avatars/man1_q85.webp" },
+    { path: "assets/avatars/man2_q85.webp" },
+    { path: "assets/avatars/man3_q85.webp", lv: 50 },
+    { path: "assets/avatars/woman1_q85.webp" },
+    { path: "assets/avatars/woman2_q85.webp" },
+    { path: "assets/avatars/woman3_q85.webp" },
+    { path: "assets/avatars/woman4_q85.webp", lv: 50 },
+    { path: "assets/avatars/cat1_q85.webp", lv: 10 },
+    { path: "assets/avatars/cat2_q85.webp", lv: 10 },
+    { path: "assets/avatars/cat3_q85.webp", lv: 20 },
+    { path: "assets/avatars/cat4_q85.webp", lv: 20 },
+    { path: "assets/avatars/cat5_q85.webp", lv: 30 },
+    { path: "assets/avatars/bosslv1_q85.webp", boss: 1 },
+    { path: "assets/avatars/bosslv10_q85.webp", boss: 10 },
+    { path: "assets/avatars/bosslv20_q85.webp", boss: 20 },
+    { path: "assets/avatars/bosslv30_q85.webp", boss: 30 },
+    { path: "assets/avatars/bosslv40_q85.webp", boss: 40 },
+    { path: "assets/avatars/bosslv50_q85.webp", boss: 50 },
+    { path: "assets/avatars/bosslv60_q85.webp", boss: 60 },
+    { path: "assets/avatars/bosslv70_q85.webp", boss: 70 },
+    { path: "assets/avatars/bosslv80_q85.webp", boss: 80 },
+    { path: "assets/avatars/bosslv90_q85.webp", boss: 90 },
+    { path: "assets/avatars/bosslv99_q85.webp", boss: 99 },
 ];
 const AVATARS = AVATAR_SET.map(a => a.path);
 // Avatar value is either an emoji or an image path (assets/avatars/... or data:image...)
 function avatarMarkup(av, cls) {
     if (av && (av.startsWith("assets/") || av.startsWith("data:image"))) return `<img src="${av}" class="${cls}" />`;
-    return `<img src="assets/avatars/slime.png" class="${cls}" />`;
+    return `<img src="assets/avatars/slime_q85.webp" class="${cls}" />`;
 }
-let selectedAvatarChoice = "assets/avatars/man1.png";
+let selectedAvatarChoice = "assets/avatars/man1_q85.webp";
 let currentLanguage = 'en';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
@@ -178,12 +178,12 @@ function startGameWithName() {
 
 // Combat animation: idle frames loop; after a hit, the damage frames play once (4 frames)
 // One damage picture, shown for 480ms after a hit
-const COMBAT_SLIME_DAMAGE_FRAMES = ['assets/combat/slime/slimedamaged.png'];
+const COMBAT_SLIME_DAMAGE_FRAMES = ['assets/combat/slime/slimedamaged_q85.webp'];
 const COMBAT_DAMAGE_FRAME_MS = 240; // monster damaged animation (half of the original 480)
 // Death: slime_dead_0001 to 0006 play once (150ms each), then the monster disappears
-const COMBAT_SLIME_DEATH_FRAMES = ['assets/combat/slime/slimedead.png'];
+const COMBAT_SLIME_DEATH_FRAMES = ['assets/combat/slime/slimedead_q85.webp'];
 const COMBAT_DEATH_FRAME_MS = 600;
-const COMBAT_SLIME_ATTACK_FRAME = 'assets/combat/slime/slimeattack.png';
+const COMBAT_SLIME_ATTACK_FRAME = 'assets/combat/slime/slimeattack_q85.webp';
 const COMBAT_MONSTER_ATTACK_MS = 300; // attack pose shown when a monster attacks
 const COMBAT_MONSTER_LUNGE_PX = -40;  // monsters stand to the right of the player, so forward is left
 const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FRAME_MS;
@@ -195,175 +195,175 @@ const MONSTER_SPRITES = {
     // Each frame is centred by its own canvas width (flex), so shift is only the correction from the feet-point check.
     // shift: { frame path: [dx, dy] px }. Frames without an entry use [0, 0].
     M006: { // Rock Golem
-        idle: ['assets/combat/rockgolem/rockgolem.png'],
-        attack: ['assets/combat/rockgolem/rockgolemattack.png'],
-        hurt: ['assets/combat/rockgolem/rockgolemdamaged.png'],
-        dead: ['assets/combat/rockgolem/rockgolemdead.png'],
+        idle: ['assets/combat/rockgolem/rockgolem_q85.webp'],
+        attack: ['assets/combat/rockgolem/rockgolemattack_q85.webp'],
+        hurt: ['assets/combat/rockgolem/rockgolemdamaged_q85.webp'],
+        dead: ['assets/combat/rockgolem/rockgolemdead_q85.webp'],
         deathMs: 600
     },
     M007: { // Kobold Sniper
-        idle: ['assets/combat/koboltsniper/koboltsniper.png'],
-        attack: ['assets/combat/koboltsniper/koboltsniperattack.png'],
-        hurt: ['assets/combat/koboltsniper/koboltsniperdamaged.png'],
-        dead: ['assets/combat/koboltsniper/koboltsniperdead.png'],
+        idle: ['assets/combat/koboltsniper/koboltsniper_q85.webp'],
+        attack: ['assets/combat/koboltsniper/koboltsniperattack_q85.webp'],
+        hurt: ['assets/combat/koboltsniper/koboltsniperdamaged_q85.webp'],
+        dead: ['assets/combat/koboltsniper/koboltsniperdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/koboltsniper/koboltsniperdamaged.png': [-9, -2], 'assets/combat/koboltsniper/koboltsniperattack.png': [0, -2], 'assets/combat/koboltsniper/koboltsniperdead.png': [0, -1] }
+        shift: { 'assets/combat/koboltsniper/koboltsniperdamaged_q85.webp': [-9, -2], 'assets/combat/koboltsniper/koboltsniperattack_q85.webp': [0, -2], 'assets/combat/koboltsniper/koboltsniperdead_q85.webp': [0, -1] }
     },
     M003: { // Goblin Archer
-        idle: ['assets/combat/goblinarcher/goblinarcher.png'],
-        attack: ['assets/combat/goblinarcher/goblinarcherattack.png'],
-        hurt: ['assets/combat/goblinarcher/goblinarcherdamaged.png'],
-        dead: ['assets/combat/goblinarcher/goblinarcherdead.png'],
+        idle: ['assets/combat/goblinarcher/goblinarcher_q85.webp'],
+        attack: ['assets/combat/goblinarcher/goblinarcherattack_q85.webp'],
+        hurt: ['assets/combat/goblinarcher/goblinarcherdamaged_q85.webp'],
+        dead: ['assets/combat/goblinarcher/goblinarcherdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/goblinarcher/goblinarcherattack.png': [-3, -2], 'assets/combat/goblinarcher/goblinarcherdead.png': [0, -1] }
+        shift: { 'assets/combat/goblinarcher/goblinarcherattack_q85.webp': [-3, -2], 'assets/combat/goblinarcher/goblinarcherdead_q85.webp': [0, -1] }
     },
     M004: { // Giant Moss Slime (boss, map lv 1): natural size; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/giantmossslime/giantmossslime.png'],
-        attack: ['assets/combat/giantmossslime/giantmossslimeattack.png'],
-        hurt: ['assets/combat/giantmossslime/giantmossslimedamaged.png'],
-        dead: ['assets/combat/giantmossslime/giantmossslimedead.png'],
+        idle: ['assets/combat/giantmossslime/giantmossslime_q85.webp'],
+        attack: ['assets/combat/giantmossslime/giantmossslimeattack_q85.webp'],
+        hurt: ['assets/combat/giantmossslime/giantmossslimedamaged_q85.webp'],
+        dead: ['assets/combat/giantmossslime/giantmossslimedead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/giantmossslime/giantmossslimeattack.png': [30, 3],
-            'assets/combat/giantmossslime/giantmossslimedamaged.png': [7, 6],
-            'assets/combat/giantmossslime/giantmossslimedead.png': [6, 6]
+            'assets/combat/giantmossslime/giantmossslimeattack_q85.webp': [30, 3],
+            'assets/combat/giantmossslime/giantmossslimedamaged_q85.webp': [7, 6],
+            'assets/combat/giantmossslime/giantmossslimedead_q85.webp': [6, 6]
         }
     },
     M084: { // Hel Stone Mage (earth mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/helstonemage/helstonemage.png'],
-        attack: ['assets/combat/helstonemage/helstonemageattack.png'],
-        hurt: ['assets/combat/helstonemage/helstonemagedamaged.png'],
-        dead: ['assets/combat/helstonemage/helstonemagedead.png'],
+        idle: ['assets/combat/helstonemage/helstonemage_q85.webp'],
+        attack: ['assets/combat/helstonemage/helstonemageattack_q85.webp'],
+        hurt: ['assets/combat/helstonemage/helstonemagedamaged_q85.webp'],
+        dead: ['assets/combat/helstonemage/helstonemagedead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/helstonemage/helstonemageattack.png': [0, 2],
-            'assets/combat/helstonemage/helstonemagedamaged.png': [-10, 2],
-            'assets/combat/helstonemage/helstonemagedead.png': [0, 1]
+            'assets/combat/helstonemage/helstonemageattack_q85.webp': [0, 2],
+            'assets/combat/helstonemage/helstonemagedamaged_q85.webp': [-10, 2],
+            'assets/combat/helstonemage/helstonemagedead_q85.webp': [0, 1]
         }
     },
     M008: { // Cave Beast (boss, map lv 10): natural size; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/cavebeast/cavebeast.png'],
-        attack: ['assets/combat/cavebeast/cavebeastattack.png'],
-        hurt: ['assets/combat/cavebeast/cavebeastdamaged.png'],
-        dead: ['assets/combat/cavebeast/cavebeastdead1.png', 'assets/combat/cavebeast/cavebeastdead2.png'],
+        idle: ['assets/combat/cavebeast/cavebeast_q85.webp'],
+        attack: ['assets/combat/cavebeast/cavebeastattack_q85.webp'],
+        hurt: ['assets/combat/cavebeast/cavebeastdamaged_q85.webp'],
+        dead: ['assets/combat/cavebeast/cavebeastdead1_q85.webp', 'assets/combat/cavebeast/cavebeastdead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/cavebeast/cavebeastattack.png': [0, -3],
-            'assets/combat/cavebeast/cavebeastdamaged.png': [0, 0],
-            'assets/combat/cavebeast/cavebeastdead1.png': [0, 0],
-            'assets/combat/cavebeast/cavebeastdead2.png': [0, -1]
+            'assets/combat/cavebeast/cavebeastattack_q85.webp': [0, -3],
+            'assets/combat/cavebeast/cavebeastdamaged_q85.webp': [0, 0],
+            'assets/combat/cavebeast/cavebeastdead1_q85.webp': [0, 0],
+            'assets/combat/cavebeast/cavebeastdead2_q85.webp': [0, -1]
         }
     },
     M060: { // Battle Storm Mage (wind mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/battlestormmage/battlestormmage.png'],
-        attack: ['assets/combat/battlestormmage/battlestormmageattack.png'],
-        hurt: ['assets/combat/battlestormmage/battlestormmagedamaged.png'],
-        dead: ['assets/combat/battlestormmage/battlestormmagedead.png'],
+        idle: ['assets/combat/battlestormmage/battlestormmage_q85.webp'],
+        attack: ['assets/combat/battlestormmage/battlestormmageattack_q85.webp'],
+        hurt: ['assets/combat/battlestormmage/battlestormmagedamaged_q85.webp'],
+        dead: ['assets/combat/battlestormmage/battlestormmagedead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/battlestormmage/battlestormmageattack.png': [0, 0],
-            'assets/combat/battlestormmage/battlestormmagedamaged.png': [0, 0],
-            'assets/combat/battlestormmage/battlestormmagedead.png': [0, -9]
+            'assets/combat/battlestormmage/battlestormmageattack_q85.webp': [0, 0],
+            'assets/combat/battlestormmage/battlestormmagedamaged_q85.webp': [0, 0],
+            'assets/combat/battlestormmage/battlestormmagedead_q85.webp': [0, -9]
         }
     },
     M033: { // Halo Warden (wind tank): natural size; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/halowarden/halowarden.png'],
-        attack: ['assets/combat/halowarden/halowardenattack.png'],
-        hurt: ['assets/combat/halowarden/halowardendamaged.png'],
-        dead: ['assets/combat/halowarden/halowardendead.png'],
+        idle: ['assets/combat/halowarden/halowarden_q85.webp'],
+        attack: ['assets/combat/halowarden/halowardenattack_q85.webp'],
+        hurt: ['assets/combat/halowarden/halowardendamaged_q85.webp'],
+        dead: ['assets/combat/halowarden/halowardendead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/halowarden/halowardenattack.png': [11, -5],
-            'assets/combat/halowarden/halowardendamaged.png': [-11, -2],
-            'assets/combat/halowarden/halowardendead.png': [27, -3]
+            'assets/combat/halowarden/halowardenattack_q85.webp': [11, -5],
+            'assets/combat/halowarden/halowardendamaged_q85.webp': [-11, -2],
+            'assets/combat/halowarden/halowardendead_q85.webp': [27, -3]
         }
     },
     M056: { // Valkyrie Healer (wind healer): natural size; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/valkyriehealer/valkyriehealer.png'],
-        attack: ['assets/combat/valkyriehealer/valkyriehealerattack.png'],
-        hurt: ['assets/combat/valkyriehealer/valkyriehealerdamaged.png'],
-        dead: ['assets/combat/valkyriehealer/valkyriehealerdead.png'],
+        idle: ['assets/combat/valkyriehealer/valkyriehealer_q85.webp'],
+        attack: ['assets/combat/valkyriehealer/valkyriehealerattack_q85.webp'],
+        hurt: ['assets/combat/valkyriehealer/valkyriehealerdamaged_q85.webp'],
+        dead: ['assets/combat/valkyriehealer/valkyriehealerdead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/valkyriehealer/valkyriehealerattack.png': [17, 4],
-            'assets/combat/valkyriehealer/valkyriehealerdamaged.png': [29, 3],
-            'assets/combat/valkyriehealer/valkyriehealerdead.png': [0, 1]
+            'assets/combat/valkyriehealer/valkyriehealerattack_q85.webp': [17, 4],
+            'assets/combat/valkyriehealer/valkyriehealerdamaged_q85.webp': [29, 3],
+            'assets/combat/valkyriehealer/valkyriehealerdead_q85.webp': [0, 1]
         }
     },
     M102: { // Halo Priest (floating: no ground shift, each frame is centred and bottom-aligned)
-        idle: ['assets/combat/halopriest/halopriest.png'],
-        attack: ['assets/combat/halopriest/halopriestattack.png'],
-        hurt: ['assets/combat/halopriest/halopriestdamaged.png'],
-        dead: ['assets/combat/halopriest/halopriestdead.png'],
+        idle: ['assets/combat/halopriest/halopriest_q85.webp'],
+        attack: ['assets/combat/halopriest/halopriestattack_q85.webp'],
+        hurt: ['assets/combat/halopriest/halopriestdamaged_q85.webp'],
+        dead: ['assets/combat/halopriest/halopriestdead_q85.webp'],
         deathMs: 600
     },
     M025: { // Mossy Boulder
-        idle: ['assets/combat/mossyboulder/mossyboulder.png'],
-        attack: ['assets/combat/mossyboulder/mossyboulderattack.png'],
-        hurt: ['assets/combat/mossyboulder/mossyboulderdamaged.png'],
-        dead: ['assets/combat/mossyboulder/mossyboulderdead.png'],
+        idle: ['assets/combat/mossyboulder/mossyboulder_q85.webp'],
+        attack: ['assets/combat/mossyboulder/mossyboulderattack_q85.webp'],
+        hurt: ['assets/combat/mossyboulder/mossyboulderdamaged_q85.webp'],
+        dead: ['assets/combat/mossyboulder/mossyboulderdead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/mossyboulder/mossyboulderattack.png': [2, -4],
-            'assets/combat/mossyboulder/mossyboulderdamaged.png': [3, 1],
-            'assets/combat/mossyboulder/mossyboulderdead.png': [3, -2]
+            'assets/combat/mossyboulder/mossyboulderattack_q85.webp': [2, -4],
+            'assets/combat/mossyboulder/mossyboulderdamaged_q85.webp': [3, 1],
+            'assets/combat/mossyboulder/mossyboulderdead_q85.webp': [3, -2]
         }
     },
     M040: { // Ice Golem: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/icegolem/icegolem.png'],
-        attack: ['assets/combat/icegolem/icegolemattack.png'],
-        hurt: ['assets/combat/icegolem/icegolemdamaged.png'],
-        dead: ['assets/combat/icegolem/icegolemdead.png'],
+        idle: ['assets/combat/icegolem/icegolem_q85.webp'],
+        attack: ['assets/combat/icegolem/icegolemattack_q85.webp'],
+        hurt: ['assets/combat/icegolem/icegolemdamaged_q85.webp'],
+        dead: ['assets/combat/icegolem/icegolemdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/icegolem/icegolemattack.png': [0, -12], 'assets/combat/icegolem/icegolemdamaged.png': [9, -5], 'assets/combat/icegolem/icegolemdead.png': [0, -4] }
+        shift: { 'assets/combat/icegolem/icegolemattack_q85.webp': [0, -12], 'assets/combat/icegolem/icegolemdamaged_q85.webp': [9, -5], 'assets/combat/icegolem/icegolemdead_q85.webp': [0, -4] }
     },
     M041: { // Frost Archer: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/frostarcher/frostarcher.png'],
-        attack: ['assets/combat/frostarcher/frostarcherattack.png'],
-        hurt: ['assets/combat/frostarcher/frostarcherdamaged.png'],
-        dead: ['assets/combat/frostarcher/frostarcherdead.png'],
+        idle: ['assets/combat/frostarcher/frostarcher_q85.webp'],
+        attack: ['assets/combat/frostarcher/frostarcherattack_q85.webp'],
+        hurt: ['assets/combat/frostarcher/frostarcherdamaged_q85.webp'],
+        dead: ['assets/combat/frostarcher/frostarcherdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/frostarcher/frostarcherattack.png': [-27, -3], 'assets/combat/frostarcher/frostarcherdamaged.png': [13, -2], 'assets/combat/frostarcher/frostarcherdead.png': [0, -1] }
+        shift: { 'assets/combat/frostarcher/frostarcherattack_q85.webp': [-27, -3], 'assets/combat/frostarcher/frostarcherdamaged_q85.webp': [13, -2], 'assets/combat/frostarcher/frostarcherdead_q85.webp': [0, -1] }
     },
     M043: { // Frost Shaman: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/frostshaman/frostshaman.png'],
-        attack: ['assets/combat/frostshaman/frostshamanattack.png'],
-        hurt: ['assets/combat/frostshaman/frostshamandamaged.png'],
-        dead: ['assets/combat/frostshaman/frostshamandead.png'],
+        idle: ['assets/combat/frostshaman/frostshaman_q85.webp'],
+        attack: ['assets/combat/frostshaman/frostshamanattack_q85.webp'],
+        hurt: ['assets/combat/frostshaman/frostshamandamaged_q85.webp'],
+        dead: ['assets/combat/frostshaman/frostshamandead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/frostshaman/frostshamanattack.png': [-23, 2], 'assets/combat/frostshaman/frostshamandamaged.png': [0, -2], 'assets/combat/frostshaman/frostshamandead.png': [0, -2] }
+        shift: { 'assets/combat/frostshaman/frostshamanattack_q85.webp': [-23, 2], 'assets/combat/frostshaman/frostshamandamaged_q85.webp': [0, -2], 'assets/combat/frostshaman/frostshamandead_q85.webp': [0, -2] }
     },
     M046: { // Jotun Frost Mage: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/jotunfrostmage/jotunfrostmage.png'],
-        attack: ['assets/combat/jotunfrostmage/jotunfrostmageattack.png'],
-        hurt: ['assets/combat/jotunfrostmage/jotunfrostmagedamaged.png'],
-        dead: ['assets/combat/jotunfrostmage/jotunfrostmagedead.png'],
+        idle: ['assets/combat/jotunfrostmage/jotunfrostmage_q85.webp'],
+        attack: ['assets/combat/jotunfrostmage/jotunfrostmageattack_q85.webp'],
+        hurt: ['assets/combat/jotunfrostmage/jotunfrostmagedamaged_q85.webp'],
+        dead: ['assets/combat/jotunfrostmage/jotunfrostmagedead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/jotunfrostmage/jotunfrostmageattack.png': [0, 2], 'assets/combat/jotunfrostmage/jotunfrostmagedamaged.png': [-18, 3], 'assets/combat/jotunfrostmage/jotunfrostmagedead.png': [0, 0] }
+        shift: { 'assets/combat/jotunfrostmage/jotunfrostmageattack_q85.webp': [0, 2], 'assets/combat/jotunfrostmage/jotunfrostmagedamaged_q85.webp': [-18, 3], 'assets/combat/jotunfrostmage/jotunfrostmagedead_q85.webp': [0, 0] }
     },
     M067: { // Flame Archer: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/flamearcher/flamearcher.png'],
-        attack: ['assets/combat/flamearcher/flamearcherattack.png'],
-        hurt: ['assets/combat/flamearcher/flamearcherdamaged.png'],
-        dead: ['assets/combat/flamearcher/flamearcherdead.png'],
+        idle: ['assets/combat/flamearcher/flamearcher_q85.webp'],
+        attack: ['assets/combat/flamearcher/flamearcherattack_q85.webp'],
+        hurt: ['assets/combat/flamearcher/flamearcherdamaged_q85.webp'],
+        dead: ['assets/combat/flamearcher/flamearcherdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/flamearcher/flamearcherattack.png': [-6, 4], 'assets/combat/flamearcher/flamearcherdamaged.png': [0, 5], 'assets/combat/flamearcher/flamearcherdead.png': [0, 2] }
+        shift: { 'assets/combat/flamearcher/flamearcherattack_q85.webp': [-6, 4], 'assets/combat/flamearcher/flamearcherdamaged_q85.webp': [0, 5], 'assets/combat/flamearcher/flamearcherdead_q85.webp': [0, 2] }
     },
     M069: { // Ember Priest: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/emberpriest/emberpriest.png'],
-        attack: ['assets/combat/emberpriest/emberpriestattack.png'],
-        hurt: ['assets/combat/emberpriest/emberpriestdamaged.png'],
-        dead: ['assets/combat/emberpriest/emberpriestdead.png'],
+        idle: ['assets/combat/emberpriest/emberpriest_q85.webp'],
+        attack: ['assets/combat/emberpriest/emberpriestattack_q85.webp'],
+        hurt: ['assets/combat/emberpriest/emberpriestdamaged_q85.webp'],
+        dead: ['assets/combat/emberpriest/emberpriestdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/emberpriest/emberpriestattack.png': [0, -1], 'assets/combat/emberpriest/emberpriestdamaged.png': [25, -4], 'assets/combat/emberpriest/emberpriestdead.png': [0, -12] }
+        shift: { 'assets/combat/emberpriest/emberpriestattack_q85.webp': [0, -1], 'assets/combat/emberpriest/emberpriestdamaged_q85.webp': [25, -4], 'assets/combat/emberpriest/emberpriestdead_q85.webp': [0, -12] }
     },
     M070: { // Muspel Flame Mage: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
-        idle: ['assets/combat/muspelflamemage/muspelflamemage.png'],
-        attack: ['assets/combat/muspelflamemage/muspelflamemageattack.png'],
-        hurt: ['assets/combat/muspelflamemage/muspelflamemagedamaged.png'],
-        dead: ['assets/combat/muspelflamemage/muspelflamemagedead.png'],
+        idle: ['assets/combat/muspelflamemage/muspelflamemage_q85.webp'],
+        attack: ['assets/combat/muspelflamemage/muspelflamemageattack_q85.webp'],
+        hurt: ['assets/combat/muspelflamemage/muspelflamemagedamaged_q85.webp'],
+        dead: ['assets/combat/muspelflamemage/muspelflamemagedead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/muspelflamemage/muspelflamemageattack.png': [0, 0], 'assets/combat/muspelflamemage/muspelflamemagedamaged.png': [-11, -6], 'assets/combat/muspelflamemage/muspelflamemagedead.png': [17, -3] }
+        shift: { 'assets/combat/muspelflamemage/muspelflamemageattack_q85.webp': [0, 0], 'assets/combat/muspelflamemage/muspelflamemagedamaged_q85.webp': [-11, -6], 'assets/combat/muspelflamemage/muspelflamemagedead_q85.webp': [17, -3] }
     }
 };
 function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
@@ -398,7 +398,7 @@ function miniEmbersHTML(m) {
 }
 function stunFxHTML(m) {
     if (!(m.status && m.status.kind === 'stun' && m.hp > 0)) return '';
-    return '<img class="stun-fx" src="assets/combat/stun/stuneffect.png" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; max-width:none; pointer-events:none; image-rendering:pixelated;">';
+    return '<img class="stun-fx" src="assets/combat/stun/stuneffect_q85.webp" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; max-width:none; pointer-events:none; image-rendering:pixelated;">';
 }
 function setMonsterFrame(img, src) {
     img.src = src;
@@ -408,7 +408,7 @@ function setMonsterFrame(img, src) {
     img.style.left = dx + 'px';
     img.style.top = dy + 'px';
 }
-const COMBAT_SLIME_FRAMES = 'assets/combat/slime/slimebase.png';
+const COMBAT_SLIME_FRAMES = 'assets/combat/slime/slimebase_q85.webp';
 // Floating damage number over a combat sprite: bold white normal, bold orange critical
 function showCombatNumber(selector, amount, crit) {
     if (!(amount > 0)) return;
@@ -481,36 +481,36 @@ const COMBAT_PLAYER_FOOT = { x: 23.5, y: -1 };
 // Both sets share the same anchors (fx,fy) so the feet stay in place when the pose changes.
 const COMBAT_POSE_SETS = {
     base: {
-        IDLE: { src: 'assets/cha/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 },
-        ATTACK: { src: 'assets/cha/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 },
-        CRI: { src: 'assets/cha/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/cha/chadead1.png', w: 162, h: 137, fx: 99.56, fy: 129 }, // falling
-        DEAD2: { src: 'assets/cha/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 }, // on the ground
+        IDLE: { src: 'assets/cha/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
+        ATTACK: { src: 'assets/cha/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
+        CRI: { src: 'assets/cha/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
+        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 162, h: 137, fx: 99.56, fy: 129 }, // falling
+        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 }, // on the ground
         REACT: {
-            block: { src: 'assets/cha/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/cha/chadodge.png', w: 147, h: 140, fx: 108.33, fy: 138 }
+            block: { src: 'assets/cha/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
+            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 147, h: 140, fx: 108.33, fy: 138 }
         }
     },
     clothCap: {
-        IDLE: { src: 'assets/helmet/cloth-cap/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 },
-        ATTACK: { src: 'assets/helmet/cloth-cap/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 },
-        CRI: { src: 'assets/helmet/cloth-cap/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/helmet/cloth-cap/chadead1.png', w: 174, h: 137, fx: 110.56, fy: 129 },
-        DEAD2: { src: 'assets/helmet/cloth-cap/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 },
+        IDLE: { src: 'assets/helmet/cloth-cap/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
+        ATTACK: { src: 'assets/helmet/cloth-cap/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
+        CRI: { src: 'assets/helmet/cloth-cap/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
+        DEAD1: { src: 'assets/helmet/cloth-cap/chadead1_q85.webp', w: 174, h: 137, fx: 110.56, fy: 129 },
+        DEAD2: { src: 'assets/helmet/cloth-cap/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },
         REACT: {
-            block: { src: 'assets/helmet/cloth-cap/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/helmet/cloth-cap/chadodge.png', w: 152, h: 140, fx: 111.33, fy: 138 }
+            block: { src: 'assets/helmet/cloth-cap/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
+            dodge: { src: 'assets/helmet/cloth-cap/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
         }
     },
     ironHelm: {
-        IDLE: { src: 'assets/helmet/iron-helm/chabase.png', w: 95, h: 193, fx: 71.5, fy: 189 },
-        ATTACK: { src: 'assets/helmet/iron-helm/chaattack.png', w: 169, h: 170, fx: 31, fy: 166 },
-        CRI: { src: 'assets/helmet/iron-helm/chacritical.png', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/helmet/iron-helm/chadead1.png', w: 174, h: 137, fx: 110.56, fy: 129 },
-        DEAD2: { src: 'assets/helmet/iron-helm/chadead2.png', w: 166, h: 99, fx: 101.14, fy: 97 },
+        IDLE: { src: 'assets/helmet/iron-helm/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
+        ATTACK: { src: 'assets/helmet/iron-helm/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
+        CRI: { src: 'assets/helmet/iron-helm/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
+        DEAD1: { src: 'assets/helmet/iron-helm/chadead1_q85.webp', w: 174, h: 137, fx: 110.56, fy: 129 },
+        DEAD2: { src: 'assets/helmet/iron-helm/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },
         REACT: {
-            block: { src: 'assets/helmet/iron-helm/chablock.png', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/helmet/iron-helm/chadodge.png', w: 152, h: 140, fx: 111.33, fy: 138 }
+            block: { src: 'assets/helmet/iron-helm/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
+            dodge: { src: 'assets/helmet/iron-helm/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
         }
     }
 };
@@ -801,7 +801,7 @@ function showRuneDetail(index) {
     const detail = def ? def.text(runeN(r.id)) : r.desc;
     const html = `<div id="rune-card-view" class="flex flex-col items-center gap-4">
             <div class="rune-pick-card rune-acq-card">
-                <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
+                <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}_q85.webp" alt="">
                 <span class="rune-pick-text">
                     <span class="rune-pick-name">${escapeHtml(r.name)}</span>
                     <span class="rune-pick-desc">${runeHighlightHtml(detail)}</span>
@@ -900,7 +900,7 @@ function flatLayout(feet, monsterFeet) {
 }
 function flatArt(name, feet, monsterFeet) {
     return {
-        bg: [`assets/combat/flat/${name}_flat_q85.jpg`],
+        bg: [`assets/combat/flat/${name}_flat_q85.webp`],
         base: [COMBAT_TRANSPARENT],
         fg: null,
         layouts: { [`${name}_flat`]: flatLayout(feet, monsterFeet) }
@@ -2017,8 +2017,8 @@ function compareHTML(selected, equipped) {
 // Close button in the top-right corner of gear detail windows, same graphic as the character page return button
 function closeCornerHTML() {
     return `<button onclick="closeModal()" class="gear-close absolute top-3 right-3 p-0 border-0 bg-transparent cursor-pointer" style="width:66px;height:67px;">`
-        + `<img class="ret-normal" src="assets/cha/button/returnbuttonsmall.png" alt="Close" style="width:66px;height:67px;">`
-        + `<img class="ret-press" src="assets/cha/button/returnbuttonpresssmall.png" alt="" style="display:none;width:66px;height:67px;">`
+        + `<img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="Close" style="width:66px;height:67px;">`
+        + `<img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="" style="display:none;width:66px;height:67px;">`
         + `</button>`;
 }
 
@@ -2526,7 +2526,7 @@ function renderSkillPage() {
 
     const mapSlot = document.getElementById('skill-map-slot');
     if (mapSlot && !mapSlot.firstChild) {
-        mapSlot.innerHTML = '<img class="skill-map" src="assets/pages/skill/skillmap.jpg" alt="">';
+        mapSlot.innerHTML = '<img class="skill-map" src="assets/pages/skill/skillmap_q85.webp" alt="">';
     }
 
     // Node centers per skill key, and lit state of each link (parent -> child)
@@ -2550,7 +2550,7 @@ function renderSkillPage() {
             const clickable = true;
             const isLocked = locked;
             const img = lvl > 0 ? 'assets/pages/skill/skillbuttonup.gif'
-                : (isLocked ? 'assets/pages/skill/skillbuttonlock.png' : 'assets/pages/skill/skillbutton.png');
+                : (isLocked ? 'assets/pages/skill/skillbuttonlock_q85.webp' : 'assets/pages/skill/skillbutton_q85.webp');
             const [w, h] = isLocked ? SKILL_NODE_SIZE.locked : SKILL_NODE_SIZE.normal;
             const title = locked && prev ? `Needs ${prev.name} Lv. ${s.reqLv}` : s.desc;
             centers[k] = p;
@@ -2827,11 +2827,11 @@ function openChest(chestType) {
 // Chest opening animation for copper, silver and gold (total 3.0 s each). Frame 2 holds with a shake; the final frame gets a light burst.
 function chestFrames(type) {
     return [
-        { src: `assets/chest/${type}/${type}c0.png`, ms: 500 },
-        { src: `assets/chest/${type}/${type}c1.png`, ms: 1000, shake: true },
-        { src: `assets/chest/${type}/${type}c2.png`, ms: 400 },
-        { src: `assets/chest/${type}/${type}c3.png`, ms: 400 },
-        { src: `assets/chest/${type}/${type}c4.png`, ms: 700, burst: true }
+        { src: `assets/chest/${type}/${type}c0_q85.webp`, ms: 500 },
+        { src: `assets/chest/${type}/${type}c1_q85.webp`, ms: 1000, shake: true },
+        { src: `assets/chest/${type}/${type}c2_q85.webp`, ms: 400 },
+        { src: `assets/chest/${type}/${type}c3_q85.webp`, ms: 400 },
+        { src: `assets/chest/${type}/${type}c4_q85.webp`, ms: 700, burst: true }
     ];
 }
 const CHEST_OPEN_FRAMES = { copper: chestFrames('copper'), silver: chestFrames('silver'), gold: chestFrames('gold') };
@@ -2885,17 +2885,17 @@ function renderQuestsView() {
             <div class="grid grid-cols-3 gap-2 mt-1">
                 <button onclick="claimQuestMilestone(1)" ${completedCount < 1 || player.questMilestoneClaimed[1] ? 'disabled' : ''} class="p-2 bg-slate-900 border border-amber-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
                     <span class="block font-bold text-amber-400">1 Quest</span>
-                    <img src="assets/chest/copper/coppercsmall.png" alt="Copper Chest" class="block mx-auto" style="width:90px; height:72px;">
+                    <img src="assets/chest/copper/coppercsmall_q85.webp" alt="Copper Chest" class="block mx-auto" style="width:90px; height:72px;">
                     ${player.questMilestoneClaimed[1] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
                 </button>
                 <button onclick="claimQuestMilestone(2)" ${completedCount < 2 || player.questMilestoneClaimed[2] ? 'disabled' : ''} class="p-2 bg-slate-900 border-slate-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
                     <span class="block font-bold text-slate-300">2 Quests</span>
-                    <img src="assets/chest/silver/silvercsmall.png" alt="Silver Chest" class="block mx-auto" style="width:90px; height:72px;">
+                    <img src="assets/chest/silver/silvercsmall_q85.webp" alt="Silver Chest" class="block mx-auto" style="width:90px; height:72px;">
                     ${player.questMilestoneClaimed[2] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
                 </button>
                 <button onclick="claimQuestMilestone(3)" ${completedCount < 3 || player.questMilestoneClaimed[3] ? 'disabled' : ''} class="p-2 bg-slate-900 border-purple-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
                     <span class="block font-bold text-purple-300">3 Quests</span>
-                    <img src="assets/chest/gold/goldcsmall.png" alt="Gold Chest" class="block mx-auto" style="width:90px; height:72px;">
+                    <img src="assets/chest/gold/goldcsmall_q85.webp" alt="Gold Chest" class="block mx-auto" style="width:90px; height:72px;">
                     ${player.questMilestoneClaimed[3] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
                 </button>
             </div>
@@ -3056,7 +3056,7 @@ function updateUI() {
         const eqSlot = ({ slot, img, x, y }) => {
             const gear = player.equipped[slot];
             const has = !!(gear && gear.name && (slot !== 'potionSlot' || gear.qty > 0));
-            const base = `assets/pages/character/slots/${img}`;
+            const base = `assets/pages/character/slots/${img.replace(/\.png$/, '_q85.webp')}`;
             const src = has && gear.img && VISUAL_EQUIP_SLOTS.includes(slot) ? gear.img : base;
             return `<div ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
                 <img src="${src}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='${base}'">
@@ -3079,7 +3079,7 @@ function updateUI() {
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
-                <div onclick="showItemDetail(${index})" class="w-[77px] h-[79px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot.png'); background-size:100% 100%;">
+                <div onclick="showItemDetail(${index})" class="w-[77px] h-[79px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot_q85.webp'); background-size:100% 100%;">
                     <span class="text-base leading-none">${itemEmoji(item)}</span>
                     <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
@@ -3090,7 +3090,7 @@ function updateUI() {
         // Closed cells after the open bag slots, shown with the grey slot graphic (not usable)
         const INVENTORY_CELLS = 130; // 50 open slots, the rest shown unavailable
         for (let i = BAG_SLOTS; i < INVENTORY_CELLS; i++) {
-            invGrid.innerHTML += `<div class="w-[77px] h-[79px]" style="width:77px; height:79px; background-image:url('assets/pages/character/inventoryslotgrey.png'); background-size:100% 100%;"></div>`;
+            invGrid.innerHTML += `<div class="w-[77px] h-[79px]" style="width:77px; height:79px; background-image:url('assets/pages/character/inventoryslotgrey_q85.webp'); background-size:100% 100%;"></div>`;
         }
         let invCountEl = document.getElementById('inventory-count');
         if (invCountEl) invCountEl.innerText = `${filledSlots} / ${BAG_SLOTS} slots`;
@@ -3211,7 +3211,7 @@ function updateUI() {
             if (!r) return '<div class="combat-rune-slot"></div>';
             // Window shows the rune's rarity picture (r1 to r5)
             const rarity = Math.min(5, Math.max(1, RUNE_DEFS[r.id] ? RUNE_DEFS[r.id].rarity : 1));
-            return `<div class="combat-rune-slot" onclick="showRuneDetail(${i})"><img src="assets/combat/runes/r${rarity}.png" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
+            return `<div class="combat-rune-slot" onclick="showRuneDetail(${i})"><img src="assets/combat/runes/r${rarity}_q85.webp" alt="" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></div>`;
         }).join('');
     }
 

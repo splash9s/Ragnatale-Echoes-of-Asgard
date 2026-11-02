@@ -7,7 +7,7 @@ const BAG_SLOTS = 50;
 
 let player = {
     name: "Hero",
-    avatar: "assets/avatars/man1.png",
+    avatar: "assets/avatars/man1_q85.webp",
     baseLv: 1,
     baseExp: 0,
     baseMaxExp: 50,

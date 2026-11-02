@@ -51,7 +51,7 @@
         const img = el.querySelector('img');
         if (!img) return;
         const normal = img.getAttribute('src');
-        const pressed = normal.replace(/\.png$/, 'press.png');
+        const pressed = normal.replace(/_q85\.webp$/, 'press_q85.webp');
         // Show the press image while the pointer is down
         // Hover shows the press image too (mouse over), click/tap shows it while held
         el.addEventListener('pointerenter', () => { img.src = pressed; });
@@ -87,9 +87,9 @@
         if (f && typeof isFinalMapUnlocked === 'function') f.classList.toggle('locked', !isFinalMapUnlocked());
     };
     // Return buttons: show the press image while the mouse is over them
-    document.querySelectorAll('img[src$="returnbutton.png"], img[src$="smallretunbutton.png"]').forEach(img => {
+    document.querySelectorAll('img[src$="returnbutton_q85.webp"], img[src$="smallretunbutton_q85.webp"]').forEach(img => {
         const normal = img.getAttribute('src');
-        const pressed = normal.replace(/(returnbutton|smallretunbutton)\.png$/, '$1press.png');
+        const pressed = normal.replace(/(returnbutton|smallretunbutton)_q85\.webp$/, '$1press_q85.webp');
         const host = img.parentElement;
         host.addEventListener('pointerenter', () => { img.src = pressed; });
         host.addEventListener('pointerleave', () => { img.src = normal; });

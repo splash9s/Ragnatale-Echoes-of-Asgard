@@ -235,7 +235,7 @@ function showRuneChoices(isNew) {
         // Every acquired rune uses the same big card size as the pick cards
         const cardW = 270;
         return `<div class="rune-pick-card rune-acq-card" style="width:${cardW}px;">
-                <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}.png" alt="">
+                <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}_q85.webp" alt="">
                 <span class="rune-pick-text">
                     <span class="rune-pick-name">${escapeHtml(pr.name)}</span>
                     <span class="rune-pick-desc">${runeHighlightHtml(detail)}</span>
@@ -250,7 +250,7 @@ function showRuneChoices(isNew) {
         const owned = (!r.flag && n > 0) ? ` <span style="color:#fbbf24;">x${n}</span>` : '';
         html += `
             <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card">
-                <img class="rune-pick-art" src="assets/combat/runes/bigr${r.rarity}.png" alt="">
+                <img class="rune-pick-art" src="assets/combat/runes/bigr${r.rarity}_q85.webp" alt="">
                 <span class="rune-pick-text">
                     <span class="rune-pick-name">${escapeHtml(r.name)}${owned}</span>
                     <span class="rune-pick-desc">${runeHighlightHtml(r.desc)}</span>
