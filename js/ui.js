@@ -3330,7 +3330,7 @@ function updateUI() {
                 ? `<div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; transform:scale(.8); pointer-events:none;">${itemIconHTML(gear)}</div>`
                 : '';
             return `<div ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
-                <img src="${src}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null;this.src='${base}'">
+                <img src="${src}" alt="" class="w-full h-full" style="object-fit:${has && !useVisual ? 'fill' : 'contain'};" onerror="this.onerror=null;this.src='${base}'">
                 ${iconLayer}
             </div>`;
         };
