@@ -2010,8 +2010,8 @@ const ITEM_ICON_RULES = [
 ];
 function itemIconHTML(item) {
     const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
-    if (rule) return `<img src="assets/items/${rule[1]}.png" alt="" style="width:40px;height:40px;object-fit:contain;margin:0 auto;" />`;
-    return itemEmoji(item);
+    if (rule) return `<img src="assets/items/${rule[1]}.png" alt="" style="width:84px;height:84px;object-fit:contain;" />`;
+    return `<span style="font-size:52px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
     if (!item) return '';
@@ -3237,8 +3237,7 @@ function updateUI() {
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
                 <div onclick="showItemDetail(${index})" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
-                    <span class="leading-none">${itemIconHTML(item)}</span>
-                    <span class="text-[9px] font-bold truncate w-full px-1">${itemName + refText}${elemIconText(item)}</span>
+                    <span class="flex items-center justify-center" style="width:84px;height:84px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-amber-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1 text-[9px] font-mono font-bold text-amber-300 bg-slate-950/80 px-1 rounded">x${item.qty}</span>` : ''}
                 </div>
