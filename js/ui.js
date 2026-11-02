@@ -13,7 +13,7 @@ const AVATAR_SET = [
     { path: "assets/avatars/woman2_q85.webp" },
     { path: "assets/avatars/woman3_q85.webp" },
     { path: "assets/avatars/woman4_q85.webp", lv: 50 },
-    { path: "assets/avatars/cat1_q85.webp", lv: 10 },
+    { path: "assets/avatars/cat1_q85.webp", lv: 1 },
     { path: "assets/avatars/cat2_q85.webp", lv: 10 },
     { path: "assets/avatars/cat3_q85.webp", lv: 20 },
     { path: "assets/avatars/cat4_q85.webp", lv: 20 },
@@ -122,16 +122,13 @@ function renderAvatarSelection() {
     let grid = document.getElementById('avatar-selection-grid');
     if (!grid) return;
     grid.innerHTML = '';
-    AVATARS.forEach((av) => {
-        const unlocked = isAvatarUnlocked(av);
+    // Name setup page: only the avatars this player can use
+    AVATARS.filter(av => isAvatarUnlocked(av)).forEach((av) => {
         let isSelected = (av === selectedAvatarChoice);
         let borderClass = isSelected ? 'border-amber-400 bg-amber-500/20' : 'border-slate-700 bg-slate-900';
-        const clickAttr = unlocked ? `onclick="selectAvatar('${av}')" class="relative aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-pointer hover:border-amber-400 transition"`
-                                   : `title="${avatarLockTitle(av)}" class="relative aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-not-allowed"`;
         grid.innerHTML += `
-            <div ${clickAttr}>
-                <div class="w-full h-full ${unlocked ? '' : 'grayscale opacity-40'}">${avatarMarkup(av, 'w-full h-full object-contain')}</div>
-                ${unlocked ? '' : `<span class="absolute bottom-0 left-0 right-0 text-center text-[10px] font-bold bg-slate-950/85 text-amber-200 py-0.5">${avatarLockText(av)}</span>`}
+            <div onclick="selectAvatar('${av}')" class="aspect-square rounded-xl border ${borderClass} flex items-center justify-center overflow-hidden cursor-pointer hover:border-amber-400 transition">
+                ${avatarMarkup(av, 'w-full h-full object-contain')}
             </div>
         `;
     });
@@ -771,18 +768,25 @@ function updateAvatarDisplay() {
 // Player stat avatar: click to choose a monster avatar
 function openAvatarPicker() {
     const options = AVATARS.map(av => {
+        // Locked avatars are grey; their requirement shows only when clicked
         if (!isAvatarUnlocked(av)) return `
-        <div title="${avatarLockTitle(av)}" class="relative h-32 w-32 rounded-xl border border-slate-700 bg-slate-900 overflow-hidden cursor-not-allowed">
+        <button onclick="showAvatarLockInfo('${av}')" class="h-64 w-64 rounded-xl border border-slate-700 bg-slate-900 cursor-pointer overflow-hidden">
             <div class="w-full h-full grayscale opacity-40">${avatarMarkup(av, 'w-full h-full object-cover')}</div>
-            <span class="absolute bottom-0 left-0 right-0 text-center text-[18px] font-bold bg-slate-950/85 text-amber-200">${avatarLockText(av)}</span>
-        </div>`;
+        </button>`;
         return `
-        <button onclick="pickPlayerAvatar('${av}')" class="h-32 w-32 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 cursor-pointer overflow-hidden">
+        <button onclick="pickPlayerAvatar('${av}')" class="h-64 w-64 rounded-xl border border-slate-700 bg-slate-900 hover:border-amber-400 cursor-pointer overflow-hidden">
             ${avatarMarkup(av, 'w-full h-full object-cover')}
         </button>`;
     }).join('');
-    showModal("Choose Avatar", "", `<div class="grid grid-cols-3 gap-3 justify-items-center max-h-[60vh] overflow-y-auto p-1">${options}</div>`);
+    showModal("Choose Avatar", "", `<div class="grid grid-cols-2 gap-3 justify-items-center max-h-[70vh] overflow-y-auto p-1">${options}</div>`);
+    // The picker needs room for two 256px columns
+    const box = document.querySelector('#game-modal > div');
+    if (box) box.style.maxWidth = '760px';
 }
+function showAvatarLockInfo(av) {
+    showModal("Avatar Locked", avatarLockTitle(av) || 'This avatar is locked.');
+}
+
 function pickPlayerAvatar(av) {
     player.avatar = av;
     selectedAvatarChoice = av;
@@ -822,7 +826,7 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     if (titleEl) titleEl.innerText = title;
     if (msgEl) msgEl.innerText = message;
     if (area) area.innerHTML = customHTML;
-    if (modalEl && modalEl.firstElementChild) modalEl.firstElementChild.classList.add('relative');
+    if (modalEl && modalEl.firstElementChild) { modalEl.firstElementChild.classList.add('relative'); modalEl.firstElementChild.style.maxWidth = ''; }
     if (btn) {
         if (customHTML) btn.classList.add('hidden');
         else btn.classList.remove('hidden');
