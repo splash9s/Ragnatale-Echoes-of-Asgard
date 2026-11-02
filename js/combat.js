@@ -887,6 +887,26 @@ function updateQuestProgress(type, amount) {
     });
 }
 
+// Base and class level-ups from the current EXP (used by kills and mail rewards)
+function checkLevelUps() {
+    if (player.baseLv < MAX_BASE_LV && player.baseExp >= player.baseMaxExp) {
+        player.baseLv++;
+        player.baseExp -= player.baseMaxExp;
+        player.baseMaxExp = Math.floor(player.baseMaxExp * 1.35);
+        player.statPoints += 3;
+        logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points`, 'levelup');
+        playSound('sound/lvup.mp3');
+    }
+
+    if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
+        player.jobLv++;
+        player.jobExp -= player.jobMaxExp;
+        player.jobMaxExp = Math.floor(player.jobMaxExp * 1.3);
+        player.jobSp += 1;
+        logMessage(`[CLASS LEVEL UP!] Reached Class Level ${player.jobLv}! Gained 1 SP`, 'levelup');
+    }
+}
+
 function awardKill(m) {
     m.rewarded = true;
     player.runes.killCount = (player.runes.killCount || 0) + 1;
@@ -919,22 +939,7 @@ function awardKill(m) {
     updateQuestProgress('slimes', 1);
     updateQuestProgress('gold', finalGold);
 
-    if (player.baseLv < MAX_BASE_LV && player.baseExp >= player.baseMaxExp) {
-        player.baseLv++;
-        player.baseExp -= player.baseMaxExp;
-        player.baseMaxExp = Math.floor(player.baseMaxExp * 1.35);
-        player.statPoints += 3;
-        logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points`, 'levelup');
-        playSound('sound/lvup.mp3');
-    }
-
-    if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
-        player.jobLv++;
-        player.jobExp -= player.jobMaxExp;
-        player.jobMaxExp = Math.floor(player.jobMaxExp * 1.3);
-        player.jobSp += 1;
-        logMessage(`[CLASS LEVEL UP!] Reached Class Level ${player.jobLv}! Gained 1 SP`, 'levelup');
-    }
+    checkLevelUps();
 
     // Events give no item drops
     if (isEvent) return;

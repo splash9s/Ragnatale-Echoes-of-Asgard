@@ -2770,18 +2770,48 @@ function claimMail(mailId) {
     if (!player.mailBox) return;
     let mail = player.mailBox.find(m => m.id === mailId);
     if (!mail || mail.claimed) return;
+    // A gear reward needs a free bag slot; keep the mail unclaimed if the bag is full
+    if (mail.rewards.gear && Array.isArray(player.inventory) && !player.inventory.some(s => s === null)) {
+        showModal('Inventory Full', 'Make room in your bag to claim this mail.');
+        return;
+    }
 
     mail.claimed = true;
     if (mail.rewards.gold) player.gold += mail.rewards.gold;
     if (mail.rewards.diamonds) player.diamonds += mail.rewards.diamonds;
     if (mail.rewards.refiningStones) player.refiningStones += mail.rewards.refiningStones;
     if (mail.rewards.resurrection) player.resurrectionPotions = (player.resurrectionPotions || 0) + mail.rewards.resurrection;
+    if (mail.rewards.baseExp || mail.rewards.classExp) {
+        player.baseExp += mail.rewards.baseExp || 0;
+        player.jobExp += mail.rewards.classExp || 0;
+        checkLevelUps();
+    }
+    if (mail.rewards.gear) {
+        const gear = makeMailGear(mail.rewards.gear.slot, mail.rewards.gear.lv);
+        if (gear) addItemToInventory(gear);
+        else logMessage(`[Mail] No gear found for that slot and level`, 'combat');
+    }
     if (mail.rewards.chest) openChest(mail.rewards.chest);
 
     logMessage(`[Mail] Claimed rewards from "${mail.title}"`, 'drop');
     renderMailBox();
     updateUI();
     saveGame();
+}
+
+// Random R5 gear for a mail reward: the shop gear of that slot at the requested level (or the nearest lower level)
+function makeMailGear(slot, lv) {
+    const pool = (typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : []).filter(i => i.slot === slot);
+    if (pool.length === 0) return null;
+    const req = i => i.levelReq || 1;
+    let cands = pool.filter(i => req(i) === lv);
+    if (cands.length === 0) {
+        const lower = pool.filter(i => req(i) <= lv);
+        const level = lower.length ? Math.max(...lower.map(req)) : Math.min(...pool.map(req));
+        cands = pool.filter(i => req(i) === level);
+    }
+    const template = cands[Math.floor(Math.random() * cands.length)];
+    return generatePoEItem(template, 5);
 }
 
 // In-game mail sender (for testing): writes a mail into the player's own mailbox
@@ -2799,6 +2829,14 @@ function openSendMailForm() {
                 <label>Resurrection <input id="mail-res" type="number" min="0" value="0" class="${field}"></label>
             </div>
             <label>Chest <select id="mail-chest" class="${field}">${opt('', 'None')}${opt('copper', 'Copper')}${opt('silver', 'Silver')}${opt('gold', 'Gold')}</select></label>
+            <div class="grid grid-cols-2 gap-2">
+                <label>Base EXP <input id="mail-base-exp" type="number" min="0" value="0" class="${field}"></label>
+                <label>Class EXP <input id="mail-class-exp" type="number" min="0" value="0" class="${field}"></label>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <label>Gear (R5) <select id="mail-gear-slot" class="${field}">${opt('', 'None')}${[['weapon','Weapon'],['shield','Shield'],['hat','Hat'],['midHead','Mid Head'],['mouth','Mouth'],['armor','Armor'],['garment','Garment'],['footgear','Boots'],['ring','Ring']].map(([v, l]) => opt(v, l)).join('')}</select></label>
+                <label>Gear Lv <input id="mail-gear-lv" type="number" min="1" max="99" value="1" class="${field}"></label>
+            </div>
             <button onclick="sendPlayerMail()" class="mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Send to Mailbox</button>
         </div>`);
 }
@@ -2811,6 +2849,9 @@ function sendPlayerMail() {
     if (num('mail-diamonds')) rewards.diamonds = num('mail-diamonds');
     if (num('mail-res')) rewards.resurrection = num('mail-res');
     if (val('mail-chest')) rewards.chest = val('mail-chest');
+    if (num('mail-base-exp')) rewards.baseExp = num('mail-base-exp');
+    if (num('mail-class-exp')) rewards.classExp = num('mail-class-exp');
+    if (val('mail-gear-slot') && num('mail-gear-lv') >= 1) rewards.gear = { slot: val('mail-gear-slot'), lv: Math.min(99, num('mail-gear-lv')) };
     if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
     player.mailBox.unshift({
         id: Date.now(),
