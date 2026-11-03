@@ -1775,7 +1775,7 @@ function showArmoryItemDetail(itemIndex) {
     const price = template.price || 300;
     const title = shopGearLabel(template).base;
 
-    // Same layout as the character page gear detail; rarity and buffs are rolled when bought
+    // Same layout as the character page gear detail, shown in the equipment window; rarity and buffs are rolled when bought
     let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
         <span class="text-slate-300 font-bold text-[11px]">Requires Base Lv. ${template.levelReq || 1}</span>
@@ -1795,9 +1795,27 @@ function showArmoryItemDetail(itemIndex) {
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
     const actions = `<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">`
-        + `<button onclick="closeModal(); buyArmoryItem(${itemIndex})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`
+        + `<button onclick="buyArmoryFromDetail(${itemIndex})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`
         + `</div></div>`;
-    showModal(title, '', closeCornerHTML() + body + actions);
+    const panel = document.getElementById('shop-detail-panel');
+    if (!panel) return;
+    panel.innerHTML = `
+        <button id="inv-detail-close" onclick="closeShopDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
+        <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
+            <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(template, 86)}</span>
+            <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span></div>
+        </div>
+        ${body}${actions}`;
+    panel.style.display = 'block';
+}
+function closeShopDetail() {
+    const panel = document.getElementById('shop-detail-panel');
+    if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
+}
+// Buy from the shop detail panel: close it first, then buy
+function buyArmoryFromDetail(itemIndex) {
+    closeShopDetail();
+    buyArmoryItem(itemIndex);
 }
 
 function buyArmoryItem(itemIndex) {

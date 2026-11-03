@@ -115,19 +115,19 @@
 .char-detail-2x .text-\[11px\] { font-size: 22px !important; }
 .char-detail-2x .text-\[10px\] { font-size: 20px !important; }
 /* Inventory item detail (left panel): readable text colors on parchment, clean section cards */
-#inv-detail-panel, #inv-detail-panel * { color: #2a1a0e !important; }
-#inv-detail-panel .text-slate-300 { color: #4b5563 !important; }
-#inv-detail-panel .text-emerald-300 { color: #1f7a4d !important; }
-#inv-detail-panel .text-blue-300 { color: #1d4ed8 !important; }
-#inv-detail-panel .text-purple-300 { color: #7e22ce !important; }
-#inv-detail-panel .text-amber-300 { color: #a16207 !important; }
-#inv-detail-panel .text-red-300 { color: #b91c1c !important; }
-#inv-detail-panel .text-cyan-300 { color: #0e7490 !important; }
-#inv-detail-panel .text-slate-400 { color: #6b5540 !important; }
-#inv-detail-panel [class*="bg-slate-"] { background-color: #f6ecd6 !important; border: 2px solid #b8945a !important; border-radius: 12px !important; padding: 10px 12px !important; }
-#inv-detail-panel #inv-detail-close { background-color: #6b5540 !important; border: none !important; color: #fff !important; }
-#inv-detail-panel button { color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
-#inv-detail-panel button.bg-amber-600, #inv-detail-panel button.bg-amber-700 { color: #fff7e0 !important; }
+#inv-detail-panel, #shop-detail-panel, #inv-detail-panel * { color: #2a1a0e !important; }
+#inv-detail-panel, #shop-detail-panel .text-slate-300 { color: #4b5563 !important; }
+#inv-detail-panel, #shop-detail-panel .text-emerald-300 { color: #1f7a4d !important; }
+#inv-detail-panel, #shop-detail-panel .text-blue-300 { color: #1d4ed8 !important; }
+#inv-detail-panel, #shop-detail-panel .text-purple-300 { color: #7e22ce !important; }
+#inv-detail-panel, #shop-detail-panel .text-amber-300 { color: #a16207 !important; }
+#inv-detail-panel, #shop-detail-panel .text-red-300 { color: #b91c1c !important; }
+#inv-detail-panel, #shop-detail-panel .text-cyan-300 { color: #0e7490 !important; }
+#inv-detail-panel, #shop-detail-panel .text-slate-400 { color: #6b5540 !important; }
+#inv-detail-panel, #shop-detail-panel [class*="bg-slate-"] { background-color: #f6ecd6 !important; border: 2px solid #b8945a !important; border-radius: 12px !important; padding: 10px 12px !important; }
+#inv-detail-panel, #shop-detail-panel #inv-detail-close { background-color: #6b5540 !important; border: none !important; color: #fff !important; }
+#inv-detail-panel, #shop-detail-panel button { color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+#inv-detail-panel, #shop-detail-panel button.bg-amber-600, #inv-detail-panel button.bg-amber-700 { color: #fff7e0 !important; }
 /* Locked avatar info: slides out on the right of the tile in the Choose Avatar picker */
 #avatar-lock-panel { position: absolute; width: 300px; padding: 14px; border-radius: 12px; background: #0f172a; border: 2px solid #b8945a; color: #e2e8f0; font-size: 18px; line-height: 1.35; z-index: 60; transform: translateX(24px); opacity: 0; transition: transform .25s ease, opacity .25s ease; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
 #avatar-lock-panel.open { transform: translateX(0); opacity: 1; }
@@ -905,6 +905,7 @@
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
                         </div>
                     </div>
+                    <div id="shop-detail-panel" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px; overflow-y:auto; display:none; z-index:6; background-color:rgba(231,209,170,.9) !important; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
                     <div id="shop-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
                         <div id="shop-armory-section" class="flex flex-col gap-3">
                             <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
@@ -1119,13 +1120,13 @@
     <script src="data/monsters.js"></script>
     <script src="data/maps.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-    <script src="js/player.js?v=20261103r"></script>
-    <script src="js/audio.js?v=20261103r"></script>
-    <script src="js/cloud.js?v=20261103r"></script>
-    <script src="js/combat.js?v=20261103r"></script>
-    <script src="js/ui.js?v=20261103r"></script>
-    <script src="js/town.js?v=20261103r"></script>
-    <script src="js/loader.js?v=20261103r"></script>
+    <script src="js/player.js?v=20261103s"></script>
+    <script src="js/audio.js?v=20261103s"></script>
+    <script src="js/cloud.js?v=20261103s"></script>
+    <script src="js/combat.js?v=20261103s"></script>
+    <script src="js/ui.js?v=20261103s"></script>
+    <script src="js/town.js?v=20261103s"></script>
+    <script src="js/loader.js?v=20261103s"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading
