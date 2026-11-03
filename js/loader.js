@@ -175,7 +175,7 @@ const LOADING_IMAGES = [
     "assets/cha/chacritical_q85.webp",
     "assets/cha/chablock_q85.webp",
     "assets/cha/chadodge_q85.webp",
-    "assets/cha/swordandshield/ssbase_q85.webp",
+    "assets/cha/swordandshield/ssbase.png",
     "assets/cha/swordandshield/ssattack_q85.webp",
     "assets/cha/swordandshield/sscritical_q85.webp",
     "assets/cha/swordandshield/sscritical2_q85.webp",

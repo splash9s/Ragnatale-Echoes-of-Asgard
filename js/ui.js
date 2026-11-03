@@ -535,7 +535,7 @@ const COMBAT_POSE_SETS = {
     swordShield: {
         // heroScale: the town and character pages draw this figure at the base body's height (183px tall figure vs 160px here)
         heroScale: 183 / 160,
-        IDLE: { src: 'assets/cha/swordandshield/ssbase_q85.webp', w: 142, h: 160, fx: 47.89, fy: 160 },
+        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 142, h: 160, fx: 47.89, fy: 160 },
         ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 154, fx: 48.64, fy: 153 },
         CRI: [
             { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 154, fx: 108.59, fy: 154 },
@@ -1051,6 +1051,7 @@ async function changeEarthLayers() {
 
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
+    syncHeroSprites(); // town and character hero art follow the current gear on every page change
     // The Diamond Cash Shop is a tab on the Shop page now
     if (viewName === 'diamond') {
         currentShopTab = 'diamond';
