@@ -529,15 +529,44 @@ const COMBAT_POSE_SETS = {
             block: { src: 'assets/helmet/iron-helm/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
             dodge: { src: 'assets/helmet/iron-helm/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
         }
+    },
+    // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
+    // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
+    swordShield: {
+        IDLE: { src: 'assets/cha/swordandshield/ssbase_q85.webp', w: 142, h: 160, fx: 47.89, fy: 160 },
+        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 154, fx: 48.64, fy: 153 },
+        CRI: [
+            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 154, fx: 108.59, fy: 154 },
+            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 190, h: 159, fx: 59.66, fy: 159 }
+        ],
+        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 162, h: 137, fx: 99.56, fy: 129 }, // no sword art yet: base falling frame
+        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },   // no sword art yet: base ground frame
+        REACT: {
+            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 162, fx: 117.07, fy: 162 },
+            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 147, h: 140, fx: 108.33, fy: 138 }
+        }
     }
 };
 // Hats with their own full-body art, by hat name
 const COMBAT_HAT_POSE_SET = { 'Cloth Cap': 'clothCap', 'Iron Helm': 'ironHelm' };
-// The pose set for the player's current hat
+// Sword and shield: a one-handed weapon with a shield in the other hand (the hat is not drawn on this art)
+function usesSwordAndShield() {
+    const w = player && player.equipped && player.equipped.weapon;
+    const s = player && player.equipped && player.equipped.shield;
+    return !!(w && s && !isTwoHanded(w));
+}
+// The pose set for the player's current gear: sword and shield first, then the hat's art, then the bare body
 function combatPose() {
+    if (usesSwordAndShield()) return COMBAT_POSE_SETS.swordShield;
     const hat = player && player.equipped && player.equipped.hat;
     const set = hat && COMBAT_HAT_POSE_SET[hat.name];
     return set ? COMBAT_POSE_SETS[set] : COMBAT_POSE_SETS.base;
+}
+// The critical frame to show: a set may have several (picked at random when the attack starts)
+function combatCriFrame(attack) {
+    const cri = combatPose().CRI;
+    if (!Array.isArray(cri)) return cri;
+    return cri[attack.criIdx || 0];
 }
 const COMBAT_PLAYER_FALL_MS = 2000; // fall time (6 fps steps from COMBAT_PLAYER_FALL_PX above the ground)
 const COMBAT_PLAYER_FALL_PX = 120;
@@ -548,11 +577,13 @@ const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
 const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
-    combatPlayerAttack = { at: Date.now(), crit: !!isCrit };
+    const cri = combatPose().CRI;
+    const criCount = Array.isArray(cri) ? cri.length : 1;
+    combatPlayerAttack = { at: Date.now(), crit: !!isCrit, criIdx: Math.floor(Math.random() * criCount) };
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
     el.dataset.lungeAt = String(combatPlayerAttack.at);
-    applyPlayerFrame(el, combatPlayerAttack.crit ? combatPose().CRI : combatPose().ATTACK);
+    applyPlayerFrame(el, combatPlayerAttack.crit ? combatCriFrame(combatPlayerAttack) : combatPose().ATTACK);
     playPlayerLunge(el, COMBAT_PLAYER_LUNGE_PX);
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
@@ -673,7 +704,7 @@ setInterval(() => {
                     img.dataset.lungeAt = String(combatPlayerAttack.at);
                     playPlayerLunge(img, COMBAT_PLAYER_LUNGE_PX);
                 }
-                applyPlayerFrame(img, combatPlayerAttack.crit ? combatPose().CRI : combatPose().ATTACK);
+                applyPlayerFrame(img, combatPlayerAttack.crit ? combatCriFrame(combatPlayerAttack) : combatPose().ATTACK);
                 return;
             }
             const re = now - combatPlayerReact.at;
