@@ -670,16 +670,16 @@ const COMBAT_POSE_SETS = {
     // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
-        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 156, h: 189, fx: 72.5, fy: 173 },
-        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 171, fx: 56.5, fy: 170 },
+        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 254, h: 210, fx: 120.5, fy: 210 },
+        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 177, h: 200, fx: 63.2, fy: 199 },
         CRI: [
-            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 168, fx: 68, fy: 168 },
-            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 190, h: 174, fx: 52.5, fy: 174 }
+            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 222, h: 198, fx: 106, fy: 198 },
+            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 210, h: 204, fx: 54.8, fy: 204 }
         ],
         DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 179, h: 155, fx: 135.5, fy: 150 }, // no sword art yet: base falling frame
         DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 186, h: 111, fx: 110, fy: 109 },   // no sword art yet: base ground frame
         REACT: {
-            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 177, fx: 107.5, fy: 177 },
+            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 177, fx: 109.2, fy: 177 },
             dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
         }
     }
@@ -738,14 +738,14 @@ function applyPlayerFrame(img, f, dy = 0) {
 // Head points and tilts come from the tracking sheet (tilt: degrees, + leans right); the hat pin is in the hat image's own pixels.
 const HAT_LAYER_SPRITE = {
     'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 35.9, y: 37 } },
-    'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 64, y: 64 } }
+    'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 40, y: 33.1 } }
 };
 const SWORD_HAT_HEAD = {
-    ssbase: { x: 88, y: 33.9, tilt: 0 },
-    ssblock: { x: 111, y: 35.9, tilt: 0 },
-    ssattack: { x: 71, y: 33.8, tilt: 5 },
-    sscritical: { x: 133.1, y: 34.7, tilt: 15 },
-    sscritical2: { x: 87.4, y: 37, tilt: 6 },
+    ssbase: { x: 138.6, y: 51.4, tilt: 0 },
+    ssblock: { x: 126.2, y: 57.2, tilt: 0 },
+    ssattack: { x: 83, y: 39.3, tilt: 85 },
+    sscritical: { x: 154.3, y: 34, tilt: 69 },
+    sscritical2: { x: 95.7, y: 46.5, tilt: 0 },
     // Falling, ground and dodge frames (shared by the base and sword sets)
     chadead1: { x: 39, y: 40.4, tilt: 130 },
     chadead2: { x: 135, y: 36, tilt: 52 },
