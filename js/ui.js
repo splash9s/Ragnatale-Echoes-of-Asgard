@@ -720,7 +720,10 @@ function playPlayerLunge(el, dx) {
         { transform: `translateX(${dx}px)`, offset: 0.5 },
         { transform: 'translateX(0px)' }
     ], { duration: 200, easing: 'ease-in-out' });
-    // The hat lunges with the body, keeping its tilt
+    lungeHat(el, dx);
+}
+// The hat moves with the body during a lunge, keeping its tilt
+function lungeHat(el, dx) {
     const hat = document.getElementById('hat-layer-' + el.id);
     if (hat && hat.style.display !== 'none' && hat.animate) {
         const t = `rotate(${hat.style.getPropertyValue('--hat-tilt') || '0deg'})`;
@@ -770,7 +773,12 @@ function playPlayerDodgeLunge() {
         { transform: 'translateX(-40px)', offset: 0.5 },
         { transform: 'translateX(0px)' }
     ], { duration: 200, easing: 'ease-in-out' });
+    lungeHat(el, -40);
 }
+// Game pages: no text highlighting by drag and no right-click menu (typing fields keep both)
+document.addEventListener('contextmenu', (e) => {
+    if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable]')) e.preventDefault();
+});
 // Red flash on the player's battle sprite when it takes damage
 function flashPlayerHurt() {
     const el = document.getElementById('combat-player-sprite');
