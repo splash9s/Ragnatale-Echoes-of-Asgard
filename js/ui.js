@@ -308,9 +308,9 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/sandking/sandkingdead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/sandking/sandkingattack_q85.webp': [45.0, -46.8],
-            'assets/combat/sandking/sandkingdamaged_q85.webp': [-39.5, 43.5],
-            'assets/combat/sandking/sandkingdead_q85.webp': [54.0, 220.5]
+            'assets/combat/sandking/sandkingattack_q85.webp': [88.0, 3.2],
+            'assets/combat/sandking/sandkingdamaged_q85.webp': [-13.0, -4.5],
+            'assets/combat/sandking/sandkingdead_q85.webp': [151.0, 47.5]
         }
     },
     M016: { // Abyss Lord (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -320,10 +320,10 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/abysslord/abysslorddead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/abysslord/abysslordattack1_q85.webp': [-5, -72],
-            'assets/combat/abysslord/abysslordattack2_q85.webp': [-21, -76],
-            'assets/combat/abysslord/abysslorddamaged_q85.webp': [3, -57],
-            'assets/combat/abysslord/abysslorddead_q85.webp': [28, 125]
+            'assets/combat/abysslord/abysslordattack1_q85.webp': [-9.0, 6.0],
+            'assets/combat/abysslord/abysslordattack2_q85.webp': [-15.0, 9.0],
+            'assets/combat/abysslord/abysslorddamaged_q85.webp': [6.0, 11.0],
+            'assets/combat/abysslord/abysslorddead_q85.webp': [6.0, 8.0]
         }
     },
     M020: { // Fallen Angel (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -333,10 +333,10 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/fallenangel/fallenangeldead1_q85.webp', 'assets/combat/fallenangel/fallenangeldead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/fallenangel/fallenangelattack_q85.webp': [-84, -17],
-            'assets/combat/fallenangel/fallenangeldamaged_q85.webp': [245, 56],
-            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [88, 81],
-            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [546, 192]
+            'assets/combat/fallenangel/fallenangelattack_q85.webp': [-178.0, -2.0],
+            'assets/combat/fallenangel/fallenangeldamaged_q85.webp': [-72.5, 0.0],
+            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [-203.0, -2.0],
+            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [385.0, 9.0]
         }
     },
     M024: { // Dusk World-Eater (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -346,10 +346,10 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/worldeater/worldeaterdead1_q85.webp', 'assets/combat/worldeater/worldeaterdead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/worldeater/worldeaterattack_q85.webp': [-120, 100],
-            'assets/combat/worldeater/worldeaterdamaged_q85.webp': [-124, 8],
-            'assets/combat/worldeater/worldeaterdead1_q85.webp': [-178, 54],
-            'assets/combat/worldeater/worldeaterdead2_q85.webp': [-136, 212]
+            'assets/combat/worldeater/worldeaterattack_q85.webp': [-95.0, -1.0],
+            'assets/combat/worldeater/worldeaterdamaged_q85.webp': [-122.0, 5.0],
+            'assets/combat/worldeater/worldeaterdead1_q85.webp': [-202.0, 2.0],
+            'assets/combat/worldeater/worldeaterdead2_q85.webp': [-121.0, 12.0]
         }
     },
     M049: { // Hrym, Frost King (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -359,11 +359,11 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/frostking/frostkingdead1_q85.webp', 'assets/combat/frostking/frostkingdead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/frostking/frostkingattack1_q85.webp': [-83, -31],
-            'assets/combat/frostking/frostkingattack2_q85.webp': [-179, -37],
-            'assets/combat/frostking/frostkingdamaged_q85.webp': [-61, -14],
-            'assets/combat/frostking/frostkingdead1_q85.webp': [-25, -17],
-            'assets/combat/frostking/frostkingdead2_q85.webp': [-94, 109]
+            'assets/combat/frostking/frostkingattack1_q85.webp': [-37.5, 7.0],
+            'assets/combat/frostking/frostkingattack2_q85.webp': [-149.5, 11.0],
+            'assets/combat/frostking/frostkingdamaged_q85.webp': [-38.0, 5.0],
+            'assets/combat/frostking/frostkingdead1_q85.webp': [-40.5, 15.0],
+            'assets/combat/frostking/frostkingdead2_q85.webp': [-31.0, 4.0]
         }
     },
     M062: { // Brynhild (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -373,10 +373,10 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/valkyrie/valkyriedead1_q85.webp', 'assets/combat/valkyrie/valkyriedead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/valkyrie/valkyrieattack_q85.webp': [-39, -113],
-            'assets/combat/valkyrie/valkyriedamaged_q85.webp': [34, -112],
-            'assets/combat/valkyrie/valkyriedead1_q85.webp': [140, 54],
-            'assets/combat/valkyrie/valkyriedead2_q85.webp': [49, 98]
+            'assets/combat/valkyrie/valkyrieattack_q85.webp': [-127.5, 15.0],
+            'assets/combat/valkyrie/valkyriedamaged_q85.webp': [-80.0, 5.0],
+            'assets/combat/valkyrie/valkyriedead1_q85.webp': [-79.5, 15.0],
+            'assets/combat/valkyrie/valkyriedead2_q85.webp': [-70.5, 11.0]
         }
     },
     M075: { // Surtr (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -386,10 +386,10 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/surtr/surtrdead1_q85.webp', 'assets/combat/surtr/surtrdead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/surtr/surtrattack_q85.webp': [119, 25],
-            'assets/combat/surtr/surtrdamaged_q85.webp': [124, 18],
-            'assets/combat/surtr/surtrdead1_q85.webp': [170, 80],
-            'assets/combat/surtr/surtrdead2_q85.webp': [302, 120]
+            'assets/combat/surtr/surtrattack_q85.webp': [122.0, 0.0],
+            'assets/combat/surtr/surtrdamaged_q85.webp': [70.0, 8.0],
+            'assets/combat/surtr/surtrdead1_q85.webp': [118.0, 11.0],
+            'assets/combat/surtr/surtrdead2_q85.webp': [213.5, 5.0]
         }
     },
     M088: { // Queen Hel (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -399,10 +399,10 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/queenhel/queenheldead1_q85.webp', 'assets/combat/queenhel/queenheldead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/queenhel/queenhelattack_q85.webp': [72, -4],
-            'assets/combat/queenhel/queenheldamaged_q85.webp': [-38, 44],
-            'assets/combat/queenhel/queenheldead1_q85.webp': [-7, 146],
-            'assets/combat/queenhel/queenheldead2_q85.webp': [-76, 270]
+            'assets/combat/queenhel/queenhelattack_q85.webp': [91.0, 7.0],
+            'assets/combat/queenhel/queenheldamaged_q85.webp': [-77.5, -4.0],
+            'assets/combat/queenhel/queenheldead1_q85.webp': [-6.5, 2.0],
+            'assets/combat/queenhel/queenheldead2_q85.webp': [-79.5, 3.0]
         }
     },
     M104: { // Void Colossus (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -412,11 +412,11 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/voidcolossus/voidcolossusdead1_q85.webp', 'assets/combat/voidcolossus/voidcolossusdead2_q85.webp', 'assets/combat/voidcolossus/voidcolossusdead3_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/voidcolossus/voidcolossusattack_q85.webp': [-244, -42],
-            'assets/combat/voidcolossus/voidcolossusdamaged_q85.webp': [82, -17],
-            'assets/combat/voidcolossus/voidcolossusdead1_q85.webp': [71, -66],
-            'assets/combat/voidcolossus/voidcolossusdead2_q85.webp': [148, -90],
-            'assets/combat/voidcolossus/voidcolossusdead3_q85.webp': [339, 151]
+            'assets/combat/voidcolossus/voidcolossusattack_q85.webp': [-209.0, 4.0],
+            'assets/combat/voidcolossus/voidcolossusdamaged_q85.webp': [-4.5, 2.0],
+            'assets/combat/voidcolossus/voidcolossusdead1_q85.webp': [-29.0, 2.0],
+            'assets/combat/voidcolossus/voidcolossusdead2_q85.webp': [131.0, 9.0],
+            'assets/combat/voidcolossus/voidcolossusdead3_q85.webp': [272.0, -3.0]
         }
     },
     M060: { // Battle Storm Mage (wind mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
@@ -1780,16 +1780,11 @@ function showArmoryItemDetail(itemIndex) {
     body += `<div class="flex justify-between items-center">
         <span class="text-slate-300 font-bold text-[11px]">Requires Base Lv. ${template.levelReq || 1}</span>
         <span class="text-[10px] text-slate-400 capitalize">Shop · ${template.slot || 'Gear'}</span></div>`;
-    if (template.desc) body += `<p class="text-[11px] text-slate-400">${template.desc}</p>`;
-    if (template.element) body += `<span class="text-[11px]">${elementDetailHTML(template.element)}</span>`;
     if (template.stats && Object.keys(template.stats).length) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
             Object.entries(template.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') +
             `</div>`;
     }
-    body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-purple-500/30 flex flex-col gap-1">
-        <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>
-        <span class="text-[11px] text-slate-400">Rarity and buffs are rolled when purchased.</span></div>`;
     body += `<span class="text-[11px] text-amber-200">Price: ${price} Gold</span>`;
     body += '</div>';
 
@@ -3479,12 +3474,32 @@ function mailTimeText(m) {
     return new Date(t).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+// Deletes a mail. An unclaimed mail with rewards asks first, so the rewards are not lost by accident.
+function deleteMail(mailId) {
+    const mail = (player.mailBox || []).find(m => m.id === mailId);
+    if (!mail) return;
+    const remove = () => {
+        player.mailBox = player.mailBox.filter(m => m.id !== mailId);
+        renderMailBox();
+        updateUI();
+        saveGame();
+    };
+    if (!mail.claimed && mailRewardText(mail.rewards || {})) {
+        confirmAction('Delete Mail', 'This mail has rewards you have not claimed. Delete it anyway?', remove);
+    } else {
+        remove();
+    }
+}
 function renderMailBox() {
     let container = document.getElementById('mailbox-container');
     if (!container) return;
     container.innerHTML = '';
 
-    if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
+    if (!Array.isArray(player.mailBox)) player.mailBox = createWelcomeMail();
+    if (player.mailBox.length === 0) {
+        container.innerHTML = '<p class="text-xs text-center" style="color:#3b2716">No mail.</p>';
+        return;
+    }
 
     player.mailBox.forEach(m => {
         container.innerHTML += `
@@ -3496,9 +3511,12 @@ function renderMailBox() {
                     <span class="text-[9px] text-purple-300 block mt-1">From: ${m.sender}</span>
                     ${mailTimeText(m) ? `<span class="text-[9px] text-slate-400 block">${mailTimeText(m)}</span>` : ''}
                 </div>
+                <div class="flex flex-col gap-1 items-end">
                 ${!m.claimed ? `
                     <button onclick="claimMail(${m.id})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer transition">Claim</button>
                 ` : `<span class="text-[10px] text-emerald-400 font-bold">Claimed</span>`}
+                <button onclick="deleteMail(${m.id})" class="px-3 py-1 bg-slate-800 hover:bg-red-700 text-slate-200 font-bold rounded-lg cursor-pointer transition text-[10px]">Delete</button>
+                </div>
             </div>
         `;
     });

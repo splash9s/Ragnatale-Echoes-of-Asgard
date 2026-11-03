@@ -295,7 +295,9 @@ const BOSS_HELMETS = {
 const BOSS_HELMET_LEVEL_BY_ID = { M004: 1, M008: 10, M012: 20, M016: 30, M020: 40, M024: 50, M049: 60, M062: 70, M075: 80, M088: 90, M104: 99 };
 const HELMET_DROP_POOL = {};
 Object.keys(BOSS_HELMETS).forEach(lv => {
-    const L = Number(lv), b = BOSS_HELMETS[lv], stats = HAT_BY_LEVEL[lv].stats;
+    const L = Number(lv), b = BOSS_HELMETS[lv];
+    // Boss helmets have 50% more base stats than the shop helmet of the same tier
+    const stats = Object.fromEntries(Object.entries(HAT_BY_LEVEL[lv].stats).map(([k, v]) => [k, Math.round(v * 1.5)]));
     HELMET_DROP_POOL[lv] = [{ id: `boss_helm_${lv}`, name: b.name, slot: "hat", levelReq: L, boss: b.boss, appearance: b.appearance, dropOnly: true, stats, desc: statText(stats) }];
 });
 // Boss helmet chance by the boss's map level: 1-30 5%, 40-60 2.5%, 70-99 1.5%
