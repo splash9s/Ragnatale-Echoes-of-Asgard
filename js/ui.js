@@ -2566,7 +2566,7 @@ function isTwoHanded(item) {
 }
 // The battle sprite's pose set also drives the hero art on the town and character pages.
 // Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
-const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
+const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 300, top: 527 } }; // character page: 50px left of the original spot
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
