@@ -2526,12 +2526,21 @@ function sellInventoryItem(index) {
 function isTwoHanded(item) {
     return !!(item && item.slot === 'weapon' && (item.twoHanded || /\(2H\)/.test(item.name || '')));
 }
-// The battle sprite's pose set also drives the hero art on the town and character pages
+// The battle sprite's pose set also drives the hero art on the town and character pages.
+// Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
+const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
 function syncHeroSprites() {
-    const src = combatPose().IDLE.src;
+    const f = combatPose().IDLE;
+    const base = COMBAT_POSE_SETS.base.IDLE;
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
-        if (el && el.getAttribute('src') !== src) el.src = src;
+        if (!el) return;
+        if (el.getAttribute('src') !== f.src) el.src = f.src;
+        const o = HERO_PAGE_ORIGIN[id];
+        el.style.width = f.w + 'px';
+        el.style.height = f.h + 'px';
+        el.style.left = (o.left + base.fx - f.fx) + 'px';
+        el.style.top = (o.top + base.fy - f.fy) + 'px';
     });
 }
 function executeEquipItem(index, targetSlot) {
