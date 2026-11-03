@@ -313,6 +313,112 @@ const MONSTER_SPRITES = {
             'assets/combat/sandking/sandkingdead_q85.webp': [-60, 173]
         }
     },
+    M016: { // Abyss Lord (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/abysslord/abysslord_q85.webp'],
+        attack: ['assets/combat/abysslord/abysslordattack1_q85.webp', 'assets/combat/abysslord/abysslordattack2_q85.webp'],
+        hurt: ['assets/combat/abysslord/abysslorddamaged_q85.webp'],
+        dead: ['assets/combat/abysslord/abysslorddead_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/abysslord/abysslordattack1_q85.webp': [-5, -72],
+            'assets/combat/abysslord/abysslordattack2_q85.webp': [-21, -76],
+            'assets/combat/abysslord/abysslorddamaged_q85.webp': [3, -57],
+            'assets/combat/abysslord/abysslorddead_q85.webp': [28, 125]
+        }
+    },
+    M020: { // Fallen Angel (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/fallenangel/fallenangel_q85.webp'],
+        attack: ['assets/combat/fallenangel/fallenangelattack_q85.webp'],
+        hurt: ['assets/combat/fallenangel/fallenangeldamaged_q85.webp'],
+        dead: ['assets/combat/fallenangel/fallenangeldead1_q85.webp', 'assets/combat/fallenangel/fallenangeldead2_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/fallenangel/fallenangelattack_q85.webp': [-84, -17],
+            'assets/combat/fallenangel/fallenangeldamaged_q85.webp': [245, 56],
+            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [88, 81],
+            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [546, 192]
+        }
+    },
+    M024: { // Dusk World-Eater (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/worldeater/worldeater_q85.webp'],
+        attack: ['assets/combat/worldeater/worldeaterattack_q85.webp'],
+        hurt: ['assets/combat/worldeater/worldeaterdamaged_q85.webp'],
+        dead: ['assets/combat/worldeater/worldeaterdead1_q85.webp', 'assets/combat/worldeater/worldeaterdead2_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/worldeater/worldeaterattack_q85.webp': [-120, 100],
+            'assets/combat/worldeater/worldeaterdamaged_q85.webp': [-124, 8],
+            'assets/combat/worldeater/worldeaterdead1_q85.webp': [-178, 54],
+            'assets/combat/worldeater/worldeaterdead2_q85.webp': [-136, 212]
+        }
+    },
+    M049: { // Hrym, Frost King (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/frostking/frostking_q85.webp'],
+        attack: ['assets/combat/frostking/frostkingattack1_q85.webp', 'assets/combat/frostking/frostkingattack2_q85.webp'],
+        hurt: ['assets/combat/frostking/frostkingdamaged_q85.webp'],
+        dead: ['assets/combat/frostking/frostkingdead1_q85.webp', 'assets/combat/frostking/frostkingdead2_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/frostking/frostkingattack1_q85.webp': [-83, -31],
+            'assets/combat/frostking/frostkingattack2_q85.webp': [-179, -37],
+            'assets/combat/frostking/frostkingdamaged_q85.webp': [-61, -14],
+            'assets/combat/frostking/frostkingdead1_q85.webp': [-25, -17],
+            'assets/combat/frostking/frostkingdead2_q85.webp': [-94, 109]
+        }
+    },
+    M062: { // Brynhild (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/valkyrie/valkyrie_q85.webp'],
+        attack: ['assets/combat/valkyrie/valkyrieattack_q85.webp'],
+        hurt: ['assets/combat/valkyrie/valkyriedamaged_q85.webp'],
+        dead: ['assets/combat/valkyrie/valkyriedead1_q85.webp', 'assets/combat/valkyrie/valkyriedead2_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/valkyrie/valkyrieattack_q85.webp': [-39, -113],
+            'assets/combat/valkyrie/valkyriedamaged_q85.webp': [34, -112],
+            'assets/combat/valkyrie/valkyriedead1_q85.webp': [140, 54],
+            'assets/combat/valkyrie/valkyriedead2_q85.webp': [49, 98]
+        }
+    },
+    M075: { // Surtr (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/surtr/surtr_q85.webp'],
+        attack: ['assets/combat/surtr/surtrattack_q85.webp'],
+        hurt: ['assets/combat/surtr/surtrdamaged_q85.webp'],
+        dead: ['assets/combat/surtr/surtrdead1_q85.webp', 'assets/combat/surtr/surtrdead2_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/surtr/surtrattack_q85.webp': [119, 25],
+            'assets/combat/surtr/surtrdamaged_q85.webp': [124, 18],
+            'assets/combat/surtr/surtrdead1_q85.webp': [170, 80],
+            'assets/combat/surtr/surtrdead2_q85.webp': [302, 120]
+        }
+    },
+    M088: { // Queen Hel (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/queenhel/queenhel_q85.webp'],
+        attack: ['assets/combat/queenhel/queenhelattack_q85.webp'],
+        hurt: ['assets/combat/queenhel/queenheldamaged_q85.webp'],
+        dead: ['assets/combat/queenhel/queenheldead1_q85.webp', 'assets/combat/queenhel/queenheldead2_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/queenhel/queenhelattack_q85.webp': [72, -4],
+            'assets/combat/queenhel/queenheldamaged_q85.webp': [-38, 44],
+            'assets/combat/queenhel/queenheldead1_q85.webp': [-7, 146],
+            'assets/combat/queenhel/queenheldead2_q85.webp': [-76, 270]
+        }
+    },
+    M104: { // Void Colossus (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/voidcolossus/voidcolossus_q85.webp'],
+        attack: ['assets/combat/voidcolossus/voidcolossusattack_q85.webp'],
+        hurt: ['assets/combat/voidcolossus/voidcolossusdamaged_q85.webp'],
+        dead: ['assets/combat/voidcolossus/voidcolossusdead1_q85.webp', 'assets/combat/voidcolossus/voidcolossusdead2_q85.webp', 'assets/combat/voidcolossus/voidcolossusdead3_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/voidcolossus/voidcolossusattack_q85.webp': [-244, -42],
+            'assets/combat/voidcolossus/voidcolossusdamaged_q85.webp': [82, -17],
+            'assets/combat/voidcolossus/voidcolossusdead1_q85.webp': [71, -66],
+            'assets/combat/voidcolossus/voidcolossusdead2_q85.webp': [148, -90],
+            'assets/combat/voidcolossus/voidcolossusdead3_q85.webp': [339, 151]
+        }
+    },
     M060: { // Battle Storm Mage (wind mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
         idle: ['assets/combat/battlestormmage/battlestormmage_q85.webp'],
         attack: ['assets/combat/battlestormmage/battlestormmageattack_q85.webp'],
