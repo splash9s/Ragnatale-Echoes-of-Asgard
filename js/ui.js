@@ -2581,7 +2581,17 @@ function syncHeroSprites() {
         el.style.left = (o.left + base.fx - f.fx * s) + 'px';
         el.style.top = (o.top + base.fy - f.fy * s) + 'px';
     });
+    // Shadows: the base body keeps its original spot; the sword-and-shield pose has its own (dark mark under the right sole)
+    const shadowSet = (combatPose() === COMBAT_POSE_SETS.swordShield) ? SHADOW_SWORD_SHIELD : SHADOW_BASE;
+    Object.keys(shadowSet).forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.left = shadowSet[id].left + 'px';
+        el.style.top = shadowSet[id].top + 'px';
+    });
 }
+const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 338, top: 688 } };
+const SHADOW_SWORD_SHIELD = { 'town-shadow': { left: 958, top: 716 }, 'char-shadow': { left: 346, top: 682 } };
 function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
