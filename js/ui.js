@@ -2590,8 +2590,8 @@ function syncHeroSprites() {
         el.style.top = shadowSet[id].top + 'px';
     });
 }
-const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 686 } };
-const SHADOW_SWORD_SHIELD = { 'town-shadow': { left: 958, top: 716 }, 'char-shadow': { left: 397, top: 680 } };
+const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
+const SHADOW_SWORD_SHIELD = { 'town-shadow': { left: 958, top: 716 }, 'char-shadow': { left: 397, top: 678 } };
 function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
