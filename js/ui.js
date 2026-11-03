@@ -531,11 +531,11 @@ const COMBAT_POSE_SETS = {
         IDLE: { src: 'assets/cha/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
         ATTACK: { src: 'assets/cha/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
         CRI: { src: 'assets/cha/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 162, h: 137, fx: 99.56, fy: 129 }, // falling
-        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 }, // on the ground
+        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 179, h: 155, fx: 135.5, fy: 150 }, // falling
+        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 186, h: 111, fx: 110, fy: 109 }, // on the ground
         REACT: {
             block: { src: 'assets/cha/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 147, h: 140, fx: 108.33, fy: 138 }
+            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
         }
     },
     clothCap: {
@@ -569,11 +569,11 @@ const COMBAT_POSE_SETS = {
             { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 168, fx: 68, fy: 168 },
             { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 190, h: 174, fx: 52.5, fy: 174 }
         ],
-        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 162, h: 137, fx: 99.56, fy: 129 }, // no sword art yet: base falling frame
-        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },   // no sword art yet: base ground frame
+        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 179, h: 155, fx: 135.5, fy: 150 }, // no sword art yet: base falling frame
+        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 186, h: 111, fx: 110, fy: 109 },   // no sword art yet: base ground frame
         REACT: {
             block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 177, fx: 107.5, fy: 177 },
-            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 147, h: 140, fx: 108.33, fy: 138 }
+            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
         }
     }
 };
@@ -635,11 +635,15 @@ const SWORD_HAT_HEAD = {
     ssblock: { x: 111, y: 35.9, tilt: 0 },
     ssattack: { x: 71, y: 33.8, tilt: 5 },
     sscritical: { x: 133.1, y: 34.7, tilt: 15 },
-    sscritical2: { x: 87.4, y: 37, tilt: 6 }
+    sscritical2: { x: 87.4, y: 37, tilt: 6 },
+    // Falling, ground and dodge frames (shared by the base and sword sets)
+    chadead1: { x: 39, y: 40.4, tilt: -40 },
+    chadead2: { x: 135, y: 36, tilt: 38 },
+    chadodge: { x: 39.8, y: 34.1, tilt: 0 }
 };
-// Which tracked sword frame a sprite file is (the hero's shadowed base uses the base head point)
+// Which tracked frame a sprite file is (the hero's shadowed base uses the base head point)
 function swordHatKey(src) {
-    const m = String(src || '').match(/(ssbase|ssblock|ssattack|sscritical2|sscritical)/);
+    const m = String(src || '').match(/(ssbase|ssblock|ssattack|sscritical2|sscritical|chadead1|chadead2|chadodge)/);
     return m ? m[1] : null;
 }
 // Places the hat over a sprite whose top-left is (left, top). Hides it for frames with no hat tracking (bare heads, other poses).
@@ -650,7 +654,7 @@ function placeHatLayer(sprite, frame, left, top) {
     let el = document.getElementById(hatId);
     const hat = player && player.equipped && player.equipped.hat;
     const spec = hat && HAT_LAYER_SPRITE[hat.name];
-    const key = frame && frame.src && String(frame.src).includes('swordandshield') ? swordHatKey(frame.src) : null;
+    const key = frame && frame.src ? swordHatKey(frame.src) : null;
     const head = key ? SWORD_HAT_HEAD[key] : null;
     if (!spec || !head) { if (el) el.style.display = 'none'; return; }
     if (!el) {
