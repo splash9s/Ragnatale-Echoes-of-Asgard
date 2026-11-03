@@ -563,8 +563,6 @@ const COMBAT_POSE_SETS = {
     // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
-        // heroScale: the town and character pages draw this figure at the base body's height (183px tall figure vs 160px here)
-        heroScale: 183 / 160,
         IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 142, h: 160, fx: 47.89, fy: 160 },
         ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 154, fx: 48.64, fy: 153 },
         CRI: [
@@ -2572,7 +2570,7 @@ const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
-    const s = combatPose().heroScale || 1;
+    const s = 1; // hero art is drawn at each frame's own file size (no scaling)
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
