@@ -736,7 +736,10 @@ function applyPlayerFrame(img, f, dy = 0) {
 
 // Hat layer: a worn hat is drawn over the sword-and-shield sprite. Its pin point sits on the head point of that frame, turned by the frame's tilt.
 // Head points and tilts come from the tracking sheet (tilt: degrees, + leans right); the hat pin is in the hat image's own pixels.
-const HAT_LAYER_SPRITE = { 'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 35.9, y: 37 } } };
+const HAT_LAYER_SPRITE = {
+    'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 35.9, y: 37 } },
+    'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 64, y: 64 } }
+};
 const SWORD_HAT_HEAD = {
     ssbase: { x: 88, y: 33.9, tilt: 0 },
     ssblock: { x: 111, y: 35.9, tilt: 0 },
@@ -744,8 +747,8 @@ const SWORD_HAT_HEAD = {
     sscritical: { x: 133.1, y: 34.7, tilt: 15 },
     sscritical2: { x: 87.4, y: 37, tilt: 6 },
     // Falling, ground and dodge frames (shared by the base and sword sets)
-    chadead1: { x: 39, y: 40.4, tilt: -40 },
-    chadead2: { x: 135, y: 36, tilt: 38 },
+    chadead1: { x: 39, y: 40.4, tilt: 130 },
+    chadead2: { x: 135, y: 36, tilt: 52 },
     chadodge: { x: 39.8, y: 34.1, tilt: 0 }
 };
 // Which tracked frame a sprite file is (the hero's shadowed base uses the base head point)
