@@ -642,7 +642,7 @@ function showHealAura(selector) {
 // Each frame's feet point is placed at COMBAT_PLAYER_FOOT relative to the anchor.
 // That offset is the idle frame's feet point, so the idle pose stays where it was.
 const COMBAT_PLAYER_FOOT = { x: 23.5, y: -1 };
-// Pose sets: 'base' is the bare-headed body. Wearing a hat with its own art (Cloth Cap, Iron Helm) uses that set.
+// Pose sets: 'base' is the bare-headed body. Wearing a hat with its own full-body art (Iron Helm) uses that set.
 // Both sets share the same anchors (fx,fy) so the feet stay in place when the pose changes.
 const COMBAT_POSE_SETS = {
     base: {
@@ -654,17 +654,6 @@ const COMBAT_POSE_SETS = {
         REACT: {
             block: { src: 'assets/cha/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
             dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
-        }
-    },
-    clothCap: {
-        IDLE: { src: 'assets/helmet/cloth-cap/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
-        ATTACK: { src: 'assets/helmet/cloth-cap/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
-        CRI: { src: 'assets/helmet/cloth-cap/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/helmet/cloth-cap/chadead1_q85.webp', w: 174, h: 137, fx: 110.56, fy: 129 },
-        DEAD2: { src: 'assets/helmet/cloth-cap/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },
-        REACT: {
-            block: { src: 'assets/helmet/cloth-cap/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/helmet/cloth-cap/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
         }
     },
     ironHelm: {
@@ -696,7 +685,7 @@ const COMBAT_POSE_SETS = {
     }
 };
 // Hats with their own full-body art, by hat name
-const COMBAT_HAT_POSE_SET = { 'Cloth Cap': 'clothCap', 'Iron Helm': 'ironHelm' };
+const COMBAT_HAT_POSE_SET = { 'Iron Helm': 'ironHelm' };
 // Sword and shield: a one-handed weapon with a shield in the other hand (the hat is not drawn on this art)
 function usesSwordAndShield() {
     const w = player && player.equipped && player.equipped.weapon;
