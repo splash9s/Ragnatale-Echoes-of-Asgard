@@ -308,9 +308,9 @@ const MONSTER_SPRITES = {
         dead: ['assets/combat/sandking/sandkingdead_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/sandking/sandkingattack_q85.webp': [66, -54],
-            'assets/combat/sandking/sandkingdamaged_q85.webp': [-73, 49],
-            'assets/combat/sandking/sandkingdead_q85.webp': [-60, 173]
+            'assets/combat/sandking/sandkingattack_q85.webp': [45.0, -46.8],
+            'assets/combat/sandking/sandkingdamaged_q85.webp': [-39.5, 43.5],
+            'assets/combat/sandking/sandkingdead_q85.webp': [54.0, 220.5]
         }
     },
     M016: { // Abyss Lord (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
