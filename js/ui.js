@@ -1773,30 +1773,31 @@ function showArmoryItemDetail(itemIndex) {
     const template = SHOP_ARMORY_ITEMS[itemIndex];
     if (!template) return;
     const price = template.price || 300;
-    const kind = template.slot || 'Gear';
+    const title = shopGearLabel(template).base;
 
-    let body = '<div class="flex flex-col gap-2 text-left" style="font-size:24px">';
+    // Same layout as the character page gear detail; rarity and buffs are rolled when bought
+    let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
-        <span style="font-size:22px" class="text-slate-300 font-bold">Shop Gear</span>
-        <span style="font-size:20px" class="text-slate-400 capitalize">${kind}</span></div>`;
-    body += `<span style="font-size:20px" class="text-slate-400">Requires Base Lv. ${template.levelReq || 1}</span>`;
-    body += `<span style="font-size:22px" class="text-amber-200">Price: ${price} Gold</span>`;
-    body += `<span style="font-size:20px" class="text-slate-500">Rarity and bonus buffs are rolled when purchased.</span>`;
-    if (template.element) body += `<span style="font-size:22px">${elementDetailHTML(template.element)}</span>`;
-    if (template.desc) body += `<p style="font-size:22px" class="text-slate-400">${template.desc}</p>`;
-    if (template.stats) {
+        <span class="text-slate-300 font-bold text-[11px]">Requires Base Lv. ${template.levelReq || 1}</span>
+        <span class="text-[10px] text-slate-400 capitalize">Shop · ${template.slot || 'Gear'}</span></div>`;
+    if (template.desc) body += `<p class="text-[11px] text-slate-400">${template.desc}</p>`;
+    if (template.element) body += `<span class="text-[11px]">${elementDetailHTML(template.element)}</span>`;
+    if (template.stats && Object.keys(template.stats).length) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-            Object.entries(template.stats).map(([k, v]) => `<span class="text-slate-200" style="font-size:24px">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
+            Object.entries(template.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') +
+            `</div>`;
     }
+    body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-purple-500/30 flex flex-col gap-1">
+        <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>
+        <span class="text-[11px] text-slate-400">Rarity and buffs are rolled when purchased.</span></div>`;
+    body += `<span class="text-[11px] text-amber-200">Price: ${price} Gold</span>`;
     body += '</div>';
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
-    actions += `<button onclick="closeModal(); buyArmoryItem(${itemIndex})" style="font-size:24px" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`;
-    actions += '</div>';
-    actions += `<button onclick="closeModal()" style="font-size:24px" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition cursor-pointer">Close</button></div>`;
-
-    showModal(shopGearLabel(template).base, '', body + actions);
+    const actions = `<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">`
+        + `<button onclick="closeModal(); buyArmoryItem(${itemIndex})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`
+        + `</div></div>`;
+    showModal(title, '', closeCornerHTML() + body + actions);
 }
 
 function buyArmoryItem(itemIndex) {
@@ -3181,8 +3182,10 @@ function renderSkillPage() {
     renderSkillDetail();
 }
 
+const STAT_MAX = 99; // each base stat can be raised up to this
 function addStat(statKey) {
     if (player.statPoints - pendingStatTotal() <= 0) return;
+    if ((player.stats[statKey] || 0) + (pendingAlloc.stats[statKey] || 0) >= STAT_MAX) return;
     pendingAlloc.stats[statKey] = (pendingAlloc.stats[statKey] || 0) + 1;
     updateUI();
 }
