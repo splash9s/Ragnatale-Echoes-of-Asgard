@@ -2566,7 +2566,7 @@ function isTwoHanded(item) {
 }
 // The battle sprite's pose set also drives the hero art on the town and character pages.
 // Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
-const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 300, top: 527 } }; // character page: 50px left of the original spot
+const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
@@ -2591,7 +2591,7 @@ function syncHeroSprites() {
     });
 }
 const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 338, top: 688 } };
-const SHADOW_SWORD_SHIELD = { 'town-shadow': { left: 958, top: 716 }, 'char-shadow': { left: 346, top: 682 } };
+const SHADOW_SWORD_SHIELD = { 'town-shadow': { left: 958, top: 716 }, 'char-shadow': { left: 396, top: 682 } };
 function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
