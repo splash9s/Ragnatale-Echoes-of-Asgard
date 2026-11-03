@@ -2585,6 +2585,9 @@ function syncHeroSprites() {
         if (el.getAttribute('src') !== f.src) el.src = f.src;
         el.style.width = f.w + 'px';
         el.style.height = f.h + 'px';
+        // The Tailwind base style caps every img at max-width 100% of its parent (95px on the town hero): lift the cap so the size stays true
+        el.style.maxWidth = 'none';
+        el.style.maxHeight = 'none';
         if (swordShadowed) {
             const par = HERO_PARENT_ORIGIN[id];
             el.style.left = (HERO_SWORD_CENTER_X[id] - f.w / 2 - par.left) + 'px';
