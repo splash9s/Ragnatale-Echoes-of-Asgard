@@ -740,16 +740,17 @@ const HAT_LAYER_SPRITE = {
     'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 35.9, y: 37 } },
     'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 40, y: 33.1 } }
 };
+// Tilt is stored as 90 minus the tracking reading (90 = upright, so a missing reading is 0). + leans right.
 const SWORD_HAT_HEAD = {
-    ssbase: { x: 138.6, y: 51.4, tilt: 90 },
-    ssblock: { x: 126.2, y: 57.2, tilt: 90 },
-    ssattack: { x: 83, y: 39.3, tilt: 85 },
-    sscritical: { x: 154.3, y: 34, tilt: 69 },
-    sscritical2: { x: 95.7, y: 46.5, tilt: 90 },
+    ssbase: { x: 138.6, y: 51.4, tilt: 0 },        // upright
+    ssblock: { x: 126.2, y: 57.2, tilt: 0 },       // upright
+    ssattack: { x: 83, y: 39.3, tilt: 5 },         // reading 85
+    sscritical: { x: 154.3, y: 34, tilt: 21 },     // reading 69
+    sscritical2: { x: 95.7, y: 46.5, tilt: 0 },    // upright
     // Falling, ground and dodge frames (shared by the base and sword sets)
-    chadead1: { x: 39, y: 40.4, tilt: 130 },
-    chadead2: { x: 135, y: 36, tilt: 52 },
-    chadodge: { x: 39.8, y: 34.1, tilt: 90 }
+    chadead1: { x: 39, y: 40.4, tilt: -40 },       // reading 130
+    chadead2: { x: 135, y: 36, tilt: 38 },         // reading 52
+    chadodge: { x: 39.8, y: 34.1, tilt: 0 }        // upright
 };
 // Which tracked frame a sprite file is (the hero's shadowed base uses the base head point)
 function swordHatKey(src) {
