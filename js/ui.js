@@ -564,7 +564,7 @@ const COMBAT_POSE_SETS = {
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
         IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 156, h: 189, fx: 72.5, fy: 173 },
-        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 154, fx: 48.64, fy: 153 },
+        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 171, fx: 56.5, fy: 170 },
         CRI: [
             { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 154, fx: 108.59, fy: 154 },
             { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 190, h: 159, fx: 59.66, fy: 159 }
@@ -624,6 +624,55 @@ function applyPlayerFrame(img, f, dy = 0) {
     img.style.top = (combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y - (f.fy !== undefined ? f.fy : f.h) + dy) + 'px';
     img.style.width = f.w + 'px';
     img.style.height = f.h + 'px';
+    placeHatLayer(img, f, parseFloat(img.style.left), parseFloat(img.style.top));
+}
+
+// Hat layer: a worn hat is drawn over the sword-and-shield sprite. Its pin point sits on the head point of that frame, turned by the frame's tilt.
+// Head points and tilts come from the tracking sheet (tilt: degrees, + leans right); the hat pin is in the hat image's own pixels.
+const HAT_LAYER_SPRITE = { 'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 35.9, y: 37 } } };
+const SWORD_HAT_HEAD = {
+    ssbase: { x: 88, y: 33.9, tilt: 0 },
+    ssblock: { x: 111, y: 35.9, tilt: 0 },
+    ssattack: { x: 71, y: 33.8, tilt: 5 },
+    sscritical: { x: 133.1, y: 34.7, tilt: 15 },
+    sscritical2: { x: 87.4, y: 37, tilt: 6 }
+};
+// Which tracked sword frame a sprite file is (the hero's shadowed base uses the base head point)
+function swordHatKey(src) {
+    const m = String(src || '').match(/(ssbase|ssblock|ssattack|sscritical2|sscritical)/);
+    return m ? m[1] : null;
+}
+// Places the hat over a sprite whose top-left is (left, top). Hides it for frames with no hat tracking (bare heads, other poses).
+function placeHatLayer(sprite, frame, left, top) {
+    const parent = sprite.parentElement;
+    if (!parent || !Number.isFinite(left) || !Number.isFinite(top)) return;
+    const hatId = 'hat-layer-' + (sprite.id || 'x');
+    let el = document.getElementById(hatId);
+    const hat = player && player.equipped && player.equipped.hat;
+    const spec = hat && HAT_LAYER_SPRITE[hat.name];
+    const key = frame && frame.src && String(frame.src).includes('swordandshield') ? swordHatKey(frame.src) : null;
+    const head = key ? SWORD_HAT_HEAD[key] : null;
+    if (!spec || !head) { if (el) el.style.display = 'none'; return; }
+    if (!el) {
+        el = document.createElement('img');
+        el.id = hatId;
+        el.alt = '';
+        el.className = 'pointer-events-none';
+        el.style.position = 'absolute';
+        el.style.maxWidth = 'none';
+        el.style.maxHeight = 'none';
+        el.style.imageRendering = 'pixelated';
+        el.style.zIndex = String((parseInt(getComputedStyle(sprite).zIndex, 10) || 0) + 1);
+        parent.appendChild(el);
+    }
+    el.style.display = '';
+    if (el.getAttribute('src') !== spec.src) el.src = spec.src;
+    el.style.width = spec.w + 'px';
+    el.style.height = spec.h + 'px';
+    el.style.left = (left + head.x - spec.pin.x) + 'px';
+    el.style.top = (top + head.y - spec.pin.y) + 'px';
+    el.style.transformOrigin = spec.pin.x + 'px ' + spec.pin.y + 'px';
+    el.style.transform = head.tilt ? `rotate(${head.tilt}deg)` : '';
 }
 // Monster attack: the card's sprite shows the attack pose and lunges forward at once (same moment as the player's lunge)
 function monsterCardImg(m) {
@@ -2597,6 +2646,7 @@ function syncHeroSprites() {
             el.style.left = (o.left + base.fx - f.fx) + 'px';
             el.style.top = (o.top + base.fy - f.fy) + 'px';
         }
+        placeHatLayer(el, f, parseFloat(el.style.left), parseFloat(el.style.top));
     });
     // The shadowed sprite carries its own shadow, so the separate shadow images are hidden for it
     ['town-shadow', 'char-shadow'].forEach(id => {
