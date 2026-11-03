@@ -533,6 +533,8 @@ const COMBAT_POSE_SETS = {
     // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
+        // heroScale: the town and character pages draw this figure at the base body's height (183px tall figure vs 160px here)
+        heroScale: 183 / 160,
         IDLE: { src: 'assets/cha/swordandshield/ssbase_q85.webp', w: 142, h: 160, fx: 47.89, fy: 160 },
         ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 154, fx: 48.64, fy: 153 },
         CRI: [
@@ -2532,15 +2534,16 @@ const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
+    const s = combatPose().heroScale || 1;
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         if (el.getAttribute('src') !== f.src) el.src = f.src;
         const o = HERO_PAGE_ORIGIN[id];
-        el.style.width = f.w + 'px';
-        el.style.height = f.h + 'px';
-        el.style.left = (o.left + base.fx - f.fx) + 'px';
-        el.style.top = (o.top + base.fy - f.fy) + 'px';
+        el.style.width = (f.w * s) + 'px';
+        el.style.height = (f.h * s) + 'px';
+        el.style.left = (o.left + base.fx - f.fx * s) + 'px';
+        el.style.top = (o.top + base.fy - f.fy * s) + 'px';
     });
 }
 function executeEquipItem(index, targetSlot) {
@@ -3044,6 +3047,15 @@ function claimMail(mailId) {
     if (mail.rewards.diamonds) player.diamonds += mail.rewards.diamonds;
     if (mail.rewards.refiningStones) player.refiningStones += mail.rewards.refiningStones;
     if (mail.rewards.resurrection) player.resurrectionPotions = (player.resurrectionPotions || 0) + mail.rewards.resurrection;
+    // LV rewards: each level is granted through checkLevelUps (stat points and SP as usual), capped at the max levels
+    for (let i = 0; i < (mail.rewards.baseLv || 0) && player.baseLv < MAX_BASE_LV; i++) {
+        player.baseExp = player.baseMaxExp;
+        checkLevelUps();
+    }
+    for (let i = 0; i < (mail.rewards.classLv || 0) && player.jobLv < MAX_CLASS_LV; i++) {
+        player.jobExp = player.jobMaxExp;
+        checkLevelUps();
+    }
     if (mail.rewards.baseExp || mail.rewards.classExp) {
         player.baseExp += mail.rewards.baseExp || 0;
         player.jobExp += mail.rewards.classExp || 0;
@@ -3074,7 +3086,9 @@ function mailRewardText(r) {
     if (r.diamonds) parts.push(`${r.diamonds} Diamonds`);
     if (r.refiningStones) parts.push(`${r.refiningStones} Refining Stones`);
     if (r.resurrection) parts.push(`${r.resurrection} Resurrection Potion`);
-    if (r.baseExp) parts.push(`${r.baseExp} Base EXP`);
+    if (r.baseLv) parts.push(`${r.baseLv} Base LV`);
+    if (r.classLv) parts.push(`${r.classLv} Class LV`);
+    if (r.baseExp) parts.push(`${r.baseExp} Base EXP`); // mails sent before the LV rewards
     if (r.classExp) parts.push(`${r.classExp} Class EXP`);
     if (r.chest) parts.push(`${r.chest[0].toUpperCase() + r.chest.slice(1)} Chest`);
     if (r.gear) parts.push(`${(MAIL_GEAR_SLOTS.find(s => s[0] === r.gear.slot) || [0, r.gear.slot])[1]} Lv ${r.gear.lv} (R5)`);
@@ -3113,8 +3127,8 @@ function openSendMailForm() {
             </div>
             <label>Chest <select id="mail-chest" class="${field}">${opt('', 'None')}${opt('copper', 'Copper')}${opt('silver', 'Silver')}${opt('gold', 'Gold')}</select></label>
             <div class="grid grid-cols-2 gap-2">
-                <label>Base EXP <input id="mail-base-exp" type="number" min="0" value="0" class="${field}"></label>
-                <label>Class EXP <input id="mail-class-exp" type="number" min="0" value="0" class="${field}"></label>
+                <label>Base LV <input id="mail-base-lv" type="number" min="0" value="0" class="${field}"></label>
+                <label>Class LV <input id="mail-class-lv" type="number" min="0" value="0" class="${field}"></label>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <label>Gear (R5) <select id="mail-gear-slot" onchange="refreshMailGearLevels()" class="${field}">${opt('', 'None')}${MAIL_GEAR_SLOTS.map(([v, l]) => opt(v, l)).join('')}</select></label>
@@ -3132,8 +3146,8 @@ function sendPlayerMail() {
     if (num('mail-diamonds')) rewards.diamonds = num('mail-diamonds');
     if (num('mail-res')) rewards.resurrection = num('mail-res');
     if (val('mail-chest')) rewards.chest = val('mail-chest');
-    if (num('mail-base-exp')) rewards.baseExp = num('mail-base-exp');
-    if (num('mail-class-exp')) rewards.classExp = num('mail-class-exp');
+    if (num('mail-base-lv')) rewards.baseLv = num('mail-base-lv');
+    if (num('mail-class-lv')) rewards.classLv = num('mail-class-lv');
     if (val('mail-gear-slot') && val('mail-gear-lv')) rewards.gear = { slot: val('mail-gear-slot'), lv: Number(val('mail-gear-lv')) };
     if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
     player.mailBox.unshift({
