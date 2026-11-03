@@ -682,6 +682,11 @@ function placeHatLayer(sprite, frame, left, top) {
         parent.appendChild(el);
     }
     el.style.display = '';
+    // On the character page the worn hat can be clicked for its item detail (battle and town stay click-through)
+    const clickable = sprite.id === 'char-hero';
+    el.style.pointerEvents = clickable ? 'auto' : '';
+    el.style.cursor = clickable ? 'pointer' : '';
+    el.onclick = clickable ? () => showEquippedDetail('hat') : null;
     if (el.getAttribute('src') !== spec.src) el.src = spec.src;
     el.style.width = spec.w + 'px';
     el.style.height = spec.h + 'px';
