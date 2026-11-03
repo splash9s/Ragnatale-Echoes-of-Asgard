@@ -3101,7 +3101,12 @@ function claimMail(mailId) {
         showModal('Mail Error', 'This gear reward cannot be created. The mail is kept.');
         return;
     }
-    if (gear && Array.isArray(player.inventory) && !player.inventory.some(s => s === null)) {
+    const bossHelm = mail.rewards.bossHelm ? makeBossHelmItem(mail.rewards.bossHelm) : null;
+    if (mail.rewards.bossHelm && !bossHelm) {
+        showModal('Mail Error', 'This boss helm reward cannot be created. The mail is kept.');
+        return;
+    }
+    if ((gear || bossHelm) && Array.isArray(player.inventory) && !player.inventory.some(s => s === null)) {
         showModal('Inventory Full', 'Make room in your bag to claim this mail.');
         return;
     }
@@ -3126,12 +3131,19 @@ function claimMail(mailId) {
         checkLevelUps();
     }
     if (gear) addItemToInventory(gear);
+    if (bossHelm) addItemToInventory(bossHelm);
     if (mail.rewards.chest) openChest(mail.rewards.chest);
 
     logMessage(`[Mail] Claimed rewards from "${mail.title}"`, 'drop');
     renderMailBox();
     updateUI();
     saveGame();
+}
+
+// The boss helm of a level (the same item a campaign boss drops), rolled at R5 like mail gear. Returns null if the level has none.
+function makeBossHelmItem(lv) {
+    const template = (HELMET_DROP_POOL[lv] || [])[0];
+    return template ? generatePoEItem(template, 5, 1) : null;
 }
 
 // Random R5 gear for a mail reward: a drop template of that slot at exactly that level. Returns null if none exists.
@@ -3156,6 +3168,7 @@ function mailRewardText(r) {
     if (r.classExp) parts.push(`${r.classExp} Class EXP`);
     if (r.chest) parts.push(`${r.chest[0].toUpperCase() + r.chest.slice(1)} Chest`);
     if (r.gear) parts.push(`${(MAIL_GEAR_SLOTS.find(s => s[0] === r.gear.slot) || [0, r.gear.slot])[1]} Lv ${r.gear.lv} (R5)`);
+    if (r.bossHelm) parts.push(`${(HELMET_DROP_POOL[r.bossHelm] || [{ name: 'Boss Helm' }])[0].name} (R5)`);
     return parts.join(', ');
 }
 
@@ -3198,6 +3211,7 @@ function openSendMailForm() {
                 <label>Gear (R5) <select id="mail-gear-slot" onchange="refreshMailGearLevels()" class="${field}">${opt('', 'None')}${MAIL_GEAR_SLOTS.map(([v, l]) => opt(v, l)).join('')}</select></label>
                 <label>Gear Lv <select id="mail-gear-lv" class="${field}"><option value="">-</option></select></label>
             </div>
+            <label>Boss Helm (R5) <select id="mail-boss-helm" class="${field}">${opt('', 'None')}${Object.keys(HELMET_DROP_POOL).map(lv => opt(lv, `Lv ${lv} ${HELMET_DROP_POOL[lv][0].name}`)).join('')}</select></label>
             <button onclick="sendPlayerMail()" class="mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Send to Mailbox</button>
         </div>`);
 }
@@ -3213,6 +3227,7 @@ function sendPlayerMail() {
     if (num('mail-base-lv')) rewards.baseLv = num('mail-base-lv');
     if (num('mail-class-lv')) rewards.classLv = num('mail-class-lv');
     if (val('mail-gear-slot') && val('mail-gear-lv')) rewards.gear = { slot: val('mail-gear-slot'), lv: Number(val('mail-gear-lv')) };
+    if (val('mail-boss-helm')) rewards.bossHelm = Number(val('mail-boss-helm'));
     if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
     player.mailBox.unshift({
         id: Date.now(),
