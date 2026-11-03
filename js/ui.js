@@ -673,6 +673,9 @@ function placeHatLayer(sprite, frame, left, top) {
     el.style.top = (top + head.y - spec.pin.y) + 'px';
     el.style.transformOrigin = spec.pin.x + 'px ' + spec.pin.y + 'px';
     el.style.transform = head.tilt ? `rotate(${head.tilt}deg)` : '';
+    // Follow the body's idle bob (same timing) and keep the tilt during it
+    el.style.setProperty('--hat-tilt', (head.tilt || 0) + 'deg');
+    el.classList.toggle('hat-idle', sprite.classList.contains('player-idle'));
 }
 // Monster attack: the card's sprite shows the attack pose and lunges forward at once (same moment as the player's lunge)
 function monsterCardImg(m) {
@@ -713,6 +716,16 @@ function playPlayerLunge(el, dx) {
         { transform: `translateX(${dx}px)`, offset: 0.5 },
         { transform: 'translateX(0px)' }
     ], { duration: 200, easing: 'ease-in-out' });
+    // The hat lunges with the body, keeping its tilt
+    const hat = document.getElementById('hat-layer-' + el.id);
+    if (hat && hat.style.display !== 'none' && hat.animate) {
+        const t = `rotate(${hat.style.getPropertyValue('--hat-tilt') || '0deg'})`;
+        hat.animate([
+            { transform: t },
+            { transform: `translateX(${dx}px) ${t}`, offset: 0.5 },
+            { transform: t }
+        ], { duration: 200, easing: 'ease-in-out' });
+    }
 }
 // Place a reaction frame on the player's feet point
 // Death: chadead1 falls 6 steps per second onto the ground, then chadead2 lies there

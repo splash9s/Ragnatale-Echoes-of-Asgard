@@ -345,6 +345,10 @@
         @keyframes playerIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
         @keyframes monsterIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
         .player-idle { animation: playerIdle 2.4s infinite; transform-origin: 50% 100%; }
+        /* Hat layer: same bob as the body, keeping its tilt (--hat-tilt is set by the script) */
+        @keyframes playerIdleHat { 0% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 100% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); } }
+        .hat-idle { animation: playerIdleHat 2.4s infinite; }
+        @media (prefers-reduced-motion: reduce) { .hat-idle { animation: none; } }
         .monster-idle { animation: monsterIdle 2.4s infinite; transform-origin: 50% 100%; }
         .monster-idle[data-stunned="1"] { animation: none; }
         @media (prefers-reduced-motion: reduce) { .player-idle, .monster-idle { animation: none; } }
@@ -1111,13 +1115,13 @@
     <script src="data/monsters.js"></script>
     <script src="data/maps.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-    <script src="js/player.js?v=20261103h"></script>
-    <script src="js/audio.js?v=20261103h"></script>
-    <script src="js/cloud.js?v=20261103h"></script>
-    <script src="js/combat.js?v=20261103h"></script>
-    <script src="js/ui.js?v=20261103h"></script>
-    <script src="js/town.js?v=20261103h"></script>
-    <script src="js/loader.js?v=20261103h"></script>
+    <script src="js/player.js?v=20261103i"></script>
+    <script src="js/audio.js?v=20261103i"></script>
+    <script src="js/cloud.js?v=20261103i"></script>
+    <script src="js/combat.js?v=20261103i"></script>
+    <script src="js/ui.js?v=20261103i"></script>
+    <script src="js/town.js?v=20261103i"></script>
+    <script src="js/loader.js?v=20261103i"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading
