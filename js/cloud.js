@@ -8,14 +8,24 @@ let cloudUserId = null;
 let cloudDirty = false;
 let cloudLastPushed = null; // JSON of the last save uploaded (or downloaded)
 let cloudDisabled = false; // set after a reset so nothing is written back to the cloud
+let cloudListening = false; // the save-on-hide listeners are added once
 
-// Sign in (anonymously if new) and sync the save. Reloads once if the cloud save is newer than this browser's.
+// Creates the Supabase client once (null when the library did not load)
+function cloudInitClient() {
+    if (cloudClient) return cloudClient;
+    if (typeof supabase === 'undefined' || !supabase.createClient) return null;
+    cloudClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return cloudClient;
+}
+
+// Sync the save for a signed-in player. Reloads once if the cloud save is newer than this browser's.
+// A browser with no save and no session is a first play: the sign-in page signs the player in first.
 async function cloudStart() {
-    if (typeof supabase === 'undefined' || !supabase.createClient) return;
+    if (!cloudInitClient()) return;
     try {
-        cloudClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let { data: { session } } = await cloudClient.auth.getSession();
         if (!session) {
+            if (!localStorage.getItem('ragnatale_save')) return; // first play: waiting for the sign-in page
             const r = await cloudClient.auth.signInAnonymously();
             if (r.error) throw r.error;
             session = r.data.session;
@@ -33,10 +43,45 @@ async function cloudStart() {
                 return;
             }
         }
-        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudFlush(); });
-        window.addEventListener('pagehide', cloudFlush);
+        if (!cloudListening) {
+            cloudListening = true;
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudFlush(); });
+            window.addEventListener('pagehide', cloudFlush);
+        }
     } catch (e) {
         console.warn('Cloud save unavailable, this browser only:', e);
+    }
+}
+
+// First-play sign-in helpers. Each returns false when the cloud is unavailable; the game then continues on this browser only.
+async function cloudHasSession() {
+    if (!cloudInitClient()) return false;
+    try {
+        const { data: { session } } = await cloudClient.auth.getSession();
+        return !!session;
+    } catch (e) { return false; }
+}
+async function cloudSignInAnonymous() {
+    if (!cloudInitClient()) return false;
+    try {
+        const r = await cloudClient.auth.signInAnonymously();
+        if (r.error) throw r.error;
+        return true;
+    } catch (e) {
+        console.warn('Anonymous sign-in failed, this browser only:', e);
+        return false;
+    }
+}
+async function cloudSignInGmail() {
+    if (!cloudInitClient()) return false;
+    try {
+        // Google sends the browser back to this page, already signed in
+        const { error } = await cloudClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+        if (error) throw error;
+        return true;
+    } catch (e) {
+        console.warn('Gmail sign-in failed, this browser only:', e);
+        return false;
     }
 }
 

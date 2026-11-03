@@ -458,20 +458,40 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
 
-        <!-- NAME SELECTION MODAL -->
-        <div id="view-name-select" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
+        <!-- SIGN-IN (first play only) -->
+        <div id="view-signin" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl text-center">
+                <h2 class="text-lg font-bold text-amber-400 pixel-font">RAGNATALE</h2>
+                <p class="text-xs text-slate-400">Sign in to keep your progress in the cloud.</p>
+                <button onclick="signInWithGmail()" class="w-full py-3 bg-slate-100 hover:bg-white text-slate-900 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
+                    Sign in with Gmail
+                </button>
+                <button onclick="signInAnonymous()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
+                    Sign in anonymous
+                </button>
+            </div>
+        </div>
+
+        <!-- CHARACTER SELECTION (first play, after sign-in) -->
+        <div id="view-name-select" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
             <div class="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
                 <div class="text-center">
                     <h2 class="text-lg font-bold text-amber-400 pixel-font mb-1">RAGNATALE</h2>
-                    <p class="text-xs text-slate-400">Choose your avatar and enter your heroic name.</p>
+                    <p class="text-xs text-slate-400">Choose your character.</p>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-300">Avatar Icon</label>
-                    <div id="avatar-selection-grid" class="grid grid-cols-5 gap-2"></div>
-                    
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-amber-400 bg-amber-500/10">
+                        <img src="assets/cha/chabase_q85.webp" alt="" class="h-40 object-contain" style="image-rendering:pixelated;">
+                        <span class="text-xs font-bold text-amber-300">Vanguard</span>
+                    </div>
+                    <div aria-disabled="true" class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-slate-700 bg-slate-900 opacity-40 grayscale cursor-not-allowed select-none">
+                        <img src="assets/cha/chabase_q85.webp" alt="" class="h-40 object-contain" style="image-rendering:pixelated;">
+                        <span class="text-xs font-bold text-slate-400">Skuggi</span>
+                        <span class="text-[10px] text-slate-500">Unavailable</span>
+                    </div>
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-bold text-slate-300">Hero Name</label>
+                    <label class="text-xs font-bold text-slate-300">Create Character Name:</label>
                     <input type="text" id="input-player-name" maxlength="13" value="VanguardHero" class="px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-400 text-slate-100">
                 </div>
                 <button onclick="startGameWithName()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
@@ -487,7 +507,10 @@
                     <img class="ts-bg" src="assets/page01/mainbg5_q85.webp" alt="" onerror="townSwap(this,'mainbg5.png')">
                     <div class="ui town-panel" style="left:24px; top:13px; width:824px; height:315px; cursor:default;">
                         <div class="town-info">
-                            <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime_q85.webp" alt="" /></div>
+                            <div class="relative flex-none">
+                                <div id="header-avatar-container" class="town-avatar" onclick="openAvatarPicker()" title="Choose avatar"><img src="assets/avatars/slime_q85.webp" alt="" /></div>
+                                <img id="avatar-alert" src="assets/page01/alert_q85.webp" alt="" class="hidden absolute pointer-events-none" style="right:-8px; top:-8px; width:36px; height:36px; z-index:5;">
+                            </div>
                             <div class="town-id">
                                 <h1 class="town-name"><span id="header-player-name">Hero</span><span id="header-vip-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
                                 <div class="town-lv">Base Lv. <strong id="header-base-lv">1</strong></div>
@@ -1100,7 +1123,6 @@
     // Called by js/loader.js once the loading screen has finished preloading
     function startGame() {
         initAudio();
-        renderAvatarSelection();
         if (loadGame()) {
             let nameSelectModal = document.getElementById('view-name-select');
             if (nameSelectModal) {
@@ -1109,6 +1131,8 @@
             }
             updateUI();
             logMessage("[System] Game loaded successfully!", "winlose");
+        } else {
+            firstPlayStart(); // no save: sign-in, then character selection
         }
         setMusicTrack('town');
         if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();

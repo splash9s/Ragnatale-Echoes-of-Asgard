@@ -175,12 +175,42 @@ function handleCustomAvatarUpload(event) {
 }
 
 const MAX_NAME_LENGTH = 13;
+const START_AVATAR = 'assets/avatars/man1_q85.webp'; // every new Vanguard starts with this avatar
+
+// First play: sign-in page first (unless already signed in), then character selection
+async function firstPlayStart() {
+    if (await cloudHasSession()) {
+        await cloudStart(); // returning from a Gmail sign-in: the saved game (if any) is loaded from the cloud
+        showCharacterPage();
+        return;
+    }
+    showSignInPage();
+}
+function showSignInPage() {
+    document.getElementById('view-name-select')?.classList.add('hidden');
+    document.getElementById('view-signin')?.classList.remove('hidden');
+}
+function showCharacterPage() {
+    document.getElementById('view-signin')?.classList.add('hidden');
+    const modal = document.getElementById('view-name-select');
+    if (modal) { modal.classList.remove('hidden'); modal.style.display = ''; }
+}
+async function signInAnonymous() {
+    await cloudSignInAnonymous(); // offline or failed: the game still continues on this browser
+    if (cloudClient) await cloudStart();
+    showCharacterPage();
+}
+async function signInWithGmail() {
+    const started = await cloudSignInGmail(); // the page leaves for Google and comes back signed in
+    if (!started) showCharacterPage();
+}
+
 function startGameWithName() {
     let nameInputEl = document.getElementById('input-player-name');
     let nameInput = nameInputEl ? nameInputEl.value.trim().slice(0, MAX_NAME_LENGTH) : "VanguardHero";
-    
+
     if (nameInput) player.name = nameInput;
-    player.avatar = selectedAvatarChoice;
+    player.avatar = START_AVATAR;
     saveGame();
 
     let nameSelectModal = document.getElementById('view-name-select');
@@ -814,12 +844,19 @@ function syncCombatInfo() {
 
 function updateAvatarDisplay() {
     let container = document.getElementById('header-avatar-container');
+    // The new-avatar alert stays until the player first clicks the avatar (remembered in the save)
+    document.getElementById('avatar-alert')?.classList.toggle('hidden', !!player.avatarClicked);
     if (!container) return;
     container.innerHTML = avatarMarkup(player.avatar, 'w-full h-full object-cover');
 }
 
-// Player stat avatar: click to choose a monster avatar
+// Player stat avatar: click to choose a monster avatar (the first click also dismisses the new-avatar alert)
 function openAvatarPicker() {
+    if (!player.avatarClicked) {
+        player.avatarClicked = true;
+        saveGame();
+        updateAvatarDisplay();
+    }
     const options = AVATARS.map(av => {
         // Locked avatars are grey; their requirement shows only when clicked
         if (!isAvatarUnlocked(av)) return `
