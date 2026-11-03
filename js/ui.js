@@ -741,15 +741,15 @@ const HAT_LAYER_SPRITE = {
     'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 40, y: 33.1 } }
 };
 const SWORD_HAT_HEAD = {
-    ssbase: { x: 138.6, y: 51.4, tilt: 0 },
-    ssblock: { x: 126.2, y: 57.2, tilt: 0 },
+    ssbase: { x: 138.6, y: 51.4, tilt: 90 },
+    ssblock: { x: 126.2, y: 57.2, tilt: 90 },
     ssattack: { x: 83, y: 39.3, tilt: 85 },
     sscritical: { x: 154.3, y: 34, tilt: 69 },
-    sscritical2: { x: 95.7, y: 46.5, tilt: 0 },
+    sscritical2: { x: 95.7, y: 46.5, tilt: 90 },
     // Falling, ground and dodge frames (shared by the base and sword sets)
     chadead1: { x: 39, y: 40.4, tilt: 130 },
     chadead2: { x: 135, y: 36, tilt: 52 },
-    chadodge: { x: 39.8, y: 34.1, tilt: 0 }
+    chadodge: { x: 39.8, y: 34.1, tilt: 90 }
 };
 // Which tracked frame a sprite file is (the hero's shadowed base uses the base head point)
 function swordHatKey(src) {
@@ -2778,17 +2778,9 @@ function isTwoHanded(item) {
 // The battle sprite's pose set also drives the hero art on the town and character pages.
 // Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
-// Sword and shield hero art with its shadow built in (156x176, drawn at its own size)
-const HERO_SWORD_SHADOWED = { src: 'assets/cha/swordandshield/ssbasewshadow.png', w: 156, h: 189 };
-// Its page position: horizontally centred (town: the 1920-wide page; character: the character and equipment window, char-panel-mid at x 93-695), top the same as chabase
-const HERO_SWORD_CENTER_X = { 'town-hero': 960, 'char-hero': 394 };
-const HERO_CHABASE_TOP = { 'town-hero': 562, 'char-hero': 527 };
-// The element each hero sits in (the town hero is inside its wrapper at 913,562)
-const HERO_PARENT_ORIGIN = { 'town-hero': { left: 913, top: 562 }, 'char-hero': { left: 0, top: 0 } };
+// Hero art is the same frame as in battle; feet are placed on the base body's feet point, and the shadow is shown as for the base body
 function syncHeroSprites() {
-    const pose = combatPose();
-    const swordShadowed = pose === COMBAT_POSE_SETS.swordShield;
-    const f = swordShadowed ? HERO_SWORD_SHADOWED : pose.IDLE;
+    const f = combatPose().IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
@@ -2799,26 +2791,17 @@ function syncHeroSprites() {
         // The Tailwind base style caps every img at max-width 100% of its parent (95px on the town hero): lift the cap so the size stays true
         el.style.maxWidth = 'none';
         el.style.maxHeight = 'none';
-        if (swordShadowed) {
-            const par = HERO_PARENT_ORIGIN[id];
-            el.style.left = (HERO_SWORD_CENTER_X[id] - f.w / 2 - par.left) + 'px';
-            el.style.top = (HERO_CHABASE_TOP[id] - par.top) + 'px';
-        } else {
-            const o = HERO_PAGE_ORIGIN[id];
-            el.style.left = (o.left + base.fx - f.fx) + 'px';
-            el.style.top = (o.top + base.fy - f.fy) + 'px';
-        }
+        const o = HERO_PAGE_ORIGIN[id];
+        el.style.left = (o.left + base.fx - f.fx) + 'px';
+        el.style.top = (o.top + base.fy - f.fy) + 'px';
         placeHatLayer(el, f, parseFloat(el.style.left), parseFloat(el.style.top));
     });
-    // The shadowed sprite carries its own shadow, so the separate shadow images are hidden for it
     ['town-shadow', 'char-shadow'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display = swordShadowed ? 'none' : '';
-        if (!swordShadowed) {
-            el.style.left = SHADOW_BASE[id].left + 'px';
-            el.style.top = SHADOW_BASE[id].top + 'px';
-        }
+        el.style.display = '';
+        el.style.left = SHADOW_BASE[id].left + 'px';
+        el.style.top = SHADOW_BASE[id].top + 'px';
     });
 }
 const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
