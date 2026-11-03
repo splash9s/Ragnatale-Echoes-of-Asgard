@@ -301,6 +301,18 @@ const MONSTER_SPRITES = {
             'assets/combat/cavebeast/cavebeastdead2_q85.webp': [0, -1]
         }
     },
+    M012: { // Sand King (boss, map lv 20): natural size; shift is [dx, dy] px so the feet stay on the same spot
+        idle: ['assets/combat/sandking/sandking_q85.webp'],
+        attack: ['assets/combat/sandking/sandkingattack_q85.webp'],
+        hurt: ['assets/combat/sandking/sandkingdamaged_q85.webp'],
+        dead: ['assets/combat/sandking/sandkingdead_q85.webp'],
+        deathMs: 600,
+        shift: {
+            'assets/combat/sandking/sandkingattack_q85.webp': [66, -54],
+            'assets/combat/sandking/sandkingdamaged_q85.webp': [-73, 49],
+            'assets/combat/sandking/sandkingdead_q85.webp': [-60, 173]
+        }
+    },
     M060: { // Battle Storm Mage (wind mage): natural size; shift is [dx, dy] px so the feet stay on the same spot
         idle: ['assets/combat/battlestormmage/battlestormmage_q85.webp'],
         attack: ['assets/combat/battlestormmage/battlestormmageattack_q85.webp'],
