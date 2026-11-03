@@ -563,7 +563,7 @@ const COMBAT_POSE_SETS = {
     // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
-        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 142, h: 160, fx: 47.89, fy: 160 },
+        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 156, h: 189, fx: 72.5, fy: 173 },
         ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 154, fx: 48.64, fy: 153 },
         CRI: [
             { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 154, fx: 108.59, fy: 154 },
