@@ -2567,31 +2567,46 @@ function isTwoHanded(item) {
 // The battle sprite's pose set also drives the hero art on the town and character pages.
 // Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
+// Sword and shield hero art with its shadow built in (156x176, drawn at its own size)
+const HERO_SWORD_SHADOWED = { src: 'assets/cha/swordandshield/ssbasewshadow.png', w: 156, h: 176 };
+// Its page position: horizontally centred on the 1920-wide page, top the same as chabase
+const HERO_SWORD_CENTER_X = 960;
+const HERO_CHABASE_TOP = { 'town-hero': 562, 'char-hero': 527 };
+// The element each hero sits in (the town hero is inside its wrapper at 913,562)
+const HERO_PARENT_ORIGIN = { 'town-hero': { left: 913, top: 562 }, 'char-hero': { left: 0, top: 0 } };
 function syncHeroSprites() {
-    const f = combatPose().IDLE;
+    const pose = combatPose();
+    const swordShadowed = pose === COMBAT_POSE_SETS.swordShield;
+    const f = swordShadowed ? HERO_SWORD_SHADOWED : pose.IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
-    const s = 1; // hero art is drawn at each frame's own file size (no scaling)
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         if (el.getAttribute('src') !== f.src) el.src = f.src;
-        const o = HERO_PAGE_ORIGIN[id];
-        el.style.width = (f.w * s) + 'px';
-        el.style.height = (f.h * s) + 'px';
-        el.style.left = (o.left + base.fx - f.fx * s) + 'px';
-        el.style.top = (o.top + base.fy - f.fy * s) + 'px';
+        el.style.width = f.w + 'px';
+        el.style.height = f.h + 'px';
+        if (swordShadowed) {
+            const par = HERO_PARENT_ORIGIN[id];
+            el.style.left = (HERO_SWORD_CENTER_X - f.w / 2 - par.left) + 'px';
+            el.style.top = (HERO_CHABASE_TOP[id] - par.top) + 'px';
+        } else {
+            const o = HERO_PAGE_ORIGIN[id];
+            el.style.left = (o.left + base.fx - f.fx) + 'px';
+            el.style.top = (o.top + base.fy - f.fy) + 'px';
+        }
     });
-    // Shadows: the base body keeps its original spot; the sword-and-shield pose has its own (dark mark under the right sole)
-    const shadowSet = (combatPose() === COMBAT_POSE_SETS.swordShield) ? SHADOW_SWORD_SHIELD : SHADOW_BASE;
-    Object.keys(shadowSet).forEach(id => {
+    // The shadowed sprite carries its own shadow, so the separate shadow images are hidden for it
+    ['town-shadow', 'char-shadow'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.left = shadowSet[id].left + 'px';
-        el.style.top = shadowSet[id].top + 'px';
+        el.style.display = swordShadowed ? 'none' : '';
+        if (!swordShadowed) {
+            el.style.left = SHADOW_BASE[id].left + 'px';
+            el.style.top = SHADOW_BASE[id].top + 'px';
+        }
     });
 }
 const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
-const SHADOW_SWORD_SHIELD = { 'town-shadow': { left: 958, top: 716 }, 'char-shadow': { left: 397, top: 678 } };
 function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
