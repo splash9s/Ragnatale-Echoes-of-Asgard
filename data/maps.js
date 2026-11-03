@@ -14,18 +14,22 @@ function spawnTweak(t) {
 }
 // Map Lv. 10 monsters are tougher: +50% HP and +50% ATK (bosses are not affected)
 const LV10_HP_ATK_MULT = 1.5;
+// A monster from a higher level keeps at least this share of its HP and ATK on a lower map (lv 60-99 monsters on lv 20-50 maps)
+const LEVEL_DOWN_FLOOR = 0.6;
 function levelScaled(t, level) {
     const d = (level || 1) - (t.lv || 1);
     let out = t;
     if (d !== 0) {
-        const f = Math.pow(LEVEL_GROWTH, d);
+        const raw = Math.pow(LEVEL_GROWTH, d);
+        const f = Math.max(LEVEL_DOWN_FLOOR, raw); // HP and ATK are floored
         const r = v => Math.max(1, Math.round(v * f));
+        const rr = v => Math.max(1, Math.round(v * raw)); // rewards keep the unfloored curve
         out = {
             ...t,
             hp: r(t.hp), maxHp: r(t.maxHp),
             atkMin: r(t.atkMin), atkMax: r(t.atkMax),
             ...(t.heal ? { heal: r(t.heal) } : {}),
-            baseExp: r(t.baseExp), jobExp: r(t.jobExp), gold: r(t.gold)
+            baseExp: rr(t.baseExp), jobExp: rr(t.jobExp), gold: rr(t.gold)
         };
     }
     if ((level || 1) === 10) {
