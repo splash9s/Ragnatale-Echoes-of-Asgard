@@ -2569,8 +2569,8 @@ function isTwoHanded(item) {
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
 // Sword and shield hero art with its shadow built in (156x176, drawn at its own size)
 const HERO_SWORD_SHADOWED = { src: 'assets/cha/swordandshield/ssbasewshadow.png', w: 156, h: 176 };
-// Its page position: horizontally centred on the 1920-wide page, top the same as chabase
-const HERO_SWORD_CENTER_X = 960;
+// Its page position: horizontally centred (town: the 1920-wide page; character: the character and equipment window, char-panel-mid at x 93-695), top the same as chabase
+const HERO_SWORD_CENTER_X = { 'town-hero': 960, 'char-hero': 394 };
 const HERO_CHABASE_TOP = { 'town-hero': 562, 'char-hero': 527 };
 // The element each hero sits in (the town hero is inside its wrapper at 913,562)
 const HERO_PARENT_ORIGIN = { 'town-hero': { left: 913, top: 562 }, 'char-hero': { left: 0, top: 0 } };
@@ -2587,7 +2587,7 @@ function syncHeroSprites() {
         el.style.height = f.h + 'px';
         if (swordShadowed) {
             const par = HERO_PARENT_ORIGIN[id];
-            el.style.left = (HERO_SWORD_CENTER_X - f.w / 2 - par.left) + 'px';
+            el.style.left = (HERO_SWORD_CENTER_X[id] - f.w / 2 - par.left) + 'px';
             el.style.top = (HERO_CHABASE_TOP[id] - par.top) + 'px';
         } else {
             const o = HERO_PAGE_ORIGIN[id];
