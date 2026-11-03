@@ -406,8 +406,8 @@ function startExpedition(mode, opts = {}) {
     monsterOpenerRound = true;
     spawnStageMonsters();
 
-    if (combatInterval) clearInterval(combatInterval); combatRunId++;
-    combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)));
+    stopCombatTimers(); combatRunId++;
+    startCombatTimers(derived);
 }
 
 // ---------- STAGE / BOSS ----------
@@ -1280,6 +1280,65 @@ function sameTargetStreak(m) {
 }
 
 // ---------- MAIN LOOP ----------
+// Monsters take their turn on their own fixed timer (COMBAT_MONSTER_MS), so ASPD only changes the player's attack speed
+const COMBAT_MONSTER_MS = 1620; // = a base-stat character's attack tick (ASPD 38)
+let monsterInterval = null;
+function monsterTurnTick() {
+    if (combatPaused) return;
+    const derived = getDerivedStats();
+    let alive = getAliveMonsters();
+    if (alive.length === 0 || player.hp <= 0) return;
+    // ---- Monster turn (every living monster attacks) ----
+    tickPlayerDebuffs();
+    alive.forEach((m, i) => monsterAct(m, derived, i));
+    monsterOpenerRound = false;
+
+    monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
+    if (getAliveMonsters().length === 0) {
+        onStageCleared();
+        return;
+    }
+
+    if (player.hp <= 0) {
+        if (player.runes.angelOfDeath && !player.angelUsedThisRun) {
+            player.angelUsedThisRun = true;
+            player.hp = derived.maxHp;
+            logMessage(`[Angel of Death] You rise again with full HP!`, 'levelup');
+            updateUI();
+            return;
+        }
+        if ((player.resurrectionPotions || 0) > 0 && !player.runes.resurrectionUsed && player.resurrectionOn !== false) {
+            player.resurrectionPotions--;
+            player.runes.resurrectionUsed = true;
+            player.hp = derived.maxHp;
+            logMessage(`[Resurrection] Resurrection Potion activated, restoring full HP! (${player.resurrectionPotions} left)`, 'winlose');
+            updateUI();
+            return;
+        }
+
+        stopCombatTimers(); combatRunId++;
+        if (typeof resetMapRunes === 'function') resetMapRunes();
+        logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
+        player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
+        startPlayerDeathAnim(); // the fall plays first
+        setTimeout(() => { // the result waits 3 seconds
+            player.hp = getDerivedStats().maxHp;
+            updateUI();
+            showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
+        }, 3000);
+    }
+    updateUI();
+}
+// Starts the player's attack timer (ASPD) and the monsters' timer; stopCombatTimers clears both
+function startCombatTimers(derived) {
+    stopCombatTimers();
+    combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)));
+    monsterInterval = setInterval(monsterTurnTick, COMBAT_MONSTER_MS);
+}
+function stopCombatTimers() {
+    clearInterval(combatInterval); clearInterval(monsterInterval);
+    combatInterval = null; monsterInterval = null;
+}
 function runCombatTick() {
     if (combatPaused) {
         if (isVipActive()) return;
@@ -1474,45 +1533,6 @@ function runCombatTick() {
         return;
     }
 
-    // ---- Monster turn (every living monster attacks) ----
-    tickPlayerDebuffs();
-    alive.forEach((m, i) => monsterAct(m, derived, i));
-    monsterOpenerRound = false;
-
-    monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
-    if (getAliveMonsters().length === 0) {
-        onStageCleared();
-        return;
-    }
-
-    if (player.hp <= 0) {
-        if (player.runes.angelOfDeath && !player.angelUsedThisRun) {
-            player.angelUsedThisRun = true;
-            player.hp = derived.maxHp;
-            logMessage(`[Angel of Death] You rise again with full HP!`, 'levelup');
-            updateUI();
-            return;
-        }
-        if ((player.resurrectionPotions || 0) > 0 && !player.runes.resurrectionUsed && player.resurrectionOn !== false) {
-            player.resurrectionPotions--;
-            player.runes.resurrectionUsed = true;
-            player.hp = derived.maxHp;
-            logMessage(`[Resurrection] Resurrection Potion activated, restoring full HP! (${player.resurrectionPotions} left)`, 'winlose');
-            updateUI();
-            return;
-        }
-
-        clearInterval(combatInterval); combatRunId++;
-        if (typeof resetMapRunes === 'function') resetMapRunes();
-        logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
-        player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
-        startPlayerDeathAnim(); // the fall plays first
-        setTimeout(() => { // the result waits 3 seconds
-            player.hp = getDerivedStats().maxHp;
-            updateUI();
-            showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
-        }, 3000);
-    }
     updateUI();
 }
 
@@ -1528,7 +1548,7 @@ function onStageCleared() {
     if (stageClearing) return;
     stageClearing = true;
     stasisAtkPct = 0; // the stage bonus ends with the stage
-    clearInterval(combatInterval); combatRunId++;
+    stopCombatTimers(); combatRunId++;
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     // Every stage end restores 10% of Max HP
     healPlayer(Math.ceil(getDerivedStats().maxHp * 0.1), 'stage');
@@ -1599,7 +1619,7 @@ function onStageCleared() {
             // Layers and positions swap first; the stage's monsters and ticks start after that
             changeEarthLayers().then(() => {
                 if (sid !== combatSessionId) return; // left combat while the next stage loaded
-                combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (getDerivedStats().aspd * 10)));
+                startCombatTimers(getDerivedStats());
                 spawnStageMonsters();
             });
         };
@@ -1627,7 +1647,7 @@ function proceedToNextStage() {
 }
 
 function returnToTown() {
-    clearInterval(combatInterval); combatRunId++;
+    stopCombatTimers(); combatRunId++;
     combatPaused = false;
     updatePauseButton();
     if (typeof resetMapRunes === 'function') resetMapRunes();
@@ -1802,7 +1822,7 @@ function restoreAfterCombat() {
     combatSessionId++;
     if (!player.inCombat) return;
     player.inCombat = false;
-    if (combatInterval) clearInterval(combatInterval); combatRunId++;
+    stopCombatTimers(); combatRunId++;
     const d = getDerivedStats();
     player.hp = d.maxHp;
     player.armor = d.maxArmor;
