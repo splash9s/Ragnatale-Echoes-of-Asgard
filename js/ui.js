@@ -722,8 +722,16 @@ function playPlayerLunge(el, dx) {
     ], { duration: 200, easing: 'ease-in-out' });
     lungeHat(el, dx);
 }
-// The hat moves with the body during a lunge, keeping its tilt
+// The hat and the ground shadow move with the body during a lunge (the hat keeps its tilt)
 function lungeHat(el, dx) {
+    const shadow = document.getElementById('combat-player-shadow');
+    if (shadow && shadow.animate) {
+        shadow.animate([
+            { transform: 'translateX(0px)' },
+            { transform: `translateX(${dx}px)`, offset: 0.5 },
+            { transform: 'translateX(0px)' }
+        ], { duration: 200, easing: 'ease-in-out' });
+    }
     const hat = document.getElementById('hat-layer-' + el.id);
     if (hat && hat.style.display !== 'none' && hat.animate) {
         const t = `rotate(${hat.style.getPropertyValue('--hat-tilt') || '0deg'})`;
