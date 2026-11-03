@@ -566,13 +566,13 @@ const COMBAT_POSE_SETS = {
         IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 156, h: 189, fx: 72.5, fy: 173 },
         ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 151, h: 171, fx: 56.5, fy: 170 },
         CRI: [
-            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 154, fx: 108.59, fy: 154 },
-            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 190, h: 159, fx: 59.66, fy: 159 }
+            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 193, h: 168, fx: 68, fy: 168 },
+            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 190, h: 174, fx: 52.5, fy: 174 }
         ],
         DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 162, h: 137, fx: 99.56, fy: 129 }, // no sword art yet: base falling frame
         DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },   // no sword art yet: base ground frame
         REACT: {
-            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 162, fx: 117.07, fy: 162 },
+            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 177, fx: 107.5, fy: 177 },
             dodge: { src: 'assets/cha/chadodge_q85.webp', w: 147, h: 140, fx: 108.33, fy: 138 }
         }
     }
@@ -2617,7 +2617,7 @@ function isTwoHanded(item) {
 // Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
 // Sword and shield hero art with its shadow built in (156x176, drawn at its own size)
-const HERO_SWORD_SHADOWED = { src: 'assets/cha/swordandshield/ssbasewshadow.png', w: 156, h: 176 };
+const HERO_SWORD_SHADOWED = { src: 'assets/cha/swordandshield/ssbasewshadow.png', w: 156, h: 189 };
 // Its page position: horizontally centred (town: the 1920-wide page; character: the character and equipment window, char-panel-mid at x 93-695), top the same as chabase
 const HERO_SWORD_CENTER_X = { 'town-hero': 960, 'char-hero': 394 };
 const HERO_CHABASE_TOP = { 'town-hero': 562, 'char-hero': 527 };
