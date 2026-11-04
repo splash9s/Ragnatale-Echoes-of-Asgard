@@ -673,8 +673,8 @@ const COMBAT_POSE_SETS = {
         IDLE: { src: 'assets/helmet/mossbloom/ssbase.png', w: 288, h: 238, fx: 130.2, fy: 238 },
         ATTACK: { src: 'assets/helmet/mossbloom/ssattack_q85.webp', w: 217, h: 244, fx: 96.2, fy: 244 },
         CRI: [
-            { src: 'assets/helmet/mossbloom/sscritical_q85.webp', w: 255, h: 247, fx: 91.0, fy: 247 },
-            { src: 'assets/helmet/mossbloom/sscritical2_q85.webp', w: 274, h: 245, fx: 108.0, fy: 245 }
+            { src: 'assets/helmet/mossbloom/sscritical_q85.webp', w: 274, h: 245, fx: 108.0, fy: 245 },
+            { src: 'assets/helmet/mossbloom/sscritical2_q85.webp', w: 255, h: 247, fx: 91.0, fy: 247 }
         ],
         DEAD1: { src: 'assets/helmet/mossbloom/chadead1_q85.webp', w: 202, h: 175, fx: 115.0, fy: 170 },
         DEAD2: { src: 'assets/helmet/mossbloom/chadead2_q85.webp', w: 223, h: 133, fx: 103.0, fy: 131 },
