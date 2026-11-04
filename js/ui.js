@@ -649,11 +649,11 @@ const COMBAT_POSE_SETS = {
         IDLE: { src: 'assets/cha/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
         ATTACK: { src: 'assets/cha/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
         CRI: { src: 'assets/cha/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 179, h: 155, fx: 135.5, fy: 150 }, // falling
-        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 186, h: 111, fx: 110, fy: 109 }, // on the ground
+        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 170 }, // falling
+        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 223, h: 133, fx: 104.5, fy: 131 }, // on the ground
         REACT: {
             block: { src: 'assets/cha/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
+            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
         }
     },
     ironHelm: {
@@ -670,17 +670,17 @@ const COMBAT_POSE_SETS = {
     // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
-        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 254, h: 210, fx: 120.5, fy: 210 },
-        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 177, h: 200, fx: 63.2, fy: 199 },
+        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 288, h: 238, fx: 130.5, fy: 238 },
+        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 217, h: 244, fx: 97.2, fy: 243 },
         CRI: [
-            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 222, h: 198, fx: 106, fy: 198 },
-            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 210, h: 204, fx: 54.8, fy: 204 }
+            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 274, h: 245, fx: 106, fy: 245 },
+            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 255, h: 247, fx: 93.8, fy: 247 }
         ],
-        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 179, h: 155, fx: 135.5, fy: 150 }, // no sword art yet: base falling frame
-        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 186, h: 111, fx: 110, fy: 109 },   // no sword art yet: base ground frame
+        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 170 }, // no sword art yet: base falling frame
+        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 223, h: 133, fx: 104.5, fy: 131 },   // no sword art yet: base ground frame
         REACT: {
-            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 205, fx: 109.2, fy: 205 },
-            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
+            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 253, h: 245, fx: 145.5, fy: 245 },
+            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
         }
     }
 };
