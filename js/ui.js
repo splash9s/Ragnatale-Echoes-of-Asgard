@@ -2819,9 +2819,12 @@ function isTwoHanded(item) {
 // Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
 // Hero art is the same frame as in battle; feet are placed on the base body's feet point, and the shadow is shown as for the base body
+// Sword-and-shield heroes on the town and character pages sit 50px left of the base body, and have no shadow yet
+const HERO_SWORD_SHIFT_X = -50;
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     const base = COMBAT_POSE_SETS.base.IDLE;
+    const sword = usesSwordAndShield();
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -2832,14 +2835,14 @@ function syncHeroSprites() {
         el.style.maxWidth = 'none';
         el.style.maxHeight = 'none';
         const o = HERO_PAGE_ORIGIN[id];
-        el.style.left = (o.left + base.fx - f.fx) + 'px';
+        el.style.left = (o.left + base.fx - f.fx + (sword ? HERO_SWORD_SHIFT_X : 0)) + 'px';
         el.style.top = (o.top + base.fy - f.fy) + 'px';
         placeHatLayer(el, f, parseFloat(el.style.left), parseFloat(el.style.top));
     });
     ['town-shadow', 'char-shadow'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display = '';
+        el.style.display = sword ? 'none' : ''; // no shadow for the sword-and-shield hero yet
         el.style.left = SHADOW_BASE[id].left + 'px';
         el.style.top = SHADOW_BASE[id].top + 'px';
     });
