@@ -667,6 +667,22 @@ const COMBAT_POSE_SETS = {
             dodge: { src: 'assets/helmet/iron-helm/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
         }
     },
+    // Magma Horn Helm (lv 10 boss helmet): the helm is drawn into each sword-and-shield frame, so no hat overlay is placed
+    magmaHornSword: {
+        hatBaked: true,
+        IDLE: { src: 'assets/helmet/magma-horn/ssbase.png', w: 288, h: 238, fx: 130.5, fy: 238 },
+        ATTACK: { src: 'assets/helmet/magma-horn/ssattack_q85.webp', w: 217, h: 244, fx: 97.2, fy: 243 },
+        CRI: [
+            { src: 'assets/helmet/magma-horn/sscritical_q85.webp', w: 274, h: 245, fx: 106, fy: 245 },
+            { src: 'assets/helmet/magma-horn/sscritical2_q85.webp', w: 255, h: 247, fx: 93.8, fy: 247 }
+        ],
+        DEAD1: { src: 'assets/helmet/magma-horn/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 170 },
+        DEAD2: { src: 'assets/helmet/magma-horn/chadead2_q85.webp', w: 223, h: 133, fx: 104.5, fy: 131 },
+        REACT: {
+            block: { src: 'assets/helmet/magma-horn/ssblock_q85.webp', w: 253, h: 245, fx: 145.5, fy: 245 },
+            dodge: { src: 'assets/helmet/magma-horn/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
+        }
+    },
     // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
     // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
     swordShield: {
@@ -692,9 +708,15 @@ function usesSwordAndShield() {
     const s = player && player.equipped && player.equipped.shield;
     return !!(w && s && !isTwoHanded(w));
 }
+// Hats drawn into the sword-and-shield frames: their own set is used when that hat is worn with a sword and shield
+const HAT_BAKED_SWORD_SET = { 'Magma Horn Helm': 'magmaHornSword' };
 // The pose set for the player's current gear: sword and shield first, then the hat's art, then the bare body
 function combatPose() {
-    if (usesSwordAndShield()) return COMBAT_POSE_SETS.swordShield;
+    if (usesSwordAndShield()) {
+        const worn = player && player.equipped && player.equipped.hat;
+        const baked = worn && HAT_BAKED_SWORD_SET[worn.name];
+        return baked ? COMBAT_POSE_SETS[baked] : COMBAT_POSE_SETS.swordShield;
+    }
     const hat = player && player.equipped && player.equipped.hat;
     const set = hat && COMBAT_HAT_POSE_SET[hat.name];
     return set ? COMBAT_POSE_SETS[set] : COMBAT_POSE_SETS.base;
@@ -763,6 +785,7 @@ function placeHatLayer(sprite, frame, left, top) {
     if (!parent || !Number.isFinite(left) || !Number.isFinite(top)) return;
     const hatId = 'hat-layer-' + (sprite.id || 'x');
     let el = document.getElementById(hatId);
+    if (combatPose().hatBaked) { if (el) el.style.display = 'none'; return; } // the hat is already in the frame
     const hat = player && player.equipped && player.equipped.hat;
     const spec = hat && HAT_LAYER_SPRITE[hat.name];
     const key = frame && frame.src ? swordHatKey(frame.src) : null;
