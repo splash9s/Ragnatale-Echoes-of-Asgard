@@ -679,7 +679,7 @@ const COMBAT_POSE_SETS = {
         DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 179, h: 155, fx: 135.5, fy: 150 }, // no sword art yet: base falling frame
         DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 186, h: 111, fx: 110, fy: 109 },   // no sword art yet: base ground frame
         REACT: {
-            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 177, fx: 109.2, fy: 177 },
+            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 188, h: 205, fx: 109.2, fy: 205 },
             dodge: { src: 'assets/cha/chadodge_q85.webp', w: 152, h: 153, fx: 102, fy: 151 }
         }
     }
