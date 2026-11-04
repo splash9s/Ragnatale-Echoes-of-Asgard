@@ -667,6 +667,22 @@ const COMBAT_POSE_SETS = {
             dodge: { src: 'assets/helmet/iron-helm/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
         }
     },
+    // Cloth Cap (lv 1 shop helmet): the cap is drawn into each sword-and-shield frame, so no hat overlay is placed
+    clothSword: {
+        hatBaked: true,
+        IDLE: { src: 'assets/helmet/cloth-cap/ssbase.png', w: 288, h: 238, fx: 130.5, fy: 238 },
+        ATTACK: { src: 'assets/helmet/cloth-cap/ssattack_q85.webp', w: 217, h: 244, fx: 96.2, fy: 244 },
+        CRI: [
+            { src: 'assets/helmet/cloth-cap/sscritical_q85.webp', w: 274, h: 245, fx: 108.0, fy: 245 },
+            { src: 'assets/helmet/cloth-cap/sscritical2_q85.webp', w: 255, h: 247, fx: 93.5, fy: 247 }
+        ],
+        DEAD1: { src: 'assets/helmet/cloth-cap/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 172 },
+        DEAD2: { src: 'assets/helmet/cloth-cap/chadead2_q85.webp', w: 223, h: 133, fx: 103.2, fy: 132 },
+        REACT: {
+            block: { src: 'assets/helmet/cloth-cap/ssblock_q85.webp', w: 253, h: 245, fx: 144.8, fy: 245 },
+            dodge: { src: 'assets/helmet/cloth-cap/chadodge_q85.webp', w: 200, h: 199, fx: 162.0, fy: 197 }
+        }
+    },
     // Mossbloom Cap (lv 1 boss helmet) and Magma Horn Helm (lv 10 boss helmet): the helm is drawn into each sword-and-shield frame, so no hat overlay is placed
     mossbloomSword: {
         hatBaked: true,
@@ -725,7 +741,7 @@ function usesSwordAndShield() {
     return !!(w && s && !isTwoHanded(w));
 }
 // Hats drawn into the sword-and-shield frames: their own set is used when that hat is worn with a sword and shield
-const HAT_BAKED_SWORD_SET = { 'Mossbloom Cap': 'mossbloomSword', 'Magma Horn Helm': 'magmaHornSword' };
+const HAT_BAKED_SWORD_SET = { 'Cloth Cap': 'clothSword', 'Mossbloom Cap': 'mossbloomSword', 'Magma Horn Helm': 'magmaHornSword' };
 // The pose set for the player's current gear: sword and shield first, then the hat's art, then the bare body
 function combatPose() {
     if (usesSwordAndShield()) {
