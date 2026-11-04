@@ -101,6 +101,11 @@ const BASE_15 = {
     haloPriest:     { ...MONSTERS_DATA.haloPriest,     role: 'healer', lv: 40 }
 };
 const BASE_LIST = Object.values(BASE_15);
+// Low maps use only low-level monsters: the lv 60-99 monsters would be floored to 0.6x and dominate them.
+// Lv. 1 map: lv 1 monsters only. Lv. 10 map: lv 1-10 monsters. No healer is that low, so healer waves use the range fallback (see pickUnit).
+const LEAF_MAGE_LV1 = { ...MONSTERS_DATA.leafSpriteMage, role: 'mage', lv: 1 };
+const LV1_MAP_ENEMIES = [BASE_15.slime, BASE_15.mossyBoulder, BASE_15.archerGoblin, LEAF_MAGE_LV1];
+const LV10_MAP_ENEMIES = [...LV1_MAP_ENEMIES, BASE_15.rockGolem, BASE_15.sniperKobold];
 
 // Base maps (shared by campaign paths, events and the daily challenge)
 // miniStage: stage with the mini boss (default 7, the stage after the 3rd rune). campaignStages: total stages in a campaign run (boss on the last stage).
@@ -109,13 +114,13 @@ const GAME_DATA = {
     maps: {
         map1: {
             title: "Map Lv. 1", levelReq: 1, campaignStages: 11, miniStage: 7, stageGrowth: 0.07, dropKey: 'map1',
-            enemies: [...BASE_LIST],
+            enemies: [...LV1_MAP_ENEMIES],
             boss: MONSTERS_DATA.bossGiantMossSlime,
             miniBoss: makeMiniBoss(BASE_15.mossyBoulder, 1)
         },
         map10: {
             title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, stageGrowth: 0.08, dropKey: 'map10',
-            enemies: [...BASE_LIST],
+            enemies: [...LV10_MAP_ENEMIES],
             boss: { ...MONSTERS_DATA.bossCavernBehemoth, bossHpMult: 1.5 }, // Lv 10 boss: 1.5x base HP (other bosses use BOSS_HP_MULT)
             miniBoss: makeMiniBoss(BASE_15.rockGolem, 10)
         },
