@@ -670,16 +670,16 @@ const COMBAT_POSE_SETS = {
     // Magma Horn Helm (lv 10 boss helmet): the helm is drawn into each sword-and-shield frame, so no hat overlay is placed
     magmaHornSword: {
         hatBaked: true,
-        IDLE: { src: 'assets/helmet/magma-horn/ssbase.png', w: 288, h: 238, fx: 130.5, fy: 238 },
-        ATTACK: { src: 'assets/helmet/magma-horn/ssattack_q85.webp', w: 217, h: 244, fx: 97.2, fy: 243 },
+        IDLE: { src: 'assets/helmet/magma-horn/ssbase.png', w: 288, h: 238, fx: 130, fy: 238 },
+        ATTACK: { src: 'assets/helmet/magma-horn/ssattack_q85.webp', w: 217, h: 244, fx: 96.8, fy: 241 },
         CRI: [
-            { src: 'assets/helmet/magma-horn/sscritical_q85.webp', w: 274, h: 245, fx: 106, fy: 245 },
+            { src: 'assets/helmet/magma-horn/sscritical_q85.webp', w: 274, h: 245, fx: 106.2, fy: 245 },
             { src: 'assets/helmet/magma-horn/sscritical2_q85.webp', w: 255, h: 247, fx: 93.8, fy: 247 }
         ],
-        DEAD1: { src: 'assets/helmet/magma-horn/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 170 },
-        DEAD2: { src: 'assets/helmet/magma-horn/chadead2_q85.webp', w: 223, h: 133, fx: 104.5, fy: 131 },
+        DEAD1: { src: 'assets/helmet/magma-horn/chadead1_q85.webp', w: 223, h: 133, fx: 102.8, fy: 128 },
+        DEAD2: { src: 'assets/helmet/magma-horn/chadead2_q85.webp', w: 202, h: 175, fx: 114, fy: 168 },
         REACT: {
-            block: { src: 'assets/helmet/magma-horn/ssblock_q85.webp', w: 253, h: 245, fx: 145.5, fy: 245 },
+            block: { src: 'assets/helmet/magma-horn/ssblock_q85.webp', w: 253, h: 245, fx: 144.5, fy: 245 },
             dodge: { src: 'assets/helmet/magma-horn/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
         }
     },
