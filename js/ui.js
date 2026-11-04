@@ -737,7 +737,7 @@ function applyPlayerFrame(img, f, dy = 0) {
 // Hat layer: a worn hat is drawn over the sword-and-shield sprite. Its pin point sits on the head point of that frame, turned by the frame's tilt.
 // Head points and tilts come from the tracking sheet (tilt: degrees, + leans right); the hat pin is in the hat image's own pixels.
 const HAT_LAYER_SPRITE = {
-    'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 35.9, y: 37 } },
+    'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 36.5, y: 44.2 } },
     'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 40, y: 33.1 } }
 };
 // Tilt is stored as 90 minus the tracking reading (90 = upright, so a missing reading is 0). + leans right.
