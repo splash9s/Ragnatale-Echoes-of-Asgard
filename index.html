@@ -337,6 +337,8 @@
         @keyframes healAura { 0% { opacity: 0; transform: scale(.6); } 35% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
         @media (prefers-reduced-motion: reduce) { .heal-aura { animation-duration: .01s; } }
         /* Idle bob for monsters that have it (Rock Golem): 3px up and down, slow */
+        .pet-idle { transform-origin: 50% 100%; animation: petIdle 1.4s ease-in-out infinite; }
+        @keyframes petIdle { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.04, .95); } }
         @keyframes monsterBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         /* Mini boss aura: embers rise from its feet, coloured by the map element (set inline as --ember) */
         .mini-aura { position: absolute; left: 50%; bottom: 0; width: 130px; height: 46px; margin-left: -65px; border-radius: 50%; background: radial-gradient(ellipse at center, var(--ember) 0%, transparent 70%); pointer-events: none; z-index: 1; animation: miniAuraPulse 1.6s ease-in-out infinite; }
@@ -566,6 +568,7 @@
                     <img id="town-shadow" alt="" src="assets/cha/chashadow_q85.webp">
                     <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
                         <img id="town-hero" class="player-idle" alt="" src="assets/cha/chabase_q85.webp">
+                    <img id="town-pet" class="pet-idle" alt="" src="assets/combat/slime/slimebase_q85.webp" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
                     </div>
                 </div>
             </div>
@@ -783,6 +786,7 @@
                     
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="assets/cha/chabase_q85.webp" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
+                    <img id="char-pet" class="pet-idle" alt="" src="assets/combat/slime/slimebase_q85.webp" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:5;">
                     <button onclick="switchView('skills')" style="position:absolute; left:394px; top:152px; transform:translate(-50%, 0); box-sizing:border-box; height:46px; line-height:42px; padding:0 20px; white-space:nowrap; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
@@ -1056,7 +1060,7 @@
                     <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase_q85.webp" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
 
                     <!-- Equipped pet: idle beside the player's feet (placed by syncPetSprite in ui.js) -->
-                    <img id="combat-pet-sprite" src="assets/combat/slime/slimebase_q85.webp" alt="" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
+                    <img id="combat-pet-sprite" class="pet-idle" src="assets/combat/slime/slimebase_q85.webp" alt="" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
 
                     <!-- Player stun effect: shown over the head while stunned (see the 60ms loop in ui.js) -->
                     <img id="combat-player-stun-fx" src="assets/combat/stun/stuneffect_q85.webp" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; display:none; max-width:none; pointer-events:none; image-rendering:pixelated; z-index:5;">
@@ -1127,7 +1131,7 @@
     <script src="js/audio.js?v=20261105h"></script>
     <script src="js/cloud.js?v=20261105h"></script>
     <script src="js/combat.js?v=20261105h"></script>
-    <script src="js/ui.js?v=20261105h"></script>
+    <script src="js/ui.js?v=20261105i"></script>
     <script src="js/town.js?v=20261105h"></script>
     <script src="js/loader.js?v=20261105h"></script>
 

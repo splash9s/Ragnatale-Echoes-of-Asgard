@@ -791,21 +791,42 @@ function applyPlayerFrame(img, f, dy = 0) {
 // Equipped pet: the pet's idle art stands beside the player's feet, 10px to the left of the player's feet, on the same ground line.
 // Each pet name has its art. Only the Support Slime Pet has art so far (the slime's idle frame).
 const PET_SPRITES = { 'Support Slime Pet': { src: 'assets/combat/slime/slimebase_q85.webp', w: 87, h: 73, fx: 43.5, fy: 73 } };
-const COMBAT_PET_GAP_X = 10;
-function syncPetSprite() {
-    const el = document.getElementById('combat-pet-sprite');
-    if (!el) return;
+const COMBAT_PET_GAP_X = 20;
+// Page pets (town and character pages) stand the same way beside the hero's feet
+const PAGE_PET_IDS = { 'town-hero': 'town-pet', 'char-hero': 'char-pet' };
+function petSpriteOf() {
     const pet = player && player.equipped && player.equipped.pet;
-    const spec = pet && PET_SPRITES[pet.name];
-    if (!spec) { el.style.display = 'none'; return; }
+    return pet ? (PET_SPRITES[pet.name] || null) : null;
+}
+function placePetImg(el, spec, feetX, feetY) {
     if (el.getAttribute('src') !== spec.src) el.src = spec.src;
-    const feetX = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - COMBAT_PET_GAP_X;
-    const feetY = combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y;
     el.style.display = '';
     el.style.width = spec.w + 'px';
     el.style.height = spec.h + 'px';
     el.style.left = (feetX - spec.fx) + 'px';
     el.style.top = (feetY - spec.fy) + 'px';
+}
+function syncPetSprite() {
+    const spec = petSpriteOf();
+    const el = document.getElementById('combat-pet-sprite');
+    if (el) {
+        if (!spec) el.style.display = 'none';
+        else placePetImg(el, spec, combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - COMBAT_PET_GAP_X, combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y);
+    }
+    syncPagePetSprites(spec);
+}
+function syncPagePetSprites(spec) {
+    const f = combatPose().IDLE;
+    Object.keys(PAGE_PET_IDS).forEach(heroId => {
+        const pet = document.getElementById(PAGE_PET_IDS[heroId]);
+        const hero = document.getElementById(heroId);
+        if (!pet) return;
+        if (!spec || !hero || hero.style.left === '') { pet.style.display = 'none'; return; }
+        // The hero's feet are where its frame's feet point sits on the page
+        const feetX = parseFloat(hero.style.left) + f.fx;
+        const feetY = parseFloat(hero.style.top) + f.fy;
+        placePetImg(pet, spec, feetX - COMBAT_PET_GAP_X, feetY);
+    });
 }
 setInterval(syncPetSprite, 100);
 // Hat layer: a worn hat is drawn over the sword-and-shield sprite. Its pin point sits on the head point of that frame, turned by the frame's tilt.
