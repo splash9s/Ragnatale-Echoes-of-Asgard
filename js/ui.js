@@ -791,7 +791,7 @@ function applyPlayerFrame(img, f, dy = 0) {
 // Equipped pet: the pet's idle art stands beside the player's feet, 10px to the left of the player's feet, on the same ground line.
 // Each pet name has its art. Only the Support Slime Pet has art so far (the slime's idle frame).
 const PET_SPRITES = { 'Support Slime Pet': { src: 'assets/combat/slime/slimebase_q85.webp', w: 87, h: 73, fx: 43.5, fy: 73 } };
-const COMBAT_PET_GAP_X = 20;
+const COMBAT_PET_GAP_X = 120;
 // Page pets (town and character pages) stand the same way beside the hero's feet
 const PAGE_PET_IDS = { 'town-hero': 'town-pet' }; // main page only; the character page shows no pet
 // Gap from the hero's feet to the pet's feet on each page
