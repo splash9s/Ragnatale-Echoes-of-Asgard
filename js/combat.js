@@ -619,10 +619,6 @@ function spawnStageMonsters() {
             }
         }
     }
-    // Map Lv. 1 (campaign): monsters deal 4x damage, except mages (normal damage)
-    if (currentMode === 'campaign' && activeMap && activeMap.levelReq === 1) {
-        monstersList.forEach(m => { if (roleOf(m) !== 'mage') { m.atkMin = Math.max(1, Math.round(m.atkMin * 4)); m.atkMax = Math.max(1, Math.round(m.atkMax * 4)); } });
-    }
     updateUI();
 }
 
@@ -708,13 +704,9 @@ function stageMultiplier() {
 
 // A fresh copy of a template for this stage
 // Tank monsters deal 70% damage
+// Lv. 1 maps use the table ATK for every role, so this only applies above Lv. 1
 function tankDamageMult(t) {
-    return roleOf(t) === 'tank' ? 0.7 : 1;
-}
-
-// Mages on level 1 maps deal half base damage (their spells use the same attack value)
-function mageLv1DamageMult(t) {
-    return roleOf(t) === 'mage' && activeMap && activeMap.levelReq === 1 ? 0.5 : 1;
+    return roleOf(t) === 'tank' && !(activeMap && activeMap.levelReq === 1) ? 0.7 : 1;
 }
 
 function makeUnit(t, mult) {
@@ -722,8 +714,8 @@ function makeUnit(t, mult) {
         ...t,
         hp: Math.floor(t.hp * mult),
         maxHp: Math.floor(t.maxHp * mult),
-        atkMin: Math.floor(t.atkMin * mult * tankDamageMult(t) * mageLv1DamageMult(t)),
-        atkMax: Math.floor(t.atkMax * mult * tankDamageMult(t) * mageLv1DamageMult(t)),
+        atkMin: Math.floor(t.atkMin * mult * tankDamageMult(t)),
+        atkMax: Math.floor(t.atkMax * mult * tankDamageMult(t)),
         hit: combatHitFlee(t).hit,
         flee: combatHitFlee(t).flee,
         isBoss: false, rewarded: false, ailments: {}

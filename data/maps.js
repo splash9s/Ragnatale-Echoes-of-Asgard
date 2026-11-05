@@ -6,9 +6,9 @@
 // HP, attack and rewards grow by LEVEL_GROWTH per level (fitted from the normal monsters: about 4% per level).
 const LEVEL_GROWTH = 1.0405;
 // Spawn tweaks applied to every monster that enters a fight: range monsters hit for 1.2x, healers heal for 0.6x
-function spawnTweak(t) {
+function spawnTweak(t, level) {
     let out = t;
-    if (t.role === 'range') out = { ...out, atkMin: Math.max(1, Math.round(out.atkMin * 1.2)), atkMax: Math.max(1, Math.round(out.atkMax * 1.2)) };
+    if (t.role === 'range' && (level || 1) !== 1) out = { ...out, atkMin: Math.max(1, Math.round(out.atkMin * 1.2)), atkMax: Math.max(1, Math.round(out.atkMax * 1.2)) };
     if (t.heal) out = { ...out, heal: Math.max(1, Math.round(out.heal * 0.6)) };
     return out;
 }
@@ -38,7 +38,7 @@ function levelScaled(t, level) {
     }
     // Lv. 1 healers heal half as much
     if ((level || 1) === 1 && out.heal) out = { ...out, heal: Math.max(1, Math.round(out.heal * 0.5)) };
-    return spawnTweak(out);
+    return spawnTweak(out, level);
 }
 
 // Mini boss: a tougher version of one base monster, scaled to the map level
@@ -106,6 +106,8 @@ const BASE_LIST = Object.values(BASE_15);
 // Low maps use only low-level monsters: the lv 60-99 monsters would be floored to 0.6x and dominate them.
 // Lv. 1 map: lv 1 monsters only. Lv. 10 map: lv 1-10 monsters. No healer is that low, so healer waves use the range fallback (see pickUnit).
 const LEAF_MAGE_LV1 = { ...MONSTERS_DATA.leafSpriteMage, role: 'mage', lv: 1 };
+// Earth lv1 mage: Hel Stone Mage with the same lv1 mage stats (only the element and art differ)
+const HEL_STONE_MAGE_LV1 = { ...MONSTERS_DATA.helStoneMage, hp: LEAF_MAGE_LV1.hp, maxHp: LEAF_MAGE_LV1.maxHp, atkMin: LEAF_MAGE_LV1.atkMin, atkMax: LEAF_MAGE_LV1.atkMax, hit: LEAF_MAGE_LV1.hit, flee: LEAF_MAGE_LV1.flee, baseExp: LEAF_MAGE_LV1.baseExp, jobExp: LEAF_MAGE_LV1.jobExp, gold: LEAF_MAGE_LV1.gold, role: 'mage', lv: 1 };
 const LV1_MAP_ENEMIES = [BASE_15.slime, BASE_15.mossyBoulder, BASE_15.archerGoblin, LEAF_MAGE_LV1];
 const LV10_MAP_ENEMIES = [...LV1_MAP_ENEMIES, BASE_15.rockGolem, BASE_15.sniperKobold];
 
@@ -275,7 +277,7 @@ Object.keys(CAMPAIGN_PATHS).forEach(pk => {
             maxStages: base.campaignStages || CAMPAIGN_STAGES,
             title: `${path.name} · ${base.title}`,
             // Lv. 1 and Lv. 10 path maps use the same low-level roster as the normal maps (element tinted); higher maps use the path roster
-            enemies: (base.levelReq < 20 ? base.enemies : PATH_ROSTERS[pk]).map(tint),
+            enemies: (base.levelReq < 20 ? base.enemies.map(t => (pk === 'earth' && t.id === LEAF_MAGE_LV1.id ? HEL_STONE_MAGE_LV1 : t)) : PATH_ROSTERS[pk]).map(tint),
             boss: tint(base.boss),
             miniBoss: tint(base.miniBoss)
         };
