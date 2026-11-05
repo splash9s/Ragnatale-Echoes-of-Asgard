@@ -272,7 +272,8 @@ Object.keys(CAMPAIGN_PATHS).forEach(pk => {
             ...base,
             maxStages: base.campaignStages || CAMPAIGN_STAGES,
             title: `${path.name} · ${base.title}`,
-            enemies: PATH_ROSTERS[pk].map(tint),
+            // Lv. 1 and Lv. 10 path maps use the same low-level roster as the normal maps (element tinted); higher maps use the path roster
+            enemies: (base.levelReq < 20 ? base.enemies : PATH_ROSTERS[pk]).map(tint),
             boss: tint(base.boss),
             miniBoss: tint(base.miniBoss)
         };
