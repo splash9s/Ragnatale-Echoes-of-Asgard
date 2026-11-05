@@ -2056,9 +2056,9 @@ function renderRuneSlot() {
     const count = player.blacksmithRuneStones || 0;
     if (count < 1) blacksmithRuneOn = false;
     if (runeEl) {
-        runeEl.innerHTML = `<span style="font-size:20px; line-height:1">🔮</span><span style="font-size:12px; font-weight:900; color:${blacksmithRuneOn ? '#86efac' : '#fca5a5'};">${blacksmithRuneOn ? 'ON' : 'OFF'}</span>`;
+        runeEl.innerHTML = `<img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:36px;height:36px;object-fit:contain;"><span style="font-size:12px; font-weight:900; color:${blacksmithRuneOn ? '#86efac' : '#fca5a5'};">${blacksmithRuneOn ? 'ON' : 'OFF'}</span>`;
     }
-    if (balEl) balEl.textContent = `Rune Stone: ${count}`;
+    if (balEl) balEl.innerHTML = `<img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;"> Rune Stone: ${count}`;
 }
 function renderBlacksmithSlot() {
     const slotEl = document.getElementById('blacksmith-gear-slot');
@@ -2099,7 +2099,7 @@ function renderRefiningUI() {
                 <button onclick="smeltRefiningStone()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer">Smelt 1 Refining Stone</button>
             </div>
             <span class="text-[10px] text-slate-400">Combine 100 Iron Scraps to forge 1 Refining Stone.</span>
-            <span class="text-xs text-amber-200">🔨 Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
+            <span class="text-xs text-amber-200 inline-flex items-center gap-1.5"><img src="assets/shop/diamond/refiningstone.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
         </div>
         <div class="text-[10px] text-slate-400 mb-1">Select gear to refine:</div>
     `;
