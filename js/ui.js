@@ -2458,6 +2458,9 @@ const ITEM_ICON_RULES = [
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
     [/Resurrection Potion/, 'potion_res'],
+    [/Copper Chest/, 'assets/shop/diamond/copperchest.png'],
+    [/Silver Chest/, 'assets/shop/diamond/silverchest.png'],
+    [/Gold Chest/, 'assets/shop/diamond/goldchest.png'],
     [/Refining Stone/, 'mat_refining'],
     [/Iron Scraps/, 'mat_scrap'],
     [/Skill Reset/, 'scroll_skillreset'],
@@ -2579,7 +2582,10 @@ const ITEM_ICON_RULES = [
 ];
 function itemIconHTML(item, size = 70) {
     const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
-    if (rule) return `<img src="assets/items/${rule[1]}.png" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
+    if (rule) {
+        const src = rule[1].includes('/') ? rule[1] : `assets/items/${rule[1]}.png`; // full path, or an items-folder name
+        return `<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
+    }
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
