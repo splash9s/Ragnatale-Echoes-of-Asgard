@@ -2655,7 +2655,9 @@ function gearCardHTML(item, label) {
     const stats = Object.entries(item.stats || {}).map(([k, v]) => `<div class="text-slate-200">${formatStatLine(k, v)}</div>`).join('') || '<div class="text-slate-500">No base stats</div>';
     const buffs = (item.buffs || []).map(b => `<div class="${(RARITY_INFO[b.tier] || RARITY_INFO[1]).text}">• ${b.desc}</div>`).join('');
     const debuffs = (item.debuffs || []).map(d => `<div class="text-red-400">▾ ${d.desc}</div>`).join('');
-    return `<div class="flex-1 min-w-0 p-2 flex flex-col gap-1 text-[10px]">
+    // Selected and Equipped cards each have their own background colour
+    const bg = label === 'Selected' ? 'bg-sky-900/50 border border-sky-600/60' : 'bg-amber-900/40 border border-amber-700/60';
+    return `<div class="flex-1 min-w-0 p-2 rounded-lg ${bg} flex flex-col gap-1 text-[10px]">
         <span class="text-[9px] uppercase tracking-wider text-slate-500">${label}</span>
         <span class="font-bold ${r.text} break-words">${item.name}${item.refineLevel > 0 ? ' +' + item.refineLevel : ''}</span>
         <span class="${r.text}">${r.name} · R${item.rarity}</span>
