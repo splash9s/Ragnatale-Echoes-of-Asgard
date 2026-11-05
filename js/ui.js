@@ -793,9 +793,9 @@ function applyPlayerFrame(img, f, dy = 0) {
 const PET_SPRITES = { 'Support Slime Pet': { src: 'assets/combat/slime/slimebase_q85.webp', w: 87, h: 73, fx: 43.5, fy: 73 } };
 const COMBAT_PET_GAP_X = 20;
 // Page pets (town and character pages) stand the same way beside the hero's feet
-const PAGE_PET_IDS = { 'town-hero': 'town-pet', 'char-hero': 'char-pet' };
+const PAGE_PET_IDS = { 'town-hero': 'town-pet' }; // main page only; the character page shows no pet
 // Gap from the hero's feet to the pet's feet on each page
-const PAGE_PET_GAP_X = { 'town-hero': 100, 'char-hero': 30 };
+const PAGE_PET_GAP_X = { 'town-hero': 100 };
 function petSpriteOf() {
     const pet = player && player.equipped && player.equipped.pet;
     return pet ? (PET_SPRITES[pet.name] || null) : null;
@@ -2454,6 +2454,7 @@ const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', ga
 const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
 // Inventory icons (PNG, transparent) for consumables and materials; other items keep the emoji
 const ITEM_ICON_RULES = [
+    [/Support Slime Pet/, 'assets/shop/diamond/slimebase.png'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
