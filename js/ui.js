@@ -794,6 +794,8 @@ const PET_SPRITES = { 'Support Slime Pet': { src: 'assets/combat/slime/slimebase
 const COMBAT_PET_GAP_X = 20;
 // Page pets (town and character pages) stand the same way beside the hero's feet
 const PAGE_PET_IDS = { 'town-hero': 'town-pet', 'char-hero': 'char-pet' };
+// Gap from the hero's feet to the pet's feet on each page
+const PAGE_PET_GAP_X = { 'town-hero': 100, 'char-hero': 30 };
 function petSpriteOf() {
     const pet = player && player.equipped && player.equipped.pet;
     return pet ? (PET_SPRITES[pet.name] || null) : null;
@@ -825,7 +827,7 @@ function syncPagePetSprites(spec) {
         // The hero's feet are where its frame's feet point sits on the page
         const feetX = parseFloat(hero.style.left) + f.fx;
         const feetY = parseFloat(hero.style.top) + f.fy;
-        placePetImg(pet, spec, feetX - COMBAT_PET_GAP_X, feetY);
+        placePetImg(pet, spec, feetX - PAGE_PET_GAP_X[heroId], feetY);
     });
 }
 setInterval(syncPetSprite, 100);
