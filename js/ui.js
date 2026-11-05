@@ -64,20 +64,20 @@ const GOLD_SHOP_CONSUMABLES = [
 ];
 
 const DIAMOND_SHOP_ITEMS = [
-    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30 },
-    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 50, type: 'vip', days: 7 },
-    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 10, type: 'vip', days: 1 },
-    { id: 'pet_loyal_slime', name: "Support Slime Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 50, type: 'pet', stats: { hp: 100, atkPct: 2 } },
-    { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death." },
-    { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment." },
-    { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear." },
-    { id: 'exp_2x_1h', name: "2x EXP (1 hour)", price: 10, type: 'boost', boost: 'exp', ms: 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 1 hour." },
-    { id: 'gold_2x_1h', name: "2x Gold (1 hour)", price: 10, type: 'boost', boost: 'gold', ms: 60 * 60 * 1000, desc: "Double gold from kills for 1 hour." },
-    { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "" },
-    { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "" },
-    { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "" },
-    { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "" },
-    { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "" }
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
+    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 50, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
+    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 10, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
+    { id: 'pet_loyal_slime', name: "Support Slime Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 50, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/slimebase.png' },
+    { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
+    { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
+    { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
+    { id: 'exp_2x_1h', name: "2x EXP (1 hour)", price: 10, type: 'boost', boost: 'exp', ms: 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 1 hour.", icon: 'assets/shop/diamond/expmulti.png' },
+    { id: 'gold_2x_1h', name: "2x Gold (1 hour)", price: 10, type: 'boost', boost: 'gold', ms: 60 * 60 * 1000, desc: "Double gold from kills for 1 hour.", icon: 'assets/shop/diamond/goldmulti.png' },
+    { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
+    { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
+    { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "", icon: 'assets/shop/diamond/copperchest.png' },
+    { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "", icon: 'assets/shop/diamond/goldchest.png' }
 ];
 
 
@@ -1941,9 +1941,12 @@ function renderDiamondShop() {
     DIAMOND_SHOP_ITEMS.forEach(item => {
         container.innerHTML += `
             <div class="p-3 bg-slate-900/80 rounded-xl border border-purple-500/40 flex justify-between items-center">
-                <div>
-                    <span class="font-bold text-purple-300 block text-xs">${item.name}</span>
-                    <span class="text-[10px] text-slate-400 block">${item.desc}</span>
+                <div class="flex items-center gap-3 min-w-0">
+                    ${item.icon ? `<img src="${item.icon}" alt="" style="width:56px;height:56px;object-fit:contain;flex:0 0 auto;">` : ''}
+                    <div class="min-w-0">
+                        <span class="font-bold text-purple-300 block text-xs">${item.name}</span>
+                        <span class="text-[10px] text-slate-400 block">${item.desc}</span>
+                    </div>
                 </div>
                 <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">💎 ${item.price}</button>
             </div>
