@@ -36,6 +36,8 @@ function levelScaled(t, level) {
         const m = v => Math.max(1, Math.round(v * LV10_HP_ATK_MULT));
         out = { ...out, hp: m(out.hp), maxHp: m(out.maxHp), atkMin: m(out.atkMin), atkMax: m(out.atkMax) };
     }
+    // Lv. 1 healers heal half as much
+    if ((level || 1) === 1 && out.heal) out = { ...out, heal: Math.max(1, Math.round(out.heal * 0.5)) };
     return spawnTweak(out);
 }
 

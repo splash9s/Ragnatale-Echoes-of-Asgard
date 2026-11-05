@@ -480,7 +480,7 @@ const MONSTER_SPRITES = {
         hurt: ['assets/combat/icegolem/icegolemdamaged_q85.webp'],
         dead: ['assets/combat/icegolem/icegolemdead_q85.webp'],
         deathMs: 600,
-        shift: { 'assets/combat/icegolem/icegolemattack_q85.webp': [0, -12], 'assets/combat/icegolem/icegolemdamaged_q85.webp': [9, -5], 'assets/combat/icegolem/icegolemdead_q85.webp': [0, -4] }
+        shift: { 'assets/combat/icegolem/icegolemattack_q85.webp': [0, 13], 'assets/combat/icegolem/icegolemdamaged_q85.webp': [9, -5], 'assets/combat/icegolem/icegolemdead_q85.webp': [0, 21] }
     },
     M041: { // Frost Archer: natural size, own art; shift is [dx, dy] px so the feet stay on the same spot
         idle: ['assets/combat/frostarcher/frostarcher_q85.webp'],
