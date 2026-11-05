@@ -788,6 +788,26 @@ function applyPlayerFrame(img, f, dy = 0) {
     placeHatLayer(img, f, parseFloat(img.style.left), parseFloat(img.style.top));
 }
 
+// Equipped pet: the pet's idle art stands beside the player's feet, 10px to the left of the player's feet, on the same ground line.
+// Each pet name has its art. Only the Support Slime Pet has art so far (the slime's idle frame).
+const PET_SPRITES = { 'Support Slime Pet': { src: 'assets/combat/slime/slimebase_q85.webp', w: 87, h: 73, fx: 43.5, fy: 73 } };
+const COMBAT_PET_GAP_X = 10;
+function syncPetSprite() {
+    const el = document.getElementById('combat-pet-sprite');
+    if (!el) return;
+    const pet = player && player.equipped && player.equipped.pet;
+    const spec = pet && PET_SPRITES[pet.name];
+    if (!spec) { el.style.display = 'none'; return; }
+    if (el.getAttribute('src') !== spec.src) el.src = spec.src;
+    const feetX = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - COMBAT_PET_GAP_X;
+    const feetY = combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y;
+    el.style.display = '';
+    el.style.width = spec.w + 'px';
+    el.style.height = spec.h + 'px';
+    el.style.left = (feetX - spec.fx) + 'px';
+    el.style.top = (feetY - spec.fy) + 'px';
+}
+setInterval(syncPetSprite, 100);
 // Hat layer: a worn hat is drawn over the sword-and-shield sprite. Its pin point sits on the head point of that frame, turned by the frame's tilt.
 // Head points and tilts come from the tracking sheet (tilt: degrees, + leans right); the hat pin is in the hat image's own pixels.
 const HAT_LAYER_SPRITE = {

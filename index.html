@@ -1055,6 +1055,9 @@
                     <!-- Character sprite (centre 488, 590) -->
                     <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase_q85.webp" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
 
+                    <!-- Equipped pet: idle beside the player's feet (placed by syncPetSprite in ui.js) -->
+                    <img id="combat-pet-sprite" src="assets/combat/slime/slimebase_q85.webp" alt="" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
+
                     <!-- Player stun effect: shown over the head while stunned (see the 60ms loop in ui.js) -->
                     <img id="combat-player-stun-fx" src="assets/combat/stun/stuneffect_q85.webp" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; display:none; max-width:none; pointer-events:none; image-rendering:pixelated; z-index:5;">
 
@@ -1116,17 +1119,17 @@
     </div>
 
     <!-- SCRIPTS -->
-    <script src="data/items.js?v=20261105g"></script>
-    <script src="data/monsters.js?v=20261105g"></script>
-    <script src="data/maps.js?v=20261105g"></script>
+    <script src="data/items.js?v=20261105h"></script>
+    <script src="data/monsters.js?v=20261105h"></script>
+    <script src="data/maps.js?v=20261105h"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-    <script src="js/player.js?v=20261105g"></script>
-    <script src="js/audio.js?v=20261105g"></script>
-    <script src="js/cloud.js?v=20261105g"></script>
-    <script src="js/combat.js?v=20261105g"></script>
-    <script src="js/ui.js?v=20261105g"></script>
-    <script src="js/town.js?v=20261105g"></script>
-    <script src="js/loader.js?v=20261105g"></script>
+    <script src="js/player.js?v=20261105h"></script>
+    <script src="js/audio.js?v=20261105h"></script>
+    <script src="js/cloud.js?v=20261105h"></script>
+    <script src="js/combat.js?v=20261105h"></script>
+    <script src="js/ui.js?v=20261105h"></script>
+    <script src="js/town.js?v=20261105h"></script>
+    <script src="js/loader.js?v=20261105h"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading
