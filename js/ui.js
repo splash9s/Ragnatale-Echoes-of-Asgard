@@ -2092,7 +2092,7 @@ function renderRefiningUI() {
     container.innerHTML = `
         <div class="p-3 bg-slate-950 rounded-xl border border-amber-500/30 mb-3 flex flex-col gap-2">
             <div class="flex justify-between items-center text-xs">
-                <span>🔩 Iron Scraps: <strong class="text-slate-200">${scraps} / 100</strong></span>
+                <span class="inline-flex items-center gap-1.5"><img src="assets/items/mat_scrap.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Iron Scraps: <strong class="text-slate-200">${scraps} / 100</strong></span>
                 <button onclick="smeltRefiningStone()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer">Smelt 1 Refining Stone</button>
             </div>
             <span class="text-[10px] text-slate-400">Combine 100 Iron Scraps to forge 1 Refining Stone.</span>
@@ -2645,7 +2645,7 @@ function gearCardHTML(item, label) {
     const stats = Object.entries(item.stats || {}).map(([k, v]) => `<div class="text-slate-200">${formatStatLine(k, v)}</div>`).join('') || '<div class="text-slate-500">No base stats</div>';
     const buffs = (item.buffs || []).map(b => `<div class="${(RARITY_INFO[b.tier] || RARITY_INFO[1]).text}">• ${b.desc}</div>`).join('');
     const debuffs = (item.debuffs || []).map(d => `<div class="text-red-400">▾ ${d.desc}</div>`).join('');
-    return `<div class="flex-1 min-w-0 p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-1 text-[10px]">
+    return `<div class="flex-1 min-w-0 p-2 flex flex-col gap-1 text-[10px]">
         <span class="text-[9px] uppercase tracking-wider text-slate-500">${label}</span>
         <span class="font-bold ${r.text} break-words">${item.name}${item.refineLevel > 0 ? ' +' + item.refineLevel : ''}</span>
         <span class="${r.text}">${r.name} · R${item.rarity}</span>
@@ -2661,11 +2661,11 @@ function compareHTML(selected, equipped) {
     const rows = [...keys].map(k => {
         const d = (s[k] || 0) - (e[k] || 0);
         if (!d) return '';
-        return `<div class="${d > 0 ? 'text-emerald-300' : 'text-red-300'}">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
+        return `<div class="font-bold ${d > 0 ? 'text-green-400' : 'text-red-400'}">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
     }).join('');
     return `<div class="flex flex-col gap-2">
         <div class="flex gap-2 items-stretch">${gearCardHTML(selected, 'Selected')}${gearCardHTML(equipped, 'Equipped')}</div>
-        ${rows ? `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change if equip:</span>${rows}</div>` : ''}
+        ${rows ? `<div class="pt-2 border-t border-slate-700 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change if equip:</span>${rows}</div>` : ''}
     </div>`;
 }
 
