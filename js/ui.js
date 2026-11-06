@@ -3619,11 +3619,11 @@ function claimQuestMilestone(count) {
     renderQuestsView();
 }
 
-// Chest rewards: gold range (inclusive), rarity roll per item, and item count
+// Chest rewards: a stack of healing potions (count inclusive), then armory gear with a rarity roll per item
 const CHEST_REWARDS = {
-    copper: { goldMin: 1, goldMax: 500, rarities: [1], items: 1 },
-    silver: { goldMin: 501, goldMax: 1000, rarities: [2, 3], items: 1 },
-    gold:   { goldMin: 1501, goldMax: 2000, rarities: [3, 4], items: 2 }
+    copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1 },
+    silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1 },
+    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2 }
 };
 
 // Reward popups show item icons (gold shows the coin icon and amount)
@@ -3639,15 +3639,22 @@ function rewardPopupHTML(title, cells, extra = '') {
         <button onclick="closeModal()" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl">Confirm</button>
     </div>`;
 }
+function potionCellHTML(item, qty) {
+    return `<div title="${item.name}" class="flex items-center justify-center relative" style="width:96px;height:92px;${REWARD_SLOT_BG}">${itemIconHTML(item)}<span class="absolute bottom-1 right-2 text-xs font-bold text-amber-200">x${qty}</span></div>`;
+}
 function goldCellHTML(amount) {
     return `<div class="flex flex-col items-center gap-1"><img src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;"><span class="text-amber-300 font-bold text-sm">${amount} Gold</span></div>`;
 }
 
 function openChest(chestType) {
     const cfg = CHEST_REWARDS[chestType] || CHEST_REWARDS.copper;
-    const goldReward = cfg.goldMin + Math.floor(Math.random() * (cfg.goldMax - cfg.goldMin + 1));
-    player.gold += goldReward;
-    const rewardCells = [goldCellHTML(goldReward)];
+    const potionTemplate = GOLD_SHOP_CONSUMABLES.find(i => i.id === cfg.potion);
+    const potionQty = cfg.potionMin + Math.floor(Math.random() * (cfg.potionMax - cfg.potionMin + 1));
+    const rewardCells = [];
+    if (potionTemplate) {
+        addItemToInventory({ ...potionTemplate, qty: potionQty });
+        rewardCells.push(potionCellHTML(potionTemplate, potionQty));
+    }
 
     const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
     if (pool.length > 0) {
@@ -4333,9 +4340,9 @@ function renderLibraryRules() {
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Chests</h3>
             <table class="w-full text-[10px] text-left text-slate-300">
-                <tr class="border-b border-slate-800"><td class="py-1">Copper Chest</td><td>500 Gold + armory item (Rarity 1)</td></tr>
-                <tr class="border-b border-slate-800"><td class="py-1">Silver Chest</td><td>1000 Gold + armory item (Rarity 2)</td></tr>
-                <tr><td class="py-1">Gold Chest</td><td>1500 Gold + armory item (Rarity 3)</td></tr>
+                <tr class="border-b border-slate-800"><td class="py-1">Copper Chest</td><td>3-5 Minor Healing Potion + 1 armory item (Rarity 2)</td></tr>
+                <tr class="border-b border-slate-800"><td class="py-1">Silver Chest</td><td>3-5 Medium Healing Potion + 1 armory item (Rarity 3 or 4, 50/50)</td></tr>
+                <tr><td class="py-1">Gold Chest</td><td>3-5 Large Healing Potion + 2 armory items (Rarity 3, 4 or 5, equal chance)</td></tr>
             </table>
             <p class="text-[10px] text-slate-500 mt-2">Gold shop: Copper 1000, Silver 4000, Gold 8000 Gold. Diamond shop: Copper 1, Silver 3, Gold 5 Diamond.</p>
         </div>`;
