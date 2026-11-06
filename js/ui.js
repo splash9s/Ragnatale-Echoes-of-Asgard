@@ -2624,7 +2624,7 @@ function setInfoHTML(setKey, activeOnly = false) {
         const on = bn === best;
         const sub = !on && have >= bn.pieces ? ' (replaced)' : '';
         // Active tier is green; tiers not reached (or replaced by a higher tier) are red
-        return `<div class="${on ? 'text-green-400 font-semibold' : 'text-red-400'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
+        return `<div class="${on ? 'font-semibold' : ''}" style="color:${on ? '#4ade80' : '#f87171'};">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
     }).join('');
     return `<div class="p-2 rounded-lg border ${have > 0 ? 'border-amber-500/40' : 'border-slate-800'} bg-slate-950/60 flex flex-col gap-1 text-[10px]">
         <span class="font-bold ${have > 0 ? 'text-amber-300' : 'text-slate-400'}">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
@@ -2674,7 +2674,9 @@ function compareHTML(selected, equipped) {
     const rows = [...keys].map(k => {
         const d = (s[k] || 0) - (e[k] || 0);
         if (!d) return '';
-        return `<div class="font-bold ${d > 0 ? 'text-green-400' : 'text-red-400'}">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
+        // Inline colour so the better/worse colour never depends on the style build: green = better, red = worse
+        const col = d > 0 ? '#4ade80' : '#f87171';
+        return `<div class="font-bold" style="color:${col};">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
     }).join('');
     return `<div class="flex flex-col gap-2">
         <div class="flex gap-2 items-stretch">${gearCardHTML(selected, 'Selected')}${gearCardHTML(equipped, 'Equipped')}</div>
