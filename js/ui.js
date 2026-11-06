@@ -1695,6 +1695,19 @@ function floatNoticeAt(text, ev) {
     setTimeout(() => el.remove(), 1100);
 }
 
+// Small green note at the click position that fades out by itself (used for successful purchases)
+function floatSuccessAt(text, ev) {
+    ev = ev || window.event;
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+    if (ev && (ev.clientX || ev.clientY)) { x = ev.clientX; y = ev.clientY; }
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#86efac; font-weight:700; font-size:12px; text-shadow:0 1px 3px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform .9s ease-out, opacity .9s ease-out;`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-190%)'; el.style.opacity = '0'; }));
+    setTimeout(() => el.remove(), 1000);
+}
+
 function updateTownAlerts() {
     const questOpen = (player.dailyQuests || []).some(q => !q.completed);
     const shopFree = isFreeGoldAvailable() || isFreeDiamondAvailable();
@@ -1847,7 +1860,7 @@ function buyGoldConsumable(itemId) {
 
     player.gold -= item.price;
     logMessage(`[Shop] Purchased ${item.name}!`, 'drop');
-    showModal("Purchase Successful", `You successfully purchased 1x ${item.name}!`);
+    floatSuccessAt(`You successfully purchased 1x ${item.name}!`);
     updateUI();
     saveGame();
 }
@@ -1926,7 +1939,7 @@ function buyArmoryItem(itemIndex) {
     gearItem.debuffs = [];
     addItemToInventory(gearItem);
     logMessage(`[Shop] Purchased ${gearItem.name}!`, 'drop');
-    showModal("Purchase Successful", `You purchased ${gearItem.name}!`);
+    floatSuccessAt(`You purchased ${gearItem.name}!`);
     updateUI();
     saveGame();
 }
@@ -1983,13 +1996,13 @@ function buyDiamondItem(itemId) {
     player.diamondsSpent = (player.diamondsSpent || 0) + item.price; // total diamonds spent in the shop (avatar unlocks)
     if (item.type === 'resurrection') {
         player.resurrectionPotions = (player.resurrectionPotions || 0) + 1;
-        showModal("Purchase Successful", "You bought a Resurrection Potion!");
+        floatSuccessAt("You bought a Resurrection Potion!");
     } else if (item.type === 'material') {
         player.refiningStones = (player.refiningStones || 0) + 5;
-        showModal("Purchase Successful", "You bought 5 Refining Stones!");
+        floatSuccessAt("You bought 5 Refining Stones!");
     } else if (item.type === 'bs_rune') {
         player.blacksmithRuneStones = (player.blacksmithRuneStones || 0) + 1;
-        showModal("Purchase Successful", "You bought a Blacksmith Rune Stone!");
+        floatSuccessAt("You bought a Blacksmith Rune Stone!");
     } else if (item.type === 'service') {
         let totalSpent = (player.stats.str - 1) + (player.stats.agi - 1) + (player.stats.vit - 1) + (player.stats.int - 1) + (player.stats.dex - 1) + (player.stats.luk - 1);
         player.statPoints += totalSpent;
@@ -2005,7 +2018,7 @@ function buyDiamondItem(itemId) {
         showModal("Skill Reset Successful", `All skills reset and ${refunded} Class SP refunded!`);
     } else if (item.type === 'chest') {
         placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
-        showModal("Purchase Successful", `You bought a ${item.name}! Open it from your inventory.`);
+        floatSuccessAt(`You bought a ${item.name}! Open it from your inventory.`);
     } else if (item.type === 'vip') {
         player.vipUntil = Date.now() + item.days * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
@@ -2015,7 +2028,7 @@ function buyDiamondItem(itemId) {
         showModal("Boost Active", `${item.name} started. It lasts 1 hour from now.`);
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
-        showModal("Purchase Successful", `You adopted a ${item.name}!`);
+        floatSuccessAt(`You adopted a ${item.name}!`);
     }
 
     updateUI();
