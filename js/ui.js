@@ -2623,7 +2623,8 @@ function setInfoHTML(setKey, activeOnly = false) {
     const rows = def.bonuses.filter(bn => !activeOnly || bn === best).map(bn => {
         const on = bn === best;
         const sub = !on && have >= bn.pieces ? ' (replaced)' : '';
-        return `<div class="${on ? 'text-emerald-300 font-semibold' : 'text-slate-500'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
+        // Active tier is green; tiers not reached (or replaced by a higher tier) are red
+        return `<div class="${on ? 'text-green-400 font-semibold' : 'text-red-400'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
     }).join('');
     return `<div class="p-2 rounded-lg border ${have > 0 ? 'border-amber-500/40' : 'border-slate-800'} bg-slate-950/60 flex flex-col gap-1 text-[10px]">
         <span class="font-bold ${have > 0 ? 'text-amber-300' : 'text-slate-400'}">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
