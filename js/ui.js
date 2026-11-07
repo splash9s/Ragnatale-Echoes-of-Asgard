@@ -1640,7 +1640,7 @@ function updateShopBalance() {
     const value = document.getElementById('shop-balance-value');
     if (!label || !value) return;
     if (currentShopTab === 'diamond') {
-        label.innerText = '💎 Balance:';
+        label.innerHTML = `<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> Balance:`;
         value.innerText = player.diamonds;
     } else {
         label.innerText = '💰 Cash Balance:';
@@ -1962,7 +1962,7 @@ function renderDiamondShop() {
                         <span class="text-[10px] text-slate-400 block">${item.desc}</span>
                     </div>
                 </div>
-                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">💎 ${item.price}</button>
+                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${item.price}</button>
             </div>
         `;
     });
