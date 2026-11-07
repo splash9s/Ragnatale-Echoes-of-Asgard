@@ -211,9 +211,17 @@ function orderFor(poseKey) {
   return state.order[poseKey];
 }
 
+// Default body parts hidden while something is worn in that slot. Sword layers already show the gripping hand,
+// worn armor replaces the body armor, and a worn helmet replaces the head.
+const SLOT_HIDES = { helmet: ['head'], wear: ['armor'], sword: ['lefthand'] };
+
 // Build the draw list for the current pose from its layer order.
 function drawList(poseKey) {
   const pose = POSES[poseKey];
+  const hidden = new Set();
+  for (const slot of Object.keys(GEAR_SLOTS)) {
+    if (wornPlacement(poseKey, slot)) for (const pid of (SLOT_HIDES[slot] || [])) hidden.add(pid);
+  }
   const list = [];
   for (const id of orderFor(poseKey)) {
     if (GEAR_SLOTS[id]) {                          // an equipment slot: draw what is worn in it
@@ -221,8 +229,7 @@ function drawList(poseKey) {
       if (placed) list.push({ id, ...placed });
       continue;
     }
-    if (id === 'armor' && wornPlacement(poseKey, 'wear')) continue;   // worn armor replaces the body armor
-    if (id === 'lefthand' && wornPlacement(poseKey, 'sword')) continue; // the sword layer already shows the hand
+    if (hidden.has(id)) continue;
     list.push(pose.parts.find(p => p.id === id));
   }
   return list;
