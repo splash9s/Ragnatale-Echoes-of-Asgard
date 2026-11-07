@@ -44,39 +44,37 @@
 </div>
 
 <script>
-// Placements are top-left corners in the 435x444 figure space, which is centred on the 500x500 canvas.
-// Attack: hands by template match against the attack reference, leg from its foot-gear footprint, head and armor centred on their gear.
-// Base: head, armor and leg aligned to the attack parts; hands at the base armor's sleeve ends.
-// Block and critical: leg visible centre and bottom aligned to the other poses; armor centred and bottom-aligned; hands at sleeve ends.
-// Critical head sits under the torso (the raised arm changes the armor's top edge).
-// Gear (sword and shield) comes from the attack lv10 layers and only fits the attack pose.
-const FIGURE_SIZE = { w: 435, h: 444 };
+// Placements are top-left corners in one shared frame. Every pose is centred on the same point (283.5, 239.4),
+// so switching poses does not jump. Each part has an optional scale (sc) where the sample showed a smaller size.
+// Positions come from matching each pose against the no-equipment reference renders (attack, critical, base, block).
+// Gear (sword and shield, attack lv10 layers) is placed by the same hand offsets as the bare-body attack pose.
+const CENTRE = { x: 283.5, y: 239.4 };
 
 const GEAR_ATTACK = {
-  shield: { id: 'shield', name: 'Shield', src: 'gear/ssattackshieldlv10.png', x: 315, y: 155 },
-  sword:  { id: 'sword',  name: 'Sword',  src: 'gear/ssattackswordlv10.png',  x: 40,  y: 164 }
+  shield: { id: 'shield', name: 'Shield', src: 'gear/ssattackshieldlv10.png', x: 415, y: 154, sc: 1 },
+  sword:  { id: 'sword',  name: 'Sword',  src: 'gear/ssattackswordlv10.png',  x: 152, y: 175, sc: 1 }
 };
 
 const POSES = {
   base: {
     label: 'base',
     parts: [
-      { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 96,  y: 229 },
-      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 103, y: 127 },
-      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 196, y: 25  },
-      { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 78,  y: 225 },
-      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 307, y: 219 }
+      { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 208, y: 246, sc: 1 },
+      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 192, y: 153, sc: 0.825 },
+      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 240, y: 36,  sc: 1 },
+      { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 167, y: 240, sc: 1 },
+      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 356, y: 213, sc: 1 }
     ],
     gear: []
   },
   attack: {
     label: 'attack',
     parts: [
-      { id: 'leg',       name: 'Leg',        src: 'attack/dattackleg.png',       x: -1,  y: 185 },
-      { id: 'armor',     name: 'Armor',      src: 'attack/dattackarmor.png',     x: 84,  y: 118 },
-      { id: 'head',      name: 'Head',       src: 'attack/dattackhead.png',      x: 193, y: 21  },
-      { id: 'lefthand',  name: 'Left hand',  src: 'attack/dattacklefthand.png',  x: 57,  y: 176 },
-      { id: 'righthand', name: 'Right hand', src: 'attack/dattackrighthand.png', x: 306, y: 224 }
+      { id: 'leg',       name: 'Leg',        src: 'attack/dattackleg.png',       x: 112, y: 194, sc: 0.975 },
+      { id: 'armor',     name: 'Armor',      src: 'attack/dattackarmor.png',     x: 193, y: 116, sc: 1 },
+      { id: 'head',      name: 'Head',       src: 'attack/dattackhead.png',      x: 316, y: 43,  sc: 1 },
+      { id: 'lefthand',  name: 'Left hand',  src: 'attack/dattacklefthand.png',  x: 165, y: 182, sc: 0.975 },
+      { id: 'righthand', name: 'Right hand', src: 'attack/dattackrighthand.png', x: 406, y: 223, sc: 1 }
     ],
     // Draw order: shield behind armor, sword in front of armor, then the hands
     gear: ['shield', 'sword']
@@ -84,22 +82,22 @@ const POSES = {
   block: {
     label: 'block',
     parts: [
-      { id: 'leg',       name: 'Leg',        src: 'block/dblockleg.png',       x: 61,  y: 270 },
-      { id: 'armor',     name: 'Armor',      src: 'block/dblockarmor.png',     x: 94,  y: 124 },
-      { id: 'head',      name: 'Head',       src: 'block/dblockhead.png',      x: 192, y: 27  },
-      { id: 'lefthand',  name: 'Left hand',  src: 'block/dblocklefthand.png',  x: 69,  y: 198 },
-      { id: 'righthand', name: 'Right hand', src: 'block/dblockrighthand.png', x: 320, y: 216 }
+      { id: 'leg',       name: 'Leg',        src: 'block/dblockleg.png',       x: 164, y: 263, sc: 1 },
+      { id: 'armor',     name: 'Armor',      src: 'block/dblockarmor.png',     x: 164, y: 130, sc: 1 },
+      { id: 'head',      name: 'Head',       src: 'block/dblockhead.png',      x: 258, y: 59,  sc: 1 },
+      { id: 'lefthand',  name: 'Left hand',  src: 'block/dblocklefthand.png',  x: 146, y: 229, sc: 1 },
+      { id: 'righthand', name: 'Right hand', src: 'block/dblockrighthand.png', x: 385, y: 211, sc: 1 }
     ],
     gear: []
   },
   critical: {
     label: 'critical',
     parts: [
-      { id: 'leg',       name: 'Leg',        src: 'critical/dcriticalleg.png',       x: 4,   y: 226 },
-      { id: 'armor',     name: 'Armor',      src: 'critical/dcriticalarmor.png',     x: 12,  y: 30  },
-      { id: 'head',      name: 'Head',       src: 'critical/dcriticalhead.png',      x: 176, y: 28  },
-      { id: 'lefthand',  name: 'Left hand',  src: 'critical/dcriticallefthand.png',  x: 78,  y: 263 },
-      { id: 'righthand', name: 'Right hand', src: 'critical/dcriticalrighthand.png', x: 308, y: 204 }
+      { id: 'leg',       name: 'Leg',        src: 'critical/dcriticalleg.png',       x: 98,  y: 237, sc: 1 },
+      { id: 'armor',     name: 'Armor',      src: 'critical/dcriticalarmor.png',     x: 131, y: 48,  sc: 1 },
+      { id: 'head',      name: 'Head',       src: 'critical/dcriticalhead.png',      x: 287, y: 61,  sc: 1 },
+      { id: 'lefthand',  name: 'Left hand',  src: 'critical/dcriticallefthand.png',  x: 244, y: 38,  sc: 0.8 },
+      { id: 'righthand', name: 'Right hand', src: 'critical/dcriticalrighthand.png', x: 419, y: 212, sc: 1 }
     ],
     gear: []
   }
@@ -153,15 +151,16 @@ async function draw(now) {
   const pose = POSES[state.pose];
   const s = state.scale;
   const bob = state.bob ? Math.sin((now - t0) * 0.0045 * state.speed) * 4 : 0;
-  const ox = (canvas.width - FIGURE_SIZE.w * s) / 2;
-  const oy = (canvas.height - FIGURE_SIZE.h * s) / 2 + bob;
+  const ox = canvas.width / 2 - CENTRE.x * s;
+  const oy = canvas.height / 2 - CENTRE.y * s + bob;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const notes = [];
   for (const item of drawList(pose)) {
     const isGear = !!item.src && item.src.startsWith('gear/');
     if (!isGear && !state.on.has(item.id)) continue;
     const img = await load(item.src);
-    ctx.drawImage(img, ox + item.x * s, oy + item.y * s, img.naturalWidth * s, img.naturalHeight * s);
+    const k = s * (item.sc || 1);
+    ctx.drawImage(img, ox + item.x * s, oy + item.y * s, img.naturalWidth * k, img.naturalHeight * k);
     notes.push(`${item.id}: ${img.naturalWidth}x${img.naturalHeight} at (${item.x}, ${item.y})`);
   }
   logEl.textContent = notes.join('\n');
