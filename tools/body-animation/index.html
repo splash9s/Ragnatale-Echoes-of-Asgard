@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gear Layer Animation Test</title>
+<title>Body Part Animation Test</title>
 <style>
   :root { --bg:#eef2f7; --panel:#ffffff; --ink:#1b2430; --line:#d5dde8; --accent:#2563eb; }
   @media (prefers-color-scheme: dark) {
@@ -20,17 +20,15 @@
   button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
   label { display:flex; gap:6px; align-items:center; }
   .log { font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; opacity:.8; }
-  .note { font-size:12px; opacity:.75; text-align:center; max-width:500px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Gear Layer Animation Test</h1>
+  <h1>Body Part Animation Test</h1>
   <canvas id="c" width="500" height="500"></canvas>
-  <div class="note" id="note"></div>
 
   <div class="panel" id="poses"><div class="title">Pose</div></div>
-  <div class="panel" id="layers"><div class="title">Gear layers (draw order back to front)</div></div>
+  <div class="panel" id="parts"><div class="title">Body parts (draw order back to front)</div></div>
   <div class="panel">
     <div class="title">Playback</div>
     <label><input type="checkbox" id="bob" checked> Idle bob</label>
@@ -38,54 +36,43 @@
     <label>Scale <input type="range" id="scale" min="0.6" max="1.6" step="0.05" value="1"></label>
     <button id="restart">Restart</button>
   </div>
-  <div class="panel">
-    <div class="title">Compare with your sample</div>
-    <label><input type="checkbox" id="ref"> Overlay sample</label>
-    <label>Opacity <input type="range" id="refAlpha" min="0" max="1" step="0.05" value="0.5"></label>
-  </div>
   <div class="log" id="log"></div>
 </div>
 
 <script>
-// Layer placement: the six attack layers were measured against the reference composite at 1:1 scale.
-// Each position is the layer's top-left corner inside the 435x444 composite. The composite is centred on the 500x500 canvas.
-const COMPOSITE_OFFSET = { x: 32, y: 28 };
+// Part placement, as the top-left corner inside the 435x444 figure space. The figure is centred on the 500x500 canvas.
+// Attack placements come from matching the parts against the attack reference (hands by template match, leg from its foot-gear footprint,
+// head and armor centred on their gear). Base placements: head, armor and leg are aligned to the attack parts, and the hands sit at the
+// sleeve ends of the base armor (the base hands were not matched to the reference, since the base pose has no reference image).
+const FIGURE_SIZE = { w: 435, h: 444 };
 
 const POSES = {
+  base: {
+    label: 'base',
+    parts: [
+      { id: 'leg',       name: 'Leg',         src: 'base/dbaseleg.png',      x: 96,  y: 229 },
+      { id: 'armor',     name: 'Armor',       src: 'base/dbasearmor.png',    x: 103, y: 127 },
+      { id: 'head',      name: 'Head',        src: 'base/dbasehead.png',     x: 196, y: 25  },
+      { id: 'lefthand',  name: 'Left hand',   src: 'base/dbaselefthand.png', x: 78,  y: 225 },
+      { id: 'righthand', name: 'Right hand',  src: 'base/dbaserighthand.png',x: 307, y: 219 }
+    ]
+  },
   attack: {
     label: 'attack',
-    layers: [
-      { id: 'manteau', name: 'Manteau (cape)', src: 'attack/ssattackmanteaulv10.png', x: 80,  y: 112 },
-      { id: 'leg',     name: 'Leg (boots)',    src: 'attack/ssattackfootlv10.png',    x: 66,  y: 243 },
-      { id: 'shield',  name: 'Shield',         src: 'attack/ssattackshieldlv10.png',  x: 315, y: 155 },
-      { id: 'armor',   name: 'Armor',          src: 'attack/ssattackarmorlv10.png',   x: 83,  y: 113 },
-      { id: 'weapon',  name: 'Weapon (sword)', src: 'attack/ssattackswordlv10.png',   x: 40,  y: 164 },
-      { id: 'head',    name: 'Head (helmet)',  src: 'attack/hatssattacklv10.png',     x: 198, y: 23  }
-    ],
-    body: null
-  },
-  shield: {
-    label: 'shield',
-    layers: [],
-    body: 'body/ssblock.png',
-    note: 'Shield (block) pose: body only. The shield gear layers for this pose are not in the folder yet.'
-  },
-  critical: {
-    label: 'critical',
-    layers: [],
-    body: 'body/sscritical.png',
-    note: 'Critical pose: body only. The critical gear layers for this pose are not in the folder yet.'
+    parts: [
+      { id: 'leg',       name: 'Leg',         src: 'attack/dattackleg.png',       x: -1,  y: 185 },
+      { id: 'armor',     name: 'Armor',       src: 'attack/dattackarmor.png',     x: 84,  y: 118 },
+      { id: 'head',      name: 'Head',        src: 'attack/dattackhead.png',      x: 193, y: 21  },
+      { id: 'lefthand',  name: 'Left hand',   src: 'attack/dattacklefthand.png',  x: 57,  y: 176 },
+      { id: 'righthand', name: 'Right hand',  src: 'attack/dattackrighthand.png', x: 306, y: 224 }
+    ]
   }
 };
 
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 const logEl = document.getElementById('log');
-const noteEl = document.getElementById('note');
-const refImg = new Image();
-refImg.src = 'reference.png';
-
-const state = { pose: 'attack', on: new Set(POSES.attack.layers.map(l => l.id)), bob: true, speed: 1, scale: 1, ref: false, refAlpha: 0.5 };
+const state = { pose: 'attack', on: new Set(POSES.attack.parts.map(p => p.id)), bob: true, speed: 1, scale: 1 };
 const cache = {};
 let t0 = performance.now();
 
@@ -101,38 +88,24 @@ function load(src) {
   return cache[src];
 }
 
+let rendering = false;
 async function draw(now) {
   const pose = POSES[state.pose];
   const s = state.scale;
   const bob = state.bob ? Math.sin((now - t0) * 0.0045 * state.speed) * 4 : 0;
+  const ox = (canvas.width - FIGURE_SIZE.w * s) / 2;
+  const oy = (canvas.height - FIGURE_SIZE.h * s) / 2 + bob;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   const notes = [];
-  if (pose.body) {
-    const b = await load(pose.body);
-    const w = b.naturalWidth * s, h = b.naturalHeight * s;
-    ctx.drawImage(b, (canvas.width - w) / 2, (canvas.height - h) / 2 + bob, w, h);
-    notes.push(`body ${b.naturalWidth}x${b.naturalHeight}`);
-  }
-
-  const ox = (canvas.width - 435 * s) / 2 + 0;
-  const oy = (canvas.height - 444 * s) / 2 + bob;
-  for (const layer of pose.layers) {
-    if (!state.on.has(layer.id)) continue;
-    const img = await load(layer.src);
-    ctx.drawImage(img, ox + layer.x * s, oy + layer.y * s, img.naturalWidth * s, img.naturalHeight * s);
-    notes.push(`${layer.id}: ${img.naturalWidth}x${img.naturalHeight} at (${layer.x}, ${layer.y})`);
-  }
-
-  if (state.ref && refImg.complete && refImg.naturalWidth) {
-    ctx.globalAlpha = state.refAlpha;
-    ctx.drawImage(refImg, (canvas.width - refImg.naturalWidth * s) / 2, (canvas.height - refImg.naturalHeight * s) / 2 + bob, refImg.naturalWidth * s, refImg.naturalHeight * s);
-    ctx.globalAlpha = 1;
+  for (const part of pose.parts) {
+    if (!state.on.has(part.id)) continue;
+    const img = await load(part.src);
+    ctx.drawImage(img, ox + part.x * s, oy + part.y * s, img.naturalWidth * s, img.naturalHeight * s);
+    notes.push(`${part.id}: ${img.naturalWidth}x${img.naturalHeight} at (${part.x}, ${part.y})`);
   }
   logEl.textContent = notes.join('\n');
 }
 
-let rendering = false;
 function loop(now) {
   if (!rendering) {
     rendering = true;
@@ -150,41 +123,34 @@ function buildControls() {
     b.onclick = () => selectPose(key);
     poseBox.appendChild(b);
   }
-  const layerBox = document.getElementById('layers');
-  for (const layer of POSES.attack.layers) {
+  const partBox = document.getElementById('parts');
+  for (const part of POSES.attack.parts) {
     const b = document.createElement('button');
-    b.textContent = layer.name;
-    b.dataset.layer = layer.id;
+    b.textContent = part.name;
+    b.dataset.part = part.id;
     b.onclick = () => {
-      if (state.on.has(layer.id)) state.on.delete(layer.id); else state.on.add(layer.id);
+      if (state.on.has(part.id)) state.on.delete(part.id); else state.on.add(part.id);
       sync();
     };
-    layerBox.appendChild(b);
+    partBox.appendChild(b);
   }
   document.getElementById('bob').onchange = e => state.bob = e.target.checked;
   document.getElementById('speed').oninput = e => state.speed = +e.target.value;
   document.getElementById('scale').oninput = e => state.scale = +e.target.value;
-  document.getElementById('ref').onchange = e => state.ref = e.target.checked;
-  document.getElementById('refAlpha').oninput = e => state.refAlpha = +e.target.value;
   document.getElementById('restart').onclick = () => { t0 = performance.now(); };
   sync();
 }
 
 function selectPose(key) {
   state.pose = key;
-  if (key === 'attack') state.on = new Set(POSES.attack.layers.map(l => l.id));
+  state.on = new Set(POSES[key].parts.map(p => p.id));
   t0 = performance.now();
   sync();
 }
 
 function sync() {
-  const pose = POSES[state.pose];
   document.querySelectorAll('[data-pose]').forEach(b => b.classList.toggle('on', b.dataset.pose === state.pose));
-  document.querySelectorAll('[data-layer]').forEach(b => {
-    b.classList.toggle('on', state.on.has(b.dataset.layer));
-    b.disabled = pose.layers.length === 0;
-  });
-  noteEl.textContent = pose.note || '';
+  document.querySelectorAll('[data-part]').forEach(b => b.classList.toggle('on', state.on.has(b.dataset.part)));
 }
 
 buildControls();
