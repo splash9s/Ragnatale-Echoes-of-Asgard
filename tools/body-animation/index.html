@@ -19,6 +19,8 @@
   button { font:inherit; padding:6px 10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:6px; cursor:pointer; }
   button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
   button:disabled { opacity:.4; cursor:not-allowed; }
+  select { font:inherit; padding:5px 8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:6px; }
+  select:disabled { opacity:.4; }
   label { display:flex; gap:6px; align-items:center; }
   .log { font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; opacity:.8; }
   .note { font-size:12px; opacity:.75; text-align:center; max-width:500px; min-height:1em; }
@@ -32,7 +34,7 @@
 
   <div class="panel" id="poses"><div class="title">Pose</div></div>
   <div class="panel" id="parts"><div class="title">Body parts</div></div>
-  <div class="panel" id="gear"><div class="title">Equipment</div></div>
+  <div class="panel" id="gear"><div class="title">Equipment (choose one per slot, None = not worn)</div></div>
   <div class="panel" id="pos"><div class="title">Layers: drawn in this order (1 = bottom, last = top), with X, Y of top-left corner</div></div>
   <div class="panel">
     <div class="title">Playback</div>
@@ -52,33 +54,36 @@
 <script>
 // Placements are top-left corners in one shared frame. Every pose is centred on the same point (283.5, 239.4),
 // so switching poses does not jump. Each part has an optional scale (sc) where the sample showed a smaller size.
-// Positions come from matching each pose against the no-equipment reference renders (attack, critical, base, block).
-// Gear (sword and shield, attack lv10 layers) is placed by the same hand offsets as the bare-body attack pose.
 const CENTRE = { x: 283.5, y: 239.4 };
 
-// Equipment per pose. Sword layers already contain the gripping hand, so the bare left hand is hidden while the sword is on.
-// Shield layers have no hand: each shield's grip sits at the right hand's top-left corner (offset set from the attack pose).
-const GEAR_NAMES = { shield: 'Shield', sword: 'Sword', wear: 'Wear' };
+// Equipment slots. The dropdown for each slot lists every option that appears under it in GEAR.
+// Sword layers already contain the gripping hand, so the bare left hand is hidden while a sword is worn.
+const GEAR_SLOTS = { shield: 'Shield', sword: 'Sword', wear: 'Wear' };
+
+// GEAR[pose][slot][option] = placement of that option's sprite in that pose.
+// To add gear: add an option key (for example "lv20") under each slot and each pose you have art for.
+// It appears in the dropdown automatically. A pose without that option simply draws nothing for the slot.
+// "wear" replaces the body armor while it is equipped.
 const GEAR = {
   attack: {
-    shield: { src: 'gear/attack/ssattackshield.png', x: 415, y: 154, sc: 1 },
-    sword:  { src: 'gear/attack/ssattackswordlv10.png', x: 146, y: 170, sc: 1 },
-    wear:   { src: 'gear/wear/ssattackarmorlv10.png', x: 192, y: 112, sc: 1 }
+    shield: { lv10: { src: 'gear/attack/ssattackshield.png',     x: 415, y: 154, sc: 1 } },
+    sword:  { lv10: { src: 'gear/attack/ssattackswordlv10.png',  x: 146, y: 170, sc: 1 } },
+    wear:   { lv10: { src: 'gear/wear/ssattackarmorlv10.png',    x: 192, y: 112, sc: 1 } }
   },
   base: {
-    shield: { src: 'gear/shield/ssshield.png', x: 321, y: 139, sc: 1 },
-    sword:  { src: 'gear/base/ssbasesword.png', x: 46, y: 224, sc: 1 },
-    wear:   { src: 'gear/wear/ssbasearmorlv10.png', x: 172, y: 129, sc: 1 }
+    shield: { lv10: { src: 'gear/shield/ssshield.png',           x: 321, y: 139, sc: 1 } },
+    sword:  { lv10: { src: 'gear/base/ssbasesword.png',           x: 46,  y: 224, sc: 1 } },
+    wear:   { lv10: { src: 'gear/wear/ssbasearmorlv10.png',       x: 172, y: 129, sc: 1 } }
   },
   block: {
-    shield: { src: 'gear/shield/ssshield.png', x: 363, y: 138, sc: 1 },
-    sword:  { src: 'gear/block/ssblocksword.png', x: 127, y: 224, sc: 1 },
-    wear:   { src: 'gear/wear/ssblockarmorlv10.png', x: 165, y: 127, sc: 1 }
+    shield: { lv10: { src: 'gear/shield/ssshield.png',           x: 363, y: 138, sc: 1 } },
+    sword:  { lv10: { src: 'gear/block/ssblocksword.png',         x: 127, y: 224, sc: 1 } },
+    wear:   { lv10: { src: 'gear/wear/ssblockarmorlv10.png',      x: 165, y: 127, sc: 1 } }
   },
   critical: {
-    shield: { src: 'gear/shield/ssshield.png', x: 390, y: 139, sc: 1 },
-    sword:  { src: 'gear/critical/sscriticalsword.png', x: 60, y: 34, sc: 1 },
-    wear:   { src: 'gear/wear/sscriticalarmorlv10.png', x: 191, y: 72, sc: 1 }
+    shield: { lv10: { src: 'gear/shield/ssshield.png',           x: 390, y: 139, sc: 1 } },
+    sword:  { lv10: { src: 'gear/critical/sscriticalsword.png',   x: 60,  y: 34,  sc: 1 } },
+    wear:   { lv10: { src: 'gear/wear/sscriticalarmorlv10.png',   x: 191, y: 72,  sc: 1 } }
   }
 };
 
@@ -91,8 +96,7 @@ const POSES = {
       { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 226, y: 54,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 168, y: 241, sc: 0.95 },
       { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 334, y: 209, sc: 1.05 }
-    ],
-    gear: ['shield', 'sword', 'wear']
+    ]
   },
   attack: {
     label: 'attack',
@@ -102,8 +106,7 @@ const POSES = {
       { id: 'head',      name: 'Head',       src: 'attack/dattackhead.png',      x: 315, y: 44,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'attack/dattacklefthand.png',  x: 156, y: 182, sc: 0.975 },
       { id: 'righthand', name: 'Right hand', src: 'attack/dattackrighthand.png', x: 406, y: 223, sc: 1 }
-    ],
-    gear: ['shield', 'sword', 'wear']
+    ]
   },
   block: {
     label: 'block',
@@ -113,8 +116,7 @@ const POSES = {
       { id: 'head',      name: 'Head',       src: 'block/dblockhead.png',      x: 258, y: 59,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'block/dblocklefthand.png',  x: 146, y: 229, sc: 1 },
       { id: 'righthand', name: 'Right hand', src: 'block/dblockrighthand.png', x: 385, y: 211, sc: 1 }
-    ],
-    gear: ['shield', 'sword', 'wear']
+    ]
   },
   critical: {
     label: 'critical',
@@ -124,9 +126,16 @@ const POSES = {
       { id: 'head',      name: 'Head',       src: 'critical/dcriticalhead.png',      x: 287, y: 61,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'critical/dcriticallefthand.png',  x: 244, y: 38,  sc: 0.8 },
       { id: 'righthand', name: 'Right hand', src: 'critical/dcriticalrighthand.png', x: 419, y: 212, sc: 1 }
-    ],
-    gear: ['shield', 'sword', 'wear']
+    ]
   }
+};
+
+// Default layer order per pose, bottom to top (the last id is the top layer). Edited in the panel.
+const LAYER_ORDER = {
+  base:     ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
+  attack:   ['shield', 'leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand'],
+  block:    ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
+  critical: ['leg', 'armor', 'wear', 'sword', 'head', 'lefthand', 'righthand', 'shield']
 };
 
 const canvas = document.getElementById('c');
@@ -136,7 +145,8 @@ const noteEl = document.getElementById('note');
 const state = {
   pose: 'attack',
   on: new Set(POSES.attack.parts.map(p => p.id)),
-  gearOn: new Set(['shield', 'sword']),
+  // The worn option for each slot, or null for none.
+  equip: { shield: 'lv10', sword: 'lv10', wear: null },
   bob: true, speed: 1, scale: 1,
   order: {}
 };
@@ -155,14 +165,19 @@ function load(src) {
   return cache[src];
 }
 
-// Default layer order per pose, bottom to top (the last id is the top layer). Edited in the panel.
-// "wear" replaces the body armor while it is on, so it sits in the armor's slot.
-const LAYER_ORDER = {
-  base:     ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
-  attack:   ['shield', 'leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand'],
-  block:    ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
-  critical: ['leg', 'armor', 'wear', 'sword', 'head', 'lefthand', 'righthand', 'shield']
-};
+// Every option name that appears under a slot, across all poses.
+function optionsFor(slot) {
+  const names = new Set();
+  for (const key of Object.keys(GEAR)) for (const o of Object.keys(GEAR[key][slot] || {})) names.add(o);
+  return [...names];
+}
+
+// The placement object for a slot in a pose, or null when nothing is worn or the pose has no art for it.
+function wornPlacement(poseKey, slot) {
+  const opt = state.equip[slot];
+  if (!opt) return null;
+  return (GEAR[poseKey][slot] || {})[opt] || null;
+}
 
 function defaultOrder(poseKey) {
   return LAYER_ORDER[poseKey].slice();
@@ -176,25 +191,24 @@ function orderFor(poseKey) {
 // Build the draw list for the current pose from its layer order.
 function drawList(poseKey) {
   const pose = POSES[poseKey];
-  const g = GEAR[poseKey];
-  const swordOn = state.gearOn.has('sword') && pose.gear.includes('sword');
-  const shieldOn = state.gearOn.has('shield') && pose.gear.includes('shield');
-  const wearOn = state.gearOn.has('wear') && pose.gear.includes('wear');
+  const wornWear = wornPlacement(poseKey, 'wear');
+  const wornSword = wornPlacement(poseKey, 'sword');
   const list = [];
   for (const id of orderFor(poseKey)) {
-    if (id === 'sword') { if (swordOn) list.push({ id: 'sword', ...g.sword }); continue; }
-    if (id === 'shield') { if (shieldOn) list.push({ id: 'shield', ...g.shield }); continue; }
-    if (id === 'wear') { if (wearOn) list.push({ id: 'wear', ...g.wear }); continue; }
-    if (id === 'armor' && wearOn) continue;        // the wear layer replaces the body armor
-    if (id === 'lefthand' && swordOn) continue;    // the sword layer already shows the hand
-    list.push(POSES[poseKey].parts.find(p => p.id === id));
+    if (id === 'sword' || id === 'shield' || id === 'wear') {
+      const placed = wornPlacement(poseKey, id);
+      if (placed) list.push({ id, ...placed });
+      continue;
+    }
+    if (id === 'armor' && wornWear) continue;     // the worn wear layer replaces the body armor
+    if (id === 'lefthand' && wornSword) continue; // the sword layer already shows the hand
+    list.push(pose.parts.find(p => p.id === id));
   }
   return list;
 }
 
 let rendering = false;
 async function draw(now) {
-  const pose = POSES[state.pose];
   const s = state.scale;
   const bob = state.bob ? Math.sin((now - t0) * 0.0045 * state.speed) * 4 : 0;
   const ox = canvas.width / 2 - CENTRE.x * s;
@@ -242,16 +256,30 @@ function buildControls() {
     partBox.appendChild(b);
   }
 
+  // One dropdown per equipment slot: None, then every option defined for it.
   const gearBox = document.getElementById('gear');
-  for (const key of Object.keys(GEAR_NAMES)) {
-    const b = document.createElement('button');
-    b.textContent = GEAR_NAMES[key] + ': on';
-    b.dataset.gear = key;
-    b.onclick = () => {
-      if (state.gearOn.has(key)) state.gearOn.delete(key); else state.gearOn.add(key);
+  for (const slot of Object.keys(GEAR_SLOTS)) {
+    const lab = document.createElement('label');
+    lab.textContent = GEAR_SLOTS[slot] + ' ';
+    const sel = document.createElement('select');
+    sel.dataset.slot = slot;
+    const none = document.createElement('option');
+    none.value = '';
+    none.textContent = 'None';
+    sel.appendChild(none);
+    for (const opt of optionsFor(slot)) {
+      const o = document.createElement('option');
+      o.value = opt;
+      o.textContent = opt;
+      sel.appendChild(o);
+    }
+    sel.onchange = () => {
+      state.equip[slot] = sel.value || null;
+      buildPosRows();
       sync();
     };
-    gearBox.appendChild(b);
+    lab.appendChild(sel);
+    gearBox.appendChild(lab);
   }
 
   document.getElementById('bob').onchange = e => state.bob = e.target.checked;
@@ -268,11 +296,11 @@ function buildControls() {
 }
 
 // One row per layer of the current pose, in draw order. X/Y edits write into POSES / GEAR; the up/down
-// buttons change the layer order in state.order. Both take effect on the next frame.
+// buttons change the layer order in state.order. Gear rows are inactive while that slot is set to None.
 function layerItem(poseKey, id) {
-  if (id === 'sword') return { label: 'Sword', obj: GEAR[poseKey].sword };
-  if (id === 'shield') return { label: 'Shield', obj: GEAR[poseKey].shield };
-  if (id === 'wear') return { label: 'Wear', obj: GEAR[poseKey].wear };
+  if (id === 'sword' || id === 'shield' || id === 'wear') {
+    return { label: GEAR_SLOTS[id], obj: wornPlacement(poseKey, id), gear: true };
+  }
   const part = POSES[poseKey].parts.find(p => p.id === id);
   return { label: part.name, obj: part };
 }
@@ -288,8 +316,8 @@ function buildPosRows() {
     row.style.cssText = 'display:flex;gap:8px;align-items:center;width:100%';
 
     const name = document.createElement('span');
-    name.textContent = (i + 1) + '. ' + it.label;
-    name.style.cssText = 'width:120px';
+    name.textContent = (i + 1) + '. ' + it.label + (it.gear && !it.obj ? ' (not worn)' : '');
+    name.style.cssText = 'width:150px';
     row.appendChild(name);
 
     for (const dir of [-1, 1]) {
@@ -311,9 +339,13 @@ function buildPosRows() {
       const inp = document.createElement('input');
       inp.type = 'number';
       inp.step = '1';
-      inp.value = it.obj[axis];
       inp.style.width = '80px';
-      inp.oninput = () => { if (inp.value !== '') it.obj[axis] = Math.round(+inp.value); };
+      if (it.obj) {
+        inp.value = it.obj[axis];
+        inp.oninput = () => { if (inp.value !== '') it.obj[axis] = Math.round(+inp.value); };
+      } else {
+        inp.disabled = true;
+      }
       lab.appendChild(inp);
       row.appendChild(lab);
     }
@@ -327,13 +359,16 @@ function buildPosRows() {
   box.appendChild(reset);
 }
 
-// Plain text of every pose's part and gear positions, ready to paste back.
+// Plain text of every pose's part and gear positions, the layer order, and what is currently worn.
 function exportPositions() {
-  const out = {};
+  const out = { worn: { ...state.equip } };
   for (const key of Object.keys(POSES)) {
     out[key] = { order: orderFor(key), parts: {}, gear: {} };
     for (const p of POSES[key].parts) out[key].parts[p.id] = { x: p.x, y: p.y };
-    for (const k of POSES[key].gear) out[key].gear[k] = { x: GEAR[key][k].x, y: GEAR[key][k].y };
+    for (const slot of Object.keys(GEAR_SLOTS)) {
+      out[key].gear[slot] = {};
+      for (const [opt, pl] of Object.entries(GEAR[key][slot] || {})) out[key].gear[slot][opt] = { x: pl.x, y: pl.y };
+    }
   }
   return JSON.stringify(out, null, 2);
 }
@@ -350,15 +385,15 @@ function sync() {
   const pose = POSES[state.pose];
   document.querySelectorAll('[data-pose]').forEach(b => b.classList.toggle('on', b.dataset.pose === state.pose));
   document.querySelectorAll('[data-part]').forEach(b => b.classList.toggle('on', state.on.has(b.dataset.part)));
-  document.querySelectorAll('[data-gear]').forEach(b => {
-    const key = b.dataset.gear;
-    const has = pose.gear.includes(key);
-    const on = has && state.gearOn.has(key);
-    b.disabled = !has;
-    b.classList.toggle('on', on);
-    b.textContent = GEAR_NAMES[key] + ': ' + (on ? 'on' : 'off');
+  document.querySelectorAll('[data-slot]').forEach(sel => {
+    const slot = sel.dataset.slot;
+    sel.value = state.equip[slot] || '';
+    sel.disabled = !Object.keys(GEAR[state.pose]).includes(slot);
   });
-  noteEl.textContent = '';
+  const missing = Object.keys(GEAR_SLOTS)
+    .filter(slot => state.equip[slot] && !wornPlacement(state.pose, slot))
+    .map(slot => `${GEAR_SLOTS[slot]} "${state.equip[slot]}" has no art for ${pose.label}`);
+  noteEl.textContent = missing.join('. ');
 }
 
 buildControls();
