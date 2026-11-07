@@ -1703,6 +1703,7 @@ function toggleVipAutoRune() {
     if (!isVipActive()) return;
     player.vipAutoRune = !player.vipAutoRune;
     updatePauseButton();
+    showCombatText('#combat-auto-rune-btn', player.vipAutoRune ? 'Auto Rune ON' : 'Auto Rune OFF', player.vipAutoRune ? 'heal' : 'resoff');
     saveGame();
 }
 
@@ -1710,6 +1711,7 @@ function toggleCombatPause() {
     if (!isVipActive()) return;
     combatPaused = !combatPaused;
     updatePauseButton();
+    showCombatText('#combat-pause-btn', combatPaused ? 'Paused' : 'Resumed', combatPaused ? 'resoff' : 'heal');
     logMessage(combatPaused ? '[System] Combat paused' : '[System] Combat resumed', 'winlose');
 }
 
