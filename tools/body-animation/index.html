@@ -11,7 +11,7 @@
   }
   :root[data-theme="dark"] { --bg:#0f1622; --panel:#17212f; --ink:#e6edf6; --line:#2a3a50; --accent:#60a5fa; }
   body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, sans-serif; }
-  .wrap { max-width:1140px; margin:0 auto; padding:16px; display:grid; grid-template-columns:minmax(0,500px) minmax(0,1fr); gap:16px; align-items:start; }
+  .wrap { max-width:none; margin:0; padding:16px; display:grid; grid-template-columns:minmax(0,500px) minmax(0,1fr); gap:16px; align-items:start; box-sizing:border-box; }
   .wrap h1 { grid-column:1 / -1; font-size:18px; margin:4px 0; }
   .left { display:flex; flex-direction:column; gap:12px; align-items:center; position:sticky; top:16px; }
   .right { display:flex; flex-direction:column; gap:12px; min-width:0; }
@@ -366,17 +366,21 @@ function buildPosRows() {
 
     for (const axis of ['x', 'y']) {
       const lab = document.createElement('label');
-      lab.textContent = axis.toUpperCase() + ' ';
+      lab.style.cssText = 'display:flex;width:100%;gap:8px;align-items:center';
+      const tag = document.createElement('span');
+      tag.textContent = axis.toUpperCase();
+      tag.style.cssText = 'width:20px';
+      lab.appendChild(tag);
       const inp = document.createElement('input');
       inp.type = 'number';
       inp.step = '1';
-      inp.style.width = '70px';
+      inp.style.width = '80px';
       const bar = document.createElement('input');
       bar.type = 'range';
       bar.min = String(BAR_MIN);
       bar.max = String(BAR_MAX);
       bar.step = '1';
-      bar.style.width = '110px';
+      bar.style.cssText = 'flex:1;width:auto;min-width:0';
       if (it.obj) {
         const clamp = v => Math.max(BAR_MIN, Math.min(BAR_MAX, v));
         inp.value = it.obj[axis];
