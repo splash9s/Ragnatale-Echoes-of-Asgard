@@ -982,7 +982,8 @@ function playPlayerReactAnim(kind) {
 }
 // Monster colour by element (CSS filter on the shared slime sprite only). Bosses, mini-bosses and monsters with their own art keep their look.
 function monsterTintClass(m) {
-    if (m.isBoss || m.isMiniBoss) return '';
+    if (m.isMiniBoss) return 'tint-gold'; // mini bosses turn gold (CSS filter)
+    if (m.isBoss) return '';
     if (monsterSpriteOf(m)) return ''; // monsters with their own art keep their colours; only the slime art is tinted
     return ({ fire: 'tint-fire', water: 'tint-water', wind: 'tint-wind' })[m.element] || '';
 }
