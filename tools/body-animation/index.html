@@ -65,15 +65,15 @@ const GEAR = {
     sword:  { src: 'gear/attack/ssattackswordlv10.png', x: 152, y: 175, sc: 1 }
   },
   base: {
-    shield: { src: 'gear/shield/ssshield.png', x: 365, y: 139, sc: 1 },
-    sword:  { src: 'gear/base/ssbasesword.png', x: 32, y: 239, sc: 1 }
+    shield: { src: 'gear/shield/ssshield.png', x: 321, y: 139, sc: 1 },
+    sword:  { src: 'gear/base/ssbasesword.png', x: 46, y: 224, sc: 1 }
   },
   block: {
-    shield: { src: 'gear/shield/ssshield.png', x: 395, y: 138, sc: 1 },
+    shield: { src: 'gear/shield/ssshield.png', x: 363, y: 138, sc: 1 },
     sword:  { src: 'gear/block/ssblocksword.png', x: 127, y: 224, sc: 1 }
   },
   critical: {
-    shield: { src: 'gear/shield/ssshield.png', x: 429, y: 139, sc: 1 },
+    shield: { src: 'gear/shield/ssshield.png', x: 409, y: 139, sc: 1 },
     sword:  { src: 'gear/critical/sscriticalsword.png', x: 60, y: 34, sc: 1 }
   }
 };
@@ -82,11 +82,11 @@ const POSES = {
   base: {
     label: 'base',
     parts: [
-      { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 208, y: 246, sc: 1 },
+      { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 196, y: 246, sc: 1 },
       { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 197, y: 133, sc: 0.8 },
-      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 239, y: 37,  sc: 1 },
+      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 225, y: 46,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 168, y: 241, sc: 0.95 },
-      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 355, y: 212, sc: 1.05 }
+      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 334, y: 209, sc: 1.05 }
     ],
     gear: ['shield', 'sword']
   },
@@ -151,16 +151,16 @@ function load(src) {
   return cache[src];
 }
 
-// Layer order per pose: the ids listed first are drawn first (bottom), the last id is the top layer.
+// Default layer order per pose, bottom to top (the last id is the top layer). Edited in the panel.
+const LAYER_ORDER = {
+  base:     ['leg', 'armor', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
+  attack:   ['shield', 'leg', 'armor', 'head', 'sword', 'lefthand', 'righthand'],
+  block:    ['leg', 'armor', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
+  critical: ['leg', 'armor', 'head', 'sword', 'lefthand', 'righthand', 'shield']
+};
+
 function defaultOrder(poseKey) {
-  const pose = POSES[poseKey];
-  const ids = [];
-  for (const p of pose.parts) {
-    ids.push(p.id);
-    if (p.id === 'head' && pose.gear.includes('sword')) ids.push('sword');
-  }
-  if (pose.gear.includes('shield')) ids.push('shield');
-  return ids;
+  return LAYER_ORDER[poseKey].slice();
 }
 
 function orderFor(poseKey) {
