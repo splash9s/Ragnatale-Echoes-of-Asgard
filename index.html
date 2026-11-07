@@ -380,6 +380,7 @@
         .combat-dmg.miss { color: #ffffff; font-size: 26px; letter-spacing: 1px; }
         .combat-dmg.stun { color: #facc15; font-size: 26px; letter-spacing: 1px; }
         .combat-dmg.heal { color: #4ade80; }
+        .combat-dmg.resoff { color: #f87171; }
         @keyframes combatDmgUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -70px; } }
         .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
         /* Rune pick card: fixed proportions; text scales with the card (container units), so it stays adaptive on phones */
@@ -406,6 +407,12 @@
         .rune-acq-card:hover { transform: none; filter: none; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot_q85.webp'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress_q85.webp'); }
+        /* VIP pause and auto rune buttons: sign graphics, press graphic while pressed or switched on */
+        #combat-pause-btn { background-image: url('assets/combat/pause_sign.png'); }
+        #combat-pause-btn:active, #combat-pause-btn.paused { background-image: url('assets/combat/pause_sign_press.png'); }
+        #combat-auto-rune-btn { background-image: url('assets/combat/auto_sign.png'); }
+        #combat-auto-rune-btn:active, #combat-auto-rune-btn.on { background-image: url('assets/combat/auto_sign_press.png'); }
+        #combat-pause-btn.hidden, #combat-auto-rune-btn.hidden { display: none !important; }
         /* Resurrection label: green "Resurrection ON" when auto-revive is on, red "Resurrection OFF" when off */
         #combat-elixir-btn > span:first-child { color: #4ade80; font-weight: 900; text-shadow: 0 1px 2px #000, 0 0 4px #000; }
         #view-combat #combat-elixir-btn > span:first-child { font-size: 18px; }
@@ -1118,8 +1125,8 @@
                     </button>
 
                     <!-- Pause (bottom right); Next Stage takes its place once the stage is cleared -->
-                    <button id="combat-pause-btn" onclick="toggleCombatPause()" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer">Pause</button>
-                    <button id="combat-auto-rune-btn" onclick="toggleVipAutoRune()" title="VIP: auto-pick a random rune" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition cursor-pointer" style="position:absolute; left:1541px; top:694px; width:175px; height:178px;"></button>
+                    <button id="combat-pause-btn" onclick="toggleCombatPause()" title="Pause" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="hidden combat-slot-btn"></button>
+                    <button id="combat-auto-rune-btn" onclick="toggleVipAutoRune()" title="VIP: auto-pick a random rune" class="hidden combat-slot-btn" style="position:absolute; left:1351px; top:890px; width:175px; height:178px;"></button>
                     <button id="next-stage-btn" onclick="proceedToNextStage()" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="hidden bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-sm transition cursor-pointer shadow">Next Stage</button>
 
                     <!-- Return (top right) -->

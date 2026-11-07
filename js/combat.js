@@ -455,6 +455,9 @@ function toggleResurrectionUse() {
     }
     player.resurrectionOn = player.resurrectionOn === false;
     updateUI();
+    // Floating toast on the button: green "Resurrection ON" or red "Resurrection OFF"
+    const on = player.resurrectionOn !== false;
+    showCombatText('#combat-elixir-btn', on ? 'Resurrection ON' : 'Resurrection OFF', on ? 'heal' : 'resoff');
 }
 
 // ---------- FINAL MAP (Lv 110) ----------
@@ -1714,15 +1717,13 @@ function updatePauseButton() {
     const btn = document.getElementById('combat-pause-btn');
     if (!btn) return;
     btn.classList.toggle('hidden', !isVipActive());
-    btn.innerText = combatPaused ? 'Resume' : 'Pause';
-    btn.classList.toggle('bg-amber-600', combatPaused);
-    btn.classList.toggle('text-slate-950', combatPaused);
+    btn.title = combatPaused ? 'Resume' : 'Pause';
+    btn.classList.toggle('paused', combatPaused); // press graphic while paused
     const ar = document.getElementById('combat-auto-rune-btn');
     if (ar) {
         ar.classList.toggle('hidden', !isVipActive());
-        ar.innerText = player.vipAutoRune ? 'Auto Rune: On' : 'Auto Rune: Off';
-        ar.classList.toggle('bg-amber-600', !!player.vipAutoRune);
-        ar.classList.toggle('text-slate-950', !!player.vipAutoRune);
+        ar.title = 'Auto Rune: ' + (player.vipAutoRune ? 'On' : 'Off');
+        ar.classList.toggle('on', !!player.vipAutoRune); // press graphic while on
     }
 }
 
