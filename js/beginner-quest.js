@@ -110,17 +110,18 @@ function renderBeginnerQuest() {
     if (st.index >= total) {
         html = `
             <div class="bq-head">Beginner Quest</div>
-            <div class="bq-title">All beginner quests complete!</div>
+            <div class="bq-row"><span class="bq-task">All beginner quests complete!</span></div>
             <div class="bq-count">${total} / ${total} done</div>`;
     } else {
         const step = BEGINNER_STEPS[st.index];
         const done = step.check();
-        const progress = step.progress ? step.progress() : (done ? 'Complete' : 'In progress');
+        const progress = step.progress ? step.progress() : '';
+        const status = done ? 'Complete' : 'In Progress';
         html = `
             <div class="bq-head">Beginner Quest</div>
             <div class="bq-count">${st.index} / ${total} done</div>
-            <div class="bq-title">${step.title}</div>
-            <div class="bq-progress ${done ? 'bq-done' : ''}">${progress}</div>
+            <div class="bq-row"><span class="bq-task">- ${step.title}</span><span class="bq-status ${done ? 'bq-done' : ''}">${status}</span></div>
+            ${progress ? `<div class="bq-count">${progress}</div>` : ''}
             <button class="bq-claim ${done ? '' : 'bq-disabled'}" ${done ? '' : 'disabled'} onclick="claimBeginnerQuest()">${done ? 'Claim' : 'Not yet'}</button>
             <div class="bq-reward">Reward: ${BEGINNER_CHEST_NAMES[step.chest]}</div>`;
     }

@@ -143,16 +143,17 @@
         .ts-inner { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: #1a1410; }
         .ts-inner .ts-bg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
         .ts-inner .ui { position: absolute; cursor: pointer; user-select: none; -webkit-user-select: none; }
-        /* Beginner quest ladder: parchment panel under the Settings button */
-        .bq-panel { position: absolute; box-sizing: border-box; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; background: #e7d1aa; border: 3px solid #b8945a; border-radius: 12px; color: #2a1a0e; font-family: Georgia, "Times New Roman", serif; text-align: center; overflow: hidden; z-index: 4; }
-        .bq-head { font-size: 26px; font-weight: 700; color: #2a1a0e; }
-        .bq-count { font-size: 18px; color: #6b5540; }
-        .bq-title { font-size: 26px; font-weight: 700; line-height: 1.2; text-wrap: balance; }
-        .bq-progress { font-size: 20px; color: #6b5540; }
-        .bq-progress.bq-done { color: #15803d; font-weight: 700; }
-        .bq-claim { margin-top: 4px; padding: 12px 10px; font-size: 26px; font-weight: 800; color: #fff; background: #15803d; border: 2px solid #0f5a2b; border-radius: 10px; cursor: pointer; }
-        .bq-claim.bq-disabled { background: #9ca3af; border-color: #6b7280; cursor: default; }
-        .bq-reward { font-size: 18px; color: #6b5540; margin-top: auto; }
+        /* Beginner quest: same look as the character info panel */
+        .bq-panel { position: absolute; box-sizing: border-box; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; background: rgba(12, 24, 52, 0.78); border: 1px solid rgba(201, 162, 39, 0.55); border-radius: 14px; color: #f5e6c0; font-family: Georgia, "Times New Roman", serif; overflow: hidden; z-index: 4; }
+        .bq-head { font-size: 26px; font-weight: 700; color: #f5c451; }
+        .bq-count { font-size: 18px; color: #bfae85; }
+        .bq-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; white-space: nowrap; }
+        .bq-task { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .bq-status { flex: 0 0 auto; font-size: 18px; color: #fbbf24; }
+        .bq-status.bq-done { color: #4ade80; }
+        .bq-claim { padding: 10px 10px; font-size: 24px; font-weight: 800; color: #fff; background: #15803d; border: 2px solid #0f5a2b; border-radius: 10px; cursor: pointer; }
+        .bq-claim.bq-disabled { background: #475569; border-color: #334155; cursor: default; }
+        .bq-reward { font-size: 17px; color: #bfae85; }
         .ts-inner .ui img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
         /* Screen intro: background fades in first, then items (buttons, frames, panels) fade in after it */
         @keyframes bgFadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -564,7 +565,7 @@
             <div class="ui" data-action="setting" style="left:1699px; top:13px; width:206px; height:209px;">
                 <img src="assets/page01/setting_q85.webp" alt="" onerror="townSwap(this,'setting.png')">
             </div>
-            <div id="beginner-quest" class="bq-panel" style="left:1699px; top:236px; width:206px; height:820px;"></div>
+            <div id="beginner-quest" class="bq-panel" style="left:1515px; top:236px; width:390px; height:auto;"></div>
             <div class="ui" data-action="character" style="left:13px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/characterbutton_q85.webp" alt="" onerror="townSwap(this,'characterbutton.png')">
                 <img id="alert-char" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
@@ -1145,7 +1146,7 @@
     <script src="js/cloud.js?v=20261105h"></script>
     <script src="js/combat.js?v=20261105j"></script>
     <script src="js/ui.js?v=20261107g"></script>
-    <script src="js/beginner-quest.js?v=20261107h"></script>
+    <script src="js/beginner-quest.js?v=20261107k"></script>
     <script src="js/town.js?v=20261105h"></script>
     <script src="js/loader.js?v=20261105h"></script>
 
