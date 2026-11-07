@@ -32,7 +32,7 @@
 
   <div class="panel" id="poses"><div class="title">Pose</div></div>
   <div class="panel" id="parts"><div class="title">Body parts</div></div>
-  <div class="panel" id="gear"><div class="title">Equipment (attack pose only for now)</div></div>
+  <div class="panel" id="gear"><div class="title">Equipment</div></div>
   <div class="panel">
     <div class="title">Playback</div>
     <label><input type="checkbox" id="bob" checked> Idle bob</label>
@@ -50,9 +50,26 @@
 // Gear (sword and shield, attack lv10 layers) is placed by the same hand offsets as the bare-body attack pose.
 const CENTRE = { x: 283.5, y: 239.4 };
 
-const GEAR_ATTACK = {
-  shield: { id: 'shield', name: 'Shield', src: 'gear/ssattackshieldlv10.png', x: 415, y: 154, sc: 1 },
-  sword:  { id: 'sword',  name: 'Sword',  src: 'gear/ssattackswordlv10.png',  x: 152, y: 175, sc: 1 }
+// Equipment per pose. Sword layers already contain the gripping hand, so the bare left hand is hidden while the sword is on.
+// Shield layers have no hand: each shield's grip sits at the right hand's top-left corner (offset set from the attack pose).
+const GEAR_NAMES = { shield: 'Shield', sword: 'Sword' };
+const GEAR = {
+  attack: {
+    shield: { src: 'gear/attack/ssattackshield.png', x: 415, y: 154, sc: 1 },
+    sword:  { src: 'gear/attack/ssattackswordlv10.png', x: 152, y: 175, sc: 1 }
+  },
+  base: {
+    shield: { src: 'gear/shield/ssshield.png', x: 365, y: 139, sc: 1 },
+    sword:  { src: 'gear/base/ssbasesword.png', x: 32, y: 239, sc: 1 }
+  },
+  block: {
+    shield: { src: 'gear/shield/ssshield.png', x: 395, y: 138, sc: 1 },
+    sword:  { src: 'gear/block/ssblocksword.png', x: 127, y: 224, sc: 1 }
+  },
+  critical: {
+    shield: { src: 'gear/shield/ssshield.png', x: 429, y: 139, sc: 1 },
+    sword:  { src: 'gear/critical/sscriticalsword.png', x: 60, y: 34, sc: 1 }
+  }
 };
 
 const POSES = {
@@ -60,12 +77,12 @@ const POSES = {
     label: 'base',
     parts: [
       { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 208, y: 246, sc: 1 },
-      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 192, y: 153, sc: 0.825 },
-      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 240, y: 36,  sc: 1 },
-      { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 167, y: 240, sc: 1 },
-      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 356, y: 213, sc: 1 }
+      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 197, y: 133, sc: 0.8 },
+      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 239, y: 37,  sc: 1 },
+      { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 168, y: 241, sc: 0.95 },
+      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 355, y: 212, sc: 1.05 }
     ],
-    gear: []
+    gear: ['shield', 'sword']
   },
   attack: {
     label: 'attack',
@@ -76,7 +93,6 @@ const POSES = {
       { id: 'lefthand',  name: 'Left hand',  src: 'attack/dattacklefthand.png',  x: 165, y: 182, sc: 0.975 },
       { id: 'righthand', name: 'Right hand', src: 'attack/dattackrighthand.png', x: 406, y: 223, sc: 1 }
     ],
-    // Draw order: shield behind armor, sword in front of armor, then the hands
     gear: ['shield', 'sword']
   },
   block: {
@@ -88,7 +104,7 @@ const POSES = {
       { id: 'lefthand',  name: 'Left hand',  src: 'block/dblocklefthand.png',  x: 146, y: 229, sc: 1 },
       { id: 'righthand', name: 'Right hand', src: 'block/dblockrighthand.png', x: 385, y: 211, sc: 1 }
     ],
-    gear: []
+    gear: ['shield', 'sword']
   },
   critical: {
     label: 'critical',
@@ -99,7 +115,7 @@ const POSES = {
       { id: 'lefthand',  name: 'Left hand',  src: 'critical/dcriticallefthand.png',  x: 244, y: 38,  sc: 0.8 },
       { id: 'righthand', name: 'Right hand', src: 'critical/dcriticalrighthand.png', x: 419, y: 212, sc: 1 }
     ],
-    gear: []
+    gear: ['shield', 'sword']
   }
 };
 
@@ -129,19 +145,17 @@ function load(src) {
 }
 
 // Build the draw list for the current pose. Gear is inserted at the position its draw order requires.
-function drawList(pose) {
+function drawList(poseKey) {
+  const pose = POSES[poseKey];
+  const g = GEAR[poseKey];
+  const swordOn = state.gearOn.has('sword') && pose.gear.includes('sword');
+  const shieldOn = state.gearOn.has('shield') && pose.gear.includes('shield');
   const list = [];
-  const gearIds = pose.gear;
   for (const part of pose.parts) {
-    if (part.id === 'armor') {
-      if (gearIds.includes('shield') && state.gearOn.has('shield')) list.push({ ...GEAR_ATTACK.shield });
-      list.push(part);
-    } else if (part.id === 'lefthand') {
-      if (gearIds.includes('sword') && state.gearOn.has('sword')) list.push({ ...GEAR_ATTACK.sword });
-      list.push(part);
-    } else {
-      list.push(part);
-    }
+    if (part.id === 'armor' && shieldOn) list.push({ id: 'shield', ...g.shield });
+    if (part.id === 'head' && swordOn) list.push({ id: 'sword', ...g.sword });
+    if (part.id === 'lefthand' && swordOn) continue;   // the sword layer already shows the hand
+    list.push(part);
   }
   return list;
 }
@@ -155,8 +169,8 @@ async function draw(now) {
   const oy = canvas.height / 2 - CENTRE.y * s + bob;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const notes = [];
-  for (const item of drawList(pose)) {
-    const isGear = !!item.src && item.src.startsWith('gear/');
+  for (const item of drawList(state.pose)) {
+    const isGear = item.src.startsWith('gear/');
     if (!isGear && !state.on.has(item.id)) continue;
     const img = await load(item.src);
     const k = s * (item.sc || 1);
@@ -197,10 +211,9 @@ function buildControls() {
   }
 
   const gearBox = document.getElementById('gear');
-  for (const key of Object.keys(GEAR_ATTACK)) {
-    const g = GEAR_ATTACK[key];
+  for (const key of Object.keys(GEAR_NAMES)) {
     const b = document.createElement('button');
-    b.textContent = g.name + ': on';
+    b.textContent = GEAR_NAMES[key] + ': on';
     b.dataset.gear = key;
     b.onclick = () => {
       if (state.gearOn.has(key)) state.gearOn.delete(key); else state.gearOn.add(key);
@@ -233,9 +246,9 @@ function sync() {
     const on = has && state.gearOn.has(key);
     b.disabled = !has;
     b.classList.toggle('on', on);
-    b.textContent = GEAR_ATTACK[key].name + ': ' + (on ? 'on' : 'off');
+    b.textContent = GEAR_NAMES[key] + ': ' + (on ? 'on' : 'off');
   });
-  noteEl.textContent = pose.gear.length === 0 ? 'No equipment layers for this pose yet.' : '';
+  noteEl.textContent = '';
 }
 
 buildControls();
