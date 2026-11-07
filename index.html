@@ -348,7 +348,6 @@
         #combat-potion-btn { background-image: url('assets/combat/potionslot_q85.webp'); }
         #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress_q85.webp'); }
         #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion_q85.webp'); }
-        #combat-potion-btn.no-potion span { display: none; }
         /* Damage numbers: white for normal, red for critical */
         .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 26px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
         .combat-dmg.crit { color: #ff9800; font-size: 36px; }
@@ -407,10 +406,11 @@
         .rune-acq-card:hover { transform: none; filter: none; }
         #combat-elixir-btn { background-image: url('assets/combat/elixirslot_q85.webp'); }
         #combat-elixir-btn:active, #combat-elixir-btn.on { background-image: url('assets/combat/elixirslotpress_q85.webp'); }
-        #combat-elixir-btn span { display: none; }
-        /* Auto-revive off: show "Resurrection OFF" on the button */
-        #combat-elixir-btn.off > span { display: inline; font-weight: bold; color: #f87171; text-shadow: 0 1px 2px #000; }
-        #combat-elixir-btn.off #player-resurrection-state { display: inline; color: #f87171; }
+        /* Resurrection label: green "Resurrection ON" when auto-revive is on, red "Resurrection OFF" when off */
+        #combat-elixir-btn > span:first-child { color: #4ade80; font-weight: 900; text-shadow: 0 1px 2px #000, 0 0 4px #000; }
+        #view-combat #combat-elixir-btn > span:first-child { font-size: 18px; }
+        #combat-elixir-btn.off > span:first-child { color: #f87171; }
+        #combat-elixir-btn #player-resurrection-state { color: inherit; }
         /* Keep HUD, enemy cards and buttons above the foreground layer */
         #combat-stage .combat-box, #combat-stage button, #combat-stage .ui, #combat-hp-under, #combat-player-sprite, #monsters-lineup-container, #combat-rune-list { z-index: 4; }
         .combat-box.minimized { height: auto !important; }
@@ -1107,7 +1107,7 @@
 
                     <!-- Resurrection (bottom right) -->
                     <button id="combat-elixir-btn" onclick="toggleResurrectionUse()" title="Click to turn auto-revive on or off" class="combat-slot-btn" style="left:1733px; top:890px; width:175px; height:178px;">
-                        <span>Resurrection <span id="player-resurrection-state" class="font-bold text-emerald-300">ON</span></span>
+                        <span>Resurrection <span id="player-resurrection-state" class="font-bold">ON</span></span>
                         <span id="player-resurrection" class="font-mono mt-1">0 left</span>
                     </button>
 

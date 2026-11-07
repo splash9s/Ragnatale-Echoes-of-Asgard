@@ -4026,7 +4026,7 @@ function updateUI() {
     el = document.getElementById('player-armor-text');
     if (el) el.innerText = `${armorNow} / ${derived.maxArmor}`;
     el = document.getElementById('player-resurrection-state');
-    if (el) el.innerText = 'OFF'; // only visible while auto-revive is off (see #combat-elixir-btn.off)
+    if (el) el.innerText = player.resurrectionOn === false ? 'OFF' : 'ON';
     el = document.getElementById('player-armor-bar');
     if (el) el.style.width = `${derived.maxArmor > 0 ? (armorNow / derived.maxArmor) * 100 : 0}%`;
 
