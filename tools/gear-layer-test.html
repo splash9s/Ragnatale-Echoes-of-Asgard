@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gear Layer Animation Test</title>
+<style>
+  :root { --bg:#eef2f7; --panel:#ffffff; --ink:#1b2430; --line:#d5dde8; --accent:#2563eb; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#0f1622; --panel:#17212f; --ink:#e6edf6; --line:#2a3a50; --accent:#60a5fa; }
+  }
+  :root[data-theme="dark"] { --bg:#0f1622; --panel:#17212f; --ink:#e6edf6; --line:#2a3a50; --accent:#60a5fa; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:12px; align-items:center; }
+  h1 { font-size:18px; margin:4px 0; }
+  canvas { width:500px; height:500px; max-width:100%; background:#8fb3d9 linear-gradient(#a9c9ea,#6f97c4); border:1px solid var(--line); border-radius:8px; image-rendering:auto; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; width:100%; box-sizing:border-box; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button { font:inherit; padding:6px 10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:6px; cursor:pointer; }
+  button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  label { display:flex; gap:6px; align-items:center; }
+  .log { font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; color:var(--ink); opacity:.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Gear Layer Animation Test</h1>
+  <canvas id="c" width="500" height="500"></canvas>
+
+  <div class="panel" id="poses"></div>
+  <div class="panel" id="layers"></div>
+  <div class="panel">
+    <label><input type="checkbox" id="bob" checked> Idle bob</label>
+    <label>Speed <input type="range" id="speed" min="0.5" max="3" step="0.1" value="1"></label>
+    <label>Scale <input type="range" id="scale" min="0.5" max="2" step="0.05" value="1.2"></label>
+  </div>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+// Sprite sets per pose. Each set has a body and optional gear layers that share the pose.
+const BASE = '../assets/';
+const POSES = {
+  base:      { body: 'cha/swordandshield/ssbase.png',            anim: null },
+  attack:    { body: 'cha/swordandshield/ssattack_q85.webp',     anim: null },
+  block:     { body: 'cha/swordandshield/ssblock_q85.webp',      anim: null },
+  critical:  { body: 'cha/swordandshield/sscritical_q85.webp',   anim: null },
+  critical2: { body: 'cha/swordandshield/sscritical2_q85.webp',  anim: null }
+};
+// Gear layers keyed by name. The file for each pose is picked by swapping the pose part of the body file name.
+const GEAR = {
+  'cloth-cap':  { folder: 'helmet/cloth-cap',  files: { base:'ssbase.png', attack:'ssattack_q85.webp', block:'ssblock_q85.webp', critical:'sscritical_q85.webp', critical2:'sscritical2_q85.webp' } },
+  'magma-horn': { folder: 'helmet/magma-horn', files: { base:'ssbase.png', attack:'ssattack_q85.webp', block:'ssblock_q85.webp', critical:'sscritical_q85.webp', critical2:'sscritical2_q85.webp' } },
+  'mossbloom':  { folder: 'helmet/mossbloom',  files: { base:'ssbase.png', attack:'ssattack_q85.webp', block:'ssblock_q85.webp', critical:'sscritical_q85.webp', critical2:'sscritical2_q85.webp' } }
+};
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const logEl = document.getElementById('log');
+const state = { pose: 'base', gear: new Set(['cloth-cap']), bob: true, speed: 1, scale: 1.2 };
+const cache = {};
+
+function load(src) {
+  if (!cache[src]) {
+    cache[src] = new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = () => rej(new Error('Failed to load ' + src));
+      img.src = BASE + src;
+    });
+  }
+  return cache[src];
+}
+
+// Layer placement, found from the images themselves (no hand-entered coordinates):
+// - Gear frame with the same size as the body frame: drawn at the same origin (already registered).
+// - Gear frame with a different size: bottom-centre aligned to the body's alpha bounding box bottom-centre.
+function alphaBox(img) {
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) {
+    if (d[(y * c.width + x) * 4 + 3] > 8) {
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+  }
+  return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+const boxCache = {};
+async function boxOf(src) {
+  if (!boxCache[src]) boxCache[src] = alphaBox(await load(src));
+  return boxCache[src];
+}
+
+async function layerOffset(bodySrc, gearSrc) {
+  const [bi, gi] = await Promise.all([load(bodySrc), load(gearSrc)]);
+  if (bi.naturalWidth === gi.naturalWidth && bi.naturalHeight === gi.naturalHeight) {
+    return { dx: 0, dy: 0, how: 'same frame size' };
+  }
+  const bb = await boxOf(bodySrc), gb = await boxOf(gearSrc);
+  const dx = (bb.x + bb.w / 2) - (gb.x + gb.w / 2);
+  const dy = (bb.y + bb.h) - (gb.y + gb.h);
+  return { dx: Math.round(dx), dy: Math.round(dy), how: 'bottom-centre aligned' };
+}
+
+let frameTime = 0;
+let last = performance.now();
+let rendering = false;
+
+async function draw() {
+  const pose = POSES[state.pose];
+  const bodyImg = await load(pose.body);
+  const s = state.scale;
+  const w = bodyImg.naturalWidth * s, h = bodyImg.naturalHeight * s;
+  const bob = state.bob ? Math.sin(frameTime * 0.0045 * state.speed) * 4 : 0;
+  const ox = (canvas.width - w) / 2;
+  const oy = (canvas.height - h) / 2 + bob;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bodyImg, ox, oy, w, h);
+
+  const notes = [`pose: ${state.pose}  body ${bodyImg.naturalWidth}x${bodyImg.naturalHeight}`];
+  for (const name of state.gear) {
+    const g = GEAR[name];
+    const gImg = await load(g.folder + '/' + g.files[state.pose]);
+    const off = await layerOffset(pose.body, g.folder + '/' + g.files[state.pose]);
+    ctx.drawImage(gImg, ox + off.dx * s, oy + off.dy * s, gImg.naturalWidth * s, gImg.naturalHeight * s);
+    notes.push(`${name}: ${gImg.naturalWidth}x${gImg.naturalHeight} offset (${off.dx}, ${off.dy}) ${off.how}`);
+  }
+  logEl.textContent = notes.join('\n');
+}
+
+function loop(now) {
+  const dt = now - last; last = now;
+  frameTime += dt;
+  draw().catch(e => logEl.textContent = e.message);
+  requestAnimationFrame(loop);
+}
+
+function buildControls() {
+  const poseBox = document.getElementById('poses');
+  for (const name of Object.keys(POSES)) {
+    const b = document.createElement('button');
+    b.textContent = name;
+    b.dataset.pose = name;
+    b.onclick = () => { state.pose = name; syncButtons(); };
+    poseBox.appendChild(b);
+  }
+  const layerBox = document.getElementById('layers');
+  for (const name of Object.keys(GEAR)) {
+    const b = document.createElement('button');
+    b.textContent = name;
+    b.dataset.gear = name;
+    b.onclick = () => {
+      if (state.gear.has(name)) state.gear.delete(name); else state.gear.add(name);
+      syncButtons();
+    };
+    layerBox.appendChild(b);
+  }
+  document.getElementById('bob').onchange = e => state.bob = e.target.checked;
+  document.getElementById('speed').oninput = e => state.speed = +e.target.value;
+  document.getElementById('scale').oninput = e => state.scale = +e.target.value;
+  syncButtons();
+}
+
+function syncButtons() {
+  document.querySelectorAll('[data-pose]').forEach(b => b.classList.toggle('on', b.dataset.pose === state.pose));
+  document.querySelectorAll('[data-gear]').forEach(b => b.classList.toggle('on', state.gear.has(b.dataset.gear)));
+}
+
+buildControls();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
