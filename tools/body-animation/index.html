@@ -58,23 +58,27 @@ const CENTRE = { x: 283.5, y: 239.4 };
 
 // Equipment per pose. Sword layers already contain the gripping hand, so the bare left hand is hidden while the sword is on.
 // Shield layers have no hand: each shield's grip sits at the right hand's top-left corner (offset set from the attack pose).
-const GEAR_NAMES = { shield: 'Shield', sword: 'Sword' };
+const GEAR_NAMES = { shield: 'Shield', sword: 'Sword', wear: 'Wear' };
 const GEAR = {
   attack: {
     shield: { src: 'gear/attack/ssattackshield.png', x: 415, y: 154, sc: 1 },
-    sword:  { src: 'gear/attack/ssattackswordlv10.png', x: 146, y: 170, sc: 1 }
+    sword:  { src: 'gear/attack/ssattackswordlv10.png', x: 146, y: 170, sc: 1 },
+    wear:   { src: 'gear/wear/ssattackarmorlv10.png', x: 192, y: 112, sc: 1 }
   },
   base: {
     shield: { src: 'gear/shield/ssshield.png', x: 321, y: 139, sc: 1 },
-    sword:  { src: 'gear/base/ssbasesword.png', x: 46, y: 224, sc: 1 }
+    sword:  { src: 'gear/base/ssbasesword.png', x: 46, y: 224, sc: 1 },
+    wear:   { src: 'gear/wear/ssbasearmorlv10.png', x: 172, y: 129, sc: 1 }
   },
   block: {
     shield: { src: 'gear/shield/ssshield.png', x: 363, y: 138, sc: 1 },
-    sword:  { src: 'gear/block/ssblocksword.png', x: 127, y: 224, sc: 1 }
+    sword:  { src: 'gear/block/ssblocksword.png', x: 127, y: 224, sc: 1 },
+    wear:   { src: 'gear/wear/ssblockarmorlv10.png', x: 165, y: 127, sc: 1 }
   },
   critical: {
-    shield: { src: 'gear/shield/ssshield.png', x: 409, y: 139, sc: 1 },
-    sword:  { src: 'gear/critical/sscriticalsword.png', x: 60, y: 34, sc: 1 }
+    shield: { src: 'gear/shield/ssshield.png', x: 390, y: 139, sc: 1 },
+    sword:  { src: 'gear/critical/sscriticalsword.png', x: 60, y: 34, sc: 1 },
+    wear:   { src: 'gear/wear/sscriticalarmorlv10.png', x: 191, y: 72, sc: 1 }
   }
 };
 
@@ -83,23 +87,23 @@ const POSES = {
     label: 'base',
     parts: [
       { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 196, y: 246, sc: 1 },
-      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 197, y: 133, sc: 1 },
-      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 225, y: 46,  sc: 1 },
+      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 172, y: 133, sc: 1 },
+      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 226, y: 54,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 168, y: 241, sc: 0.95 },
       { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 334, y: 209, sc: 1.05 }
     ],
-    gear: ['shield', 'sword']
+    gear: ['shield', 'sword', 'wear']
   },
   attack: {
     label: 'attack',
     parts: [
       { id: 'leg',       name: 'Leg',        src: 'attack/dattackleg.png',       x: 112, y: 194, sc: 0.975 },
       { id: 'armor',     name: 'Armor',      src: 'attack/dattackarmor.png',     x: 193, y: 116, sc: 1 },
-      { id: 'head',      name: 'Head',       src: 'attack/dattackhead.png',      x: 316, y: 43,  sc: 1 },
+      { id: 'head',      name: 'Head',       src: 'attack/dattackhead.png',      x: 315, y: 44,  sc: 1 },
       { id: 'lefthand',  name: 'Left hand',  src: 'attack/dattacklefthand.png',  x: 156, y: 182, sc: 0.975 },
       { id: 'righthand', name: 'Right hand', src: 'attack/dattackrighthand.png', x: 406, y: 223, sc: 1 }
     ],
-    gear: ['shield', 'sword']
+    gear: ['shield', 'sword', 'wear']
   },
   block: {
     label: 'block',
@@ -110,7 +114,7 @@ const POSES = {
       { id: 'lefthand',  name: 'Left hand',  src: 'block/dblocklefthand.png',  x: 146, y: 229, sc: 1 },
       { id: 'righthand', name: 'Right hand', src: 'block/dblockrighthand.png', x: 385, y: 211, sc: 1 }
     ],
-    gear: ['shield', 'sword']
+    gear: ['shield', 'sword', 'wear']
   },
   critical: {
     label: 'critical',
@@ -121,7 +125,7 @@ const POSES = {
       { id: 'lefthand',  name: 'Left hand',  src: 'critical/dcriticallefthand.png',  x: 244, y: 38,  sc: 0.8 },
       { id: 'righthand', name: 'Right hand', src: 'critical/dcriticalrighthand.png', x: 419, y: 212, sc: 1 }
     ],
-    gear: ['shield', 'sword']
+    gear: ['shield', 'sword', 'wear']
   }
 };
 
@@ -152,11 +156,12 @@ function load(src) {
 }
 
 // Default layer order per pose, bottom to top (the last id is the top layer). Edited in the panel.
+// "wear" replaces the body armor while it is on, so it sits in the armor's slot.
 const LAYER_ORDER = {
-  base:     ['leg', 'armor', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
-  attack:   ['shield', 'leg', 'armor', 'head', 'sword', 'lefthand', 'righthand'],
-  block:    ['leg', 'armor', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
-  critical: ['leg', 'armor', 'head', 'sword', 'lefthand', 'righthand', 'shield']
+  base:     ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
+  attack:   ['shield', 'leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand'],
+  block:    ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
+  critical: ['leg', 'armor', 'wear', 'sword', 'head', 'lefthand', 'righthand', 'shield']
 };
 
 function defaultOrder(poseKey) {
@@ -174,11 +179,14 @@ function drawList(poseKey) {
   const g = GEAR[poseKey];
   const swordOn = state.gearOn.has('sword') && pose.gear.includes('sword');
   const shieldOn = state.gearOn.has('shield') && pose.gear.includes('shield');
+  const wearOn = state.gearOn.has('wear') && pose.gear.includes('wear');
   const list = [];
   for (const id of orderFor(poseKey)) {
     if (id === 'sword') { if (swordOn) list.push({ id: 'sword', ...g.sword }); continue; }
     if (id === 'shield') { if (shieldOn) list.push({ id: 'shield', ...g.shield }); continue; }
-    if (id === 'lefthand' && swordOn) continue;   // the sword layer already shows the hand
+    if (id === 'wear') { if (wearOn) list.push({ id: 'wear', ...g.wear }); continue; }
+    if (id === 'armor' && wearOn) continue;        // the wear layer replaces the body armor
+    if (id === 'lefthand' && swordOn) continue;    // the sword layer already shows the hand
     list.push(POSES[poseKey].parts.find(p => p.id === id));
   }
   return list;
@@ -264,6 +272,7 @@ function buildControls() {
 function layerItem(poseKey, id) {
   if (id === 'sword') return { label: 'Sword', obj: GEAR[poseKey].sword };
   if (id === 'shield') return { label: 'Shield', obj: GEAR[poseKey].shield };
+  if (id === 'wear') return { label: 'Wear', obj: GEAR[poseKey].wear };
   const part = POSES[poseKey].parts.find(p => p.id === id);
   return { label: part.name, obj: part };
 }
