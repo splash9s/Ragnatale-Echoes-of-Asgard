@@ -33,7 +33,7 @@
   <div class="panel" id="poses"><div class="title">Pose</div></div>
   <div class="panel" id="parts"><div class="title">Body parts</div></div>
   <div class="panel" id="gear"><div class="title">Equipment</div></div>
-  <div class="panel" id="pos"><div class="title">Position (X, Y of top-left corner, page px)</div></div>
+  <div class="panel" id="pos"><div class="title">Layers: drawn in this order (1 = bottom, last = top), with X, Y of top-left corner</div></div>
   <div class="panel">
     <div class="title">Playback</div>
     <label><input type="checkbox" id="bob" checked> Idle bob</label>
@@ -133,7 +133,8 @@ const state = {
   pose: 'attack',
   on: new Set(POSES.attack.parts.map(p => p.id)),
   gearOn: new Set(['shield', 'sword']),
-  bob: true, speed: 1, scale: 1
+  bob: true, speed: 1, scale: 1,
+  order: {}
 };
 const cache = {};
 let t0 = performance.now();
@@ -150,20 +151,36 @@ function load(src) {
   return cache[src];
 }
 
-// Build the draw list for the current pose. Gear is inserted at the position its draw order requires.
+// Layer order per pose: the ids listed first are drawn first (bottom), the last id is the top layer.
+function defaultOrder(poseKey) {
+  const pose = POSES[poseKey];
+  const ids = [];
+  for (const p of pose.parts) {
+    ids.push(p.id);
+    if (p.id === 'head' && pose.gear.includes('sword')) ids.push('sword');
+  }
+  if (pose.gear.includes('shield')) ids.push('shield');
+  return ids;
+}
+
+function orderFor(poseKey) {
+  if (!state.order[poseKey]) state.order[poseKey] = defaultOrder(poseKey);
+  return state.order[poseKey];
+}
+
+// Build the draw list for the current pose from its layer order.
 function drawList(poseKey) {
   const pose = POSES[poseKey];
   const g = GEAR[poseKey];
   const swordOn = state.gearOn.has('sword') && pose.gear.includes('sword');
   const shieldOn = state.gearOn.has('shield') && pose.gear.includes('shield');
   const list = [];
-  for (const part of pose.parts) {
-    if (part.id === 'head' && swordOn) list.push({ id: 'sword', ...g.sword });
-    if (part.id === 'lefthand' && swordOn) continue;   // the sword layer already shows the hand
-    list.push(part);
+  for (const id of orderFor(poseKey)) {
+    if (id === 'sword') { if (swordOn) list.push({ id: 'sword', ...g.sword }); continue; }
+    if (id === 'shield') { if (shieldOn) list.push({ id: 'shield', ...g.shield }); continue; }
+    if (id === 'lefthand' && swordOn) continue;   // the sword layer already shows the hand
+    list.push(POSES[poseKey].parts.find(p => p.id === id));
   }
-  // Shield is always the top layer, drawn after the body and sword.
-  if (shieldOn) list.push({ id: 'shield', ...g.shield });
   return list;
 }
 
@@ -242,24 +259,43 @@ function buildControls() {
   sync();
 }
 
-// One X/Y row per visible part and equipment piece of the current pose. Edits write straight into the
-// POSES / GEAR objects, so the next frame draws the new position.
+// One row per layer of the current pose, in draw order. X/Y edits write into POSES / GEAR; the up/down
+// buttons change the layer order in state.order. Both take effect on the next frame.
+function layerItem(poseKey, id) {
+  if (id === 'sword') return { label: 'Sword', obj: GEAR[poseKey].sword };
+  if (id === 'shield') return { label: 'Shield', obj: GEAR[poseKey].shield };
+  const part = POSES[poseKey].parts.find(p => p.id === id);
+  return { label: part.name, obj: part };
+}
+
 function buildPosRows() {
   const box = document.getElementById('pos');
   box.querySelectorAll('.row').forEach(r => r.remove());
-  const pose = POSES[state.pose];
-  const items = [
-    ...pose.parts.map(p => ({ label: p.name, obj: p })),
-    ...pose.gear.map(k => ({ label: GEAR_NAMES[k], obj: GEAR[state.pose][k] }))
-  ];
-  for (const it of items) {
+  const ids = orderFor(state.pose);
+  ids.forEach((id, i) => {
+    const it = layerItem(state.pose, id);
     const row = document.createElement('div');
     row.className = 'row';
     row.style.cssText = 'display:flex;gap:8px;align-items:center;width:100%';
+
     const name = document.createElement('span');
-    name.textContent = it.label;
-    name.style.cssText = 'width:90px';
+    name.textContent = (i + 1) + '. ' + it.label;
+    name.style.cssText = 'width:120px';
     row.appendChild(name);
+
+    for (const dir of [-1, 1]) {
+      const btn = document.createElement('button');
+      btn.textContent = dir < 0 ? '▲' : '▼';
+      btn.title = dir < 0 ? 'Move up (drawn later)' : 'Move down (drawn earlier)';
+      btn.disabled = (dir < 0 && i === 0) || (dir > 0 && i === ids.length - 1);
+      btn.onclick = () => {
+        const j = i + dir;
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+        buildPosRows();
+      };
+      row.appendChild(btn);
+    }
+
     for (const axis of ['x', 'y']) {
       const lab = document.createElement('label');
       lab.textContent = axis.toUpperCase() + ' ';
@@ -273,14 +309,20 @@ function buildPosRows() {
       row.appendChild(lab);
     }
     box.appendChild(row);
-  }
+  });
+
+  const reset = document.createElement('button');
+  reset.className = 'row';
+  reset.textContent = 'Reset layer order for this pose';
+  reset.onclick = () => { delete state.order[state.pose]; buildPosRows(); };
+  box.appendChild(reset);
 }
 
 // Plain text of every pose's part and gear positions, ready to paste back.
 function exportPositions() {
   const out = {};
   for (const key of Object.keys(POSES)) {
-    out[key] = { parts: {}, gear: {} };
+    out[key] = { order: orderFor(key), parts: {}, gear: {} };
     for (const p of POSES[key].parts) out[key].parts[p.id] = { x: p.x, y: p.y };
     for (const k of POSES[key].gear) out[key].gear[k] = { x: GEAR[key][k].x, y: GEAR[key][k].y };
   }
