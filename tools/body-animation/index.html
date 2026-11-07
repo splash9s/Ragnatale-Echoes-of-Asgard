@@ -58,7 +58,7 @@ const CENTRE = { x: 283.5, y: 239.4 };
 
 // Equipment slots. The dropdown for each slot lists every option that appears under it in GEAR.
 // Sword layers already contain the gripping hand, so the bare left hand is hidden while a sword is worn.
-const GEAR_SLOTS = { shield: 'Shield', sword: 'Sword', wear: 'Wear' };
+const GEAR_SLOTS = { helmet: 'Helmet', wear: 'Armor (gear)', sword: 'Weapon', shield: 'Shield', foot: 'Foot', garment: 'Garment' };
 
 // GEAR[pose][slot][option] = placement of that option's sprite in that pose.
 // To add gear: add an option key (for example "lv20") under each slot and each pose you have art for.
@@ -66,24 +66,36 @@ const GEAR_SLOTS = { shield: 'Shield', sword: 'Sword', wear: 'Wear' };
 // "wear" replaces the body armor while it is equipped.
 const GEAR = {
   attack: {
-    shield: { lv10: { src: 'gear/attack/ssattackshield.png',     x: 415, y: 154, sc: 1 } },
-    sword:  { lv10: { src: 'gear/attack/ssattackswordlv10.png',  x: 146, y: 170, sc: 1 } },
-    wear:   { lv10: { src: 'gear/wear/ssattackarmorlv10.png',    x: 192, y: 112, sc: 1 } }
+    helmet: { lv10: { src: 'gear/helmet/ssattackhelmetlv10.png', x: 274, y: -5, sc: 1 } },
+    wear: { lv10: { src: 'gear/wear/ssattackarmorlv10.png', x: 192, y: 112, sc: 1 } },
+    sword: { lv10: { src: 'gear/attack/ssattackswordlv10.png', x: 146, y: 170, sc: 1 } },
+    shield: { lv10: { src: 'gear/attack/ssattackshield.png', x: 415, y: 154, sc: 1 } },
+    foot: { lv10: { src: 'gear/foot/ssattackfootlv10.png', x: 149, y: 224, sc: 1 } },
+    garment: { lv10: { src: 'gear/garment/ssattackmanteaulv10.png', x: 196, y: 100, sc: 1 } }
   },
   base: {
-    shield: { lv10: { src: 'gear/shield/ssshield.png',           x: 321, y: 139, sc: 1 } },
-    sword:  { lv10: { src: 'gear/base/ssbasesword.png',           x: 46,  y: 224, sc: 1 } },
-    wear:   { lv10: { src: 'gear/wear/ssbasearmorlv10.png',       x: 172, y: 129, sc: 1 } }
+    helmet: { lv10: { src: 'gear/helmet/ssbasehelmetlv10.png', x: 146, y: 4, sc: 1 } },
+    wear: { lv10: { src: 'gear/wear/ssbasearmorlv10.png', x: 172, y: 129, sc: 1 } },
+    sword: { lv10: { src: 'gear/base/ssbasesword.png', x: 46, y: 224, sc: 1 } },
+    shield: { lv10: { src: 'gear/shield/ssshield.png', x: 321, y: 139, sc: 1 } },
+    foot: { lv10: { src: 'gear/foot/ssbasefootlv10.png', x: 196, y: 246, sc: 1 } },
+    garment: { lv10: { src: 'gear/garment/ssbasemanteaulv10.png', x: 168, y: 113, sc: 1 } }
   },
   block: {
-    shield: { lv10: { src: 'gear/shield/ssshield.png',           x: 363, y: 138, sc: 1 } },
-    sword:  { lv10: { src: 'gear/block/ssblocksword.png',         x: 127, y: 224, sc: 1 } },
-    wear:   { lv10: { src: 'gear/wear/ssblockarmorlv10.png',      x: 165, y: 127, sc: 1 } }
+    helmet: { lv10: { src: 'gear/helmet/ssblockhelmetlv10.png', x: 200, y: 6, sc: 1 } },
+    wear: { lv10: { src: 'gear/wear/ssblockarmorlv10.png', x: 165, y: 127, sc: 1 } },
+    sword: { lv10: { src: 'gear/block/ssblocksword.png', x: 127, y: 224, sc: 1 } },
+    shield: { lv10: { src: 'gear/shield/ssshield.png', x: 363, y: 138, sc: 1 } },
+    foot: { lv10: { src: 'gear/foot/ssblockfootlv10.png', x: 164, y: 263, sc: 1 } },
+    garment: { lv10: { src: 'gear/garment/ssblockmanteaulv10.png', x: 170, y: 110, sc: 1 } }
   },
   critical: {
-    shield: { lv10: { src: 'gear/shield/ssshield.png',           x: 390, y: 139, sc: 1 } },
-    sword:  { lv10: { src: 'gear/critical/sscriticalsword.png',   x: 60,  y: 34,  sc: 1 } },
-    wear:   { lv10: { src: 'gear/wear/sscriticalarmorlv10.png',   x: 191, y: 72,  sc: 1 } }
+    helmet: { lv10: { src: 'gear/helmet/sscriticalhelmetlv10.png', x: 227, y: 10, sc: 1 } },
+    wear: { lv10: { src: 'gear/wear/sscriticalarmorlv10.png', x: 191, y: 72, sc: 1 } },
+    sword: { lv10: { src: 'gear/critical/sscriticalsword.png', x: 60, y: 34, sc: 1 } },
+    shield: { lv10: { src: 'gear/shield/ssshield.png', x: 390, y: 139, sc: 1 } },
+    foot: { lv10: { src: 'gear/foot/sscriticalfootlv10.png', x: 133, y: 256, sc: 1 } },
+    garment: { lv10: { src: 'gear/garment/sscriticalmanteaulv10.png', x: 181, y: 92, sc: 1 } }
   }
 };
 
@@ -132,10 +144,10 @@ const POSES = {
 
 // Default layer order per pose, bottom to top (the last id is the top layer). Edited in the panel.
 const LAYER_ORDER = {
-  base:     ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
-  attack:   ['shield', 'leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand'],
-  block:    ['leg', 'armor', 'wear', 'head', 'sword', 'lefthand', 'righthand', 'shield'],
-  critical: ['leg', 'armor', 'wear', 'sword', 'head', 'lefthand', 'righthand', 'shield']
+  base:     ['leg', 'foot', 'garment', 'armor', 'wear', 'head', 'helmet', 'sword', 'lefthand', 'righthand', 'shield'],
+  attack:   ['shield', 'leg', 'foot', 'garment', 'armor', 'wear', 'head', 'helmet', 'sword', 'lefthand', 'righthand'],
+  block:    ['leg', 'foot', 'garment', 'armor', 'wear', 'head', 'helmet', 'sword', 'lefthand', 'righthand', 'shield'],
+  critical: ['leg', 'foot', 'garment', 'armor', 'wear', 'sword', 'head', 'helmet', 'lefthand', 'righthand', 'shield']
 };
 
 const canvas = document.getElementById('c');
@@ -146,7 +158,7 @@ const state = {
   pose: 'attack',
   on: new Set(POSES.attack.parts.map(p => p.id)),
   // The worn option for each slot, or null for none.
-  equip: { shield: 'lv10', sword: 'lv10', wear: null },
+  equip: { helmet: null, wear: null, sword: 'lv10', shield: 'lv10', foot: null, garment: null },
   bob: true, speed: 1, scale: 1,
   order: {}
 };
@@ -191,17 +203,15 @@ function orderFor(poseKey) {
 // Build the draw list for the current pose from its layer order.
 function drawList(poseKey) {
   const pose = POSES[poseKey];
-  const wornWear = wornPlacement(poseKey, 'wear');
-  const wornSword = wornPlacement(poseKey, 'sword');
   const list = [];
   for (const id of orderFor(poseKey)) {
-    if (id === 'sword' || id === 'shield' || id === 'wear') {
+    if (GEAR_SLOTS[id]) {                          // an equipment slot: draw what is worn in it
       const placed = wornPlacement(poseKey, id);
       if (placed) list.push({ id, ...placed });
       continue;
     }
-    if (id === 'armor' && wornWear) continue;     // the worn wear layer replaces the body armor
-    if (id === 'lefthand' && wornSword) continue; // the sword layer already shows the hand
+    if (id === 'armor' && wornPlacement(poseKey, 'wear')) continue;   // worn armor replaces the body armor
+    if (id === 'lefthand' && wornPlacement(poseKey, 'sword')) continue; // the sword layer already shows the hand
     list.push(pose.parts.find(p => p.id === id));
   }
   return list;
@@ -298,7 +308,7 @@ function buildControls() {
 // One row per layer of the current pose, in draw order. X/Y edits write into POSES / GEAR; the up/down
 // buttons change the layer order in state.order. Gear rows are inactive while that slot is set to None.
 function layerItem(poseKey, id) {
-  if (id === 'sword' || id === 'shield' || id === 'wear') {
+  if (GEAR_SLOTS[id]) {
     return { label: GEAR_SLOTS[id], obj: wornPlacement(poseKey, id), gear: true };
   }
   const part = POSES[poseKey].parts.find(p => p.id === id);
