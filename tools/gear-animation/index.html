@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gear Layer Animation Test</title>
+<style>
+  :root { --bg:#eef2f7; --panel:#ffffff; --ink:#1b2430; --line:#d5dde8; --accent:#2563eb; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#0f1622; --panel:#17212f; --ink:#e6edf6; --line:#2a3a50; --accent:#60a5fa; }
+  }
+  :root[data-theme="dark"] { --bg:#0f1622; --panel:#17212f; --ink:#e6edf6; --line:#2a3a50; --accent:#60a5fa; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:12px; align-items:center; }
+  h1 { font-size:18px; margin:4px 0; }
+  canvas { width:500px; height:500px; max-width:100%; background:linear-gradient(#a9c9ea,#6f97c4); border:1px solid var(--line); border-radius:8px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; width:100%; box-sizing:border-box; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .panel .title { font-weight:700; width:100%; font-size:12px; opacity:.7; text-transform:uppercase; letter-spacing:.04em; }
+  button { font:inherit; padding:6px 10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:6px; cursor:pointer; }
+  button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  label { display:flex; gap:6px; align-items:center; }
+  .log { font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; opacity:.8; }
+  .note { font-size:12px; opacity:.75; text-align:center; max-width:500px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Gear Layer Animation Test</h1>
+  <canvas id="c" width="500" height="500"></canvas>
+  <div class="note" id="note"></div>
+
+  <div class="panel" id="poses"><div class="title">Pose</div></div>
+  <div class="panel" id="layers"><div class="title">Gear layers (draw order back to front)</div></div>
+  <div class="panel">
+    <div class="title">Playback</div>
+    <label><input type="checkbox" id="bob" checked> Idle bob</label>
+    <label>Speed <input type="range" id="speed" min="0.5" max="3" step="0.1" value="1"></label>
+    <label>Scale <input type="range" id="scale" min="0.6" max="1.6" step="0.05" value="1"></label>
+    <button id="restart">Restart</button>
+  </div>
+  <div class="panel">
+    <div class="title">Compare with your sample</div>
+    <label><input type="checkbox" id="ref"> Overlay sample</label>
+    <label>Opacity <input type="range" id="refAlpha" min="0" max="1" step="0.05" value="0.5"></label>
+  </div>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+// Layer placement: the six attack layers were measured against the reference composite at 1:1 scale.
+// Each position is the layer's top-left corner inside the 435x444 composite. The composite is centred on the 500x500 canvas.
+const COMPOSITE_OFFSET = { x: 32, y: 28 };
+
+const POSES = {
+  attack: {
+    label: 'attack',
+    layers: [
+      { id: 'manteau', name: 'Manteau (cape)', src: 'attack/ssattackmanteaulv10.png', x: 80,  y: 112 },
+      { id: 'leg',     name: 'Leg (boots)',    src: 'attack/ssattackfootlv10.png',    x: 66,  y: 243 },
+      { id: 'armor',   name: 'Armor',          src: 'attack/ssattackarmorlv10.png',   x: 83,  y: 113 },
+      { id: 'weapon',  name: 'Weapon (sword)', src: 'attack/ssattackswordlv10.png',   x: 40,  y: 164 },
+      { id: 'shield',  name: 'Shield',         src: 'attack/ssattackshieldlv10.png',  x: 315, y: 155 },
+      { id: 'head',    name: 'Head (helmet)',  src: 'attack/hatssattacklv10.png',     x: 198, y: 23  }
+    ],
+    body: null
+  },
+  shield: {
+    label: 'shield',
+    layers: [],
+    body: 'body/ssblock.png',
+    note: 'Shield (block) pose: body only. The shield gear layers for this pose are not in the folder yet.'
+  },
+  critical: {
+    label: 'critical',
+    layers: [],
+    body: 'body/sscritical.png',
+    note: 'Critical pose: body only. The critical gear layers for this pose are not in the folder yet.'
+  }
+};
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const logEl = document.getElementById('log');
+const noteEl = document.getElementById('note');
+const refImg = new Image();
+refImg.src = 'reference.png';
+
+const state = { pose: 'attack', on: new Set(POSES.attack.layers.map(l => l.id)), bob: true, speed: 1, scale: 1, ref: false, refAlpha: 0.5 };
+const cache = {};
+let t0 = performance.now();
+
+function load(src) {
+  if (!cache[src]) {
+    cache[src] = new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = () => rej(new Error('Failed to load ' + src));
+      img.src = src;
+    });
+  }
+  return cache[src];
+}
+
+async function draw(now) {
+  const pose = POSES[state.pose];
+  const s = state.scale;
+  const bob = state.bob ? Math.sin((now - t0) * 0.0045 * state.speed) * 4 : 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const notes = [];
+  if (pose.body) {
+    const b = await load(pose.body);
+    const w = b.naturalWidth * s, h = b.naturalHeight * s;
+    ctx.drawImage(b, (canvas.width - w) / 2, (canvas.height - h) / 2 + bob, w, h);
+    notes.push(`body ${b.naturalWidth}x${b.naturalHeight}`);
+  }
+
+  const ox = (canvas.width - 435 * s) / 2 + 0;
+  const oy = (canvas.height - 444 * s) / 2 + bob;
+  for (const layer of pose.layers) {
+    if (!state.on.has(layer.id)) continue;
+    const img = await load(layer.src);
+    ctx.drawImage(img, ox + layer.x * s, oy + layer.y * s, img.naturalWidth * s, img.naturalHeight * s);
+    notes.push(`${layer.id}: ${img.naturalWidth}x${img.naturalHeight} at (${layer.x}, ${layer.y})`);
+  }
+
+  if (state.ref && refImg.complete && refImg.naturalWidth) {
+    ctx.globalAlpha = state.refAlpha;
+    ctx.drawImage(refImg, (canvas.width - refImg.naturalWidth * s) / 2, (canvas.height - refImg.naturalHeight * s) / 2 + bob, refImg.naturalWidth * s, refImg.naturalHeight * s);
+    ctx.globalAlpha = 1;
+  }
+  logEl.textContent = notes.join('\n');
+}
+
+let rendering = false;
+function loop(now) {
+  if (!rendering) {
+    rendering = true;
+    draw(now).catch(e => logEl.textContent = e.message).finally(() => rendering = false);
+  }
+  requestAnimationFrame(loop);
+}
+
+function buildControls() {
+  const poseBox = document.getElementById('poses');
+  for (const key of Object.keys(POSES)) {
+    const b = document.createElement('button');
+    b.textContent = POSES[key].label;
+    b.dataset.pose = key;
+    b.onclick = () => selectPose(key);
+    poseBox.appendChild(b);
+  }
+  const layerBox = document.getElementById('layers');
+  for (const layer of POSES.attack.layers) {
+    const b = document.createElement('button');
+    b.textContent = layer.name;
+    b.dataset.layer = layer.id;
+    b.onclick = () => {
+      if (state.on.has(layer.id)) state.on.delete(layer.id); else state.on.add(layer.id);
+      sync();
+    };
+    layerBox.appendChild(b);
+  }
+  document.getElementById('bob').onchange = e => state.bob = e.target.checked;
+  document.getElementById('speed').oninput = e => state.speed = +e.target.value;
+  document.getElementById('scale').oninput = e => state.scale = +e.target.value;
+  document.getElementById('ref').onchange = e => state.ref = e.target.checked;
+  document.getElementById('refAlpha').oninput = e => state.refAlpha = +e.target.value;
+  document.getElementById('restart').onclick = () => { t0 = performance.now(); };
+  sync();
+}
+
+function selectPose(key) {
+  state.pose = key;
+  if (key === 'attack') state.on = new Set(POSES.attack.layers.map(l => l.id));
+  t0 = performance.now();
+  sync();
+}
+
+function sync() {
+  const pose = POSES[state.pose];
+  document.querySelectorAll('[data-pose]').forEach(b => b.classList.toggle('on', b.dataset.pose === state.pose));
+  document.querySelectorAll('[data-layer]').forEach(b => {
+    b.classList.toggle('on', state.on.has(b.dataset.layer));
+    b.disabled = pose.layers.length === 0;
+  });
+  noteEl.textContent = pose.note || '';
+}
+
+buildControls();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
