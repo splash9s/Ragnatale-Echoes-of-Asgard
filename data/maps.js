@@ -109,6 +109,9 @@ const LEAF_MAGE_LV1 = { ...MONSTERS_DATA.leafSpriteMage, role: 'mage', lv: 1 };
 // Earth lv1 mage: Hel Stone Mage with the same lv1 mage stats (only the element and art differ)
 const HEL_STONE_MAGE_LV1 = { ...MONSTERS_DATA.helStoneMage, hp: LEAF_MAGE_LV1.hp, maxHp: LEAF_MAGE_LV1.maxHp, atkMin: LEAF_MAGE_LV1.atkMin, atkMax: LEAF_MAGE_LV1.atkMax, hit: LEAF_MAGE_LV1.hit, flee: LEAF_MAGE_LV1.flee, baseExp: LEAF_MAGE_LV1.baseExp, jobExp: LEAF_MAGE_LV1.jobExp, gold: LEAF_MAGE_LV1.gold, role: 'mage', lv: 1 };
 const LV1_MAP_ENEMIES = [BASE_15.slime, BASE_15.mossyBoulder, BASE_15.archerGoblin, LEAF_MAGE_LV1];
+// Lv 20 mage: Bat Witch stats at lv 20 (48 HP, below the lv 20 tanks). The lv 60-99 mages were far too strong for this map.
+const LV20_MAGE = { ...MONSTERS_DATA.batWitch, role: 'mage', lv: 20 };
+const EARTH_LV20_MAGE = { ...LV20_MAGE, element: 'earth' }; // earth path roster: same stats, earth element
 const LV10_MAP_ENEMIES = [...LV1_MAP_ENEMIES, BASE_15.rockGolem, BASE_15.sniperKobold];
 
 // Base maps (shared by campaign paths, events and the daily challenge)
@@ -130,7 +133,7 @@ const GAME_DATA = {
         },
         map20: {
             title: "Map Lv. 20", levelReq: 20, campaignStages: 15, miniStage: 7, dropKey: 'map20',
-            enemies: [...BASE_LIST],
+            enemies: [...BASE_LIST.filter(m => m.role !== 'mage'), LV20_MAGE], // lv 20 mage replaces the lv 60-99 mages
             boss: MONSTERS_DATA.bossAncientPharaoh,
             miniBoss: makeMiniBoss(BASE_15.sniperKobold, 20)
         },
@@ -220,7 +223,7 @@ const PATH_ROSTERS = {
         { ...MONSTERS_DATA.mossyBoulder, role: 'tank',   lv: 1 },
         { ...MONSTERS_DATA.archerGoblin, role: 'range',  lv: 1 },
         { ...MONSTERS_DATA.haloPriest,   role: 'healer', lv: 40 },
-        { ...MONSTERS_DATA.helStoneMage, role: 'mage',   lv: 90 }
+        EARTH_LV20_MAGE
     ],
     fire: [
         { ...MONSTERS_DATA.slime,            role: 'melee',  lv: 1 },
