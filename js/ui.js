@@ -1860,6 +1860,7 @@ function buyGoldConsumable(itemId) {
 
     player.gold -= item.price;
     logMessage(`[Shop] Purchased ${item.name}!`, 'drop');
+    markBeginnerFlag('potion');
     floatSuccessAt("Purchased!");
     updateUI();
     saveGame();
@@ -3316,6 +3317,7 @@ function confirmPendingStats() {
         if (t <= 0 || t > player.statPoints) { pendingAlloc.stats = {}; updateUI(); return; }
         for (const k in pendingAlloc.stats) player.stats[k] += pendingAlloc.stats[k];
         player.statPoints -= t;
+        markBeginnerFlag('stat');
         pendingAlloc.stats = {};
         updateUI();
         saveGame();
@@ -3349,6 +3351,7 @@ function confirmPendingSkills() {
         if (t <= 0 || t > player.jobSp) { pendingAlloc.skills = {}; updateUI(); return; }
         for (const k in pendingAlloc.skills) player.skills[k].level += pendingAlloc.skills[k];
         player.jobSp -= t;
+        markBeginnerFlag('skill');
         pendingAlloc.skills = {};
         updateUI();
         saveGame();

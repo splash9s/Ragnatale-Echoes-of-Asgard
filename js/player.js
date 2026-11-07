@@ -412,6 +412,7 @@ function loadGame() {
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (typeof ensureDailyQuestsToday === 'function') ensureDailyQuestsToday();
             if (!player.materials) player.materials = { ironScraps: 0 };
+            if (!player.beginnerQuest) player.beginnerQuest = { index: 0, flags: {} };
             player.runes = { ...defaultRunes(), ...(player.runes || {}) };
             if (!player.clearedMaps) {
                 player.clearedMaps = {};
