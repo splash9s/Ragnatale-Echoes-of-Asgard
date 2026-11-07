@@ -151,8 +151,13 @@ function drawList(poseKey) {
   const swordOn = state.gearOn.has('sword') && pose.gear.includes('sword');
   const shieldOn = state.gearOn.has('shield') && pose.gear.includes('shield');
   const list = [];
+  // Attack: shield sits behind the armor. Base, block and critical: shield is drawn on top of the armor.
+  const shieldBehindArmor = poseKey === 'attack';
   for (const part of pose.parts) {
-    if (part.id === 'armor' && shieldOn) list.push({ id: 'shield', ...g.shield });
+    if (part.id === 'armor' && shieldOn && shieldBehindArmor) list.push({ id: 'shield', ...g.shield });
+    if (part.id === 'armor') list.push(part);
+    if (part.id === 'armor' && shieldOn && !shieldBehindArmor) list.push({ id: 'shield', ...g.shield });
+    if (part.id === 'armor') continue;
     if (part.id === 'head' && swordOn) list.push({ id: 'sword', ...g.sword });
     if (part.id === 'lefthand' && swordOn) continue;   // the sword layer already shows the hand
     list.push(part);
