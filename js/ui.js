@@ -1702,10 +1702,10 @@ function floatSuccessAt(text, ev) {
     if (ev && (ev.clientX || ev.clientY)) { x = ev.clientX; y = ev.clientY; }
     const el = document.createElement('div');
     el.textContent = text;
-    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#86efac; font-weight:700; font-size:12px; text-shadow:0 1px 3px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform .9s ease-out, opacity .9s ease-out;`;
+    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#86efac; font-weight:800; font-size:22px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform 1.8s ease-out 0.4s, opacity 0.6s ease-in 1.4s;`;
     document.body.appendChild(el);
-    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-190%)'; el.style.opacity = '0'; }));
-    setTimeout(() => el.remove(), 1000);
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-220%)'; el.style.opacity = '0'; }));
+    setTimeout(() => el.remove(), 2200);
 }
 
 function updateTownAlerts() {
@@ -1860,7 +1860,7 @@ function buyGoldConsumable(itemId) {
 
     player.gold -= item.price;
     logMessage(`[Shop] Purchased ${item.name}!`, 'drop');
-    floatSuccessAt(`You successfully purchased 1x ${item.name}!`);
+    floatSuccessAt("Purchased!");
     updateUI();
     saveGame();
 }
@@ -1939,7 +1939,7 @@ function buyArmoryItem(itemIndex) {
     gearItem.debuffs = [];
     addItemToInventory(gearItem);
     logMessage(`[Shop] Purchased ${gearItem.name}!`, 'drop');
-    floatSuccessAt(`You purchased ${gearItem.name}!`);
+    floatSuccessAt("Purchased!");
     updateUI();
     saveGame();
 }
@@ -1996,13 +1996,13 @@ function buyDiamondItem(itemId) {
     player.diamondsSpent = (player.diamondsSpent || 0) + item.price; // total diamonds spent in the shop (avatar unlocks)
     if (item.type === 'resurrection') {
         player.resurrectionPotions = (player.resurrectionPotions || 0) + 1;
-        floatSuccessAt("You bought a Resurrection Potion!");
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'material') {
         player.refiningStones = (player.refiningStones || 0) + 5;
-        floatSuccessAt("You bought 5 Refining Stones!");
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'bs_rune') {
         player.blacksmithRuneStones = (player.blacksmithRuneStones || 0) + 1;
-        floatSuccessAt("You bought a Blacksmith Rune Stone!");
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'service') {
         let totalSpent = (player.stats.str - 1) + (player.stats.agi - 1) + (player.stats.vit - 1) + (player.stats.int - 1) + (player.stats.dex - 1) + (player.stats.luk - 1);
         player.statPoints += totalSpent;
@@ -2018,7 +2018,7 @@ function buyDiamondItem(itemId) {
         showModal("Skill Reset Successful", `All skills reset and ${refunded} Class SP refunded!`);
     } else if (item.type === 'chest') {
         placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
-        floatSuccessAt(`You bought a ${item.name}! Open it from your inventory.`);
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'vip') {
         player.vipUntil = Date.now() + item.days * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
@@ -2028,7 +2028,7 @@ function buyDiamondItem(itemId) {
         showModal("Boost Active", `${item.name} started. It lasts 1 hour from now.`);
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
-        floatSuccessAt(`You adopted a ${item.name}!`);
+        floatSuccessAt("Purchased!");
     }
 
     updateUI();
