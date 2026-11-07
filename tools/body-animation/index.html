@@ -18,17 +18,21 @@
   .panel .title { font-weight:700; width:100%; font-size:12px; opacity:.7; text-transform:uppercase; letter-spacing:.04em; }
   button { font:inherit; padding:6px 10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:6px; cursor:pointer; }
   button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button:disabled { opacity:.4; cursor:not-allowed; }
   label { display:flex; gap:6px; align-items:center; }
   .log { font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; opacity:.8; }
+  .note { font-size:12px; opacity:.75; text-align:center; max-width:500px; min-height:1em; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Body Part Animation Test</h1>
   <canvas id="c" width="500" height="500"></canvas>
+  <div class="note" id="note"></div>
 
   <div class="panel" id="poses"><div class="title">Pose</div></div>
-  <div class="panel" id="parts"><div class="title">Body parts (draw order back to front)</div></div>
+  <div class="panel" id="parts"><div class="title">Body parts</div></div>
+  <div class="panel" id="gear"><div class="title">Equipment (attack pose only for now)</div></div>
   <div class="panel">
     <div class="title">Playback</div>
     <label><input type="checkbox" id="bob" checked> Idle bob</label>
@@ -40,39 +44,77 @@
 </div>
 
 <script>
-// Part placement, as the top-left corner inside the 435x444 figure space. The figure is centred on the 500x500 canvas.
-// Attack placements come from matching the parts against the attack reference (hands by template match, leg from its foot-gear footprint,
-// head and armor centred on their gear). Base placements: head, armor and leg are aligned to the attack parts, and the hands sit at the
-// sleeve ends of the base armor (the base hands were not matched to the reference, since the base pose has no reference image).
+// Placements are top-left corners in the 435x444 figure space, which is centred on the 500x500 canvas.
+// Attack: hands by template match against the attack reference, leg from its foot-gear footprint, head and armor centred on their gear.
+// Base: head, armor and leg aligned to the attack parts; hands at the base armor's sleeve ends.
+// Block and critical: leg visible centre and bottom aligned to the other poses; armor centred and bottom-aligned; hands at sleeve ends.
+// Critical head sits under the torso (the raised arm changes the armor's top edge).
+// Gear (sword and shield) comes from the attack lv10 layers and only fits the attack pose.
 const FIGURE_SIZE = { w: 435, h: 444 };
+
+const GEAR_ATTACK = {
+  shield: { id: 'shield', name: 'Shield', src: 'gear/ssattackshieldlv10.png', x: 315, y: 155 },
+  sword:  { id: 'sword',  name: 'Sword',  src: 'gear/ssattackswordlv10.png',  x: 40,  y: 164 }
+};
 
 const POSES = {
   base: {
     label: 'base',
     parts: [
-      { id: 'leg',       name: 'Leg',         src: 'base/dbaseleg.png',      x: 96,  y: 229 },
-      { id: 'armor',     name: 'Armor',       src: 'base/dbasearmor.png',    x: 103, y: 127 },
-      { id: 'head',      name: 'Head',        src: 'base/dbasehead.png',     x: 196, y: 25  },
-      { id: 'lefthand',  name: 'Left hand',   src: 'base/dbaselefthand.png', x: 78,  y: 225 },
-      { id: 'righthand', name: 'Right hand',  src: 'base/dbaserighthand.png',x: 307, y: 219 }
-    ]
+      { id: 'leg',       name: 'Leg',        src: 'base/dbaseleg.png',       x: 96,  y: 229 },
+      { id: 'armor',     name: 'Armor',      src: 'base/dbasearmor.png',     x: 103, y: 127 },
+      { id: 'head',      name: 'Head',       src: 'base/dbasehead.png',      x: 196, y: 25  },
+      { id: 'lefthand',  name: 'Left hand',  src: 'base/dbaselefthand.png',  x: 78,  y: 225 },
+      { id: 'righthand', name: 'Right hand', src: 'base/dbaserighthand.png', x: 307, y: 219 }
+    ],
+    gear: []
   },
   attack: {
     label: 'attack',
     parts: [
-      { id: 'leg',       name: 'Leg',         src: 'attack/dattackleg.png',       x: -1,  y: 185 },
-      { id: 'armor',     name: 'Armor',       src: 'attack/dattackarmor.png',     x: 84,  y: 118 },
-      { id: 'head',      name: 'Head',        src: 'attack/dattackhead.png',      x: 193, y: 21  },
-      { id: 'lefthand',  name: 'Left hand',   src: 'attack/dattacklefthand.png',  x: 57,  y: 176 },
-      { id: 'righthand', name: 'Right hand',  src: 'attack/dattackrighthand.png', x: 306, y: 224 }
-    ]
+      { id: 'leg',       name: 'Leg',        src: 'attack/dattackleg.png',       x: -1,  y: 185 },
+      { id: 'armor',     name: 'Armor',      src: 'attack/dattackarmor.png',     x: 84,  y: 118 },
+      { id: 'head',      name: 'Head',       src: 'attack/dattackhead.png',      x: 193, y: 21  },
+      { id: 'lefthand',  name: 'Left hand',  src: 'attack/dattacklefthand.png',  x: 57,  y: 176 },
+      { id: 'righthand', name: 'Right hand', src: 'attack/dattackrighthand.png', x: 306, y: 224 }
+    ],
+    // Draw order: shield behind armor, sword in front of armor, then the hands
+    gear: ['shield', 'sword']
+  },
+  block: {
+    label: 'block',
+    parts: [
+      { id: 'leg',       name: 'Leg',        src: 'block/dblockleg.png',       x: 61,  y: 270 },
+      { id: 'armor',     name: 'Armor',      src: 'block/dblockarmor.png',     x: 94,  y: 124 },
+      { id: 'head',      name: 'Head',       src: 'block/dblockhead.png',      x: 192, y: 27  },
+      { id: 'lefthand',  name: 'Left hand',  src: 'block/dblocklefthand.png',  x: 69,  y: 198 },
+      { id: 'righthand', name: 'Right hand', src: 'block/dblockrighthand.png', x: 320, y: 216 }
+    ],
+    gear: []
+  },
+  critical: {
+    label: 'critical',
+    parts: [
+      { id: 'leg',       name: 'Leg',        src: 'critical/dcriticalleg.png',       x: 4,   y: 226 },
+      { id: 'armor',     name: 'Armor',      src: 'critical/dcriticalarmor.png',     x: 12,  y: 30  },
+      { id: 'head',      name: 'Head',       src: 'critical/dcriticalhead.png',      x: 176, y: 28  },
+      { id: 'lefthand',  name: 'Left hand',  src: 'critical/dcriticallefthand.png',  x: 78,  y: 263 },
+      { id: 'righthand', name: 'Right hand', src: 'critical/dcriticalrighthand.png', x: 308, y: 204 }
+    ],
+    gear: []
   }
 };
 
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 const logEl = document.getElementById('log');
-const state = { pose: 'attack', on: new Set(POSES.attack.parts.map(p => p.id)), bob: true, speed: 1, scale: 1 };
+const noteEl = document.getElementById('note');
+const state = {
+  pose: 'attack',
+  on: new Set(POSES.attack.parts.map(p => p.id)),
+  gearOn: new Set(['shield', 'sword']),
+  bob: true, speed: 1, scale: 1
+};
 const cache = {};
 let t0 = performance.now();
 
@@ -88,6 +130,24 @@ function load(src) {
   return cache[src];
 }
 
+// Build the draw list for the current pose. Gear is inserted at the position its draw order requires.
+function drawList(pose) {
+  const list = [];
+  const gearIds = pose.gear;
+  for (const part of pose.parts) {
+    if (part.id === 'armor') {
+      if (gearIds.includes('shield') && state.gearOn.has('shield')) list.push({ ...GEAR_ATTACK.shield });
+      list.push(part);
+    } else if (part.id === 'lefthand') {
+      if (gearIds.includes('sword') && state.gearOn.has('sword')) list.push({ ...GEAR_ATTACK.sword });
+      list.push(part);
+    } else {
+      list.push(part);
+    }
+  }
+  return list;
+}
+
 let rendering = false;
 async function draw(now) {
   const pose = POSES[state.pose];
@@ -97,11 +157,12 @@ async function draw(now) {
   const oy = (canvas.height - FIGURE_SIZE.h * s) / 2 + bob;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const notes = [];
-  for (const part of pose.parts) {
-    if (!state.on.has(part.id)) continue;
-    const img = await load(part.src);
-    ctx.drawImage(img, ox + part.x * s, oy + part.y * s, img.naturalWidth * s, img.naturalHeight * s);
-    notes.push(`${part.id}: ${img.naturalWidth}x${img.naturalHeight} at (${part.x}, ${part.y})`);
+  for (const item of drawList(pose)) {
+    const isGear = !!item.src && item.src.startsWith('gear/');
+    if (!isGear && !state.on.has(item.id)) continue;
+    const img = await load(item.src);
+    ctx.drawImage(img, ox + item.x * s, oy + item.y * s, img.naturalWidth * s, img.naturalHeight * s);
+    notes.push(`${item.id}: ${img.naturalWidth}x${img.naturalHeight} at (${item.x}, ${item.y})`);
   }
   logEl.textContent = notes.join('\n');
 }
@@ -123,6 +184,7 @@ function buildControls() {
     b.onclick = () => selectPose(key);
     poseBox.appendChild(b);
   }
+
   const partBox = document.getElementById('parts');
   for (const part of POSES.attack.parts) {
     const b = document.createElement('button');
@@ -134,6 +196,20 @@ function buildControls() {
     };
     partBox.appendChild(b);
   }
+
+  const gearBox = document.getElementById('gear');
+  for (const key of Object.keys(GEAR_ATTACK)) {
+    const g = GEAR_ATTACK[key];
+    const b = document.createElement('button');
+    b.textContent = g.name + ': on';
+    b.dataset.gear = key;
+    b.onclick = () => {
+      if (state.gearOn.has(key)) state.gearOn.delete(key); else state.gearOn.add(key);
+      sync();
+    };
+    gearBox.appendChild(b);
+  }
+
   document.getElementById('bob').onchange = e => state.bob = e.target.checked;
   document.getElementById('speed').oninput = e => state.speed = +e.target.value;
   document.getElementById('scale').oninput = e => state.scale = +e.target.value;
@@ -149,8 +225,18 @@ function selectPose(key) {
 }
 
 function sync() {
+  const pose = POSES[state.pose];
   document.querySelectorAll('[data-pose]').forEach(b => b.classList.toggle('on', b.dataset.pose === state.pose));
   document.querySelectorAll('[data-part]').forEach(b => b.classList.toggle('on', state.on.has(b.dataset.part)));
+  document.querySelectorAll('[data-gear]').forEach(b => {
+    const key = b.dataset.gear;
+    const has = pose.gear.includes(key);
+    const on = has && state.gearOn.has(key);
+    b.disabled = !has;
+    b.classList.toggle('on', on);
+    b.textContent = GEAR_ATTACK[key].name + ': ' + (on ? 'on' : 'off');
+  });
+  noteEl.textContent = pose.gear.length === 0 ? 'No equipment layers for this pose yet.' : '';
 }
 
 buildControls();
