@@ -4283,24 +4283,28 @@ function renderLibraryView() {
                 <span class="text-[9px] text-slate-500">${kind}</span></div>`;
         }).join('');
     }
-    if (monstersEl && typeof MONSTERS_DATA !== 'undefined') {
-        // Normal monsters the game uses: base roster and element-path rosters (bosses are not listed here)
-        const normalIds = new Set();
-        if (typeof BASE_15 !== 'undefined') Object.values(BASE_15).forEach(m => normalIds.add(m.id));
-        if (typeof LV10_MAP_ENEMIES !== 'undefined') LV10_MAP_ENEMIES.forEach(m => normalIds.add(m.id));
-        if (typeof PATH_ROSTERS !== 'undefined') Object.values(PATH_ROSTERS).forEach(list => list.forEach(m => normalIds.add(m.id)));
-        const rows = Object.values(MONSTERS_DATA).filter(m => normalIds.has(m.id) && !m.isBoss).map(m => {
-            const el = (ROLE_ICONS[m.role || (m.isRanged ? 'range' : 'melee')] || '') + ' ' + (m.element && ELEMENTS[m.element] ? `${ELEMENTS[m.element].icon} ${ELEMENTS[m.element].name}` : 'None');
-            const type = m.isBoss ? 'Boss' : (m.isRanged ? 'Ranged' : 'Melee');
-            return `<tr class="border-t border-slate-800 ${m.isBoss ? 'text-amber-300' : 'text-slate-200'}">
-                <td class="py-1.5 pr-2">${m.name}</td><td class="pr-2">${type}</td><td class="pr-2">${el}</td>
-                <td class="pr-2 font-mono">${m.maxHp}</td><td class="pr-2 font-mono">${m.atkMin}-${m.atkMax}</td>
-                <td class="pr-2 font-mono">${m.hit}</td><td class="font-mono">${m.flee}</td></tr>`;
+    if (monstersEl && typeof MONSTERS_DATA !== 'undefined' && typeof MONSTER_CURVE !== 'undefined') {
+        // Normal monsters (animated pool) and their strength by map level (from the level curve in data/maps.js)
+        const roleName = r => r.charAt(0).toUpperCase() + r.slice(1);
+        const list = (typeof ANIMATED_POOL !== 'undefined' ? ANIMATED_POOL : []).map(m => {
+            const role = curveRoleOf(m);
+            const el = m.element && ELEMENTS[m.element] ? `${ELEMENTS[m.element].icon} ${ELEMENTS[m.element].name}` : 'None';
+            return `<tr class="border-t border-slate-800 text-slate-200"><td class="py-1.5 pr-2">${m.name}</td><td class="pr-2">${ROLE_ICONS[role] || ''} ${roleName(role)}</td><td>${el}</td></tr>`;
+        }).join('');
+        const cell = s => `<td class="pr-2 font-mono">${s.maxHp} / ${s.atkMin}-${s.atkMax}</td>`;
+        const curveRows = MONSTER_CURVE.map(([L]) => {
+            const at = role => levelScaled({ role }, L);
+            const boss = typeof makeBoss === 'function' ? makeBoss(curveBoss({}, L)) : curveBoss({}, L);
+            return `<tr class="border-t border-slate-800 text-slate-200"><td class="py-1.5 pr-2 font-bold">Lv ${L}</td>${cell(at('melee'))}${cell(at('tank'))}${cell(at('range'))}${cell(at('mage'))}${cell(at('healer'))}<td class="pr-2 font-mono">${at('healer').heal}</td>${cell(boss)}</tr>`;
         }).join('');
         monstersEl.innerHTML = `<div class="overflow-x-auto"><table class="w-full text-[10px] text-left">
-            <thead><tr class="text-slate-400 uppercase"><th class="pb-1 pr-2">Name</th><th class="pr-2">Type</th><th class="pr-2">Element</th><th class="pr-2">HP</th><th class="pr-2">ATK</th><th class="pr-2">HIT</th><th>FLEE</th></tr></thead>
-            <tbody>${rows}</tbody></table></div>
-            <p class="text-[10px] text-slate-500 mt-2">Campaign monsters take the element of their path. Bosses are about 25% stronger and mini bosses have 3x HP.</p>`;
+            <thead><tr class="text-slate-400 uppercase"><th class="pb-1 pr-2">Name</th><th class="pr-2">Role</th><th>Element</th></tr></thead>
+            <tbody>${list}</tbody></table></div>
+            <p class="text-[10px] text-slate-400 mt-3 mb-1 font-bold uppercase">Strength by map level (HP / ATK)</p>
+            <div class="overflow-x-auto"><table class="w-full text-[10px] text-left">
+            <thead><tr class="text-slate-400 uppercase"><th class="pb-1 pr-2">Map</th><th class="pr-2">Melee</th><th class="pr-2">Tank</th><th class="pr-2">Range</th><th class="pr-2">Mage</th><th class="pr-2">Healer</th><th class="pr-2">Heal</th><th>Boss</th></tr></thead>
+            <tbody>${curveRows}</tbody></table></div>
+            <p class="text-[10px] text-slate-500 mt-2">Every monster on a map has the map's level; its stats come from its role. Tanks have 20% armor. Mini bosses have 3x HP and 1.5x ATK. Campaign monsters take the element of their path. A player within 5 levels of the map can clear it.</p>`;
     }
 }
 

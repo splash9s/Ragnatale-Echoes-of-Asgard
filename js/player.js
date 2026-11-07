@@ -3,6 +3,7 @@
 // ==========================================
 
 const MAX_POTION_SLOT = 5;
+const ASPD_CAP = 150; // max ASPD (attack interval = 2000 - ASPD x 10 ms, so 150 = 500 ms)
 const BAG_SLOTS = 63;
 
 let player = {
@@ -367,6 +368,7 @@ function getDerivedStats() {
     hit += extra.hit;
     crit += extra.crit;
     aspd += skillBonus('aspd') + extra.aspd;
+    aspd = Math.min(ASPD_CAP, aspd); // ASPD cap: 150 = one attack every 0.5 s
     // Armor comes only from items (default 0)
     const maxArmor = Math.max(0, Math.floor(extra.armor * (1 + skillBonus('armorPct') / 100)));
 

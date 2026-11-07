@@ -489,7 +489,7 @@ function finalStageMult(stage) {
 function spawnFinalStage() {
     const mult = finalStageMult(currentStage);
     if (currentStage === maxStages) {
-        const boss = makeBoss(MONSTERS_DATA.bossWorldEater);
+        const boss = makeBoss(curveBoss(MONSTERS_DATA.bossWorldEater, 110)); // final boss: top of the level curve, then FINAL_BOSS_MULT
         const up = v => Math.floor(v * FINAL_BOSS_MULT);
         const finalBoss = { ...boss, hp: up(boss.hp), maxHp: up(boss.maxHp), atkMin: up(boss.atkMin), atkMax: up(boss.atkMax), isFinalBoss: true };
         const escorts = [
@@ -605,7 +605,7 @@ function spawnStageMonsters() {
             const mult = currentMode === 'endless' ? 1 : stageMultiplier(); // Void Tower: one level 1 slime per stage
             for (let i = 0; i < count; i++) {
                 const picked = pool[Math.floor(Math.random() * pool.length)];
-                const template = currentMode === 'daily' ? picked : levelScaled(picked, currentMode === 'endless' ? 1 : (activeMap && activeMap.levelReq));
+                const template = (currentMode === 'daily' || currentMode === 'endless') ? picked : levelScaled(picked, activeMap && activeMap.levelReq); // Void Tower keeps its raw lv 1 slime
                 const base = {
                     ...template,
                     hp: Math.floor(template.hp * mult),
@@ -701,15 +701,15 @@ function combatHitFlee(t) {
     return { hit: t.hit, flee: t.flee };
 }
 
+// Map difficulty now lives in the level curve (MONSTER_CURVE in data/maps.js), so stages add no extra multiplier
 function stageMultiplier() {
-    return mapPower().hp;
+    return 1;
 }
 
 // A fresh copy of a template for this stage
-// Tank monsters deal 70% damage
-// Lv. 1 maps use the table ATK for every role, so this only applies above Lv. 1
+// (Tank damage used to be cut to 70% here; it is now part of the tank profile in the level curve.)
 function tankDamageMult(t) {
-    return roleOf(t) === 'tank' && !(activeMap && activeMap.levelReq === 1) ? 0.7 : 1;
+    return 1; // tank damage is part of the tank role profile in the level curve (ROLE_CURVE.tank.atk)
 }
 
 function makeUnit(t, mult) {
@@ -1773,6 +1773,7 @@ function buildEventMap(kind, mapKey) {
     const base = GAME_DATA.maps[mapKey];
     const scale = t => ({
         ...t,
+        powerMult: (t.powerMult || 1) * 1.5, // regular monsters get their stats from the level curve, x1.5
         hp: Math.floor(t.hp * 1.5),
         maxHp: Math.floor(t.maxHp * 1.5),
         atkMin: Math.floor(t.atkMin * 1.5),
