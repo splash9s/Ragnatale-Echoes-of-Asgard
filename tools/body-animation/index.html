@@ -33,12 +33,18 @@
   <div class="panel" id="poses"><div class="title">Pose</div></div>
   <div class="panel" id="parts"><div class="title">Body parts</div></div>
   <div class="panel" id="gear"><div class="title">Equipment</div></div>
+  <div class="panel" id="pos"><div class="title">Position (X, Y of top-left corner, page px)</div></div>
   <div class="panel">
     <div class="title">Playback</div>
     <label><input type="checkbox" id="bob" checked> Idle bob</label>
     <label>Speed <input type="range" id="speed" min="0.5" max="3" step="0.1" value="1"></label>
     <label>Scale <input type="range" id="scale" min="0.6" max="1.6" step="0.05" value="1"></label>
     <button id="restart">Restart</button>
+  </div>
+  <div class="panel">
+    <div class="title">Export positions</div>
+    <button id="copy">Copy all positions</button>
+    <textarea id="export" readonly rows="8" style="width:100%;font:12px/1.4 ui-monospace,monospace;box-sizing:border-box"></textarea>
   </div>
   <div class="log" id="log"></div>
 </div>
@@ -151,17 +157,13 @@ function drawList(poseKey) {
   const swordOn = state.gearOn.has('sword') && pose.gear.includes('sword');
   const shieldOn = state.gearOn.has('shield') && pose.gear.includes('shield');
   const list = [];
-  // Attack: shield sits behind the armor. Base, block and critical: shield is drawn on top of the armor.
-  const shieldBehindArmor = poseKey === 'attack';
   for (const part of pose.parts) {
-    if (part.id === 'armor' && shieldOn && shieldBehindArmor) list.push({ id: 'shield', ...g.shield });
-    if (part.id === 'armor') list.push(part);
-    if (part.id === 'armor' && shieldOn && !shieldBehindArmor) list.push({ id: 'shield', ...g.shield });
-    if (part.id === 'armor') continue;
     if (part.id === 'head' && swordOn) list.push({ id: 'sword', ...g.sword });
     if (part.id === 'lefthand' && swordOn) continue;   // the sword layer already shows the hand
     list.push(part);
   }
+  // Shield is always the top layer, drawn after the body and sword.
+  if (shieldOn) list.push({ id: 'shield', ...g.shield });
   return list;
 }
 
@@ -231,13 +233,65 @@ function buildControls() {
   document.getElementById('speed').oninput = e => state.speed = +e.target.value;
   document.getElementById('scale').oninput = e => state.scale = +e.target.value;
   document.getElementById('restart').onclick = () => { t0 = performance.now(); };
+  document.getElementById('copy').onclick = async () => {
+    const text = exportPositions();
+    document.getElementById('export').value = text;
+    try { await navigator.clipboard.writeText(text); } catch (e) { /* clipboard may be blocked; text is still in the box */ }
+  };
+  buildPosRows();
   sync();
+}
+
+// One X/Y row per visible part and equipment piece of the current pose. Edits write straight into the
+// POSES / GEAR objects, so the next frame draws the new position.
+function buildPosRows() {
+  const box = document.getElementById('pos');
+  box.querySelectorAll('.row').forEach(r => r.remove());
+  const pose = POSES[state.pose];
+  const items = [
+    ...pose.parts.map(p => ({ label: p.name, obj: p })),
+    ...pose.gear.map(k => ({ label: GEAR_NAMES[k], obj: GEAR[state.pose][k] }))
+  ];
+  for (const it of items) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;width:100%';
+    const name = document.createElement('span');
+    name.textContent = it.label;
+    name.style.cssText = 'width:90px';
+    row.appendChild(name);
+    for (const axis of ['x', 'y']) {
+      const lab = document.createElement('label');
+      lab.textContent = axis.toUpperCase() + ' ';
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.step = '1';
+      inp.value = it.obj[axis];
+      inp.style.width = '80px';
+      inp.oninput = () => { if (inp.value !== '') it.obj[axis] = Math.round(+inp.value); };
+      lab.appendChild(inp);
+      row.appendChild(lab);
+    }
+    box.appendChild(row);
+  }
+}
+
+// Plain text of every pose's part and gear positions, ready to paste back.
+function exportPositions() {
+  const out = {};
+  for (const key of Object.keys(POSES)) {
+    out[key] = { parts: {}, gear: {} };
+    for (const p of POSES[key].parts) out[key].parts[p.id] = { x: p.x, y: p.y };
+    for (const k of POSES[key].gear) out[key].gear[k] = { x: GEAR[key][k].x, y: GEAR[key][k].y };
+  }
+  return JSON.stringify(out, null, 2);
 }
 
 function selectPose(key) {
   state.pose = key;
   state.on = new Set(POSES[key].parts.map(p => p.id));
   t0 = performance.now();
+  buildPosRows();
   sync();
 }
 
