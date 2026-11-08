@@ -63,10 +63,42 @@ async function cloudHasSession() {
         return !!session;
     } catch (e) { return false; }
 }
+// Cloudflare Turnstile site key (public). Supabase checks the token against the secret key set in its dashboard.
+const TURNSTILE_SITE_KEY = '0x4AAAAAAF4dLDqdgb20d9iY';
+let turnstileWidgetId = null;
+let turnstileResolve = null;
+
+// Gets a fresh CAPTCHA token from the widget on the sign-in page. Resolves null if it is unavailable or times out.
+function cloudCaptchaToken() {
+    return new Promise(resolve => {
+        const box = document.getElementById('turnstile-box');
+        if (!window.turnstile || !box) { resolve(null); return; }
+        const finish = (token) => {
+            const r = turnstileResolve;
+            turnstileResolve = null;
+            if (r) r(token);
+        };
+        turnstileResolve = resolve;
+        setTimeout(() => finish(null), 60000);
+        if (turnstileWidgetId === null) {
+            turnstileWidgetId = turnstile.render(box, {
+                sitekey: TURNSTILE_SITE_KEY,
+                callback: (token) => finish(token),
+                'error-callback': () => finish(null),
+                'expired-callback': () => finish(null),
+            });
+        } else {
+            turnstile.reset(turnstileWidgetId);
+        }
+    });
+}
+
 async function cloudSignInAnonymous() {
     if (!cloudInitClient()) return false;
     try {
-        const r = await cloudClient.auth.signInAnonymously();
+        const captchaToken = await cloudCaptchaToken();
+        if (!captchaToken) throw new Error('CAPTCHA was not completed');
+        const r = await cloudClient.auth.signInAnonymously({ options: { captchaToken } });
         if (r.error) throw r.error;
         return true;
     } catch (e) {
