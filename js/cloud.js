@@ -217,13 +217,15 @@ async function claimServerMail(serverId) {
     }
 }
 
-// Used by reset: removes the cloud save and stops any pending write
+// Used by reset: removes the cloud save, signs this browser out and stops any pending write.
+// Signing out makes the next start show the sign-in page again.
 async function cloudDeleteSave() {
     cloudDisabled = true;
     cloudDirty = false;
-    if (!cloudClient || !cloudUserId) return;
+    if (!cloudClient) return;
     try {
-        await cloudClient.from('saves').delete().eq('user_id', cloudUserId);
+        if (cloudUserId) await cloudClient.from('saves').delete().eq('user_id', cloudUserId);
+        await cloudClient.auth.signOut({ scope: 'local' });
     } catch (e) {
         console.warn('Cloud reset failed:', e);
     }
