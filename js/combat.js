@@ -567,7 +567,6 @@ function spawnStageMonsters() {
     if (runeN('turnStun') > 0) { playerStunUntil = Date.now() + 5000; logMessage('[Stasis] You are stunned for 5 seconds', 'winlose'); }
     playerTimedDebuffs = {};
     playerAspdToggle = false;
-    combatPlayerDeath.at = 0;
     const derived = getDerivedStats();
     monstersList = [];
     const dailyScale = currentMode === 'daily' ? 0.7 : 1;
@@ -1317,7 +1316,6 @@ function monsterTurnTick() {
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
-        startPlayerDeathAnim(); // the fall plays first
         setTimeout(() => { // the result waits 3 seconds
             player.hp = getDerivedStats().maxHp;
             updateUI();

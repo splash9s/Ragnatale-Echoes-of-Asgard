@@ -789,11 +789,6 @@ function combatCriFrame(attack) {
     if (!Array.isArray(cri)) return cri;
     return cri[attack.criIdx || 0];
 }
-const COMBAT_PLAYER_FALL_MS = 2000; // fall time (6 fps steps from COMBAT_PLAYER_FALL_PX above the ground)
-const COMBAT_PLAYER_FALL_PX = 120;
-const COMBAT_PLAYER_FALL_FPS = 6;
-const COMBAT_PLAYER_GROUND_MS = 1000; // then chadead2 for 1 second
-let combatPlayerDeath = { at: 0 }; // when the player fell (0 = not dead)
 const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
 const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
@@ -987,18 +982,6 @@ function lungeHat(el, dx) {
     }
 }
 // Place a reaction frame on the player's feet point
-// Death: chadead1 falls 6 steps per second onto the ground, then chadead2 lies there
-function applyPlayerDeathFrame(img, t) {
-    img.style.animation = 'none'; // stop the idle bob
-    if (t < COMBAT_PLAYER_FALL_MS) {
-        const steps = COMBAT_PLAYER_FALL_MS * COMBAT_PLAYER_FALL_FPS / 1000;
-        const step = Math.min(steps, Math.floor(t * COMBAT_PLAYER_FALL_FPS / 1000));
-        applyPlayerFrame(img, combatPose().DEAD1, -COMBAT_PLAYER_FALL_PX * (1 - step / steps));
-    } else {
-        applyPlayerFrame(img, combatPose().DEAD2);
-    }
-}
-function startPlayerDeathAnim() { combatPlayerDeath.at = Date.now(); }
 function applyPlayerReactFrame(img, f) {
     applyPlayerFrame(img, f);
 }
@@ -1049,10 +1032,6 @@ const LINEUP_DEFAULT_POS = [[914, 784], [1065, 784], [1218, 769], [1358, 721], [
 setInterval(() => {
     const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
-        if (img.id === 'combat-player-sprite' && combatPlayerDeath.at) {
-            applyPlayerDeathFrame(img, now - combatPlayerDeath.at);
-            return;
-        }
         if (img.id === 'combat-player-sprite') {
             const ae = now - combatPlayerAttack.at;
             if (combatPlayerAttack.at && ae >= 0 && ae < COMBAT_PLAYER_ATTACK_MS) {
