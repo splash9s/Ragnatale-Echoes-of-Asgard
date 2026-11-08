@@ -672,6 +672,7 @@ function showHealAura(selector) {
 // Each frame's feet point is placed at COMBAT_PLAYER_FOOT relative to the anchor.
 // That offset is the idle frame's feet point, so the idle pose stays where it was.
 const COMBAT_PLAYER_FOOT = { x: 23.5, y: -1 };
+const COMBAT_PLAYER_SCALE = 0.5; // the battle hero is drawn at half the frame size
 // The pose frames come from js/hero-body.js (combatPose)
 // The critical frame to show: a set may have several (picked at random when the attack starts)
 function combatCriFrame(attack) {
@@ -697,10 +698,11 @@ function playPlayerAttackAnim(isCrit) {
 function applyPlayerFrame(img, f, dy = 0) {
     if (!f) return; // still loading
     img.src = f.src;
-    img.style.left = (combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - (f.fx !== undefined ? f.fx : f.w / 2)) + 'px';
-    img.style.top = (combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y - (f.fy !== undefined ? f.fy : f.h) + dy) + 'px';
-    img.style.width = f.w + 'px';
-    img.style.height = f.h + 'px';
+    const S = COMBAT_PLAYER_SCALE;
+    img.style.left = (combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - (f.fx !== undefined ? f.fx : f.w / 2) * S) + 'px';
+    img.style.top = (combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y - (f.fy !== undefined ? f.fy : f.h) * S + dy * S) + 'px';
+    img.style.width = f.w * S + 'px';
+    img.style.height = f.h * S + 'px';
 }
 
 // Equipped pet: the pet's idle art stands beside the player's feet, 10px to the left of the player's feet, on the same ground line.
