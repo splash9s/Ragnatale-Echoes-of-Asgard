@@ -7,8 +7,8 @@ const HERO_BODY_POSES = {
     id: 'leg',
     name: 'Leg',
     src: 'assets/body/base/dbaseleg.png',
-    x: 196,
-    y: 263,
+    x: 192,
+    y: 258,
     sc: 1
    },
    {
@@ -40,7 +40,7 @@ const HERO_BODY_POSES = {
     name: 'Right hand',
     src: 'assets/body/base/dbaserighthand.png',
     x: 353,
-    y: 220,
+    y: 228,
     sc: 1.05
    }
   ]
@@ -500,8 +500,8 @@ const HERO_BODY_GEAR = {
    },
    shoplv30: {
     src: 'assets/body/gear/helmet/shop/ssbaseshoplv30.png',
-    x: 193,
-    y: 9,
+    x: 196,
+    y: 8,
     sc: 1
    },
    shoplv40: {
@@ -588,7 +588,7 @@ const HERO_BODY_GEAR = {
   sword: {
    lv10: {
     src: 'assets/body/gear/base/ssbasesword.png',
-    x: 25,
+    x: 18,
     y: 241,
     sc: 1
    }
@@ -640,7 +640,7 @@ const HERO_BODY_GEAR = {
    },
    lv10: {
     src: 'assets/body/gear/foot/ssbasefootlv10.png',
-    x: 196,
+    x: 190,
     y: 256,
     sc: 1
    }
