@@ -221,22 +221,36 @@ async function signInWithGmail() {
     if (!started) showCharacterPage();
 }
 
-function startGameWithName() {
-    let nameInputEl = document.getElementById('input-player-name');
-    let nameInput = nameInputEl ? nameInputEl.value.trim().slice(0, MAX_NAME_LENGTH) : "VanguardHero";
+let startNameBusy = false;
+async function startGameWithName() {
+    if (startNameBusy) return;
+    startNameBusy = true;
+    try {
+        let nameInputEl = document.getElementById('input-player-name');
+        let nameInput = nameInputEl ? nameInputEl.value.trim().slice(0, MAX_NAME_LENGTH) : "VanguardHero";
 
-    if (nameInput) player.name = nameInput;
-    player.avatar = START_AVATAR;
-    saveGame();
+        // Player names are unique: a name another player uses is refused and the name window stays open
+        if (nameInput && await cloudNameTaken(nameInput)) {
+            showModal('Name taken', `"${nameInput}" is already used by another player. Choose a different name.`);
+            return;
+        }
 
-    let nameSelectModal = document.getElementById('view-name-select');
-    if (nameSelectModal) {
-        nameSelectModal.classList.add('hidden');
-        nameSelectModal.style.display = 'none';
+        if (nameInput) player.name = nameInput;
+        player.avatar = START_AVATAR;
+        saveGame();
+        if (typeof cloudPushProfile === 'function') cloudPushProfile(); // the friend list shows this name at once
+
+        let nameSelectModal = document.getElementById('view-name-select');
+        if (nameSelectModal) {
+            nameSelectModal.classList.add('hidden');
+            nameSelectModal.style.display = 'none';
+        }
+
+        logMessage(`[System] Welcome to Haven of Dawn, ${player.name}!`, 'winlose');
+        updateUI();
+    } finally {
+        startNameBusy = false;
     }
-
-    logMessage(`[System] Welcome to Haven of Dawn, ${player.name}!`, 'winlose');
-    updateUI();
 }
 
 // Combat animation: idle frames loop; after a hit, the damage frames play once (4 frames)

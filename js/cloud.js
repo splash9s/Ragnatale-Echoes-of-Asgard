@@ -139,13 +139,34 @@ function cloudFlush() {
 // ---- Friends, player IDs and server mail (needs supabase/friends.sql) ----
 
 // The public card other players see: name, base level and avatar (the friend ID is made by the server)
+let cloudProfileKey = null; // the last profile row the server accepted; unchanged profiles are not sent again
 function cloudPushProfile() {
     if (!cloudClient || !cloudUserId || cloudDisabled || typeof player === 'undefined') return;
     const av = player.avatar || '';
     const avatar = av.startsWith('assets/') || (av.startsWith('data:image') && av.length < 20000) ? av : '';
+    const row = { user_id: cloudUserId, name: String(player.name || 'Hero').slice(0, 20), base_lv: player.baseLv || 1, avatar };
+    const key = JSON.stringify(row);
+    if (key === cloudProfileKey) return;
     cloudClient.from('profiles')
-        .upsert({ user_id: cloudUserId, name: String(player.name || 'Hero').slice(0, 20), base_lv: player.baseLv || 1, avatar }, { onConflict: 'user_id' })
-        .then(({ error }) => { if (error) console.warn('Profile save failed:', error.message); });
+        .upsert(row, { onConflict: 'user_id' })
+        .then(({ error }) => {
+            if (error) console.warn('Profile save failed:', error.message);
+            else cloudProfileKey = key;
+        });
+}
+
+// Asks the server whether another player already uses this name (case ignored; your own name is free).
+// Resolves to true (taken), false (free) or null (cloud or name check unavailable: the name is allowed).
+async function cloudNameTaken(name) {
+    if (!cloudInitClient() || !cloudUserId) return null;
+    try {
+        const { data, error } = await cloudClient.rpc('name_available', { p_name: String(name || '') });
+        if (error) throw error;
+        return data === false;
+    } catch (e) {
+        console.warn('Name check unavailable:', e);
+        return null;
+    }
 }
 
 // Calls a friends function on the server. Resolves to { data } or { error } with a message the player can read.
