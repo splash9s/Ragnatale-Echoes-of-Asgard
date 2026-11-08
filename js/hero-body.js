@@ -312,6 +312,12 @@ const HERO_BODY_GEAR = {
    }
   },
   wear: {
+   lv0: {
+    src: 'assets/body/gear/wear/ssattackarmorlv0.png',
+    x: 179,
+    y: 162,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/wear/ssattackarmorlv10.png',
     x: 190,
@@ -328,6 +334,12 @@ const HERO_BODY_GEAR = {
    }
   },
   shield: {
+   lv1: {
+    src: 'assets/body/gear/shield/ssattackshieldlv1.png',
+    x: 414,
+    y: 160,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/attack/ssattackshield.png',
     x: 415,
@@ -336,6 +348,12 @@ const HERO_BODY_GEAR = {
    }
   },
   foot: {
+   lv0: {
+    src: 'assets/body/gear/foot/ssattackfootlv0.png',
+    x: 172,
+    y: 249,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/foot/ssattackfootlv10.png',
     x: 171,
@@ -482,6 +500,12 @@ const HERO_BODY_GEAR = {
    }
   },
   wear: {
+   lv0: {
+    src: 'assets/body/gear/wear/ssbasearmorlv0.png',
+    x: 174,
+    y: 166,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/wear/ssbasearmorlv10.png',
     x: 172,
@@ -498,6 +522,12 @@ const HERO_BODY_GEAR = {
    }
   },
   shield: {
+   lv1: {
+    src: 'assets/body/gear/shield/ssbaseshieldlv1.png',
+    x: 303,
+    y: 150,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/shield/ssshield.png',
     x: 321,
@@ -506,6 +536,12 @@ const HERO_BODY_GEAR = {
    }
   },
   foot: {
+   lv0: {
+    src: 'assets/body/gear/foot/ssbasefootlv0.png',
+    x: 196,
+    y: 258,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/foot/ssbasefootlv10.png',
     x: 196,
@@ -652,6 +688,12 @@ const HERO_BODY_GEAR = {
    }
   },
   wear: {
+   lv0: {
+    src: 'assets/body/gear/wear/ssblockarmorlv0.png',
+    x: 154,
+    y: 170,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/wear/ssblockarmorlv10.png',
     x: 165,
@@ -668,6 +710,12 @@ const HERO_BODY_GEAR = {
    }
   },
   shield: {
+   lv1: {
+    src: 'assets/body/gear/shield/ssblockshieldlv1.png',
+    x: 338,
+    y: 142,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/shield/ssshield.png',
     x: 363,
@@ -676,6 +724,12 @@ const HERO_BODY_GEAR = {
    }
   },
   foot: {
+   lv0: {
+    src: 'assets/body/gear/foot/ssblockfootlv0.png',
+    x: 160,
+    y: 270,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/foot/ssblockfootlv10.png',
     x: 162,
@@ -822,6 +876,12 @@ const HERO_BODY_GEAR = {
    }
   },
   wear: {
+   lv0: {
+    src: 'assets/body/gear/wear/sscriticalarmorlv0.png',
+    x: 197,
+    y: 104,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/wear/sscriticalarmorlv10.png',
     x: 219,
@@ -844,6 +904,12 @@ const HERO_BODY_GEAR = {
    }
   },
   shield: {
+   lv1: {
+    src: 'assets/body/gear/shield/sscriticalshieldlv1.png',
+    x: 343,
+    y: 148,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/shield/ssshield.png',
     x: 361,
@@ -852,6 +918,12 @@ const HERO_BODY_GEAR = {
    }
   },
   foot: {
+   lv0: {
+    src: 'assets/body/gear/foot/sscriticalfootlv0.png',
+    x: 153,
+    y: 270,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/foot/sscriticalfootlv10.png',
     x: 144,
@@ -1046,7 +1118,19 @@ const HERO_BODY_SRCS = [
  'assets/body/gear/critical/sscriticalsword.png',
  'assets/body/gear/critical/sscriticalsword_lv1.png',
  'assets/body/gear/foot/sscriticalfootlv10.png',
- 'assets/body/gear/garment/sscriticalmanteaulv10.png'
+ 'assets/body/gear/garment/sscriticalmanteaulv10.png',
+ 'assets/body/gear/wear/ssattackarmorlv0.png',
+ 'assets/body/gear/wear/ssbasearmorlv0.png',
+ 'assets/body/gear/wear/ssblockarmorlv0.png',
+ 'assets/body/gear/wear/sscriticalarmorlv0.png',
+ 'assets/body/gear/foot/ssattackfootlv0.png',
+ 'assets/body/gear/foot/ssbasefootlv0.png',
+ 'assets/body/gear/foot/ssblockfootlv0.png',
+ 'assets/body/gear/foot/sscriticalfootlv0.png',
+ 'assets/body/gear/shield/ssattackshieldlv1.png',
+ 'assets/body/gear/shield/ssbaseshieldlv1.png',
+ 'assets/body/gear/shield/ssblockshieldlv1.png',
+ 'assets/body/gear/shield/sscriticalshieldlv1.png'
 ];
 // The hero is drawn from the body animation tool's parts: base (idle), attack, block and critical poses.
 // Worn gear is layered with the same rules as the tool. Each pose and gear set is composed once into a frame
@@ -1080,10 +1164,10 @@ function heroBodyLoadout() {
     const e = (typeof player !== 'undefined' && player.equipped) || {};
     return {
         helmet: heroBodyHelmet(e.hat),
-        wear: e.armor && (e.armor.levelReq || 1) >= 10 ? 'lv10' : null, // lv10 art only for level 10 and up
+        wear: e.armor && (e.armor.levelReq || 1) >= 10 ? 'lv10' : 'lv0', // lv10 art for level 10 and up; lv0 otherwise
         sword: e.weapon ? 'lv10' : null,
-        shield: e.shield && (e.shield.levelReq || 1) >= 10 ? 'lv10' : null, // the lv10 shield art is shown only for shields of level 10 and up
-        foot: e.footgear && (e.footgear.levelReq || 1) >= 10 ? 'lv10' : null, // lv10 art only for level 10 and up
+        shield: e.shield ? ((e.shield.levelReq || 1) >= 10 ? 'lv10' : 'lv1') : null, // lv10 art for level 10 and up; lv1 art otherwise
+        foot: e.footgear && (e.footgear.levelReq || 1) >= 10 ? 'lv10' : 'lv0', // lv10 art for level 10 and up; lv0 otherwise
         garment: null, // the cloak (manteau) is not drawn on the hero
     };
 }
