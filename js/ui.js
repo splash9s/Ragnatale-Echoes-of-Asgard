@@ -55,13 +55,29 @@ let currentLanguage = 'en';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
 const GOLD_SHOP_CONSUMABLES = [
-    { id: 'potion_minor', name: "Minor Healing Potion", price: 50, type: 'potion', heal: 100, desc: "Restores 100 HP" },
-    { id: 'potion_med', name: "Medium Healing Potion", price: 250, type: 'potion', heal: 250, desc: "Restores 250 HP" },
-    { id: 'potion_large', name: "Large Healing Potion", price: 600, type: 'potion', heal: 500, desc: "Restores 500 HP" },
+    { id: 'potion_minor', name: "Minor Healing Potion", price: 100, type: 'potion', heal: 200, desc: "Restores 200 HP" },
+    { id: 'potion_med', name: "Medium Healing Potion", price: 300, type: 'potion', heal: 500, desc: "Restores 500 HP" },
+    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP" },
     { id: 'gchest_copper', name: "Copper Chest", price: 2500, type: 'chest', chestType: 'copper', desc: "" },
     { id: 'gchest_silver', name: "Silver Chest", price: 10000, type: 'chest', chestType: 'silver', desc: "" },
     { id: 'gchest_gold', name: "Gold Chest", price: 20000, type: 'chest', chestType: 'gold', desc: "" }
 ];
+
+// Healing potion numbers come from GOLD_SHOP_CONSUMABLES (matched by name), so potions already in a save heal the current amount.
+// Minor and Medium heal a fixed HP; Large heals healPct % of max HP.
+function potionTemplateOf(item) {
+    if (!item) return null;
+    return GOLD_SHOP_CONSUMABLES.find(t => t.type === 'potion' && t.name === item.name) || null;
+}
+function potionHealAmount(item, maxHp) {
+    const t = potionTemplateOf(item) || item || {};
+    if (t.healPct) return Math.max(1, Math.round(maxHp * t.healPct / 100));
+    return t.heal || 0;
+}
+function potionHealText(item) {
+    const t = potionTemplateOf(item) || item || {};
+    return t.healPct ? `${t.healPct}% of max HP` : `${t.heal} HP`;
+}
 
 const DIAMOND_SHOP_ITEMS = [
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
@@ -1389,7 +1405,7 @@ function switchView(viewName) {
         currentShopTab = 'diamond';
         viewName = 'shop';
     }
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -1399,10 +1415,10 @@ function switchView(viewName) {
     // Refresh badges on every screen change, so the character page shows current point alerts
     if (typeof updateTownAlerts === 'function') updateTownAlerts();
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -1412,6 +1428,10 @@ function switchView(viewName) {
         renderMapGateUI();
     }
     if (viewName === 'character') document.getElementById('view-character')?.classList.remove('hidden');
+    if (viewName === 'friend') {
+        document.getElementById('view-friend')?.classList.remove('hidden');
+        openFriendPage();
+    }
     if (viewName === 'skills') {
         document.getElementById('view-skills')?.classList.remove('hidden');
         renderSkillPage();
@@ -1438,6 +1458,7 @@ function switchView(viewName) {
     if (viewName === 'quests') {
         document.getElementById('view-quests')?.classList.remove('hidden');
         renderMailBox();
+        syncServerMail(); // friend gifts that arrived while playing
     }
     if (viewName === 'combat') {
         const combatView = document.getElementById('view-combat');
@@ -2728,7 +2749,7 @@ function showItemDetail(index) {
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '★ Favorite · ' : ''}${kind}</span></div>`;
     if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (!isEquip && !isPotion && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
-    if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
+    if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>`;
     if (item.setName) body += setInfoHTML(item.setName);
     if (isEquip && item.slot !== 'pet') {
         body += compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]);
@@ -2793,7 +2814,7 @@ function showEquippedDetail(slot) {
             <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>${buffsDetailHTML(item.buffs, item.debuffs)}</div>`;
     }
     if (item.setName) body += setInfoHTML(item.setName);
-    if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${item.heal} HP · Qty ${item.qty || 1}</span>`;
+    if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>`;
     body += '</div>';
 
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
@@ -3035,7 +3056,7 @@ function manualDrinkPotion() {
         alert("No potions equipped!");
         return;
     }
-    let healAmt = potionSlot.heal || 50;
+    let healAmt = potionHealAmount(potionSlot, derived.maxHp) || 50;
     potionSlot.qty--;
     if (potionSlot.qty <= 0) player.equipped.potionSlot = { name: "", type: "potion", heal: 0, qty: 0, desc: "" };
     healPlayer(healAmt, 'Potion');
@@ -3420,10 +3441,34 @@ function toggleCombatPlayerPanel() {
 }
 
 // Mail & Quests Rendering Functions
-function claimMail(mailId) {
+// Server mail being claimed right now (not saved: a page reload simply tries again)
+const mailClaimBusy = new Set();
+
+async function claimMail(mailId) {
     if (!player.mailBox) return;
     let mail = player.mailBox.find(m => m.id === mailId);
-    if (!mail || mail.claimed) return;
+    if (!mail || mail.claimed || mailClaimBusy.has(mailId)) return;
+    // Potions need bag room before anything is claimed; the mail stays unclaimed if it does not fit
+    const potionRewards = Object.entries(mail.rewards.potions || {}).filter(([, q]) => q > 0);
+    for (const [id, q] of potionRewards) {
+        const template = GOLD_SHOP_CONSUMABLES.find(i => i.id === id && i.type === 'potion');
+        if (template && countFreeCapacity(template) < q) {
+            showModal('Inventory Full', 'Make room in your bag to claim this mail.');
+            return;
+        }
+    }
+    // Server mail (friend gifts): the server marks it claimed and returns the rewards it stored
+    if (mail.serverId) {
+        mailClaimBusy.add(mailId);
+        const res = await claimServerMail(mail.serverId);
+        mailClaimBusy.delete(mailId);
+        if (res.error) {
+            showModal('Mail Error', res.error + ' The mail is kept.');
+            return;
+        }
+        mail.rewards = res.rewards;
+        if (!res.rewards || Object.keys(res.rewards).length === 0) logMessage(`[Mail] "${mail.title}" was already claimed on another device`, 'drop');
+    }
     // A gear reward needs a free bag slot; keep the mail unclaimed if the bag is full
     // Build the gear first: if it cannot be made, the mail stays unclaimed
     const gear = mail.rewards.gear ? makeMailGear(mail.rewards.gear.slot, mail.rewards.gear.lv) : null;
@@ -3463,6 +3508,11 @@ function claimMail(mailId) {
     if (gear) addItemToInventory(gear);
     if (bossHelm) addItemToInventory(bossHelm);
     if (mail.rewards.chest) openChest(mail.rewards.chest);
+    // Potions (friend gifts, rewards): they stack in the bag like shop potions
+    for (const [id, q] of Object.entries(mail.rewards.potions || {})) {
+        const template = GOLD_SHOP_CONSUMABLES.find(i => i.id === id && i.type === 'potion');
+        if (template && q > 0) addItemToInventory({ ...template, qty: q });
+    }
 
     logMessage(`[Mail] Claimed rewards from "${mail.title}"`, 'drop');
     renderMailBox();
@@ -3492,6 +3542,9 @@ function mailRewardText(r) {
     if (r.diamonds) parts.push(`${r.diamonds} Diamonds`);
     if (r.refiningStones) parts.push(`${r.refiningStones} Refining Stones`);
     if (r.resurrection) parts.push(`${r.resurrection} Resurrection Potion`);
+    for (const [id, q] of Object.entries(r.potions || {})) {
+        if (q > 0) parts.push(`${q} ${(GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id }).name}`);
+    }
     if (r.baseLv) parts.push(`${r.baseLv} Base LV`);
     if (r.classLv) parts.push(`${r.classLv} Class LV`);
     if (r.baseExp) parts.push(`${r.baseExp} Base EXP`); // mails sent before the LV rewards
@@ -3586,6 +3639,11 @@ function mailTimeText(m) {
 function deleteMail(mailId) {
     const mail = (player.mailBox || []).find(m => m.id === mailId);
     if (!mail) return;
+    // Server mail stays on the server until it is claimed, so deleting it first would bring it back on the next sync
+    if (mail.serverId && !mail.claimed) {
+        showModal('Mail', 'Claim this gift first, then you can delete it.');
+        return;
+    }
     const remove = () => {
         player.mailBox = player.mailBox.filter(m => m.id !== mailId);
         renderMailBox();

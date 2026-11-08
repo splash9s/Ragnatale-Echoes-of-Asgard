@@ -43,6 +43,8 @@ async function cloudStart() {
                 return;
             }
         }
+        cloudPushProfile();
+        if (typeof player !== 'undefined') syncServerMail();
         if (!cloudListening) {
             cloudListening = true;
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudFlush(); });
@@ -97,8 +99,90 @@ function cloudFlush() {
     cloudDirty = false;
     if (json === cloudLastPushed) return;
     cloudLastPushed = json;
+    cloudPushProfile();
     cloudClient.from('saves').upsert({ user_id: cloudUserId, data: player, updated_at: new Date().toISOString() })
         .then(({ error }) => { if (error) { console.warn('Cloud save failed:', error.message); cloudLastPushed = null; cloudDirty = true; } });
+}
+
+// ---- Friends, player IDs and server mail (needs supabase/friends.sql) ----
+
+// The public card other players see: name, base level and avatar (the friend ID is made by the server)
+function cloudPushProfile() {
+    if (!cloudClient || !cloudUserId || cloudDisabled || typeof player === 'undefined') return;
+    const av = player.avatar || '';
+    const avatar = av.startsWith('assets/') || (av.startsWith('data:image') && av.length < 20000) ? av : '';
+    cloudClient.from('profiles')
+        .upsert({ user_id: cloudUserId, name: String(player.name || 'Hero').slice(0, 20), base_lv: player.baseLv || 1, avatar }, { onConflict: 'user_id' })
+        .then(({ error }) => { if (error) console.warn('Profile save failed:', error.message); });
+}
+
+// Calls a friends function on the server. Resolves to { data } or { error } with a message the player can read.
+async function friendRpc(fn, args) {
+    if (!cloudInitClient() || !cloudUserId) return { error: 'Friends need the cloud. Sign in to use them.' };
+    try {
+        const { data, error } = await cloudClient.rpc(fn, args || {});
+        if (error) {
+            if (/Could not find the function|does not exist/i.test(error.message || '')) return { error: 'Friends are not set up on the server yet.' };
+            return { error: error.message || 'Friends are not available right now.' };
+        }
+        return { data };
+    } catch (e) {
+        console.warn('Friends unavailable:', e);
+        return { error: 'Friends are not available right now.' };
+    }
+}
+
+const friendApi = {
+    list: () => friendRpc('list_friends'),
+    add: (query) => friendRpc('add_friend', { p_query: query }),
+    remove: (userId) => friendRpc('remove_friend', { p_friend: userId }),
+    sendGift: (userId) => friendRpc('send_friend_gift', { p_friend: userId }),
+    restoreStreak: (userId) => friendRpc('restore_friend_streak', { p_friend: userId }),
+};
+
+// Copies unclaimed server mail (friend gifts) into the mailbox once. Negative ids keep them apart from local mail.
+async function syncServerMail() {
+    if (!cloudInitClient() || !cloudUserId || cloudDisabled) return false;
+    try {
+        const { data, error } = await cloudClient.from('mail')
+            .select('id, title, sender, message, rewards, sent_at')
+            .eq('recipient_id', cloudUserId).is('claimed_at', null)
+            .order('sent_at', { ascending: true }).limit(100);
+        if (error) throw error;
+        if (!Array.isArray(player.mailBox)) player.mailBox = [];
+        let added = 0;
+        for (const row of data || []) {
+            const id = -Number(row.id);
+            if (player.mailBox.some(m => m.id === id)) continue;
+            player.mailBox.unshift({ id, serverId: Number(row.id), title: row.title, sender: row.sender, message: row.message, rewards: row.rewards || {}, claimed: false, sentAt: Date.parse(row.sent_at) || Date.now() });
+            added++;
+        }
+        if (added) {
+            if (typeof renderMailBox === 'function') renderMailBox();
+            if (typeof updateTownAlerts === 'function') updateTownAlerts();
+        }
+        return added > 0;
+    } catch (e) {
+        console.warn('Mail sync unavailable:', e);
+        return false;
+    }
+}
+
+// Marks a server mail as claimed and returns the rewards the server stored for it.
+// Resolves to { rewards } or { error }. A mail already claimed on another device gives empty rewards.
+async function claimServerMail(serverId) {
+    if (!cloudInitClient() || !cloudUserId) return { error: 'Mail needs the cloud. Sign in to claim it.' };
+    try {
+        const { data, error } = await cloudClient.rpc('claim_mail', { p_id: serverId });
+        if (error) {
+            if (/not claimable/i.test(error.message || '')) return { rewards: {} };
+            return { error: error.message || 'Could not claim this mail right now.' };
+        }
+        return { rewards: data || {} };
+    } catch (e) {
+        console.warn('Claim unavailable:', e);
+        return { error: 'Could not claim this mail right now.' };
+    }
 }
 
 // Used by reset: removes the cloud save and stops any pending write

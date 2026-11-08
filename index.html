@@ -264,6 +264,40 @@
         #shop-panel-right { border-color: transparent; }
         #blacksmith-panel-left { border: none; }
         #blacksmith-panel-right { border-color: transparent; }
+        /* Friends page: parchment window (the inventory colour), friend rows in the character info style (navy, gold name) */
+        #view-friend .friend-title { position: absolute; left: 0; top: 0; width: 1920px; height: 70px; line-height: 70px; text-align: center; font-size: 32px; font-weight: 700; color: #f5c451; letter-spacing: 3px; z-index: 3; pointer-events: none; font-family: Georgia, "Times New Roman", serif; }
+        #view-friend .friend-window { position: absolute; left: 60px; top: 92px; width: 1800px; height: 956px; box-sizing: border-box; padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; background: rgba(231,209,170,.9); border-radius: 18px; z-index: 5; font-family: Georgia, "Times New Roman", serif; color: #2a1a0e; }
+        .friend-top { display: flex; flex-direction: column; gap: 12px; flex: none; }
+        .friend-myid { display: flex; align-items: center; gap: 14px; font-size: 24px; color: #3b2716; }
+        .friend-myid strong { font-family: monospace; font-size: 30px; letter-spacing: 4px; color: #2a1a0e; }
+        .friend-add { display: flex; gap: 12px; }
+        .friend-add input { flex: 1; min-width: 0; height: 60px; font-size: 26px; padding: 0 18px; border-radius: 10px; border: 2px solid #b8945a; background: #f5e8c8; color: #2a1a0e; font-family: inherit; }
+        .friend-add input::placeholder { color: #8a6d46; }
+        .friend-btn { height: 60px; padding: 0 26px; font-size: 24px; font-weight: 700; font-family: inherit; color: #fff; background: #15803d; border: 2px solid #0f5a2b; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+        .friend-btn:active { filter: brightness(.9); }
+        .friend-btn:disabled { background: #6b5a44; border-color: #4a3b28; color: #d9c9a6; cursor: default; }
+        .friend-btn.copy { height: 44px; padding: 0 18px; font-size: 20px; background: #7a5a2c; border-color: #4a3418; }
+        .friend-btn.add { min-width: 220px; }
+        .friend-btn.restore { background: #b45309; border-color: #7c2d12; }
+        .friend-btn.del { background: #7f1d1d; border-color: #450a0a; }
+        .friend-status { min-height: 30px; font-size: 22px; color: #3b2716; }
+        .friend-status.err { color: #9b1c1c; font-weight: 700; }
+        .friend-list { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 4px 8px 4px 2px; }
+        .friend-row { flex: none; display: flex; align-items: center; gap: 24px; padding: 18px 22px; background: rgba(12, 24, 52, 0.78); border: 1px solid rgba(201, 162, 39, 0.55); border-radius: 14px; color: #e8d9b5; }
+        .friend-avatar { width: 150px; height: 150px; flex: none; border-radius: 12px; overflow: hidden; background: rgba(0, 0, 0, 0.25); }
+        .friend-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .friend-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+        .friend-name { font-size: 38px; font-weight: 700; line-height: 1.1; color: #f5c451; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .friend-lv { font-size: 24px; color: #bfae85; }
+        .friend-lv strong, .friend-bond strong { color: #f5e6c0; }
+        .friend-bond { font-size: 24px; color: #f5e6c0; }
+        .friend-bar { height: 10px; width: 100%; max-width: 460px; margin-top: 4px; background: #0f1a2b; border: 1px solid #2a3a55; border-radius: 999px; overflow: hidden; }
+        .friend-bar .fill { height: 100%; background: #e0a526; }
+        .friend-hint { font-size: 19px; color: #bfae85; }
+        .friend-actions { flex: none; width: 360px; display: flex; flex-direction: column; gap: 10px; }
+        .friend-actions .friend-btn { width: 100%; }
+        .friend-actions .friend-hint { font-size: 17px; line-height: 1.25; }
+        .friend-empty { padding: 60px 20px; text-align: center; font-size: 28px; color: #3b2716; }
         /* Dark font on the art pages (not Mail/Setting, which are .art-dark-off); cards and selects get a light parchment background so the text stays readable */
         .art-dark .art-panel, .art-dark .art-panel * { color: #2a1a0e !important; }
         /* Campaign Dungeons panel: parchment background (c.png), dark text; buttons and dropdown keep dark text */
@@ -568,6 +602,9 @@
                             </div>
                         </div>
                     </div>
+            <div class="ui" data-action="friend" style="left:1021px; top:13px; width:206px; height:209px;">
+                <img src="assets/page01/friendbutton_q85.webp" alt="" onerror="townSwap(this,'friendbutton.png')">
+            </div>
             <div class="ui" data-action="events" style="left:1247px; top:13px; width:206px; height:209px;">
                 <img src="assets/page01/eventsbutton_q85.webp" alt="" onerror="townSwap(this,'eventsbutton.png')">
                 <img id="alert-events" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
@@ -599,6 +636,34 @@
                     <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
                         <img id="town-hero" class="player-idle" alt="" src="assets/cha/chabase_q85.webp">
                     <img id="town-pet" class="pet-idle" alt="" src="assets/combat/slime/slimebase_q85.webp" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: FRIENDS (tavern background, parchment window, friend rows in the character info style) -->
+        <div id="view-friend" class="hidden art-screen art-dark">
+            <div id="friend-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/friend/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'friendpage.png')">
+                    <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
+                    <div class="friend-title">Friends</div>
+                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                    </div>
+                    <div class="friend-window">
+                        <div class="friend-top">
+                            <div class="friend-myid">My ID: <strong id="friend-my-code">--------</strong>
+                                <button class="friend-btn copy" onclick="copyFriendCode()">Copy</button>
+                            </div>
+                            <div class="friend-add">
+                                <input id="friend-add-input" type="text" maxlength="20" placeholder="Player name or ID" onkeydown="if (event.key === 'Enter') addFriendFromInput()">
+                                <button id="friend-add-btn" class="friend-btn add" onclick="addFriendFromInput()">Add Friend</button>
+                            </div>
+                            <div id="friend-status" class="friend-status"></div>
+                        </div>
+                        <div id="friend-list" class="friend-list"></div>
                     </div>
                 </div>
             </div>
@@ -1158,12 +1223,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="js/player.js?v=20261108a"></script>
     <script src="js/audio.js?v=20261105h"></script>
-    <script src="js/cloud.js?v=20261105h"></script>
+    <script src="js/cloud.js?v=20261108d"></script>
     <script src="js/combat.js?v=20261108c"></script>
-    <script src="js/ui.js?v=20261108a"></script>
+    <script src="js/ui.js?v=20261108b"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
-    <script src="js/town.js?v=20261105h"></script>
-    <script src="js/loader.js?v=20261108b"></script>
+    <script src="js/friends.js?v=20261108a"></script>
+    <script src="js/town.js?v=20261108a"></script>
+    <script src="js/loader.js?v=20261108c"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading

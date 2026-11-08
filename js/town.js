@@ -37,6 +37,7 @@
 
     // Button actions. Mail opens the Quests & Mail screen. Setting opens the Setting page.
     const TOWN_ACTIONS = {
+        friend:     () => switchView('friend'),
         events:     () => switchView('events'),
         diamond:    () => switchView('diamond'),
         mail:       () => switchView('quests'),
