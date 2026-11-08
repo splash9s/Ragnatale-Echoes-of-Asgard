@@ -943,7 +943,9 @@ setInterval(() => {
             const fw = 102, fh = 78;
             const sl = parseFloat(psp.style.left) || 0, st = parseFloat(psp.style.top) || 0, sw = parseFloat(psp.style.width) || 95;
             const shake = Math.round(Math.sin(now / 50) * 4);
-            pfx.style.left = (sl + sw / 2 - fw / 2 + shake) + 'px';
+            const hx = heroBodyHeadX('base'); // the head's centre in the frame, scaled to the battle size
+            const headX = hx === null ? sw / 2 : hx * COMBAT_PLAYER_SCALE;
+            pfx.style.left = (sl + headX - fw / 2 + shake) + 'px';
             pfx.style.top = (st - fh / 2) + 'px';
         }
     }

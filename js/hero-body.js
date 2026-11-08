@@ -1241,6 +1241,20 @@ function heroBodyFrame(pose, loadout) {
     return frame;
 }
 
+// X of the head's centre inside the composed frame (frame pixels, before the battle scale).
+// The helmet when one is worn, otherwise the head. Used to put the stun picture over the head.
+function heroBodyHeadX(pose, loadout) {
+    loadout = loadout || heroBodyLoadout();
+    const items = heroBodyItems(pose, loadout);
+    if (!items.length) return null;
+    const minX = Math.min(...items.map(i => i.x));
+    const head = items.find(i => i.id === 'helmet') || items.find(i => i.id === 'head');
+    if (!head) return null;
+    const img = heroBodyImage(head.src);
+    if (!heroBodyLoaded(img)) return null;
+    return head.x + img.naturalWidth * (head.sc || 1) / 2 - minX;
+}
+
 // The battle hero's frames for the current gear. Dodge shows the block frame with the lunge back. No dead pose: a defeat shows the result.
 function combatPose() {
     const L = heroBodyLoadout();
