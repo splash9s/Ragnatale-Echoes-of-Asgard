@@ -1084,7 +1084,7 @@ function heroBodyLoadout() {
         sword: e.weapon ? 'lv10' : null,
         shield: e.shield ? 'lv10' : null,
         foot: e.footgear ? 'lv10' : null,
-        garment: e.garment ? 'lv10' : null,
+        garment: null, // the cloak (manteau) is not drawn on the hero
     };
 }
 
