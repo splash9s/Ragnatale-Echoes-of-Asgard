@@ -1080,10 +1080,10 @@ function heroBodyLoadout() {
     const e = (typeof player !== 'undefined' && player.equipped) || {};
     return {
         helmet: heroBodyHelmet(e.hat),
-        wear: e.armor ? 'lv10' : null,
+        wear: e.armor && (e.armor.levelReq || 1) >= 10 ? 'lv10' : null, // lv10 art only for level 10 and up
         sword: e.weapon ? 'lv10' : null,
         shield: e.shield && (e.shield.levelReq || 1) >= 10 ? 'lv10' : null, // the lv10 shield art is shown only for shields of level 10 and up
-        foot: e.footgear ? 'lv10' : null,
+        foot: e.footgear && (e.footgear.levelReq || 1) >= 10 ? 'lv10' : null, // lv10 art only for level 10 and up
         garment: null, // the cloak (manteau) is not drawn on the hero
     };
 }
