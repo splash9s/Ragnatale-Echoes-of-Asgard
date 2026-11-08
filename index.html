@@ -557,11 +557,11 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-amber-400 bg-amber-500/10">
-                        <img src="assets/cha/chabase_q85.webp" alt="" class="h-40 object-contain" style="image-rendering:pixelated;">
+                        <img alt="" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
                         <span class="text-xs font-bold text-amber-300">Vanguard</span>
                     </div>
                     <div aria-disabled="true" class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-slate-700 bg-slate-900 opacity-40 grayscale cursor-not-allowed select-none">
-                        <img src="assets/cha/chabase_q85.webp" alt="" class="h-40 object-contain" style="image-rendering:pixelated;">
+                        <img alt="" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
                         <span class="text-xs font-bold text-slate-400">Skuggi</span>
                         <span class="text-[10px] text-slate-500">Unavailable</span>
                     </div>
@@ -638,7 +638,7 @@
             </div>
                     <img id="town-shadow" alt="" src="assets/cha/chashadow_q85.webp">
                     <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
-                        <img id="town-hero" class="player-idle" alt="" src="assets/cha/chabase_q85.webp">
+                        <img id="town-hero" class="player-idle" alt="" src="">
                     <img id="town-pet" class="pet-idle" alt="" src="assets/combat/slime/slimebase_q85.webp" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
                     </div>
                 </div>
@@ -888,7 +888,7 @@
                     <img class="ts-bg" src="assets/pages/character/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
                     
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
-                    <img id="char-hero" class="art-frame pointer-events-none" src="assets/cha/chabase_q85.webp" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
+                    <img id="char-hero" class="art-frame pointer-events-none" src="" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
                     <button onclick="switchView('skills')" style="position:absolute; left:394px; top:152px; transform:translate(-50%, 0); box-sizing:border-box; height:46px; line-height:42px; padding:0 20px; white-space:nowrap; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
@@ -1159,7 +1159,7 @@
                     <img id="combat-player-shadow" src="assets/cha/chashadow_q85.webp" alt="" style="position:absolute; left:403px; top:839px; width:102px; height:41px; pointer-events:none; z-index:3;">
 
                     <!-- Character sprite (centre 488, 590) -->
-                    <img id="combat-player-sprite" class="idle-anim player-idle" src="assets/cha/chabase_q85.webp" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
+                    <img id="combat-player-sprite" class="idle-anim player-idle" src="" alt="" style="position:absolute; left:470px; top:678px; width:95px; height:193px; image-rendering:pixelated; pointer-events:none;">
 
                     <!-- Equipped pet: idle beside the player's feet (placed by syncPetSprite in ui.js) -->
                     <img id="combat-pet-sprite" class="pet-idle" src="assets/combat/slime/slimebase_q85.webp" alt="" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
@@ -1233,8 +1233,9 @@
     <script src="js/player.js?v=20261108a"></script>
     <script src="js/audio.js?v=20261105h"></script>
     <script src="js/cloud.js?v=20261108h"></script>
+    <script src="js/hero-body.js?v=20261108a"></script>
     <script src="js/combat.js?v=20261108d"></script>
-    <script src="js/ui.js?v=20261108d"></script>
+    <script src="js/ui.js?v=20261108e"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261108b"></script>
     <script src="js/town.js?v=20261108a"></script>

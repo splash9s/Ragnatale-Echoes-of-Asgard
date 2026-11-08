@@ -672,117 +672,7 @@ function showHealAura(selector) {
 // Each frame's feet point is placed at COMBAT_PLAYER_FOOT relative to the anchor.
 // That offset is the idle frame's feet point, so the idle pose stays where it was.
 const COMBAT_PLAYER_FOOT = { x: 23.5, y: -1 };
-// Pose sets: 'base' is the bare-headed body. Wearing a hat with its own full-body art (Iron Helm) uses that set.
-// Both sets share the same anchors (fx,fy) so the feet stay in place when the pose changes.
-const COMBAT_POSE_SETS = {
-    base: {
-        IDLE: { src: 'assets/cha/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
-        ATTACK: { src: 'assets/cha/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
-        CRI: { src: 'assets/cha/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 170 }, // falling
-        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 223, h: 133, fx: 104.5, fy: 131 }, // on the ground
-        REACT: {
-            block: { src: 'assets/cha/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
-        }
-    },
-    ironHelm: {
-        IDLE: { src: 'assets/helmet/iron-helm/chabase_q85.webp', w: 95, h: 193, fx: 71.5, fy: 189 },
-        ATTACK: { src: 'assets/helmet/iron-helm/chaattack_q85.webp', w: 169, h: 170, fx: 31, fy: 166 },
-        CRI: { src: 'assets/helmet/iron-helm/chacritical_q85.webp', w: 178, h: 222, fx: 40.59, fy: 210 },
-        DEAD1: { src: 'assets/helmet/iron-helm/chadead1_q85.webp', w: 174, h: 137, fx: 110.56, fy: 129 },
-        DEAD2: { src: 'assets/helmet/iron-helm/chadead2_q85.webp', w: 166, h: 99, fx: 101.14, fy: 97 },
-        REACT: {
-            block: { src: 'assets/helmet/iron-helm/chablock_q85.webp', w: 122, h: 167, fx: 63.19, fy: 163 },
-            dodge: { src: 'assets/helmet/iron-helm/chadodge_q85.webp', w: 152, h: 140, fx: 111.33, fy: 138 }
-        }
-    },
-    // Cloth Cap (lv 1 shop helmet): the cap is drawn into each sword-and-shield frame, so no hat overlay is placed
-    clothSword: {
-        hatBaked: true,
-        IDLE: { src: 'assets/helmet/cloth-cap/ssbase.png', w: 288, h: 238, fx: 130.5, fy: 238 },
-        ATTACK: { src: 'assets/helmet/cloth-cap/ssattack_q85.webp', w: 217, h: 244, fx: 96.2, fy: 244 },
-        CRI: [
-            { src: 'assets/helmet/cloth-cap/sscritical_q85.webp', w: 274, h: 245, fx: 108.0, fy: 245 },
-            { src: 'assets/helmet/cloth-cap/sscritical2_q85.webp', w: 255, h: 247, fx: 93.5, fy: 247 }
-        ],
-        DEAD1: { src: 'assets/helmet/cloth-cap/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 172 },
-        DEAD2: { src: 'assets/helmet/cloth-cap/chadead2_q85.webp', w: 223, h: 133, fx: 103.2, fy: 132 },
-        REACT: {
-            block: { src: 'assets/helmet/cloth-cap/ssblock_q85.webp', w: 253, h: 245, fx: 144.8, fy: 245 },
-            dodge: { src: 'assets/helmet/cloth-cap/chadodge_q85.webp', w: 200, h: 199, fx: 162.0, fy: 197 }
-        }
-    },
-    // Mossbloom Cap (lv 1 boss helmet) and Magma Horn Helm (lv 10 boss helmet): the helm is drawn into each sword-and-shield frame, so no hat overlay is placed
-    mossbloomSword: {
-        hatBaked: true,
-        IDLE: { src: 'assets/helmet/mossbloom/ssbase.png', w: 288, h: 238, fx: 130.2, fy: 238 },
-        ATTACK: { src: 'assets/helmet/mossbloom/ssattack_q85.webp', w: 217, h: 244, fx: 96.2, fy: 244 },
-        CRI: [
-            { src: 'assets/helmet/mossbloom/sscritical_q85.webp', w: 274, h: 245, fx: 108.0, fy: 245 },
-            { src: 'assets/helmet/mossbloom/sscritical2_q85.webp', w: 255, h: 247, fx: 91.0, fy: 247 }
-        ],
-        DEAD1: { src: 'assets/helmet/mossbloom/chadead1_q85.webp', w: 202, h: 175, fx: 115.0, fy: 170 },
-        DEAD2: { src: 'assets/helmet/mossbloom/chadead2_q85.webp', w: 223, h: 133, fx: 103.0, fy: 131 },
-        REACT: {
-            block: { src: 'assets/helmet/mossbloom/ssblock_q85.webp', w: 253, h: 245, fx: 145.8, fy: 245 },
-            dodge: { src: 'assets/helmet/mossbloom/chadodge_q85.webp', w: 200, h: 199, fx: 105.0, fy: 198 }
-        }
-    },
-    // Magma Horn Helm (lv 10 boss helmet): the helm is drawn into each sword-and-shield frame, so no hat overlay is placed
-    magmaHornSword: {
-        hatBaked: true,
-        IDLE: { src: 'assets/helmet/magma-horn/ssbase.png', w: 288, h: 238, fx: 130, fy: 238 },
-        ATTACK: { src: 'assets/helmet/magma-horn/ssattack_q85.webp', w: 217, h: 244, fx: 96.8, fy: 241 },
-        CRI: [
-            { src: 'assets/helmet/magma-horn/sscritical_q85.webp', w: 274, h: 245, fx: 106.2, fy: 245 },
-            { src: 'assets/helmet/magma-horn/sscritical2_q85.webp', w: 255, h: 247, fx: 93.8, fy: 247 }
-        ],
-        DEAD1: { src: 'assets/helmet/magma-horn/chadead1_q85.webp', w: 223, h: 133, fx: 102.8, fy: 128 },
-        DEAD2: { src: 'assets/helmet/magma-horn/chadead2_q85.webp', w: 202, h: 175, fx: 114, fy: 168 },
-        REACT: {
-            block: { src: 'assets/helmet/magma-horn/ssblock_q85.webp', w: 253, h: 245, fx: 144.5, fy: 245 },
-            dodge: { src: 'assets/helmet/magma-horn/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
-        }
-    },
-    // Sword and shield (1H weapon + shield). Sprites keep their exact file size; fx,fy are the feet point tracked from the boots.
-    // CRI has two frames: one is picked at random for each critical attack. No dodge art yet, so dodge uses the base dodge.
-    swordShield: {
-        IDLE: { src: 'assets/cha/swordandshield/ssbase.png', w: 288, h: 238, fx: 130.5, fy: 238 },
-        ATTACK: { src: 'assets/cha/swordandshield/ssattack_q85.webp', w: 217, h: 244, fx: 97.2, fy: 243 },
-        CRI: [
-            { src: 'assets/cha/swordandshield/sscritical_q85.webp', w: 274, h: 245, fx: 106, fy: 245 },
-            { src: 'assets/cha/swordandshield/sscritical2_q85.webp', w: 255, h: 247, fx: 93.8, fy: 247 }
-        ],
-        DEAD1: { src: 'assets/cha/chadead1_q85.webp', w: 202, h: 175, fx: 115.5, fy: 170 }, // no sword art yet: base falling frame
-        DEAD2: { src: 'assets/cha/chadead2_q85.webp', w: 223, h: 133, fx: 104.5, fy: 131 },   // no sword art yet: base ground frame
-        REACT: {
-            block: { src: 'assets/cha/swordandshield/ssblock_q85.webp', w: 253, h: 245, fx: 145.5, fy: 245 },
-            dodge: { src: 'assets/cha/chadodge_q85.webp', w: 200, h: 199, fx: 104.2, fy: 197 }
-        }
-    }
-};
-// Hats with their own full-body art, by hat name
-const COMBAT_HAT_POSE_SET = { 'Iron Helm': 'ironHelm' };
-// Sword and shield: a one-handed weapon with a shield in the other hand (the hat is not drawn on this art)
-function usesSwordAndShield() {
-    const w = player && player.equipped && player.equipped.weapon;
-    const s = player && player.equipped && player.equipped.shield;
-    return !!(w && s && !isTwoHanded(w));
-}
-// Hats drawn into the sword-and-shield frames: their own set is used when that hat is worn with a sword and shield
-const HAT_BAKED_SWORD_SET = { 'Cloth Cap': 'clothSword', 'Mossbloom Cap': 'mossbloomSword', 'Magma Horn Helm': 'magmaHornSword' };
-// The pose set for the player's current gear: sword and shield first, then the hat's art, then the bare body
-function combatPose() {
-    if (usesSwordAndShield()) {
-        const worn = player && player.equipped && player.equipped.hat;
-        const baked = worn && HAT_BAKED_SWORD_SET[worn.name];
-        return baked ? COMBAT_POSE_SETS[baked] : COMBAT_POSE_SETS.swordShield;
-    }
-    const hat = player && player.equipped && player.equipped.hat;
-    const set = hat && COMBAT_HAT_POSE_SET[hat.name];
-    return set ? COMBAT_POSE_SETS[set] : COMBAT_POSE_SETS.base;
-}
+// The pose frames come from js/hero-body.js (combatPose)
 // The critical frame to show: a set may have several (picked at random when the attack starts)
 function combatCriFrame(attack) {
     const cri = combatPose().CRI;
@@ -805,12 +695,12 @@ function playPlayerAttackAnim(isCrit) {
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
 // Place a battle frame so its feet point sits on the player's feet (exact size)
 function applyPlayerFrame(img, f, dy = 0) {
+    if (!f) return; // still loading
     img.src = f.src;
     img.style.left = (combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - (f.fx !== undefined ? f.fx : f.w / 2)) + 'px';
     img.style.top = (combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y - (f.fy !== undefined ? f.fy : f.h) + dy) + 'px';
     img.style.width = f.w + 'px';
     img.style.height = f.h + 'px';
-    placeHatLayer(img, f, parseFloat(img.style.left), parseFloat(img.style.top));
 }
 
 // Equipped pet: the pet's idle art stands beside the player's feet, 10px to the left of the player's feet, on the same ground line.
@@ -856,70 +746,6 @@ function syncPagePetSprites(spec) {
     });
 }
 setInterval(syncPetSprite, 100);
-// Hat layer: a worn hat is drawn over the sword-and-shield sprite. Its pin point sits on the head point of that frame, turned by the frame's tilt.
-// Head points and tilts come from the tracking sheet (tilt: degrees, + leans right); the hat pin is in the hat image's own pixels.
-const HAT_LAYER_SPRITE = {
-    'Mossbloom Cap': { src: 'assets/helmet/lv1/hatbosslv1.png', w: 83, h: 82, pin: { x: 36.5, y: 44.2 } },
-    'Cloth Cap': { src: 'assets/helmet/lv1/helmetlv1.png', w: 74, h: 74, pin: { x: 40, y: 33.1 } }
-};
-// Tilt is stored as 90 minus the tracking reading (90 = upright, so a missing reading is 0). + leans right.
-const SWORD_HAT_HEAD = {
-    ssbase: { x: 138.6, y: 51.4, tilt: 0 },        // upright
-    ssblock: { x: 126.2, y: 57.2, tilt: 0 },       // upright
-    ssattack: { x: 83, y: 39.3, tilt: 5 },         // reading 85
-    sscritical: { x: 154.3, y: 34, tilt: 21 },     // reading 69
-    sscritical2: { x: 95.7, y: 46.5, tilt: 0 },    // upright
-    // Falling, ground and dodge frames (shared by the base and sword sets)
-    chadead1: { x: 39, y: 40.4, tilt: -40 },       // reading 130
-    chadead2: { x: 135, y: 36, tilt: 38 },         // reading 52
-    chadodge: { x: 39.8, y: 34.1, tilt: 0 }        // upright
-};
-// Which tracked frame a sprite file is (the hero's shadowed base uses the base head point)
-function swordHatKey(src) {
-    const m = String(src || '').match(/(ssbase|ssblock|ssattack|sscritical2|sscritical|chadead1|chadead2|chadodge)/);
-    return m ? m[1] : null;
-}
-// Places the hat over a sprite whose top-left is (left, top). Hides it for frames with no hat tracking (bare heads, other poses).
-function placeHatLayer(sprite, frame, left, top) {
-    const parent = sprite.parentElement;
-    if (!parent || !Number.isFinite(left) || !Number.isFinite(top)) return;
-    const hatId = 'hat-layer-' + (sprite.id || 'x');
-    let el = document.getElementById(hatId);
-    if (combatPose().hatBaked) { if (el) el.style.display = 'none'; return; } // the hat is already in the frame
-    const hat = player && player.equipped && player.equipped.hat;
-    const spec = hat && HAT_LAYER_SPRITE[hat.name];
-    const key = frame && frame.src ? swordHatKey(frame.src) : null;
-    const head = key ? SWORD_HAT_HEAD[key] : null;
-    if (!spec || !head) { if (el) el.style.display = 'none'; return; }
-    if (!el) {
-        el = document.createElement('img');
-        el.id = hatId;
-        el.alt = '';
-        el.className = 'pointer-events-none';
-        el.style.position = 'absolute';
-        el.style.maxWidth = 'none';
-        el.style.maxHeight = 'none';
-        el.style.imageRendering = 'pixelated';
-        el.style.zIndex = String((parseInt(getComputedStyle(sprite).zIndex, 10) || 0) + 1);
-        parent.appendChild(el);
-    }
-    el.style.display = '';
-    // On the character page the worn hat can be clicked for its item detail (battle and town stay click-through)
-    const clickable = sprite.id === 'char-hero';
-    el.style.pointerEvents = clickable ? 'auto' : '';
-    el.style.cursor = clickable ? 'pointer' : '';
-    el.onclick = clickable ? () => showEquippedDetail('hat') : null;
-    if (el.getAttribute('src') !== spec.src) el.src = spec.src;
-    el.style.width = spec.w + 'px';
-    el.style.height = spec.h + 'px';
-    el.style.left = (left + head.x - spec.pin.x) + 'px';
-    el.style.top = (top + head.y - spec.pin.y) + 'px';
-    el.style.transformOrigin = spec.pin.x + 'px ' + spec.pin.y + 'px';
-    el.style.transform = head.tilt ? `rotate(${head.tilt}deg)` : '';
-    // Follow the body's idle bob (same timing) and keep the tilt during it
-    el.style.setProperty('--hat-tilt', (head.tilt || 0) + 'deg');
-    el.classList.toggle('hat-idle', sprite.classList.contains('player-idle'));
-}
 // Monster attack: the card's sprite shows the attack pose and lunges forward at once (same moment as the player's lunge)
 function monsterCardImg(m) {
     const idx = monstersList.indexOf(m);
@@ -969,15 +795,6 @@ function lungeHat(el, dx) {
             { transform: 'translateX(0px)' },
             { transform: `translateX(${dx}px)`, offset: 0.5 },
             { transform: 'translateX(0px)' }
-        ], { duration: 200, easing: 'ease-in-out' });
-    }
-    const hat = document.getElementById('hat-layer-' + el.id);
-    if (hat && hat.style.display !== 'none' && hat.animate) {
-        const t = `rotate(${hat.style.getPropertyValue('--hat-tilt') || '0deg'})`;
-        hat.animate([
-            { transform: t },
-            { transform: `translateX(${dx}px) ${t}`, offset: 0.5 },
-            { transform: t }
         ], { duration: 200, easing: 'ease-in-out' });
     }
 }
@@ -1315,8 +1132,9 @@ function closeModal() {
 // feet = the player's feet point; monsters = each slot's feet point (sprite bottom on the flat ground). Positions are first-pass placements.
 const COMBAT_TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 function flatLayout(feet, monsterFeet) {
+    const idle = combatPose().IDLE || { fx: 0, fy: 0 }; // frame still composing
     return {
-        player: { x: feet[0], y: feet[1], left: feet[0] - combatPose().IDLE.fx, top: feet[1] - combatPose().IDLE.fy },
+        player: { x: feet[0], y: feet[1], left: feet[0] - idle.fx, top: feet[1] - idle.fy },
         hud: { left: feet[0] - 102, top: feet[1] + 20 }, // HP and armor below the character
         monsters: monsterFeet.map(([x, y]) => [x - 100, y - 100]) // card: 200px wide, sprite bottom at the card's 100px sprite box
     };
@@ -1390,6 +1208,10 @@ async function changeEarthLayers() {
     document.getElementById('view-combat')?.classList.remove('art-loading'); // first layers are in place
 }
 
+// Town and character page heroes: the base frame, with its feet where the base body's feet were before
+const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
+const HERO_PAGE_FEET = { x: 71.5, y: 189 };
+const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
@@ -2917,39 +2739,31 @@ function sellInventoryItem(index) {
 function isTwoHanded(item) {
     return !!(item && item.slot === 'weapon' && (item.twoHanded || /\(2H\)/.test(item.name || '')));
 }
-// The battle sprite's pose set also drives the hero art on the town and character pages.
-// Each hero keeps its exact frame size, and its feet point stays where the base body's feet are on that page.
-const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } }; // character page: original spot
-// Hero art is the same frame as in battle; feet are placed on the base body's feet point, and the shadow is shown as for the base body
-// Sword-and-shield heroes on the town and character pages sit 50px left of the base body, and have no shadow yet
-const HERO_SWORD_SHIFT_X = -50;
 function syncHeroSprites() {
     const f = combatPose().IDLE;
-    const base = COMBAT_POSE_SETS.base.IDLE;
-    const sword = usesSwordAndShield();
+    if (!f) return; // still loading
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         if (el.getAttribute('src') !== f.src) el.src = f.src;
         el.style.width = f.w + 'px';
         el.style.height = f.h + 'px';
-        // The Tailwind base style caps every img at max-width 100% of its parent (95px on the town hero): lift the cap so the size stays true
+        // The Tailwind base style caps every img at its parent's size: lift the cap so the size stays true
         el.style.maxWidth = 'none';
         el.style.maxHeight = 'none';
         const o = HERO_PAGE_ORIGIN[id];
-        el.style.left = (o.left + base.fx - f.fx + (sword ? HERO_SWORD_SHIFT_X : 0)) + 'px';
-        el.style.top = (o.top + base.fy - f.fy) + 'px';
-        placeHatLayer(el, f, parseFloat(el.style.left), parseFloat(el.style.top));
+        el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx) + 'px';
+        el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy) + 'px';
     });
+    document.querySelectorAll('img.hero-thumb').forEach(el => { if (el.getAttribute('src') !== f.src) el.src = f.src; });
     ['town-shadow', 'char-shadow'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.style.display = sword ? 'none' : ''; // no shadow for the sword-and-shield hero yet
+        el.style.display = '';
         el.style.left = SHADOW_BASE[id].left + 'px';
         el.style.top = SHADOW_BASE[id].top + 'px';
     });
 }
-const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
 function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
