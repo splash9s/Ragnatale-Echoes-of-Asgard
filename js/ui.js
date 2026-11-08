@@ -1211,6 +1211,7 @@ async function changeEarthLayers() {
 // Town and character page heroes: the base frame, with its feet where the base body's feet were before
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
 const HERO_PAGE_FEET = { x: 71.5, y: 189 };
+const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the battle size
 const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
@@ -2728,14 +2729,14 @@ function syncHeroSprites() {
         const el = document.getElementById(id);
         if (!el) return;
         if (el.getAttribute('src') !== f.src) el.src = f.src;
-        el.style.width = f.w + 'px';
-        el.style.height = f.h + 'px';
+        el.style.width = f.w * HERO_PAGE_SCALE + 'px';
+        el.style.height = f.h * HERO_PAGE_SCALE + 'px';
         // The Tailwind base style caps every img at its parent's size: lift the cap so the size stays true
         el.style.maxWidth = 'none';
         el.style.maxHeight = 'none';
         const o = HERO_PAGE_ORIGIN[id];
-        el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx) + 'px';
-        el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy) + 'px';
+        el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx * HERO_PAGE_SCALE) + 'px';
+        el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy * HERO_PAGE_SCALE) + 'px';
     });
     document.querySelectorAll('img.hero-thumb').forEach(el => { if (el.getAttribute('src') !== f.src) el.src = f.src; });
     ['town-shadow', 'char-shadow'].forEach(id => {
