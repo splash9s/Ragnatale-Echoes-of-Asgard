@@ -1316,11 +1316,9 @@ function monsterTurnTick() {
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
-        setTimeout(() => { // the result waits 3 seconds
-            player.hp = getDerivedStats().maxHp;
-            updateUI();
-            showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
-        }, 3000);
+        player.hp = getDerivedStats().maxHp;
+        updateUI();
+        showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
     }
     updateUI();
 }

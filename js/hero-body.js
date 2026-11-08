@@ -1157,15 +1157,15 @@ function heroBodyFrame(pose, loadout) {
     return frame;
 }
 
-// The battle hero's frames for the current gear. Dodge and dead use the base frame (the tool has no art for them).
+// The battle hero's frames for the current gear. Dodge shows the block frame with the lunge back. No dead pose: a defeat shows the result.
 function combatPose() {
     const L = heroBodyLoadout();
-    const base = heroBodyFrame('base', L);
+    const block = heroBodyFrame('block', L);
     return {
-        IDLE: base,
+        IDLE: heroBodyFrame('base', L),
         ATTACK: heroBodyFrame('attack', L),
         CRI: heroBodyFrame('critical', L),
-        REACT: { block: heroBodyFrame('block', L), dodge: base },
+        REACT: { block, dodge: block },
     };
 }
 

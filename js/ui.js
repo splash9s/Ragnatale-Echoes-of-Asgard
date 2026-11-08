@@ -2317,20 +2317,15 @@ const ITEM_ICON_RULES = [
     [/Iron Scraps/, 'mat_scrap'],
     [/Skill Reset/, 'scroll_skillreset'],
     [/Worn Iron Sword/, 'gear_sword'],
-    [/Rookie Dagger/, 'gear_dagger'],
     [/Leather Boots/, 'gear_boots'],
     [/Apprentice Ring/, 'gear_ring'],
-    [/Iron Knuckles/, 'gear_knuckles'],
     [/Wooden Buckler/, 'gear_buckler'],
-    [/Cloth Cap/, 'gear_clothcap'],
     [/Iron Cuirass/, 'gear_cuirass'],
     [/Mossbloom Cap/, 'gear_mossbloomcap'],
     [/Cotton Cloak/, 'gear_cloak'],
     // Level 10 gear icons
     [/Iron Ring/, 'gear_lv10_ring'],
     [/Steel Broadsword/, 'gear_lv10_sword'],
-    [/Assassin Main Gauche/, 'gear_lv10_dagger'],
-    [/Spiked Knuckles/, 'gear_lv10_knuckles'],
     [/Iron Vanguard Shield/, 'gear_lv10_shield'],
     [/Steel Plate Armor/, 'gear_lv10_armor'],
     [/Chain Mail Mantle/, 'gear_lv10_cloak'],
@@ -2340,8 +2335,6 @@ const ITEM_ICON_RULES = [
     // Level 20 gear icons
     [/Ring of Swiftness/, 'gear_lv20_ring'],
     [/Commander Blade/, 'gear_lv20_sword'],
-    [/Katar Kris/, 'gear_lv20_dagger'],
-    [/Bone Crusher Knuckles/, 'gear_lv20_knuckles'],
     [/Royal Aegis/, 'gear_lv20_shield'],
     [/Mithril Cuirass/, 'gear_lv20_armor'],
     [/Valkyrie Cloak/, 'gear_lv20_cloak'],
@@ -2351,8 +2344,6 @@ const ITEM_ICON_RULES = [
     // Level 30 gear icons
     [/Eagle Ring/, 'gear_lv30_ring'],
     [/Excalibur Fragment/, 'gear_lv30_sword'],
-    [/Main Gauche of Shadows/, 'gear_lv30_dagger'],
-    [/Dusk Gauntlets/, 'gear_lv30_knuckles'],
     [/Shield of Asgard/, 'gear_lv30_shield'],
     [/Divine Armor of Valhalla/, 'gear_lv30_armor'],
     [/Winged Shroud/, 'gear_lv30_cloak'],
@@ -2362,8 +2353,6 @@ const ITEM_ICON_RULES = [
     // Level 40 gear icons
     [/Titan Ring/, 'gear_lv40_ring'],
     [/Solar Blade/, 'gear_lv40_sword'],
-    [/Solar Kris/, 'gear_lv40_dagger'],
-    [/Solar Gauntlets/, 'gear_lv40_knuckles'],
     [/Aegis of Light/, 'gear_lv40_shield'],
     [/Solar Plate/, 'gear_lv40_armor'],
     [/Solar Mantle/, 'gear_lv40_cloak'],
@@ -2373,8 +2362,6 @@ const ITEM_ICON_RULES = [
     // Level 50 gear icons
     [/Ring of Odin/, 'gear_lv50_ring'],
     [/Blade of Asgard/, 'gear_lv50_sword'],
-    [/Katar of Destruction/, 'gear_lv50_dagger'],
-    [/Dusk World-Fists/, 'gear_lv50_knuckles'],
     [/Ultimate Aegis/, 'gear_lv50_shield'],
     [/Armor of the Gods/, 'gear_lv50_armor'],
     [/Shroud of Eternity/, 'gear_lv50_cloak'],
@@ -2384,7 +2371,6 @@ const ITEM_ICON_RULES = [
     // Level 60 gear icons
     [/Ring of Jotun Frost/, 'gear_lv60_ring'],
     [/Jotun Ice Axe/, 'gear_lv60_sword'],
-    [/Jotun Frost Fists/, 'gear_lv60_knuckles'],
     [/Jotun Rime Shield/, 'gear_lv60_shield'],
     [/Jotun Fur Armor/, 'gear_lv60_armor'],
     [/Jotun Snow Cloak/, 'gear_lv60_cloak'],
@@ -2394,7 +2380,6 @@ const ITEM_ICON_RULES = [
     // Level 70 gear icons
     [/Ring of the Valkyrie/, 'gear_lv70_ring'],
     [/Einherjar Blade/, 'gear_lv70_sword'],
-    [/Einherjar Gauntlets/, 'gear_lv70_knuckles'],
     [/Valkyrie Bulwark/, 'gear_lv70_shield'],
     [/Valkyrie Plate/, 'gear_lv70_armor'],
     [/Valkyrie Wing Mantle/, 'gear_lv70_cloak'],
@@ -2404,7 +2389,6 @@ const ITEM_ICON_RULES = [
     // Level 80 gear icons
     [/Ring of Muspel Ember/, 'gear_lv80_ring'],
     [/Muspel Flame Blade/, 'gear_lv80_sword'],
-    [/Muspel Ember Gauntlets/, 'gear_lv80_knuckles'],
     [/Muspel Ember Shield/, 'gear_lv80_shield'],
     [/Muspel Forged Plate/, 'gear_lv80_armor'],
     [/Muspel Ash Cloak/, 'gear_lv80_cloak'],
@@ -2414,7 +2398,6 @@ const ITEM_ICON_RULES = [
     // Level 90 gear icons
     [/Ring of Hel/, 'gear_lv90_ring'],
     [/Hel Bone Blade/, 'gear_lv90_sword'],
-    [/Hel Bone Knuckles/, 'gear_lv90_knuckles'],
     [/Hel Grave Shield/, 'gear_lv90_shield'],
     [/Hel Death Plate/, 'gear_lv90_armor'],
     [/Hel Shroud/, 'gear_lv90_cloak'],
@@ -2424,7 +2407,6 @@ const ITEM_ICON_RULES = [
     // Level 99 gear icons
     [/Dusk Oath Ring/, 'gear_lv99_ring'],
     [/Dusk Reaper Blade/, 'gear_lv99_sword'],
-    [/Dusk Reaper Fists/, 'gear_lv99_knuckles'],
     [/Dusk Ward Shield/, 'gear_lv99_shield'],
     [/Dusk Titan Plate/, 'gear_lv99_armor'],
     [/Dusk Veil Cloak/, 'gear_lv99_cloak'],

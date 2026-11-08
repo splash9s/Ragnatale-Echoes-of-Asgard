@@ -13,48 +13,36 @@ const SHOP_ITEMS = [
     { id: "a1", name: "Iron Cuirass", slot: "armor", levelReq: 1, price: 60, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
     { id: "g1", name: "Cotton Cloak", slot: "garment", levelReq: 1, price: 30, stats: { flee: 2 }, desc: "FLEE +2" },
     { id: "f1", name: "Leather Boots", slot: "footgear", levelReq: 1, price: 30, stats: { hp: 20 }, desc: "HP +20" },
-    { id: "d1", name: "Rookie Dagger", slot: "weapon", levelReq: 1, price: 45, stats: { atk: 8, crit: 1 }, desc: "Atk +8, CRIT +1%" },
-    { id: "kn1", name: "Iron Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 1, price: 90, stats: { atk: 16 }, desc: "Atk +16 (2H knuckle, takes Shield slot)" },
 
     { id: "w10", name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, price: 150, stats: { atk: 25 }, desc: "Atk +25" },
     { id: "s10", name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, price: 120, stats: { def: 6 }, desc: "DEF +6" },
     { id: "a10", name: "Steel Plate Armor", slot: "armor", levelReq: 10, price: 180, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
     { id: "g10", name: "Chain Mail Mantle", slot: "garment", levelReq: 10, price: 100, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
     { id: "f10", name: "Armored Greaves", slot: "footgear", levelReq: 10, price: 100, stats: { hp: 50, def: 3 }, desc: "HP +50, DEF +3" },
-    { id: "d10", name: "Assassin Main Gauche", slot: "weapon", levelReq: 10, price: 140, stats: { atk: 20, crit: 3 }, desc: "Atk +20, CRIT +3%" },
-    { id: "kn10", name: "Spiked Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 10, price: 280, stats: { atk: 38 }, desc: "Atk +38 (2H knuckle, takes Shield slot)" },
 
     { id: "w20", name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, price: 400, stats: { atk: 50, crit: 2 }, desc: "Atk +50, CRIT +2%" },
     { id: "s20", name: "Royal Aegis", slot: "shield", levelReq: 20, price: 350, stats: { def: 12 }, desc: "DEF +12" },
     { id: "a20", name: "Mithril Cuirass", slot: "armor", levelReq: 20, price: 500, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
     { id: "g20", name: "Valkyrie Cloak", slot: "garment", levelReq: 20, price: 300, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
     { id: "f20", name: "Knight Striders", slot: "footgear", levelReq: 20, price: 300, stats: { hp: 100, aspd: 5 }, desc: "HP +100, ASPD +5" },
-    { id: "d20", name: "Katar Kris", slot: "weapon", levelReq: 20, price: 380, stats: { atk: 45, crit: 4 }, desc: "Atk +45, CRIT +4%" },
-    { id: "kn20", name: "Bone Crusher Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 20, price: 750, stats: { atk: 75 }, desc: "Atk +75 (2H knuckle, takes Shield slot)" },
 
     { id: "w30", name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, price: 1000, stats: { atk: 90, crit: 4 }, desc: "Atk +90, CRIT +4%" },
     { id: "s30", name: "Shield of Asgard", slot: "shield", levelReq: 30, price: 900, stats: { def: 20 }, desc: "DEF +20" },
     { id: "a30", name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, price: 1300, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
     { id: "g30", name: "Winged Shroud", slot: "garment", levelReq: 30, price: 800, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
     { id: "f30", name: "Boots of Swift Retribution", slot: "footgear", levelReq: 30, price: 800, stats: { hp: 200, aspd: 12 }, desc: "HP +200, ASPD +12" },
-    { id: "d30", name: "Main Gauche of Shadows", slot: "weapon", levelReq: 30, price: 950, stats: { atk: 82, crit: 7 }, desc: "Atk +82, CRIT +7%" },
-    { id: "kn30", name: "Dusk Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 30, price: 2000, stats: { atk: 140, crit: 2 }, desc: "Atk +140, CRIT +2% (2H knuckle, takes Shield slot)" },
 
     { id: "w40", name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, price: 2500, stats: { atk: 140, crit: 6 }, desc: "Atk +140, CRIT +6%" },
     { id: "s40", name: "Aegis of Light", slot: "shield", levelReq: 40, price: 2200, stats: { def: 32 }, desc: "DEF +32" },
     { id: "a40", name: "Solar Plate", slot: "armor", levelReq: 40, price: 3000, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
     { id: "g40", name: "Solar Mantle", slot: "garment", levelReq: 40, price: 1800, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
     { id: "f40", name: "Solar Greaves", slot: "footgear", levelReq: 40, price: 1800, stats: { hp: 350, aspd: 18 }, desc: "HP +350, ASPD +18" },
-    { id: "d40", name: "Solar Kris", slot: "weapon", levelReq: 40, price: 2400, stats: { atk: 130, crit: 9 }, desc: "Atk +130, CRIT +9%" },
-    { id: "kn40", name: "Solar Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 40, price: 4500, stats: { atk: 220, crit: 4 }, desc: "Atk +220, CRIT +4% (2H knuckle, takes Shield slot)" },
 
     { id: "w50", name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, price: 5000, stats: { atk: 210, crit: 7 }, desc: "Atk +210, CRIT +7%" },
     { id: "s50", name: "Ultimate Aegis", slot: "shield", levelReq: 50, price: 4500, stats: { def: 50 }, desc: "DEF +50" },
     { id: "a50", name: "Armor of the Gods", slot: "armor", levelReq: 50, price: 6500, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
     { id: "g50", name: "Shroud of Eternity", slot: "garment", levelReq: 50, price: 3800, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
     { id: "f50", name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" },
-    { id: "d50", name: "Katar of Destruction", slot: "weapon", levelReq: 50, price: 4800, stats: { atk: 195, crit: 13 }, desc: "Atk +195, CRIT +13%" },
-    { id: "kn50", name: "Dusk World-Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 50, price: 9500, stats: { atk: 330, crit: 6 }, desc: "Atk +330, CRIT +6% (2H knuckle, takes Shield slot)" }
 ];
 
 SHOP_ITEMS.push(...RING_ITEMS);
@@ -62,7 +50,6 @@ SHOP_ITEMS.push(...RING_ITEMS);
 const GEAR_POOL = {
     map1: [
         { id: "G001", name: "Worn Iron Sword (1H)", slot: "weapon", levelReq: 1, stats: { atk: 10 }, desc: "Atk +10" },
-        { id: "kd1", name: "Iron Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 1, stats: { atk: 16 }, desc: "Atk +16 (2H knuckle, takes Shield slot)" },
         { id: "G002", name: "Wooden Buckler", slot: "shield", levelReq: 1, stats: { def: 2 }, desc: "DEF +2" },
         { id: "G003", name: "Iron Cuirass", slot: "armor", levelReq: 1, stats: { hp: 50, def: 5 }, desc: "HP +50, DEF +5" },
         { id: "G004", name: "Cotton Cloak", slot: "garment", levelReq: 1, stats: { flee: 2 }, desc: "FLEE +2" },
@@ -70,7 +57,6 @@ const GEAR_POOL = {
     ],
     map10: [
         { id: "G006", name: "Steel Broadsword (1H)", slot: "weapon", levelReq: 10, stats: { atk: 25 }, desc: "Atk +25" },
-        { id: "kd10", name: "Spiked Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 10, stats: { atk: 38 }, desc: "Atk +38 (2H knuckle, takes Shield slot)" },
         { id: "G007", name: "Iron Vanguard Shield", slot: "shield", levelReq: 10, stats: { def: 6 }, desc: "DEF +6" },
         { id: "G008", name: "Steel Plate Armor", slot: "armor", levelReq: 10, stats: { hp: 120, def: 12 }, desc: "HP +120, DEF +12" },
         { id: "G009", name: "Chain Mail Mantle", slot: "garment", levelReq: 10, stats: { flee: 6, def: 2 }, desc: "FLEE +6, DEF +2" },
@@ -78,7 +64,6 @@ const GEAR_POOL = {
     ],
     map20: [
         { id: "G011", name: "Commander Blade (1H)", slot: "weapon", levelReq: 20, stats: { atk: 50, crit: 2 }, desc: "Atk +50, CRIT +2%" },
-        { id: "kd20", name: "Bone Crusher Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 20, stats: { atk: 75 }, desc: "Atk +75 (2H knuckle, takes Shield slot)" },
         { id: "G012", name: "Royal Aegis", slot: "shield", levelReq: 20, stats: { def: 12 }, desc: "DEF +12" },
         { id: "G013", name: "Mithril Cuirass", slot: "armor", levelReq: 20, stats: { hp: 250, def: 22 }, desc: "HP +250, DEF +22" },
         { id: "G014", name: "Valkyrie Cloak", slot: "garment", levelReq: 20, stats: { flee: 12, mdef: 5 }, desc: "FLEE +12, MDEF +5" },
@@ -86,7 +71,6 @@ const GEAR_POOL = {
     ],
     map30: [
         { id: "G016", name: "Excalibur Fragment (1H)", slot: "weapon", levelReq: 30, stats: { atk: 90, crit: 4 }, desc: "Atk +90, CRIT +4%" },
-        { id: "kd30", name: "Dusk Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 30, stats: { atk: 140, crit: 2 }, desc: "Atk +140, CRIT +2% (2H knuckle, takes Shield slot)" },
         { id: "G017", name: "Shield of Asgard", slot: "shield", levelReq: 30, stats: { def: 20 }, desc: "DEF +20" },
         { id: "G018", name: "Divine Armor of Valhalla", slot: "armor", levelReq: 30, stats: { hp: 500, def: 40 }, desc: "HP +500, DEF +40" },
         { id: "G019", name: "Winged Shroud", slot: "garment", levelReq: 30, stats: { flee: 25, def: 10 }, desc: "FLEE +25, DEF +10" },
@@ -94,7 +78,6 @@ const GEAR_POOL = {
     ],
     map40: [
         { id: "G021", name: "Solar Blade (1H)", slot: "weapon", levelReq: 40, stats: { atk: 140, crit: 6 }, desc: "Atk +140, CRIT +6%" },
-        { id: "kd40", name: "Solar Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 40, stats: { atk: 220, crit: 4 }, desc: "Atk +220, CRIT +4% (2H knuckle, takes Shield slot)" },
         { id: "G022", name: "Aegis of Light", slot: "shield", levelReq: 40, stats: { def: 32 }, desc: "DEF +32" },
         { id: "G023", name: "Solar Plate", slot: "armor", levelReq: 40, stats: { hp: 850, def: 60 }, desc: "HP +850, DEF +60" },
         { id: "G024", name: "Solar Mantle", slot: "garment", levelReq: 40, stats: { flee: 35, def: 15 }, desc: "FLEE +35, DEF +15" },
@@ -102,7 +85,6 @@ const GEAR_POOL = {
     ],
     map50: [
         { id: "G026", name: "Blade of Asgard (1H)", slot: "weapon", levelReq: 50, stats: { atk: 210, crit: 7 }, desc: "Atk +210, CRIT +7%" },
-        { id: "kd50", name: "Dusk World-Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 50, stats: { atk: 330, crit: 6 }, desc: "Atk +330, CRIT +6% (2H knuckle, takes Shield slot)" },
         { id: "G027", name: "Ultimate Aegis", slot: "shield", levelReq: 50, stats: { def: 50 }, desc: "DEF +50" },
         { id: "G028", name: "Armor of the Gods", slot: "armor", levelReq: 50, stats: { hp: 1500, def: 90 }, desc: "HP +1500, DEF +90" },
         { id: "G029", name: "Shroud of Eternity", slot: "garment", levelReq: 50, stats: { flee: 50, def: 25 }, desc: "FLEE +50, DEF +25" },
@@ -110,7 +92,6 @@ const GEAR_POOL = {
     ],
     map60: [
         { id: "G031", name: "Jotun Ice Axe (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
-        { id: "kd60", name: "Jotun Frost Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 60, stats: { atk: 419, crit: 5 }, desc: "Atk +419, CRIT +5% (2H knuckle, takes Shield slot)" },
         { id: "G032", name: "Jotun Rime Shield", slot: "shield", levelReq: 60, stats: { def: 65 }, desc: "DEF +65" },
         { id: "G033", name: "Jotun Fur Armor", slot: "armor", levelReq: 60, stats: { hp: 1900, def: 115 }, desc: "HP +1900, DEF +115" },
         { id: "G034", name: "Jotun Snow Cloak", slot: "garment", levelReq: 60, stats: { flee: 65, def: 30 }, desc: "FLEE +65, DEF +30" },
@@ -118,7 +99,6 @@ const GEAR_POOL = {
     ],
     map70: [
         { id: "G036", name: "Einherjar Blade (1H)", slot: "weapon", levelReq: 70, stats: { atk: 340, crit: 9 }, desc: "Atk +340, CRIT +9%" },
-        { id: "kd70", name: "Einherjar Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 70, stats: { atk: 527, crit: 5 }, desc: "Atk +527, CRIT +5% (2H knuckle, takes Shield slot)" },
         { id: "G037", name: "Valkyrie Bulwark", slot: "shield", levelReq: 70, stats: { def: 80 }, desc: "DEF +80" },
         { id: "G038", name: "Valkyrie Plate", slot: "armor", levelReq: 70, stats: { hp: 2400, def: 140 }, desc: "HP +2400, DEF +140" },
         { id: "G039", name: "Valkyrie Wing Mantle", slot: "garment", levelReq: 70, stats: { flee: 80, def: 38 }, desc: "FLEE +80, DEF +38" },
@@ -126,7 +106,6 @@ const GEAR_POOL = {
     ],
     map80: [
         { id: "G041", name: "Muspel Flame Blade (1H)", slot: "weapon", levelReq: 80, stats: { atk: 420, crit: 10 }, desc: "Atk +420, CRIT +10%" },
-        { id: "kd80", name: "Muspel Ember Gauntlets (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 80, stats: { atk: 651, crit: 6 }, desc: "Atk +651, CRIT +6% (2H knuckle, takes Shield slot)" },
         { id: "G042", name: "Muspel Ember Shield", slot: "shield", levelReq: 80, stats: { def: 100 }, desc: "DEF +100" },
         { id: "G043", name: "Muspel Forged Plate", slot: "armor", levelReq: 80, stats: { hp: 3000, def: 170 }, desc: "HP +3000, DEF +170" },
         { id: "G044", name: "Muspel Ash Cloak", slot: "garment", levelReq: 80, stats: { flee: 95, def: 45 }, desc: "FLEE +95, DEF +45" },
@@ -134,7 +113,6 @@ const GEAR_POOL = {
     ],
     map90: [
         { id: "G046", name: "Hel Bone Blade (1H)", slot: "weapon", levelReq: 90, stats: { atk: 520, crit: 12 }, desc: "Atk +520, CRIT +12%" },
-        { id: "kd90", name: "Hel Bone Knuckles (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 90, stats: { atk: 806, crit: 7 }, desc: "Atk +806, CRIT +7% (2H knuckle, takes Shield slot)" },
         { id: "G047", name: "Hel Grave Shield", slot: "shield", levelReq: 90, stats: { def: 125 }, desc: "DEF +125" },
         { id: "G048", name: "Hel Death Plate", slot: "armor", levelReq: 90, stats: { hp: 3800, def: 210 }, desc: "HP +3800, DEF +210" },
         { id: "G049", name: "Hel Shroud", slot: "garment", levelReq: 90, stats: { flee: 115, def: 55 }, desc: "FLEE +115, DEF +55" },
@@ -142,7 +120,6 @@ const GEAR_POOL = {
     ],
     map99: [
         { id: "G051", name: "Dusk Reaper Blade (1H)", slot: "weapon", levelReq: 99, stats: { atk: 680, crit: 14 }, desc: "Atk +680, CRIT +14%" },
-        { id: "kd99", name: "Dusk Reaper Fists (2H)", slot: "weapon", weaponType: "knuckle", twoHanded: true, levelReq: 99, stats: { atk: 1054, crit: 8 }, desc: "Atk +1054, CRIT +8% (2H knuckle, takes Shield slot)" },
         { id: "G052", name: "Dusk Ward Shield", slot: "shield", levelReq: 99, stats: { def: 160 }, desc: "DEF +160" },
         { id: "G053", name: "Dusk Titan Plate", slot: "armor", levelReq: 99, stats: { hp: 5000, def: 260 }, desc: "HP +5000, DEF +260" },
         { id: "G054", name: "Dusk Veil Cloak", slot: "garment", levelReq: 99, stats: { flee: 140, def: 65 }, desc: "FLEE +140, DEF +65" },
@@ -162,7 +139,7 @@ const HIGH_RING_ITEMS = [
 // ---------- HATS (new gear slot) ----------
 // One hat per gear tier. Tiers 1-50 are also sold in the shop.
 const HAT_BY_LEVEL = {
-    1:  { name: "Cloth Cap", stats: { hp: 15, def: 1 }, price: 25, appearance: "A plain brown cloth cap stitched from rough linen, with a folded brim and a small leather tie at the back." },
+    1:  { name: "Cloth Cap", stats: { hp: 15, def: 1 }, price: 25 }, // tier-1 stats only: not sold, no drop (Cloth Cap is removed from the game)
     10: { name: "Iron Helm", stats: { hp: 60, def: 4 }, price: 90, appearance: "A round iron helm with a flat nose guard and a riveted rim. Dull grey and lightly scratched." },
     20: { name: "Knight Helm", stats: { hp: 120, def: 8 }, price: 280 },
     30: { name: "Winged Helm", stats: { hp: 250, def: 12, flee: 5 }, price: 750, appearance: "A polished steel helm with a pair of small white feathered wings on each side of the crown." },
@@ -241,7 +218,7 @@ function statText(stats) {
 }
 
 // Shop: only these four helmets are sold
-const SHOP_HAT_LEVELS = [1, 10, 30, 50];
+const SHOP_HAT_LEVELS = [10, 30, 50];
 Object.keys(HAT_BY_LEVEL).forEach(lv => {
     const h = HAT_BY_LEVEL[lv];
     if (!h.price || !SHOP_HAT_LEVELS.includes(Number(lv))) return;
