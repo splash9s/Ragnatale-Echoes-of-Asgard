@@ -187,7 +187,11 @@ async function friendRpc(fn, args) {
 
 const friendApi = {
     list: () => friendRpc('list_friends'),
+    requests: () => friendRpc('list_requests'),
     add: (query) => friendRpc('add_friend', { p_query: query }),
+    accept: (userId) => friendRpc('accept_friend_request', { p_from: userId }),
+    decline: (userId) => friendRpc('decline_friend_request', { p_from: userId }),
+    cancel: (userId) => friendRpc('cancel_friend_request', { p_to: userId }),
     remove: (userId) => friendRpc('remove_friend', { p_friend: userId }),
     sendGift: (userId) => friendRpc('send_friend_gift', { p_friend: userId }),
     restoreStreak: (userId) => friendRpc('restore_friend_streak', { p_friend: userId }),

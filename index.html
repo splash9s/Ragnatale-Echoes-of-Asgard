@@ -282,6 +282,9 @@
         .friend-btn.del { background: #7f1d1d; border-color: #450a0a; }
         .friend-status { min-height: 30px; font-size: 22px; color: #3b2716; }
         .friend-status.err { color: #9b1c1c; font-weight: 700; }
+        .friend-tabs { display: flex; gap: 12px; flex: none; }
+        .friend-tab { height: 56px; padding: 0 30px; font-size: 24px; font-weight: 700; font-family: inherit; color: #3b2716; background: #f5e8c8; border: 2px solid #b8945a; border-radius: 10px; cursor: pointer; }
+        .friend-tab.active { background: #7a5a2c; border-color: #4a3418; color: #fff; }
         .friend-list { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 4px 8px 4px 2px; }
         .friend-row { flex: none; display: flex; align-items: center; gap: 24px; padding: 18px 22px; background: rgba(12, 24, 52, 0.78); border: 1px solid rgba(201, 162, 39, 0.55); border-radius: 14px; color: #e8d9b5; }
         .friend-avatar { width: 150px; height: 150px; flex: none; border-radius: 12px; overflow: hidden; background: rgba(0, 0, 0, 0.25); }
@@ -663,6 +666,10 @@
                                 <button id="friend-add-btn" class="friend-btn add" onclick="addFriendFromInput()">Add Friend</button>
                             </div>
                             <div id="friend-status" class="friend-status"></div>
+                        </div>
+                        <div class="friend-tabs">
+                            <button id="friend-tab-friends" class="friend-tab active" onclick="setFriendTab('friends')">Friends (0)</button>
+                            <button id="friend-tab-requests" class="friend-tab" onclick="setFriendTab('requests')">Requests</button>
                         </div>
                         <div id="friend-list" class="friend-list"></div>
                     </div>
@@ -1225,11 +1232,11 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261108a"></script>
     <script src="js/audio.js?v=20261105h"></script>
-    <script src="js/cloud.js?v=20261108g"></script>
+    <script src="js/cloud.js?v=20261108h"></script>
     <script src="js/combat.js?v=20261108c"></script>
     <script src="js/ui.js?v=20261108c"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
-    <script src="js/friends.js?v=20261108a"></script>
+    <script src="js/friends.js?v=20261108b"></script>
     <script src="js/town.js?v=20261108a"></script>
     <script src="js/loader.js?v=20261108c"></script>
 
