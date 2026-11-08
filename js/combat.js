@@ -1200,7 +1200,7 @@ function monsterAct(m, derived, position = 0) {
     if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
 
     startMonsterAttack(m, (monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0) + position * COMBAT_MONSTER_STAGGER_MS); // same moment as the player's attack, except the first round of a map
-    const hitChance = Math.min(0.95, Math.max(0.35, (m.hit - derived.flee + 50) / 100));
+    const hitChance = Math.min(0.95, Math.max(MON_HIT_MIN, (m.hit - derived.flee + 50) / 100));
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
@@ -1252,6 +1252,8 @@ function monsterAct(m, derived, position = 0) {
 }
 
 // Mages roll a 10% chance to cast their spell after every attack (hit or miss).
+// Monsters always keep at least this hit chance, so FLEE (mostly from AGI) can dodge at most 35% of attacks
+const MON_HIT_MIN = 0.65;
 const MAGE_SPELL_CAST_CHANCE = 0.10;
 function tryMageSpellCast(m) {
     if (!m.spell || player.hp <= 0 || m.hp <= 0) return;
