@@ -345,6 +345,30 @@ const HERO_BODY_GEAR = {
     x: 415,
     y: 154,
     sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/shield/ssattackshieldlv20.png',
+    x: 410,
+    y: 151,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/shield/ssattackshieldlv30.png',
+    x: 414,
+    y: 159,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/shield/ssattackshieldlv40.png',
+    x: 414,
+    y: 159,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/shield/ssattackshieldlv50.png',
+    x: 414,
+    y: 159,
+    sc: 1
    }
   },
   foot: {
@@ -533,6 +557,30 @@ const HERO_BODY_GEAR = {
     x: 321,
     y: 139,
     sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/shield/ssbaseshieldlv20.png',
+    x: 305,
+    y: 138,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/shield/ssbaseshieldlv30.png',
+    x: 304,
+    y: 150,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/shield/ssbaseshieldlv40.png',
+    x: 304,
+    y: 150,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/shield/ssbaseshieldlv50.png',
+    x: 303,
+    y: 149,
+    sc: 1
    }
   },
   foot: {
@@ -720,6 +768,30 @@ const HERO_BODY_GEAR = {
     src: 'assets/body/gear/shield/ssshield.png',
     x: 363,
     y: 138,
+    sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/shield/ssblockshieldlv20.png',
+    x: 345,
+    y: 136,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/shield/ssblockshieldlv30.png',
+    x: 340,
+    y: 143,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/shield/ssblockshieldlv40.png',
+    x: 339,
+    y: 143,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/shield/ssblockshieldlv50.png',
+    x: 338,
+    y: 144,
     sc: 1
    }
   },
@@ -914,6 +986,30 @@ const HERO_BODY_GEAR = {
     src: 'assets/body/gear/shield/ssshield.png',
     x: 361,
     y: 137,
+    sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/shield/sscriticalshieldlv20.png',
+    x: 354,
+    y: 140,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/shield/sscriticalshieldlv30.png',
+    x: 352,
+    y: 150,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/shield/sscriticalshieldlv40.png',
+    x: 352,
+    y: 150,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/shield/sscriticalshieldlv50.png',
+    x: 352,
+    y: 150,
     sc: 1
    }
   },
@@ -1130,7 +1226,23 @@ const HERO_BODY_SRCS = [
  'assets/body/gear/shield/ssattackshieldlv1.png',
  'assets/body/gear/shield/ssbaseshieldlv1.png',
  'assets/body/gear/shield/ssblockshieldlv1.png',
- 'assets/body/gear/shield/sscriticalshieldlv1.png'
+ 'assets/body/gear/shield/sscriticalshieldlv1.png',
+ 'assets/body/gear/shield/ssattackshieldlv20.png',
+ 'assets/body/gear/shield/ssbaseshieldlv20.png',
+ 'assets/body/gear/shield/ssblockshieldlv20.png',
+ 'assets/body/gear/shield/sscriticalshieldlv20.png',
+ 'assets/body/gear/shield/ssattackshieldlv30.png',
+ 'assets/body/gear/shield/ssbaseshieldlv30.png',
+ 'assets/body/gear/shield/ssblockshieldlv30.png',
+ 'assets/body/gear/shield/sscriticalshieldlv30.png',
+ 'assets/body/gear/shield/ssattackshieldlv40.png',
+ 'assets/body/gear/shield/ssbaseshieldlv40.png',
+ 'assets/body/gear/shield/ssblockshieldlv40.png',
+ 'assets/body/gear/shield/sscriticalshieldlv40.png',
+ 'assets/body/gear/shield/ssattackshieldlv50.png',
+ 'assets/body/gear/shield/ssbaseshieldlv50.png',
+ 'assets/body/gear/shield/ssblockshieldlv50.png',
+ 'assets/body/gear/shield/sscriticalshieldlv50.png'
 ];
 // The hero is drawn from the body animation tool's parts: base (idle), attack, block and critical poses.
 // Worn gear is layered with the same rules as the tool. Each pose and gear set is composed once into a frame
@@ -1160,13 +1272,18 @@ function heroBodyHelmet(hat) {
     for (const lv in BOSS_HELMETS) if (BOSS_HELMETS[lv].name === hat.name) key = 'bosslv' + lv;
     return key && HERO_BODY_GEAR.attack.helmet[key] ? key : null;
 }
+// The shield art of the highest tier at or below the shield's level (lv1, lv10, lv20 ... lv50)
+function heroBodyShieldTier(levelReq) {
+    for (const t of [50, 40, 30, 20, 10]) if (levelReq >= t) return 'lv' + t;
+    return 'lv1';
+}
 function heroBodyLoadout() {
     const e = (typeof player !== 'undefined' && player.equipped) || {};
     return {
         helmet: heroBodyHelmet(e.hat),
         wear: e.armor && (e.armor.levelReq || 1) >= 10 ? 'lv10' : 'lv0', // lv10 art for level 10 and up; lv0 otherwise
         sword: e.weapon ? 'lv10' : null,
-        shield: e.shield ? ((e.shield.levelReq || 1) >= 10 ? 'lv10' : 'lv1') : null, // lv10 art for level 10 and up; lv1 art otherwise
+        shield: e.shield ? heroBodyShieldTier(e.shield.levelReq || 1) : null,
         foot: e.footgear && (e.footgear.levelReq || 1) >= 10 ? 'lv10' : 'lv0', // lv10 art for level 10 and up; lv0 otherwise
         garment: null, // the cloak (manteau) is not drawn on the hero
     };
