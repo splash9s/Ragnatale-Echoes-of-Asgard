@@ -1060,7 +1060,7 @@ const heroBodyImgs = {};
 function heroBodyImage(src) {
     if (!heroBodyImgs[src]) {
         const img = new Image();
-        img.src = src;
+        img.src = (typeof HERO_ART !== 'undefined' && HERO_ART[src]) || src; // data URL on file:// pages
         heroBodyImgs[src] = img;
     }
     return heroBodyImgs[src];
@@ -1082,7 +1082,7 @@ function heroBodyLoadout() {
         helmet: heroBodyHelmet(e.hat),
         wear: e.armor ? 'lv10' : null,
         sword: e.weapon ? 'lv10' : null,
-        shield: e.shield ? 'lv10' : null,
+        shield: e.shield && (e.shield.levelReq || 1) >= 10 ? 'lv10' : null, // the lv10 shield art is shown only for shields of level 10 and up
         foot: e.footgear ? 'lv10' : null,
         garment: null, // the cloak (manteau) is not drawn on the hero
     };

@@ -328,17 +328,16 @@ function hideLoading() {
 
 window.addEventListener('load', () => {
     setLoading(0, 'Starting Ragnatale...');
+    // The loading screen always goes away, even if the preload or the game start fails
+    const start = () => {
+        try { if (typeof startGame === 'function') startGame(); }
+        catch (err) { console.error('Start failed:', err); }
+        hideLoading();
+    };
     runPreload()
-        .then(() => {
-            setLoading(100, 'Preparing town...');
-            if (typeof startGame === 'function') startGame();
-            hideLoading();
-        })
-        .catch(err => {
-            console.log('Preload failed:', err);
-            if (typeof startGame === 'function') startGame();
-            hideLoading();
-        });
+        .then(() => setLoading(100, 'Preparing town...'))
+        .catch(err => console.log('Preload failed:', err))
+        .then(start);
 });
 
 // Phone browsers (Chrome): go full screen on a touch, since Chrome does not do it by itself.
