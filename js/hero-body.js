@@ -15,7 +15,7 @@ const HERO_BODY_POSES = {
     id: 'armor',
     name: 'Armor',
     src: 'assets/body/base/dbasearmor.png',
-    x: 167,
+    x: 170,
     y: 127,
     sc: 1
    },
@@ -39,8 +39,8 @@ const HERO_BODY_POSES = {
     id: 'righthand',
     name: 'Right hand',
     src: 'assets/body/base/dbaserighthand.png',
-    x: 342,
-    y: 209,
+    x: 353,
+    y: 220,
     sc: 1.05
    }
   ]
@@ -61,22 +61,22 @@ const HERO_BODY_POSES = {
     name: 'Armor',
     src: 'assets/body/attack/dattackarmor.png',
     x: 190,
-    y: 116,
+    y: 123,
     sc: 1
    },
    {
     id: 'head',
     name: 'Head',
     src: 'assets/body/attack/dattackhead.png',
-    x: 312,
-    y: 36,
+    x: 309,
+    y: 48,
     sc: 1
    },
    {
     id: 'lefthand',
     name: 'Left hand',
     src: 'assets/body/attack/dattacklefthand.png',
-    x: 165,
+    x: 160,
     y: 181,
     sc: 0.975
    },
@@ -98,7 +98,7 @@ const HERO_BODY_POSES = {
     name: 'Leg',
     src: 'assets/body/block/dblockleg.png',
     x: 164,
-    y: 276,
+    y: 262,
     sc: 1
    },
    {
@@ -129,8 +129,8 @@ const HERO_BODY_POSES = {
     id: 'righthand',
     name: 'Right hand',
     src: 'assets/body/block/dblockrighthand.png',
-    x: 385,
-    y: 211,
+    x: 388,
+    y: 223,
     sc: 1
    }
   ]
@@ -143,7 +143,7 @@ const HERO_BODY_POSES = {
     name: 'Leg',
     src: 'assets/body/critical/dcriticalleg.png',
     x: 91,
-    y: 236,
+    y: 238,
     sc: 1
    },
    {
@@ -314,14 +314,14 @@ const HERO_BODY_GEAR = {
   wear: {
    lv0: {
     src: 'assets/body/gear/wear/ssattackarmorlv0.png',
-    x: 179,
-    y: 162,
+    x: 160,
+    y: 156,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/wear/ssattackarmorlv10.png',
     x: 190,
-    y: 123,
+    y: 126,
     sc: 1
    },
    lv20: {
@@ -353,7 +353,7 @@ const HERO_BODY_GEAR = {
    lv10: {
     src: 'assets/body/gear/attack/ssattackswordlv10.png',
     x: 146,
-    y: 170,
+    y: 173,
     sc: 1
    }
   },
@@ -550,8 +550,8 @@ const HERO_BODY_GEAR = {
   wear: {
    lv0: {
     src: 'assets/body/gear/wear/ssbasearmorlv0.png',
-    x: 174,
-    y: 166,
+    x: 180,
+    y: 145,
     sc: 1
    },
    lv10: {
@@ -635,13 +635,13 @@ const HERO_BODY_GEAR = {
    lv0: {
     src: 'assets/body/gear/foot/ssbasefootlv0.png',
     x: 196,
-    y: 258,
+    y: 250,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/foot/ssbasefootlv10.png',
     x: 196,
-    y: 260,
+    y: 256,
     sc: 1
    }
   },
@@ -787,7 +787,7 @@ const HERO_BODY_GEAR = {
    lv0: {
     src: 'assets/body/gear/wear/ssblockarmorlv0.png',
     x: 154,
-    y: 170,
+    y: 148,
     sc: 1
    },
    lv10: {
@@ -798,25 +798,25 @@ const HERO_BODY_GEAR = {
    },
    lv20: {
     src: 'assets/body/gear/wear/ssblockarmorlv20.png',
-    x: 142,
-    y: 138,
+    x: 139,
+    y: 135,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/wear/ssblockarmorlv30.png',
-    x: 150,
-    y: 124,
+    x: 157,
+    y: 132,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/wear/ssblockarmorlv40.png',
-    x: 158,
-    y: 124,
+    x: 163,
+    y: 136,
     sc: 1
    },
    lv50: {
     src: 'assets/body/gear/wear/ssblockarmorlv50.png',
-    x: 147,
+    x: 159,
     y: 116,
     sc: 1
    }
@@ -824,8 +824,8 @@ const HERO_BODY_GEAR = {
   sword: {
    lv10: {
     src: 'assets/body/gear/block/ssblocksword.png',
-    x: 127,
-    y: 219,
+    x: 111,
+    y: 216,
     sc: 1
    }
   },
@@ -870,14 +870,14 @@ const HERO_BODY_GEAR = {
   foot: {
    lv0: {
     src: 'assets/body/gear/foot/ssblockfootlv0.png',
-    x: 160,
-    y: 270,
+    x: 158,
+    y: 240,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/foot/ssblockfootlv10.png',
     x: 162,
-    y: 275,
+    y: 268,
     sc: 1
    }
   },
@@ -1034,26 +1034,26 @@ const HERO_BODY_GEAR = {
    },
    lv20: {
     src: 'assets/body/gear/wear/sscriticalarmorlv20.png',
-    x: 189,
-    y: 91,
+    x: 209,
+    y: 84,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/wear/sscriticalarmorlv30.png',
-    x: 198,
-    y: 84,
+    x: 212,
+    y: 93,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/wear/sscriticalarmorlv40.png',
-    x: 200,
-    y: 84,
+    x: 206,
+    y: 95,
     sc: 1
    },
    lv50: {
     src: 'assets/body/gear/wear/sscriticalarmorlv50.png',
-    x: 196,
-    y: 84,
+    x: 203,
+    y: 92,
     sc: 1
    }
   },
@@ -1119,7 +1119,7 @@ const HERO_BODY_GEAR = {
    lv10: {
     src: 'assets/body/gear/foot/sscriticalfootlv10.png',
     x: 144,
-    y: 270,
+    y: 268,
     sc: 1
    }
   },
@@ -1145,7 +1145,7 @@ const HERO_BODY_ORDER = {
   'sword',
   'lefthand',
   'righthand',
-  'shield'
+  'shield',
  ],
  attack: [
   'shield',
@@ -1158,7 +1158,7 @@ const HERO_BODY_ORDER = {
   'helmet',
   'sword',
   'lefthand',
-  'righthand'
+  'righthand',
  ],
  block: [
   'garment',
@@ -1171,7 +1171,7 @@ const HERO_BODY_ORDER = {
   'sword',
   'lefthand',
   'righthand',
-  'shield'
+  'shield',
  ],
  critical: [
   'garment',
@@ -1184,7 +1184,7 @@ const HERO_BODY_ORDER = {
   'helmet',
   'lefthand',
   'righthand',
-  'shield'
+  'shield',
  ]
 };
 const HERO_BODY_SRCS = [
@@ -1362,6 +1362,8 @@ const HERO_BODY_SRCS = [
 // Positions and layer order come from the tool; the art is in assets/body/.
 const HERO_BODY_SLOTS = ['helmet', 'wear', 'sword', 'shield', 'foot', 'garment'];
 const HERO_BODY_SLOT_HIDES = { helmet: ['head'], wear: ['armor'], sword: ['lefthand'], foot: ['leg'] };
+// Parts hidden by one specific gear option (the lv20 armor covers the right hand)
+const HERO_BODY_OPTION_HIDES = { wear: { lv20: ['righthand'] } };
 
 // One Image per file, started when this script loads
 const heroBodyImgs = {};
@@ -1414,6 +1416,7 @@ function heroBodyItems(pose, loadout) {
         const opt = loadout[slot];
         if (opt && HERO_BODY_GEAR[pose][slot] && HERO_BODY_GEAR[pose][slot][opt]) {
             for (const pid of HERO_BODY_SLOT_HIDES[slot] || []) hidden.add(pid);
+            for (const pid of ((HERO_BODY_OPTION_HIDES[slot] || {})[opt] || [])) hidden.add(pid);
         }
     }
     const items = [];
