@@ -318,6 +318,12 @@ const HERO_BODY_GEAR = {
     y: 156,
     sc: 1
    },
+   lv1: {
+    src: 'assets/body/gear/wear/ssattackarmorlv1.png',
+    x: 190,
+    y: 126,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/wear/ssattackarmorlv10.png',
     x: 190,
@@ -552,6 +558,12 @@ const HERO_BODY_GEAR = {
     src: 'assets/body/gear/wear/ssbasearmorlv0.png',
     x: 180,
     y: 145,
+    sc: 1
+   },
+   lv1: {
+    src: 'assets/body/gear/wear/ssbasearmorlv1.png',
+    x: 172,
+    y: 129,
     sc: 1
    },
    lv10: {
@@ -790,6 +802,12 @@ const HERO_BODY_GEAR = {
     y: 148,
     sc: 1
    },
+   lv1: {
+    src: 'assets/body/gear/wear/ssblockarmorlv1.png',
+    x: 165,
+    y: 126,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/wear/ssblockarmorlv10.png',
     x: 165,
@@ -1024,6 +1042,12 @@ const HERO_BODY_GEAR = {
     src: 'assets/body/gear/wear/sscriticalarmorlv0.png',
     x: 197,
     y: 104,
+    sc: 1
+   },
+   lv1: {
+    src: 'assets/body/gear/wear/sscriticalarmorlv1.png',
+    x: 219,
+    y: 72,
     sc: 1
    },
    lv10: {
@@ -1354,7 +1378,11 @@ const HERO_BODY_SRCS = [
  'assets/body/gear/wear/ssattackarmorlv50.png',
  'assets/body/gear/wear/ssbasearmorlv50.png',
  'assets/body/gear/wear/ssblockarmorlv50.png',
- 'assets/body/gear/wear/sscriticalarmorlv50.png'
+ 'assets/body/gear/wear/sscriticalarmorlv50.png',
+ 'assets/body/gear/wear/ssattackarmorlv1.png',
+ 'assets/body/gear/wear/ssbasearmorlv1.png',
+ 'assets/body/gear/wear/ssblockarmorlv1.png',
+ 'assets/body/gear/wear/sscriticalarmorlv1.png'
 ];
 // The hero is drawn from the body animation tool's parts: base (idle), attack, block and critical poses.
 // Worn gear is layered with the same rules as the tool. Each pose and gear set is composed once into a frame
@@ -1394,7 +1422,7 @@ function heroBodyShieldTier(levelReq) {
 // The armor art of the highest tier at or below the armor's level (lv0 below level 10, then lv10 ... lv50)
 function heroBodyArmorTier(levelReq) {
     for (const t of [50, 40, 30, 20, 10]) if (levelReq >= t) return 'lv' + t;
-    return 'lv0';
+    return 'lv1';
 }
 function heroBodyLoadout() {
     const e = (typeof player !== 'undefined' && player.equipped) || {};
