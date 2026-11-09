@@ -623,6 +623,8 @@ function spawnStageMonsters() {
             }
         }
     }
+    // Tanks stand in the first positions (the front) whenever they are in the stage
+    monstersList.sort((a, b) => (roleOf(a) === 'tank' ? 0 : 1) - (roleOf(b) === 'tank' ? 0 : 1));
     updateUI();
 }
 
@@ -777,7 +779,7 @@ function spawnWaveFromSet(dailyScale, scaled) {
 }
 
 // Boss stage: the boss stands in the 3rd lineup position, and support monsters fill the other positions
-// Lineup slots 1-6 (index 0-5). Range and mage go to slot 6, tank to slot 5 (or the next free slot).
+// Lineup slots 1-6 (index 0-5). Range and mage go to slot 6, tanks go to the front (slot 1 or the next free one).
 const BOSS_LINEUP_SLOT = 2; // boss (and mini-boss) stand in the 3rd lineup position (index 2)
 function addBossSupport(boss) {
     const mult = stageMultiplier();
@@ -797,7 +799,7 @@ function addBossSupport(boss) {
         const unit = makeUnit(levelScaled(picked, activeMap.levelReq), mult);
         let want = s.pos - 1;
         if (s.role === 'range' || s.role === 'mage') want = 5;
-        else if (s.role === 'tank') want = 4;
+        else if (s.role === 'tank') want = 0; // tanks take the front slot that is free
         const at = freeSlot(want);
         used[at] = true;
         unit.lineupSlot = at;
