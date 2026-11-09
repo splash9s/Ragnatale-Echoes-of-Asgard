@@ -45,7 +45,7 @@ function friendStreakState(f, today) {
     return { streak: 0, sentToday: false, canRestore: false };
 }
 
-const friendState = { loaded: false, error: '', today: null, myCode: '', friends: [], incoming: [], outgoing: [], tab: 'friends', busy: false };
+const friendState = { loaded: false, error: '', today: null, myCode: '', friends: [], busy: false };
 
 // The diamond icon used in price and cost labels
 const FRIEND_DIAMOND_ICON = '<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:20px;height:20px;vertical-align:-4px;display:inline-block">';
@@ -70,7 +70,7 @@ function openFriendPage() {
 }
 
 async function refreshFriends() {
-    const [res, reqs] = await Promise.all([friendApi.list(), friendApi.requests()]);
+    const res = await friendApi.list();
     friendState.loaded = true;
     if (res.error) {
         friendState.error = res.error;
@@ -80,66 +80,7 @@ async function refreshFriends() {
         friendState.myCode = res.data.my_code || '';
         friendState.friends = res.data.friends || [];
     }
-    if (reqs.error) {
-        setFriendStatus(reqs.error, true);
-    } else {
-        friendState.incoming = reqs.data.incoming || [];
-        friendState.outgoing = reqs.data.outgoing || [];
-    }
     renderFriendPage();
-}
-
-// Switches between the Friends and Requests tabs
-function setFriendTab(tab) {
-    friendState.tab = tab;
-    setFriendStatus('');
-    renderFriendPage();
-}
-
-// One row in the Requests tab: 'in' = someone asked to be your friend, 'out' = you asked them
-function requestRowHTML(r, kind, idx) {
-    const hint = kind === 'in' ? 'Wants to be your friend.' : 'Waiting for them to accept.';
-    const actions = kind === 'in'
-        ? `<button class="friend-btn gift" onclick="acceptFriendRequest(${idx})">Accept</button>
-           <button class="friend-btn del" onclick="declineFriendRequest(${idx})">Decline</button>`
-        : `<button class="friend-btn copy" onclick="cancelFriendRequest(${idx})">Cancel Request</button>`;
-    return `
-    <div class="friend-row">
-        <div class="friend-avatar">${friendAvatarHTML(r.avatar)}</div>
-        <div class="friend-info">
-            <div class="friend-name">${escapeHtml(r.name || 'Hero')}</div>
-            <div class="friend-lv">Base Lv. <strong>${r.base_lv || 1}</strong> · ID <strong>${escapeHtml(r.friend_code || '')}</strong></div>
-            <div class="friend-hint">${hint}</div>
-        </div>
-        <div class="friend-actions">${actions}</div>
-    </div>`;
-}
-
-async function acceptFriendRequest(idx) {
-    const r = friendState.incoming[idx];
-    if (!r) return;
-    const res = await friendApi.accept(r.user_id);
-    if (res.error) { setFriendStatus(res.error, true); return; }
-    setFriendStatus(`${r.name} is now your friend.`);
-    refreshFriends();
-}
-
-async function declineFriendRequest(idx) {
-    const r = friendState.incoming[idx];
-    if (!r) return;
-    const res = await friendApi.decline(r.user_id);
-    if (res.error) { setFriendStatus(res.error, true); return; }
-    setFriendStatus(`Request from ${r.name} declined.`);
-    refreshFriends();
-}
-
-async function cancelFriendRequest(idx) {
-    const r = friendState.outgoing[idx];
-    if (!r) return;
-    const res = await friendApi.cancel(r.user_id);
-    if (res.error) { setFriendStatus(res.error, true); return; }
-    setFriendStatus(`Request to ${r.name} cancelled.`);
-    refreshFriends();
 }
 
 function friendRowHTML(f, today, idx) {
@@ -194,28 +135,7 @@ function renderFriendPage() {
     if (code) code.textContent = friendState.myCode || '--------';
 
     const tabFriends = document.getElementById('friend-tab-friends');
-    const tabRequests = document.getElementById('friend-tab-requests');
-    if (tabFriends) {
-        tabFriends.textContent = `Friends (${friendState.friends.length})`;
-        tabFriends.classList.toggle('active', friendState.tab === 'friends');
-    }
-    if (tabRequests) {
-        tabRequests.textContent = friendState.incoming.length ? `Requests (${friendState.incoming.length})` : 'Requests';
-        tabRequests.classList.toggle('active', friendState.tab === 'requests');
-    }
-
-    if (friendState.tab === 'requests') {
-        if (!friendState.loaded) {
-            list.innerHTML = '<div class="friend-empty">Loading requests...</div>';
-            return;
-        }
-        const rows = [
-            ...friendState.incoming.map((r, i) => requestRowHTML(r, 'in', i)),
-            ...friendState.outgoing.map((r, i) => requestRowHTML(r, 'out', i)),
-        ];
-        list.innerHTML = rows.length ? rows.join('') : '<div class="friend-empty">No friend requests.</div>';
-        return;
-    }
+    if (tabFriends) tabFriends.textContent = `Friends (${friendState.friends.length})`;
 
     if (!friendState.loaded) {
         list.innerHTML = '<div class="friend-empty">Loading friends...</div>';
@@ -238,9 +158,7 @@ async function addFriendFromInput() {
     setFriendBusy(false);
     if (res.error) { setFriendStatus(res.error, true); return; }
     if (input) input.value = '';
-    setFriendStatus(res.data.status === 'friends'
-        ? `${res.data.name} is now your friend.`
-        : `Friend request sent to ${res.data.name}. They must accept it first.`);
+    setFriendStatus(`${res.data.name} is now your friend.`);
     refreshFriends();
 }
 
