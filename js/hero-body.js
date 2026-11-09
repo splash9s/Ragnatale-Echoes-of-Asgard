@@ -461,7 +461,7 @@ const HERO_BODY_GEAR = {
     sc: 1
    },
    lv10: {
-    src: 'assets/body/gear/attack/ssattackshield.png',
+    src: 'assets/body/gear/shield/ssshield.png',
     x: 415,
     y: 154,
     sc: 1
