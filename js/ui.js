@@ -771,7 +771,7 @@ function startMonsterAttack(m, delayMs = 0) {
     }
     m._attackAt = Date.now();
     m._animAt = m._attackAt;
-    m._hitAt = 0; // a new attack cancels the damaged animation
+    // (the damaged pose is not cleared here: the newer of hurt/attack wins in the frame loop)
     const el = monsterCardImg(m);
     if (!el) return;
     el.dataset.attackAt = String(m._attackAt);
@@ -3955,7 +3955,6 @@ function updateUI() {
                 const dmgNum = m._prevHp - m.hp, dmgCrit = !!m.lastHitCrit;
                 m.lastHitCrit = false;
                 setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
-                if (dmgCrit) setTimeout(() => playCritFx(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`), 0);
                 if (m.hp <= 0) {
                     m._deathAt = Date.now();
                     if (typeof playSound === 'function') playSound('sound/slime_dead.mp3');

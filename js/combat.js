@@ -1419,6 +1419,8 @@ function runCombatTick() {
         targetEnemy.lastHitCrit = !!isCrit;
         if (isCrit) {
             pDmg = Math.floor(pDmg * (1.5 + (skillBonus('critDmgPct') + setStat('critDmgPct')) / 100));
+            const critIdx = monstersList.indexOf(targetEnemy);
+            if (critIdx >= 0 && typeof playCritFx === 'function') setTimeout(() => playCritFx(`#monsters-lineup-container > div:nth-child(${critIdx + 1}) img`), 0);
             updateQuestProgress('crit', 1);
             playSound('sound/critical.mp3');
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
