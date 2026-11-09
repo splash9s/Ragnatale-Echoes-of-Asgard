@@ -320,8 +320,8 @@ const HERO_BODY_GEAR = {
    },
    lv1: {
     src: 'assets/body/gear/wear/ssattackarmorlv1.png',
-    x: 190,
-    y: 126,
+    x: 157,
+    y: 133,
     sc: 1
    },
    lv10: {
@@ -592,14 +592,14 @@ const HERO_BODY_GEAR = {
    },
    lv1: {
     src: 'assets/body/gear/wear/ssbasearmorlv1.png',
-    x: 172,
-    y: 129,
+    x: 145,
+    y: 139,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/wear/ssbasearmorlv10.png',
-    x: 172,
-    y: 129,
+    x: 169,
+    y: 142,
     sc: 1
    },
    lv20: {
