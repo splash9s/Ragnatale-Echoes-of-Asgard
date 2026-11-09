@@ -16,14 +16,14 @@ const HERO_BODY_POSES = {
     name: 'Armor',
     src: 'assets/body/base/dbasearmor.png',
     x: 170,
-    y: 132,
+    y: 145,
     sc: 1
    },
    {
     id: 'head',
     name: 'Head',
     src: 'assets/body/base/dbasehead.png',
-    x: 223,
+    x: 216,
     y: 40,
     sc: 1
    },
@@ -40,7 +40,7 @@ const HERO_BODY_POSES = {
     name: 'Right hand',
     src: 'assets/body/base/dbaserighthand.png',
     x: 353,
-    y: 228,
+    y: 235,
     sc: 1.05
    }
   ]
@@ -106,7 +106,7 @@ const HERO_BODY_POSES = {
     name: 'Armor',
     src: 'assets/body/block/dblockarmor.png',
     x: 188,
-    y: 119,
+    y: 108,
     sc: 1
    },
    {
@@ -159,7 +159,7 @@ const HERO_BODY_POSES = {
     name: 'Head',
     src: 'assets/body/critical/dcriticalhead.png',
     x: 273,
-    y: 45,
+    y: 51,
     sc: 1
    },
    {
@@ -357,31 +357,31 @@ const HERO_BODY_GEAR = {
    lv60: {
     src: 'assets/body/gear/wear/ssattackarmorlv60.png',
     x: 194,
-    y: 106,
+    y: 121,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/wear/ssattackarmorlv70.png',
-    x: 194,
-    y: 106,
+    x: 167,
+    y: 125,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/wear/ssattackarmorlv80.png',
-    x: 194,
-    y: 106,
+    x: 169,
+    y: 127,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/wear/ssattackarmorlv90.png',
-    x: 194,
-    y: 106,
+    x: 167,
+    y: 123,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/wear/ssattackarmorlv99.png',
-    x: 194,
-    y: 106,
+    x: 160,
+    y: 127,
     sc: 1
    }
   },
@@ -400,14 +400,14 @@ const HERO_BODY_GEAR = {
    },
    lv20: {
     src: 'assets/body/gear/attack/ssattackswordlv20.png',
-    x: 146,
-    y: 173,
+    x: 27,
+    y: 196,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/attack/ssattackswordlv30.png',
-    x: 146,
-    y: 173,
+    x: 34,
+    y: 178,
     sc: 1
    },
    lv40: {
@@ -424,99 +424,99 @@ const HERO_BODY_GEAR = {
    },
    lv60: {
     src: 'assets/body/gear/attack/ssattackswordlv60.png',
-    x: 146,
-    y: 173,
+    x: 31,
+    y: 161,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/attack/ssattackswordlv70.png',
-    x: 146,
-    y: 173,
+    x: 31,
+    y: 164,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/attack/ssattackswordlv80.png',
-    x: 146,
-    y: 173,
+    x: 18,
+    y: 168,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/attack/ssattackswordlv90.png',
-    x: 146,
-    y: 173,
+    x: 28,
+    y: 187,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/attack/ssattackswordlv99.png',
-    x: 146,
-    y: 173,
+    x: 31,
+    y: 167,
     sc: 1
    }
   },
   shield: {
    lv1: {
     src: 'assets/body/gear/shield/ssattackshieldlv1.png',
-    x: 371,
+    x: 418,
     y: 153,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/shield/ssshield.png',
-    x: 415,
-    y: 154,
+    x: 408,
+    y: 139,
     sc: 1
    },
    lv20: {
     src: 'assets/body/gear/shield/ssattackshieldlv20.png',
-    x: 356,
+    x: 401,
     y: 151,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/shield/ssattackshieldlv30.png',
-    x: 371,
+    x: 409,
     y: 159,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/shield/ssattackshieldlv40.png',
-    x: 375,
+    x: 407,
     y: 154,
     sc: 1
    },
    lv50: {
     src: 'assets/body/gear/shield/ssattackshieldlv50.png',
-    x: 414,
+    x: 401,
     y: 159,
     sc: 1
    },
    lv60: {
     src: 'assets/body/gear/shield/ssattackshieldlv60.png',
-    x: 414,
+    x: 406,
     y: 159,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/shield/ssattackshieldlv70.png',
-    x: 414,
+    x: 380,
     y: 159,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/shield/ssattackshieldlv80.png',
-    x: 414,
+    x: 399,
     y: 159,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/shield/ssattackshieldlv90.png',
-    x: 414,
+    x: 400,
     y: 159,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/shield/ssattackshieldlv99.png',
-    x: 414,
+    x: 393,
     y: 159,
     sc: 1
    }
@@ -531,7 +531,7 @@ const HERO_BODY_GEAR = {
    lv10: {
     src: 'assets/body/gear/foot/ssattackfootlv10.png',
     x: 171,
-    y: 253,
+    y: 250,
     sc: 1
    },
    lv1: {
@@ -543,7 +543,7 @@ const HERO_BODY_GEAR = {
    lv20: {
     src: 'assets/body/gear/foot/ssattackfootlv20.png',
     x: 171,
-    y: 253,
+    y: 250,
     sc: 1
    },
    lv30: {
@@ -567,31 +567,31 @@ const HERO_BODY_GEAR = {
    lv60: {
     src: 'assets/body/gear/foot/ssattackfootlv60.png',
     x: 171,
-    y: 253,
+    y: 247,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/foot/ssattackfootlv70.png',
     x: 171,
-    y: 253,
+    y: 250,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/foot/ssattackfootlv80.png',
-    x: 171,
+    x: 164,
     y: 253,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/foot/ssattackfootlv90.png',
-    x: 171,
+    x: 161,
     y: 253,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/foot/ssattackfootlv99.png',
     x: 171,
-    y: 253,
+    y: 250,
     sc: 1
    },
   },
@@ -748,26 +748,26 @@ const HERO_BODY_GEAR = {
    },
    lv10: {
     src: 'assets/body/gear/wear/ssbasearmorlv10.png',
-    x: 169,
-    y: 142,
+    x: 165,
+    y: 147,
     sc: 1
    },
    lv20: {
     src: 'assets/body/gear/wear/ssbasearmorlv20.png',
-    x: 155,
-    y: 142,
+    x: 146,
+    y: 151,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/wear/ssbasearmorlv30.png',
-    x: 175,
+    x: 170,
     y: 142,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/wear/ssbasearmorlv40.png',
-    x: 170,
-    y: 130,
+    x: 168,
+    y: 138,
     sc: 1
    },
    lv50: {
@@ -778,14 +778,14 @@ const HERO_BODY_GEAR = {
    },
    lv60: {
     src: 'assets/body/gear/wear/ssbasearmorlv60.png',
-    x: 163,
-    y: 122,
+    x: 168,
+    y: 135,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/wear/ssbasearmorlv70.png',
-    x: 163,
-    y: 122,
+    x: 146,
+    y: 136,
     sc: 1
    },
    lv80: {
@@ -796,14 +796,14 @@ const HERO_BODY_GEAR = {
    },
    lv90: {
     src: 'assets/body/gear/wear/ssbasearmorlv90.png',
-    x: 163,
-    y: 122,
+    x: 148,
+    y: 134,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/wear/ssbasearmorlv99.png',
-    x: 163,
-    y: 122,
+    x: 146,
+    y: 139,
     sc: 1
    }
   },
@@ -878,67 +878,67 @@ const HERO_BODY_GEAR = {
   shield: {
    lv1: {
     src: 'assets/body/gear/shield/ssbaseshieldlv1.png',
-    x: 303,
-    y: 150,
+    x: 326,
+    y: 155,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/shield/ssshield.png',
-    x: 321,
-    y: 139,
+    x: 352,
+    y: 145,
     sc: 1
    },
    lv20: {
     src: 'assets/body/gear/shield/ssbaseshieldlv20.png',
-    x: 305,
+    x: 325,
     y: 138,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/shield/ssbaseshieldlv30.png',
-    x: 304,
+    x: 317,
     y: 150,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/shield/ssbaseshieldlv40.png',
-    x: 304,
+    x: 317,
     y: 150,
     sc: 1
    },
    lv50: {
     src: 'assets/body/gear/shield/ssbaseshieldlv50.png',
-    x: 303,
+    x: 319,
     y: 149,
     sc: 1
    },
    lv60: {
     src: 'assets/body/gear/shield/ssbaseshieldlv60.png',
-    x: 303,
+    x: 318,
     y: 149,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/shield/ssbaseshieldlv70.png',
-    x: 303,
+    x: 312,
     y: 149,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/shield/ssbaseshieldlv80.png',
-    x: 303,
+    x: 310,
     y: 149,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/shield/ssbaseshieldlv90.png',
-    x: 303,
+    x: 317,
     y: 149,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/shield/ssbaseshieldlv99.png',
-    x: 303,
+    x: 320,
     y: 149,
     sc: 1
    }
@@ -989,7 +989,7 @@ const HERO_BODY_GEAR = {
    lv60: {
     src: 'assets/body/gear/foot/ssbasefootlv60.png',
     x: 190,
-    y: 256,
+    y: 248,
     sc: 1
    },
    lv70: {
@@ -1145,7 +1145,7 @@ const HERO_BODY_GEAR = {
    shoplv90: {
     src: 'assets/body/gear/helmet/shop/ssblockshoplv90.png',
     x: 250,
-    y: 22,
+    y: 35,
     sc: 1
    },
    shoplv99: {
@@ -1206,8 +1206,8 @@ const HERO_BODY_GEAR = {
    },
    lv70: {
     src: 'assets/body/gear/wear/ssblockarmorlv70.png',
-    x: 168,
-    y: 116,
+    x: 153,
+    y: 132,
     sc: 1
    },
    lv80: {
@@ -1218,14 +1218,14 @@ const HERO_BODY_GEAR = {
    },
    lv90: {
     src: 'assets/body/gear/wear/ssblockarmorlv90.png',
-    x: 168,
-    y: 116,
+    x: 151,
+    y: 129,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/wear/ssblockarmorlv99.png',
-    x: 168,
-    y: 116,
+    x: 154,
+    y: 135,
     sc: 1
    }
   },
@@ -1244,20 +1244,20 @@ const HERO_BODY_GEAR = {
    },
    lv20: {
     src: 'assets/body/gear/block/ssblockswordlv20.png',
-    x: 120,
-    y: 206,
+    x: 27,
+    y: 215,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/block/ssblockswordlv30.png',
-    x: 120,
-    y: 206,
+    x: 34,
+    y: 218,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/block/ssblockswordlv40.png',
     x: 31,
-    y: 167,
+    y: 177,
     sc: 1
    },
    lv50: {
@@ -1268,32 +1268,32 @@ const HERO_BODY_GEAR = {
    },
    lv60: {
     src: 'assets/body/gear/block/ssblockswordlv60.png',
-    x: 120,
-    y: 206,
+    x: 34,
+    y: 177,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/block/ssblockswordlv70.png',
-    x: 120,
-    y: 206,
+    x: 34,
+    y: 177,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/block/ssblockswordlv80.png',
-    x: 120,
-    y: 206,
+    x: 25,
+    y: 180,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/block/ssblockswordlv90.png',
-    x: 120,
-    y: 206,
+    x: 28,
+    y: 212,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/block/ssblockswordlv99.png',
-    x: 120,
-    y: 206,
+    x: 37,
+    y: 177,
     sc: 1
    }
   },
@@ -1566,8 +1566,8 @@ const HERO_BODY_GEAR = {
    },
    shoplv90: {
     src: 'assets/body/gear/helmet/shop/sscriticalshoplv90.png',
-    x: 270,
-    y: 34,
+    x: 264,
+    y: 38,
     sc: 1
    },
    shoplv99: {
@@ -1622,14 +1622,14 @@ const HERO_BODY_GEAR = {
    },
    lv60: {
     src: 'assets/body/gear/wear/sscriticalarmorlv60.png',
-    x: 203,
-    y: 92,
+    x: 205,
+    y: 88,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/wear/sscriticalarmorlv70.png',
-    x: 203,
-    y: 92,
+    x: 209,
+    y: 60,
     sc: 1
    },
    lv80: {
@@ -1640,14 +1640,14 @@ const HERO_BODY_GEAR = {
    },
    lv90: {
     src: 'assets/body/gear/wear/sscriticalarmorlv90.png',
-    x: 203,
-    y: 92,
+    x: 211,
+    y: 53,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/wear/sscriticalarmorlv99.png',
-    x: 203,
-    y: 92,
+    x: 208,
+    y: 60,
     sc: 1
    }
   },
@@ -1684,38 +1684,38 @@ const HERO_BODY_GEAR = {
    },
    lv50: {
     src: 'assets/body/gear/critical/sscriticalswordlv50.png',
-    x: 94,
-    y: 48,
+    x: 92,
+    y: 52,
     sc: 1
    },
    lv60: {
     src: 'assets/body/gear/critical/sscriticalswordlv60.png',
-    x: 31,
-    y: 69,
+    x: 85,
+    y: 53,
     sc: 1
    },
    lv70: {
     src: 'assets/body/gear/critical/sscriticalswordlv70.png',
-    x: 31,
-    y: 69,
+    x: 89,
+    y: 54,
     sc: 1
    },
    lv80: {
     src: 'assets/body/gear/critical/sscriticalswordlv80.png',
-    x: 31,
-    y: 69,
+    x: 54,
+    y: 53,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/critical/sscriticalswordlv90.png',
-    x: 31,
-    y: 69,
+    x: 89,
+    y: 53,
     sc: 1
    },
    lv99: {
     src: 'assets/body/gear/critical/sscriticalswordlv99.png',
-    x: 31,
-    y: 69,
+    x: 86,
+    y: 56,
     sc: 1
    }
   },
