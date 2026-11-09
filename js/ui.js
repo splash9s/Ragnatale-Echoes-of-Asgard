@@ -3955,6 +3955,7 @@ function updateUI() {
                 const dmgNum = m._prevHp - m.hp, dmgCrit = !!m.lastHitCrit;
                 m.lastHitCrit = false;
                 setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
+                if (dmgCrit) setTimeout(() => playCritFx(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`), 0);
                 if (m.hp <= 0) {
                     m._deathAt = Date.now();
                     if (typeof playSound === 'function') playSound('sound/slime_dead.mp3');
