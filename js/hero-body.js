@@ -592,8 +592,8 @@ const HERO_BODY_GEAR = {
    },
    lv1: {
     src: 'assets/body/gear/wear/ssbasearmorlv1.png',
-    x: 145,
-    y: 139,
+    x: 153,
+    y: 145,
     sc: 1
    },
    lv10: {
@@ -865,7 +865,7 @@ const HERO_BODY_GEAR = {
    lv1: {
     src: 'assets/body/gear/wear/ssblockarmorlv1.png',
     x: 165,
-    y: 140,
+    y: 131,
     sc: 1
    },
    lv10: {
