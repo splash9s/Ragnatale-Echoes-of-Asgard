@@ -16,6 +16,7 @@ const CRIT_SLASH_FRAMES = [
 ];
 const CRIT_SLASH_FRAME_MS = 80;  // time each crit frame stays on screen
 const CRIT_SLASH_SCALE = 0.6;    // frames are drawn at this fraction of their own size (design px)
+const SLASH_LIGHT_SIZE = 2400;   // diameter (design px) of the light a critical slash gives off
 
 // Normal attack slash frames (atkslay1-5)
 const ATK_SLASH_FRAMES = [
@@ -43,7 +44,7 @@ function critFxLayer(stage) {
     if (!fx) {
         fx = document.createElement('div');
         fx.className = 'crit-fx-layer';
-        fx.innerHTML = '<div class="crit-flash"></div>';
+        fx.innerHTML = '<div class="crit-flash"></div><div class="heavy-vignette"></div>';
         stage.appendChild(fx);
     }
     return fx;
@@ -70,6 +71,18 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
     const b = anchor.getBoundingClientRect();
     const cx = (b.left + b.width / 2 - ib.left) / sc;
     const cy = (b.top + b.height / 2 - ib.top) / sc;
+    if (screenFx) {
+        // A light source at the monster: it lights the scene around it for a moment
+        let light = inner.querySelector('.slash-light');
+        if (!light) {
+            light = document.createElement('div');
+            light.className = 'slash-light';
+            inner.appendChild(light);
+        }
+        light.style.left = (cx - SLASH_LIGHT_SIZE / 2) + 'px';
+        light.style.top = (cy - SLASH_LIGHT_SIZE / 2) + 'px';
+        restartFxClass(light, 'lit');
+    }
     let img = inner.querySelector('.crit-slash');
     if (!img) {
         img = document.createElement('img');
@@ -105,6 +118,14 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
 // Critical hit: crit slash with screen shake and flash
 function playCritFx(selector) {
     playSlashFx(selector, CRIT_SLASH_FRAMES, CRIT_SLASH_FRAME_MS, CRIT_SLASH_SCALE, true);
+}
+
+// Boss Heavy Strike: dark vignette and a screen shake
+function playHeavyFx() {
+    const stage = document.getElementById('combat-stage');
+    if (!stage || document.getElementById('view-combat')?.classList.contains('hidden')) return;
+    restartFxClass(stage, 'heavy-shake');
+    restartFxClass(critFxLayer(stage), 'heavy-on');
 }
 
 // Normal hit: atkslay slash only

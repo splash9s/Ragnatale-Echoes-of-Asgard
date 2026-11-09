@@ -1207,6 +1207,7 @@ function monsterAct(m, derived, position = 0) {
             eDmg = Math.floor(eDmg * 2);
             logMessage(`[Boss Skill] ${m.name} uses Heavy Strike!`, 'winlose');
             if (typeof showBossBalloon === 'function') showBossBalloon('Heavy Strike!');
+            if (typeof playHeavyFx === 'function') setTimeout(() => playHeavyFx(), 0); // dark vignette and screen shake
         }
         let ignoreArmor = false;
         if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'magmaRoar' && m.attackCount % 5 === 0) {

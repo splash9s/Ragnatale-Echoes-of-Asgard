@@ -499,6 +499,16 @@
         .crit-flash { position: absolute; inset: 0; opacity: 0; }
         .crit-flash { background: rgba(120, 210, 255, .28); }
                         .crit-fx-layer.crit-on .crit-flash { animation: critFlash .28s ease-out; }
+        /* Boss Heavy Strike: dark vignette and a stronger screen shake */
+        .heavy-vignette { position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, .9) 100%); }
+        .crit-fx-layer.heavy-on .heavy-vignette { animation: heavyVignette .6s ease-out; }
+        @keyframes heavyVignette { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+        #combat-stage.heavy-shake { animation: heavyShake .45s linear; }
+        @keyframes heavyShake { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-6px, 4px); } 20% { transform: translate(5px, -5px); } 30% { transform: translate(-5px, -3px); } 40% { transform: translate(4px, 3px); } 50% { transform: translate(-3px, 2px); } 60% { transform: translate(2px, -2px); } 70% { transform: translate(-2px, 1px); } 80% { transform: translate(1px, 0); } 90% { transform: translate(0, 0); } }
+        /* Critical slash light: a soft light source that lights up the scene around the monster */
+        .slash-light { position: absolute; width: 2400px; height: 2400px; border-radius: 50%; pointer-events: none; z-index: 5; opacity: 0; mix-blend-mode: screen; background: radial-gradient(circle, rgba(190, 240, 255, .9) 0%, rgba(110, 170, 255, .45) 25%, rgba(60, 90, 200, .15) 50%, rgba(0, 0, 0, 0) 70%); }
+        .slash-light.lit { animation: slashLightBurst .55s ease-out; }
+        @keyframes slashLightBurst { 0% { opacity: 0; transform: scale(.4); } 12% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
                         @keyframes critFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
                 .crit-slash { position: absolute; pointer-events: none; z-index: 10; mix-blend-mode: screen; filter: drop-shadow(0 0 10px rgba(120, 220, 255, .95)) drop-shadow(0 0 22px rgba(90, 140, 255, .6)); }
         /* Slash lighting: each frame flashes brighter, then settles */
@@ -1247,8 +1257,8 @@
     <script src="js/cloud.js?v=20261110a"></script>
     <script src="js/hero-art.js?v=20261109v"></script>
     <script src="js/hero-body.js?v=20261109za"></script>
-    <script src="js/combat.js?v=20261109c"></script>
-    <script src="js/crit-fx.js?v=20261109d"></script>
+    <script src="js/combat.js?v=20261110c"></script>
+    <script src="js/crit-fx.js?v=20261110c"></script>
     <script src="js/ui.js?v=20261110b"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
