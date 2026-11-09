@@ -1,7 +1,7 @@
 // ==========================================
 // CRITICAL HIT EFFECT
 // When the player lands a critical hit: a slash animation over the monster that was hit,
-// a short screen shake, a light vignette and a shine across the combat screen.
+// a small screen shake, a blue vignette and a flash across the combat screen.
 // Called from the monster hit code in ui.js (only for critical hits).
 // ==========================================
 
@@ -32,7 +32,7 @@ function critFxLayer(stage) {
     if (!fx) {
         fx = document.createElement('div');
         fx.className = 'crit-fx-layer';
-        fx.innerHTML = '<div class="crit-vignette"></div><div class="crit-shine"></div><div class="crit-flash"></div>';
+        fx.innerHTML = '<div class="crit-vignette"></div><div class="crit-flash"></div>';
         stage.appendChild(fx);
     }
     return fx;

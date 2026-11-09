@@ -492,21 +492,18 @@
         @keyframes playerHurtFlash { 0% { filter: none; } 30% { filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 100% { filter: none; } }
         /* Keep the idle loop running while the hit flash plays (the flash must not replace the idle animation) */
         #combat-player-sprite.player-hurt { animation: playerIdle 2.4s infinite, playerHurtFlash .3s ease; }
-        /* Critical hit: short screen shake, slash over the monster, light vignette, shine and flash across the screen */
+        /* Critical hit: short small screen shake, slash over the monster, blue vignette and flash across the screen */
         #combat-stage.crit-shake { animation: critShake .32s linear; }
-        @keyframes critShake { 0%, 100% { transform: translate(0, 0); } 12% { transform: translate(-7px, 4px); } 25% { transform: translate(6px, -5px); } 37% { transform: translate(-5px, -2px); } 50% { transform: translate(5px, 3px); } 62% { transform: translate(-3px, 2px); } 75% { transform: translate(3px, -2px); } 88% { transform: translate(-1px, 1px); } }
+        @keyframes critShake { 0%, 100% { transform: translate(0, 0); } 12% { transform: translate(-3px, 2px); } 25% { transform: translate(3px, -2px); } 37% { transform: translate(-2px, -1px); } 50% { transform: translate(2px, 1px); } 62% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, -1px); } 88% { transform: translate(0, 0); } }
         .crit-fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
         .crit-vignette, .crit-flash { position: absolute; inset: 0; opacity: 0; }
-        .crit-vignette { background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 55%, rgba(20, 8, 40, .6) 100%); }
-        .crit-flash { background: rgba(200, 245, 255, .3); }
-        .crit-shine { position: absolute; top: -20%; bottom: -20%; left: -60%; width: 45%; opacity: 0; transform: skewX(-12deg); background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(190, 240, 255, .6) 50%, rgba(255, 255, 255, 0) 100%); mix-blend-mode: screen; }
-        .crit-fx-layer.crit-on .crit-vignette { animation: critVignette .7s ease-out; }
+        .crit-vignette { background: radial-gradient(ellipse at center, rgba(60, 120, 255, 0) 55%, rgba(90, 110, 255, .55) 100%); }
+        .crit-flash { background: rgba(120, 210, 255, .28); }
+                .crit-fx-layer.crit-on .crit-vignette { animation: critVignette .7s ease-out; }
         .crit-fx-layer.crit-on .crit-flash { animation: critFlash .28s ease-out; }
-        .crit-fx-layer.crit-on .crit-shine { animation: critShine .5s ease-out; }
-        @keyframes critVignette { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+                @keyframes critVignette { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
         @keyframes critFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
-        @keyframes critShine { 0% { left: -60%; opacity: 0; } 15% { opacity: 1; } 100% { left: 120%; opacity: 0; } }
-        .crit-slash { position: absolute; pointer-events: none; z-index: 10; }
+                .crit-slash { position: absolute; pointer-events: none; z-index: 10; }
         /* Keep the aspect ratio when a frame is not exactly the set size (some idle frames are 103x216) */
         #combat-player-sprite { object-fit: contain; }
         /* Monster colours by element: fire = fire slime, water (ice) = light blue slime, wind = grey slime. Earth keeps the base green. */
@@ -1250,8 +1247,8 @@
     <script src="js/hero-art.js?v=20261109v"></script>
     <script src="js/hero-body.js?v=20261109za"></script>
     <script src="js/combat.js?v=20261109b"></script>
-    <script src="js/crit-fx.js?v=20261109a"></script>
-    <script src="js/ui.js?v=20261109g"></script>
+    <script src="js/crit-fx.js?v=20261109b"></script>
+    <script src="js/ui.js?v=20261109h"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261108c"></script>
     <script src="js/town.js?v=20261108a"></script>

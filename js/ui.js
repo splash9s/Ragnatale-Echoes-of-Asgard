@@ -681,6 +681,7 @@ function combatCriFrame(attack) {
     return cri[attack.criIdx || 0];
 }
 const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
+const COMBAT_PLAYER_CRIT_MS = 520;   // a critical attack holds its own pose longer
 const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
 function playPlayerAttackAnim(isCrit) {
@@ -853,7 +854,7 @@ setInterval(() => {
     document.querySelectorAll('img.idle-anim').forEach(img => {
         if (img.id === 'combat-player-sprite') {
             const ae = now - combatPlayerAttack.at;
-            if (combatPlayerAttack.at && ae >= 0 && ae < COMBAT_PLAYER_ATTACK_MS) {
+            if (combatPlayerAttack.at && ae >= 0 && ae < (combatPlayerAttack.crit ? COMBAT_PLAYER_CRIT_MS : COMBAT_PLAYER_ATTACK_MS)) {
                 // Attack: the attack pose plays and the sprite lunges forward once per attack
                 if (img.dataset.lungeAt !== String(combatPlayerAttack.at)) {
                     img.dataset.lungeAt = String(combatPlayerAttack.at);
@@ -906,7 +907,7 @@ setInterval(() => {
         const atkAt = Number(img.dataset.attackAt) || 0;
         const ae = now - atkAt;
         const attackOn = atkAt && ae >= 0 && ae < COMBAT_MONSTER_ATTACK_MS;
-        if (hurtOn && (!attackOn || hitAt >= atkAt)) {
+        if (hurtOn) { // the damaged pose always shows while it plays (a monster's own attack no longer hides it)
             if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
             // Same red flash as the player's battle sprite (first 150ms of the hit)
             img.style.filter = elapsed < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
