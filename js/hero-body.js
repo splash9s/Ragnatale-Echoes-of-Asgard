@@ -1530,8 +1530,8 @@ const HERO_BODY_SRCS = [
 // Positions and layer order come from the tool; the art is in assets/body/.
 const HERO_BODY_SLOTS = ['helmet', 'wear', 'sword', 'shield', 'foot', 'garment'];
 const HERO_BODY_SLOT_HIDES = { helmet: ['head'], wear: ['armor'], sword: ['lefthand'], foot: ['leg'] };
-// Parts hidden by one specific gear option (the lv20 armor covers the right hand)
-const HERO_BODY_OPTION_HIDES = { wear: { lv20: ['righthand'] } };
+// Body parts that are never drawn
+const HERO_BODY_ALWAYS_HIDDEN = ['righthand'];
 
 // One Image per file, started when this script loads
 const heroBodyImgs = {};
@@ -1584,12 +1584,11 @@ function heroBodyLoadout() {
 // The draw list for a pose, as the tool builds it: worn gear in its layer, hidden parts left out
 function heroBodyItems(pose, loadout) {
     const P = HERO_BODY_POSES[pose];
-    const hidden = new Set();
+    const hidden = new Set(HERO_BODY_ALWAYS_HIDDEN);
     for (const slot of HERO_BODY_SLOTS) {
         const opt = loadout[slot];
         if (opt && HERO_BODY_GEAR[pose][slot] && HERO_BODY_GEAR[pose][slot][opt]) {
             for (const pid of HERO_BODY_SLOT_HIDES[slot] || []) hidden.add(pid);
-            for (const pid of ((HERO_BODY_OPTION_HIDES[slot] || {})[opt] || [])) hidden.add(pid);
         }
     }
     const items = [];
