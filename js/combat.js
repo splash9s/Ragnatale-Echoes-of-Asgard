@@ -604,7 +604,8 @@ function spawnStageMonsters() {
             const count = currentMode === 'endless' ? 1 : Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
             const mult = currentMode === 'endless' ? 1 : stageMultiplier(); // Void Tower: one level 1 slime per stage
             for (let i = 0; i < count; i++) {
-                const picked = pool[Math.floor(Math.random() * pool.length)];
+                let picked = pool[Math.floor(Math.random() * pool.length)];
+                if (roleOf(picked) === 'tank' && monstersList.filter(x => roleOf(x) === 'tank').length >= MAX_TANKS_PER_STAGE) picked = pickUnitNoTank(pool);
                 const template = (currentMode === 'daily' || currentMode === 'endless') ? picked : levelScaled(picked, activeMap && activeMap.levelReq); // Void Tower keeps its raw lv 1 slime
                 const base = {
                     ...template,
@@ -667,6 +668,13 @@ function pickUnit(pool, role) {
         if (list.length > 0) return list[Math.floor(Math.random() * list.length)];
     }
     return pool[Math.floor(Math.random() * pool.length)];
+}
+// A stage has at most this many tanks. Past that, a tank pick becomes a non-tank unit from the same pool.
+const MAX_TANKS_PER_STAGE = 2;
+function pickUnitNoTank(pool) {
+    const list = pool.filter(m => roleOf(m) !== 'tank');
+    const src = list.length > 0 ? list : pool;
+    return src[Math.floor(Math.random() * src.length)];
 }
 
 // Campaign monsters do not scale within a map. Each map gets one flat power multiplier:
@@ -757,8 +765,12 @@ function spawnWaveFromSet(dailyScale, scaled) {
     set.length = n;
     const pool = activeMap.enemies;
     const mult = stageMultiplier();
+    let tanksHere = 0;
     set.forEach(role => {
-        const unit = makeUnit(levelScaled(pickUnit(pool, role), activeMap.levelReq), mult);
+        let picked = pickUnit(pool, role);
+        if (roleOf(picked) === 'tank' && tanksHere >= MAX_TANKS_PER_STAGE) picked = pickUnitNoTank(pool);
+        if (roleOf(picked) === 'tank') tanksHere++;
+        const unit = makeUnit(levelScaled(picked, activeMap.levelReq), mult);
         monstersList.push(dailyScale === 1 ? unit : scaled(unit));
     });
     logMessage(`[Wave] ${monstersList.length} enemies come forward!`, 'combat');
@@ -777,8 +789,12 @@ function addBossSupport(boss) {
         return wanted;
     };
     const supports = [];
+    let tanksHere = 0;
     ((activeMap && activeMap.bossSupport) || []).forEach(s => {
-        const unit = makeUnit(levelScaled(pickUnit(activeMap.enemies, s.role), activeMap.levelReq), mult);
+        let picked = pickUnit(activeMap.enemies, s.role);
+        if (roleOf(picked) === 'tank' && tanksHere >= MAX_TANKS_PER_STAGE) picked = pickUnitNoTank(activeMap.enemies);
+        if (roleOf(picked) === 'tank') tanksHere++;
+        const unit = makeUnit(levelScaled(picked, activeMap.levelReq), mult);
         let want = s.pos - 1;
         if (s.role === 'range' || s.role === 'mage') want = 5;
         else if (s.role === 'tank') want = 4;
