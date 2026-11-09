@@ -38,7 +38,7 @@ function skillLvl(name) {
 
 const DAILY_TOTAL_STAGES = 31;
 const DAILY_BOSS_STAGES = [11, 21, 31];
-const BOSS_HP_MULT = 2.5; // 2x the old 1.25
+const BOSS_HP_MULT = 1.75; // was 2.5; cut 30% (ends up 0.7x)
 const BOSS_ATK_MULT = 2.4; // 2x the old 1.2
 
 // Helper to play audio effects safely

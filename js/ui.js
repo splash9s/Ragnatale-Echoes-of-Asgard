@@ -625,6 +625,19 @@ function showBossBalloon(text) {
     stage.appendChild(wrap);
     setTimeout(() => { if (wrap.parentNode) wrap.remove(); }, 3000);
 }
+// Red floating notice (replaces browser alert popups). Floats above the anchor element, or the screen centre.
+function showFloatNotice(text, anchorSel) {
+    let x = window.innerWidth / 2, y = window.innerHeight * 0.4;
+    const a = anchorSel ? document.querySelector(anchorSel) : null;
+    if (a) { const b = a.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; }
+    const d = document.createElement('div');
+    d.className = 'float-notice';
+    d.textContent = text;
+    d.style.left = x + 'px';
+    d.style.top = y + 'px';
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 1400);
+}
 function showCombatText(selector, text, variant) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
@@ -885,26 +898,22 @@ setInterval(() => {
         if (deathAt) {
             const e = now - deathAt;
             const total = Number(img.dataset.deathTotal) || COMBAT_DEATH_TOTAL_MS;
-            const ms = Number(img.dataset.deathMs) || COMBAT_DEATH_FRAME_MS;
-            const dead = img.dataset.deathFrames ? img.dataset.deathFrames.split(',') : COMBAT_SLIME_DEATH_FRAMES;
             const hurtMs = Number(img.dataset.deathHurtMs) || 0; // boss: damaged pose first
             if (e >= total) {
                 if (img.parentElement) img.parentElement.style.display = 'none';
                 return;
             }
-            if (e < hurtMs) {
-                const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
-                if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(e / hurtMs * hurt.length))]);
-                img.style.filter = e < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
-                return;
+            // No death animation: show the damaged pose (boss: while it plays, then held), then fade out
+            const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
+            if (hurt.length) {
+                const hi = e < hurtMs ? Math.floor(e / hurtMs * hurt.length) : hurt.length - 1;
+                setMonsterFrame(img, hurt[Math.min(hurt.length - 1, hi)]);
+            } else {
+                setMonsterFrame(img, img.dataset.frames.split(',')[0]);
             }
-            img.style.filter = '';
-            if (img.dataset.slowDeath === '1') {
-                // Boss death in slow motion: the death frames step slowly while the body fades out
-                const p = Math.min(1, (e - hurtMs) / Math.max(1, total - hurtMs));
-                img.style.opacity = String(1 - 0.75 * p * p);
-            }
-            setMonsterFrame(img, dead[Math.min(dead.length - 1, Math.floor((e - hurtMs) / ms))]);
+            img.style.filter = e < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
+            const p = Math.min(1, Math.max(0, e - hurtMs) / Math.max(1, total - hurtMs));
+            img.style.opacity = String(1 - p * p);
             return;
         }
         // Hurt and attack: whichever started later plays and overrides the other (idle is the fallback)
@@ -916,17 +925,16 @@ setInterval(() => {
         const atkAt = Number(img.dataset.attackAt) || 0;
         const ae = now - atkAt;
         const attackOn = atkAt && ae >= 0 && ae < COMBAT_MONSTER_ATTACK_MS;
-        if (hurtOn) { // the damaged pose always shows while it plays (a monster's own attack no longer hides it)
-            if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
-            // Same red flash as the player's battle sprite (first 150ms of the hit)
-            img.style.filter = elapsed < 320 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
+        const redFlashOn = hitAt && elapsed >= 0 && elapsed < 320; // same red flash as the player's sprite
+        if (attackOn) {
+            // Attack pose has priority and plays to the end; the red flash still shows on a hit
+            img.style.filter = redFlashOn ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
+            setMonsterFrame(img, img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME);
             return;
         }
-        if (attackOn) {
-            const flashAt = Number(img.dataset.flashAt) || 0;
-            const flashOn = flashAt && now - flashAt >= 0 && now - flashAt < 150;
-            img.style.filter = flashOn ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
-            setMonsterFrame(img, img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME);
+        if (hurtOn) {
+            if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
+            img.style.filter = redFlashOn ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             return;
         }
         if (img.style.filter) img.style.filter = '';
@@ -2008,7 +2016,7 @@ function refineEquipment(slot) {
     let current = gear.refineLevel;
     let costGold = (current + 1) * 100;
     if (player.gold < costGold || (player.refiningStones || 0) < 1) {
-        alert(`Refining needs ${costGold} Gold and 1 Refining Stone.`);
+        showFloatNotice(`Refining needs ${costGold} Gold and 1 Refining Stone.`);
         return;
     }
 
@@ -2262,7 +2270,7 @@ function unequipPotionSlot() {
     if (!ps || !ps.name) return;
     if ((ps.qty || 0) > 0) {
         if (!placeItemInInventory({ ...ps, qty: ps.qty })) {
-            alert("Inventory is full! Make room before unequipping potions.");
+            showFloatNotice("Inventory is full! Make room before unequipping potions.");
             return;
         }
         logMessage(`[Potion] Unequipped ${ps.name} x${ps.qty}`, 'drop');
@@ -2280,7 +2288,7 @@ function unequipItem(slotName) {
     if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
     let emptyIdx = player.inventory.findIndex(s => s === null);
     if (emptyIdx === -1) {
-        alert("Inventory is full!");
+        showFloatNotice("Inventory is full!");
         return;
     }
 
@@ -2659,7 +2667,7 @@ function useInventoryPotion(index) {
     const old = player.equipped.potionSlot;
     if (old && old.name !== item.name && (old.qty || 0) > 0) {
         if (!placeItemInInventory({ ...old, qty: old.qty })) {
-            alert("Inventory is full! Make room before swapping potions.");
+            showFloatNotice("Inventory is full! Make room before swapping potions.", "#potion-slot-box");
             return false;
         }
         logMessage(`[Potion] Returned ${old.name} x${old.qty} to inventory`, 'drop');
@@ -2670,7 +2678,7 @@ function useInventoryPotion(index) {
     const current = (slot && slot.name === item.name) ? (slot.qty || 0) : 0;
     const space = MAX_SLOT - current;
     if (space <= 0) {
-        alert(`Potion Slot is full.`);
+        showFloatNotice("Potion slot is full", "#potion-slot-box");
         return false;
     }
     const moveQty = Math.min(space, item.qty || 1);
@@ -2723,8 +2731,8 @@ function confirmItemList(targets) {
 function sellInventoryItem(index) {
     const item = player.inventory[index];
     if (!item) return false;
-    if (item.favorite) { alert("Favorite items cannot be sold. Unmark it first."); return false; }
-    if (item.slot && (item.levelReq || 1) >= 99) { alert("Level 99 gear cannot be sold to the shop."); return false; }
+    if (item.favorite) { showFloatNotice("Favorite items cannot be sold. Unmark it first."); return false; }
+    if (item.slot && (item.levelReq || 1) >= 99) { showFloatNotice("Level 99 gear cannot be sold to the shop."); return false; }
     const total = getSellPrice(item);
     const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
     const sellMsg = `Sell ${item.name}${qtyText}?\n\nYou get: ${total} Gold\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
@@ -2776,13 +2784,13 @@ function executeEquipItem(index, targetSlot) {
     const slotKey = targetSlot || (item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot);
     // Two-handed weapons take the shield slot: a shield cannot be worn with one, so equipping one moves the shield to the bag
     if (slotKey === 'shield' && isTwoHanded(player.equipped.weapon)) {
-        alert("A two-handed weapon is equipped. Unequip it first.");
+        showFloatNotice("A two-handed weapon is equipped. Unequip it first.");
         return false;
     }
     if (slotKey === 'weapon' && isTwoHanded(item) && player.equipped.shield) {
         const free = player.inventory.findIndex((s, i) => s === null && i !== index);
         if (free === -1) {
-            alert("Inventory is full! Make room for your shield first.");
+            showFloatNotice("Inventory is full! Make room for your shield first.");
             return false;
         }
         player.inventory[free] = { ...player.equipped.shield };
@@ -2805,7 +2813,7 @@ function salvageScrapGain(item) {
 function salvageEquipmentItem(index) {
     let item = player.inventory[index];
     if (!item || !item.slot) return;
-    if (item.favorite) { alert("Favorite items cannot be salvaged. Unmark it first."); return; }
+    if (item.favorite) { showFloatNotice("Favorite items cannot be salvaged. Unmark it first."); return; }
     let scrapGain = salvageScrapGain(item);
     const salvageMsg = `Salvage ${item.name}?\n\nYou get: ${scrapGain} Iron Scrap\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
     if (item.rarity >= 3 && !confirm(salvageMsg)) return;
@@ -2813,7 +2821,7 @@ function salvageEquipmentItem(index) {
     player.inventory[index] = null;
     if (!addScraps(scrapGain)) {
         player.inventory[index] = item;
-        alert("Inventory is full! Cannot salvage.");
+        showFloatNotice("Inventory is full! Cannot salvage.");
         return;
     }
     logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
@@ -2828,13 +2836,13 @@ function bulkEquipTargets() {
 
 function salvageAllEquipment() {
     const targets = bulkEquipTargets();
-    if (targets.length === 0) { alert("No equipment to salvage."); return; }
+    if (targets.length === 0) { showFloatNotice("No equipment to salvage."); return; }
     const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
     if (!confirm(`Salvage ${targets.length} equipment item(s)?\n\nYou get: ${gain} Iron Scrap\n\n${confirmItemList(targets)}\n\nFavorites are kept. This cannot be undone.`)) return;
     targets.forEach(({ i }) => { player.inventory[i] = null; });
     if (!addScraps(gain)) {
         targets.forEach(({ it, i }) => { player.inventory[i] = it; });
-        alert("Inventory is full! Cannot salvage.");
+        showFloatNotice("Inventory is full! Cannot salvage.");
         return;
     }
     logMessage(`[Salvage] Salvaged ${targets.length} item(s) for ${gain} Iron Scrap(s)`, 'drop');
@@ -2844,7 +2852,7 @@ function salvageAllEquipment() {
 
 function sellAllEquipment() {
     const targets = bulkEquipTargets().filter(({ it }) => (it.levelReq || 1) < 99);
-    if (targets.length === 0) { alert("No equipment to sell."); return; }
+    if (targets.length === 0) { showFloatNotice("No equipment to sell."); return; }
     const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
     if (!confirm(`Sell ${targets.length} equipment item(s)?\n\nYou get: ${total} Gold\n\n${confirmItemList(targets)}\n\nFavorites and Lv 99 gear are kept. This cannot be undone.`)) return;
     targets.forEach(({ i }) => { player.inventory[i] = null; });
@@ -2856,13 +2864,13 @@ function sellAllEquipment() {
 
 function manualDrinkPotion() {
     if (currentMode === 'daily') {
-        alert("Health potions are disabled in the Daily Challenge.");
+        showFloatNotice("Health potions are disabled in the Daily Challenge.");
         return;
     }
     let derived = getDerivedStats();
     let potionSlot = player.equipped.potionSlot;
     if (!potionSlot || (potionSlot.qty || 0) <= 0) {
-        alert("No potions equipped!");
+        showFloatNotice("No potions equipped!", "#potion-slot-box");
         return;
     }
     let healAmt = potionHealAmount(potionSlot, derived.maxHp) || 50;
@@ -3163,7 +3171,7 @@ function upgradeSkill(skillKey) {
     if (s.req) {
         const parent = player.skills[s.req];
         if (parent.level + (pendingAlloc.skills[s.req] || 0) < s.reqLv) {
-            alert(`Requires ${parent.name} Lv. ${s.reqLv}!`);
+            showFloatNotice(`Requires ${parent.name} Lv. ${s.reqLv}!`);
             return;
         }
     }
@@ -3800,9 +3808,10 @@ function updateUI() {
             const iconLayer = has && !useVisual
                 ? `<div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; transform:scale(.8); pointer-events:none;">${itemIconHTML(gear)}</div>`
                 : '';
-            return `<div ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
+            return `<div ${slot === 'potionSlot' ? 'id="potion-slot-box"' : ''} ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
                 <img src="${src}" alt="" class="w-full h-full" style="object-fit:${has && !useVisual ? 'fill' : 'contain'};" onerror="this.onerror=null;this.src='${base}'">
                 ${iconLayer}
+                ${slot === 'potionSlot' && has && gear.qty > 1 ? `<span class="absolute bottom-0 right-0.5 text-[10px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${gear.qty}</span>` : ''}
             </div>`;
         };
         eqContainer.innerHTML = EQUIP_SLOTS.map(eqSlot).join('');

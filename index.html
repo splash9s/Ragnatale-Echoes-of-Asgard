@@ -388,6 +388,7 @@
         /* Damage numbers: white for normal, red for critical */
         .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 26px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
         .combat-dmg.crit { color: #ff9800; font-size: 36px; }
+        .float-notice { position: fixed; z-index: 99999; transform: translate(-50%, -100%); color: #ff3b30; font-size: 22px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp 1.3s ease-out forwards; }
         /* Green aura on heal (monster or player) */
         .heal-aura { position: absolute; z-index: 5; border-radius: 50%; pointer-events: none; transform: translate(0, 0); background: radial-gradient(circle, rgba(74,222,128,.75) 0%, rgba(74,222,128,.35) 45%, rgba(74,222,128,0) 70%); mix-blend-mode: screen; animation: healAura .8s ease-out forwards; }
         @keyframes healAura { 0% { opacity: 0; transform: scale(.6); } 35% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
@@ -1263,12 +1264,12 @@
     <script src="js/cloud.js?v=20261110a"></script>
     <script src="js/hero-art.js?v=20261109v"></script>
     <script src="js/hero-body.js?v=20261109za"></script>
-    <script src="js/combat.js?v=20261110g"></script>
+    <script src="js/combat.js?v=20261110h"></script>
     <script src="js/crit-fx.js?v=20261110d"></script>
-    <script src="js/ui.js?v=20261110d"></script>
+    <script src="js/ui.js?v=20261110f"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
-    <script src="js/town.js?v=20261108a"></script>
+    <script src="js/town.js?v=20261110a"></script>
     <script src="js/loader.js?v=20261109c"></script>
 
 <script>
