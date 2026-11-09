@@ -356,8 +356,38 @@ const HERO_BODY_GEAR = {
    }
   },
   sword: {
+   lv1: {
+    src: 'assets/body/gear/attack/ssattackswordlv1.png',
+    x: 146,
+    y: 173,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/attack/ssattackswordlv10.png',
+    x: 146,
+    y: 173,
+    sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/attack/ssattackswordlv20.png',
+    x: 146,
+    y: 173,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/attack/ssattackswordlv30.png',
+    x: 146,
+    y: 173,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/attack/ssattackswordlv40.png',
+    x: 146,
+    y: 173,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/attack/ssattackswordlv50.png',
     x: 146,
     y: 173,
     sc: 1
@@ -628,8 +658,38 @@ const HERO_BODY_GEAR = {
    }
   },
   sword: {
+   lv1: {
+    src: 'assets/body/gear/base/ssbaseswordlv1.png',
+    x: 18,
+    y: 241,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/base/ssbasesword.png',
+    x: 18,
+    y: 241,
+    sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/base/ssbaseswordlv20.png',
+    x: 18,
+    y: 241,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/base/ssbaseswordlv30.png',
+    x: 18,
+    y: 241,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/base/ssbaseswordlv40.png',
+    x: 18,
+    y: 241,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/base/ssbaseswordlv50.png',
     x: 18,
     y: 241,
     sc: 1
@@ -900,8 +960,38 @@ const HERO_BODY_GEAR = {
    }
   },
   sword: {
+   lv1: {
+    src: 'assets/body/gear/block/ssblockswordlv1.png',
+    x: 120,
+    y: 206,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/block/ssblocksword.png',
+    x: 120,
+    y: 206,
+    sc: 1
+   },
+   lv20: {
+    src: 'assets/body/gear/block/ssblockswordlv20.png',
+    x: 120,
+    y: 206,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/block/ssblockswordlv30.png',
+    x: 120,
+    y: 206,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/block/ssblockswordlv40.png',
+    x: 120,
+    y: 206,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/block/ssblockswordlv50.png',
     x: 120,
     y: 206,
     sc: 1
@@ -1172,16 +1262,40 @@ const HERO_BODY_GEAR = {
    }
   },
   sword: {
+   lv1: {
+    src: 'assets/body/gear/critical/sscriticalswordlv1.png',
+    x: 65,
+    y: 38,
+    sc: 1
+   },
    lv10: {
     src: 'assets/body/gear/critical/sscriticalsword.png',
     x: 31,
     y: 69,
     sc: 1
    },
-   lv1: {
-    src: 'assets/body/gear/critical/sscriticalsword_lv1.png',
-    x: 65,
-    y: 38,
+   lv20: {
+    src: 'assets/body/gear/critical/sscriticalswordlv20.png',
+    x: 31,
+    y: 69,
+    sc: 1
+   },
+   lv30: {
+    src: 'assets/body/gear/critical/sscriticalswordlv30.png',
+    x: 31,
+    y: 69,
+    sc: 1
+   },
+   lv40: {
+    src: 'assets/body/gear/critical/sscriticalswordlv40.png',
+    x: 31,
+    y: 69,
+    sc: 1
+   },
+   lv50: {
+    src: 'assets/body/gear/critical/sscriticalswordlv50.png',
+    x: 31,
+    y: 69,
     sc: 1
    }
   },
@@ -1522,7 +1636,27 @@ const HERO_BODY_SRCS = [
  'assets/body/gear/foot/ssbasefootlv50.png',
  'assets/body/gear/foot/ssattackfootlv50.png',
  'assets/body/gear/foot/ssblockfootlv50.png',
- 'assets/body/gear/foot/sscriticalfootlv50.png'
+ 'assets/body/gear/foot/sscriticalfootlv50.png',
+ 'assets/body/gear/attack/ssattackswordlv1.png',
+ 'assets/body/gear/base/ssbaseswordlv1.png',
+ 'assets/body/gear/block/ssblockswordlv1.png',
+ 'assets/body/gear/critical/sscriticalswordlv1.png',
+ 'assets/body/gear/attack/ssattackswordlv20.png',
+ 'assets/body/gear/base/ssbaseswordlv20.png',
+ 'assets/body/gear/block/ssblockswordlv20.png',
+ 'assets/body/gear/critical/sscriticalswordlv20.png',
+ 'assets/body/gear/attack/ssattackswordlv30.png',
+ 'assets/body/gear/base/ssbaseswordlv30.png',
+ 'assets/body/gear/block/ssblockswordlv30.png',
+ 'assets/body/gear/critical/sscriticalswordlv30.png',
+ 'assets/body/gear/attack/ssattackswordlv40.png',
+ 'assets/body/gear/base/ssbaseswordlv40.png',
+ 'assets/body/gear/block/ssblockswordlv40.png',
+ 'assets/body/gear/critical/sscriticalswordlv40.png',
+ 'assets/body/gear/attack/ssattackswordlv50.png',
+ 'assets/body/gear/base/ssbaseswordlv50.png',
+ 'assets/body/gear/block/ssblockswordlv50.png',
+ 'assets/body/gear/critical/sscriticalswordlv50.png'
 ];
 // The hero is drawn from the body animation tool's parts: base (idle), attack, block and critical poses.
 // Worn gear is layered with the same rules as the tool. Each pose and gear set is composed once into a frame
@@ -1569,12 +1703,17 @@ function heroBodyFootTier(levelReq) {
     for (const t of [50, 40, 30, 20, 10]) if (levelReq >= t) return 'lv' + t;
     return 'lv1';
 }
+// The sword art of the highest tier at or below the weapon's level (lv1 below level 10, then lv10 ... lv50)
+function heroBodySwordTier(levelReq) {
+    for (const t of [50, 40, 30, 20, 10]) if (levelReq >= t) return 'lv' + t;
+    return 'lv1';
+}
 function heroBodyLoadout() {
     const e = (typeof player !== 'undefined' && player.equipped) || {};
     return {
         helmet: heroBodyHelmet(e.hat),
         wear: e.armor ? heroBodyArmorTier(e.armor.levelReq || 1) : 'lv0',
-        sword: e.weapon ? 'lv10' : null,
+        sword: e.weapon ? heroBodySwordTier(e.weapon.levelReq || 1) : null, // lv1 art below level 10
         shield: e.shield ? heroBodyShieldTier(e.shield.levelReq || 1) : null,
         foot: e.footgear ? heroBodyFootTier(e.footgear.levelReq || 1) : 'lv0', // lv0 when no boots are worn
         garment: null, // the cloak (manteau) is not drawn on the hero
