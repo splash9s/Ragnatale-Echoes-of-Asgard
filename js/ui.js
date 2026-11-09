@@ -1562,6 +1562,10 @@ function updateTownAlerts() {
     if (ev) ev.style.display = questOpen ? 'block' : 'none';
     if (sh) sh.style.display = shopFree ? 'block' : 'none';
     if (ml) ml.style.display = mailOpen ? 'block' : 'none';
+    // Friend button: an unclaimed friend gift in the mailbox (claiming it clears the alert)
+    const fa = document.getElementById('alert-friend');
+    const friendGiftOpen = (player.mailBox || []).some(m => !m.claimed && m.title === 'Friend Gift');
+    if (fa) fa.style.display = friendGiftOpen ? 'block' : 'none';
     // Tab badges: Diamond tab (free diamond unclaimed), Shop tab (free gold unclaimed), Events > Daily Quests (quest open)
     const tabDia = document.getElementById('alert-tab-diamond');
     const tabShop = document.getElementById('alert-tab-shop');
