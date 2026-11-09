@@ -43,15 +43,19 @@ alter table public.mail enable row level security;
 alter table public.global_mail enable row level security;
 alter table public.global_mail_claims enable row level security;
 
+drop policy if exists "own save" on public.saves;
 create policy "own save" on public.saves for all
     using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own mail" on public.mail;
 create policy "own mail" on public.mail for select
     using (auth.uid() = recipient_id);
 
+drop policy if exists "read global mail" on public.global_mail;
 create policy "read global mail" on public.global_mail for select
     to authenticated using (true);
 
+drop policy if exists "own global claims" on public.global_mail_claims;
 create policy "own global claims" on public.global_mail_claims for select
     using (auth.uid() = user_id);
 

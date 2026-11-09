@@ -27,9 +27,11 @@ create table if not exists public.friendships (
 alter table public.profiles enable row level security;
 alter table public.friendships enable row level security;
 
+drop policy if exists "own profile" on public.profiles;
 create policy "own profile" on public.profiles for all
     using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own friendships" on public.friendships;
 create policy "own friendships" on public.friendships for select
     using (auth.uid() = owner_id);
 
