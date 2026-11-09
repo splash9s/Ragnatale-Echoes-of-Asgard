@@ -2375,7 +2375,7 @@ const ITEM_ICON_RULES = [
     [/Worldshell Helm/, 'gear_lv50_boss'],
     // Level 60 gear icons
     [/Ring of Jotun Frost/, 'gear_lv60_ring'],
-    [/Jotun Ice Axe/, 'gear_lv60_sword'],
+    [/Jotun Ice Sword/, 'gear_lv60_sword'],
     [/Jotun Rime Shield/, 'gear_lv60_shield'],
     [/Jotun Fur Armor/, 'gear_lv60_armor'],
     [/Jotun Snow Cloak/, 'gear_lv60_cloak'],

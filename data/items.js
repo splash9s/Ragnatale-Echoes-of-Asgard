@@ -91,7 +91,7 @@ const GEAR_POOL = {
         { id: "G030", name: "Striders of Odin", slot: "footgear", levelReq: 50, price: 3800, stats: { hp: 600, aspd: 25 }, desc: "HP +600, ASPD +25" }
     ],
     map60: [
-        { id: "G031", name: "Jotun Ice Axe (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
+        { id: "G031", name: "Jotun Ice Sword (1H)", slot: "weapon", levelReq: 60, stats: { atk: 270, crit: 8 }, desc: "Atk +270, CRIT +8%" },
         { id: "G032", name: "Jotun Rime Shield", slot: "shield", levelReq: 60, stats: { def: 65 }, desc: "DEF +65" },
         { id: "G033", name: "Jotun Fur Armor", slot: "armor", levelReq: 60, stats: { hp: 1900, def: 115 }, desc: "HP +1900, DEF +115" },
         { id: "G034", name: "Jotun Snow Cloak", slot: "garment", levelReq: 60, stats: { flee: 65, def: 30 }, desc: "FLEE +65, DEF +30" },
