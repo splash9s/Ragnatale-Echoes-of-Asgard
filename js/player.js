@@ -260,6 +260,7 @@ function defaultRunes() {
 
 function resetMapRunes() {
     player.runes = defaultRunes();
+    if (typeof stasisAtkPct !== 'undefined') stasisAtkPct = 0; // Stasis Rune bonus ends with the map run
 }
 
 function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
@@ -358,7 +359,7 @@ function getDerivedStats() {
 
     atk += extra.atk;
     extra.atkPct += skillBonus('atkPct');
-    extra.atkPct += (typeof stasisAtkPct === 'number' ? stasisAtkPct : 0); // Stasis Rune: +15% ATK during the stage
+    extra.atkPct += (typeof stasisAtkPct === 'number' ? stasisAtkPct : 0); // Stasis Rune: +15% ATK per stage, for the whole map
     atk = Math.floor(atk * (1 + extra.atkPct / 100));
     def = Math.floor(def * (1 + (skillBonus('defPct') + extra.defPct) / 100));
     def += extra.def;
