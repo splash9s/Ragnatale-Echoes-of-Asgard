@@ -494,8 +494,8 @@
         /* Keep the idle loop running while the hit flash plays (the flash must not replace the idle animation) */
         #combat-player-sprite.player-hurt { animation: playerIdle 2.4s infinite, playerHurtFlash .3s ease; }
         /* Defeat: the hero falls over to the side, darkens and fades (uses the same sprite frames) */
-        #combat-player-sprite.player-fall { animation: playerFall 1.1s ease-in forwards; transform-origin: 50% 90%; }
-        @keyframes playerFall { 0% { transform: rotate(0deg); opacity: 1; filter: none; } 20% { transform: rotate(-8deg); opacity: 1; filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 60% { transform: rotate(45deg) translateY(8px); opacity: .9; filter: grayscale(.4) brightness(.8); } 100% { transform: rotate(90deg) translateY(30px); opacity: .25; filter: grayscale(.8) brightness(.5); } }
+        #combat-player-sprite.player-fall { animation: playerFall 1.1s ease-in forwards; }
+        @keyframes playerFall { 0% { opacity: 1; filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 15% { opacity: 1; filter: none; } 100% { opacity: 0; filter: none; } }
         /* Critical hit: short small screen shake, slash over the monster, blue flash across the screen */
         #combat-stage.crit-shake { animation: critShake .32s linear; }
         @keyframes critShake { 0%, 100% { transform: translate(0, 0); } 12% { transform: translate(-3px, 2px); } 25% { transform: translate(3px, -2px); } 37% { transform: translate(-2px, -1px); } 50% { transform: translate(2px, 1px); } 62% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, -1px); } 88% { transform: translate(0, 0); } }
@@ -1256,7 +1256,7 @@
     <!-- SCRIPTS -->
     <script src="data/items.js?v=20261109b"></script>
     <script src="data/monsters.js?v=20261105j"></script>
-    <script src="data/maps.js?v=20261110e"></script>
+    <script src="data/maps.js?v=20261110f"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261110a"></script>
@@ -1266,7 +1266,7 @@
     <script src="js/hero-body.js?v=20261109za"></script>
     <script src="js/combat.js?v=20261110h"></script>
     <script src="js/crit-fx.js?v=20261110d"></script>
-    <script src="js/ui.js?v=20261110f"></script>
+    <script src="js/ui.js?v=20261110g"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
     <script src="js/town.js?v=20261110a"></script>

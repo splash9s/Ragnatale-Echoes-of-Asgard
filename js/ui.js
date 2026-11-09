@@ -898,22 +898,26 @@ setInterval(() => {
         if (deathAt) {
             const e = now - deathAt;
             const total = Number(img.dataset.deathTotal) || COMBAT_DEATH_TOTAL_MS;
+            const ms = Number(img.dataset.deathMs) || COMBAT_DEATH_FRAME_MS;
+            const dead = img.dataset.deathFrames ? img.dataset.deathFrames.split(',') : COMBAT_SLIME_DEATH_FRAMES;
             const hurtMs = Number(img.dataset.deathHurtMs) || 0; // boss: damaged pose first
             if (e >= total) {
                 if (img.parentElement) img.parentElement.style.display = 'none';
                 return;
             }
-            // No death animation: show the damaged pose (boss: while it plays, then held), then fade out
-            const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
-            if (hurt.length) {
-                const hi = e < hurtMs ? Math.floor(e / hurtMs * hurt.length) : hurt.length - 1;
-                setMonsterFrame(img, hurt[Math.min(hurt.length - 1, hi)]);
-            } else {
-                setMonsterFrame(img, img.dataset.frames.split(',')[0]);
+            if (e < hurtMs) {
+                const hurt = img.dataset.hurtFrames ? img.dataset.hurtFrames.split(',') : [];
+                if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(e / hurtMs * hurt.length))]);
+                img.style.filter = e < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
+                return;
             }
-            img.style.filter = e < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
-            const p = Math.min(1, Math.max(0, e - hurtMs) / Math.max(1, total - hurtMs));
-            img.style.opacity = String(1 - p * p);
+            img.style.filter = '';
+            if (img.dataset.slowDeath === '1') {
+                // Boss death in slow motion: the death frames step slowly while the body fades out
+                const p = Math.min(1, (e - hurtMs) / Math.max(1, total - hurtMs));
+                img.style.opacity = String(1 - 0.75 * p * p);
+            }
+            setMonsterFrame(img, dead[Math.min(dead.length - 1, Math.floor((e - hurtMs) / ms))]);
             return;
         }
         // Hurt and attack: whichever started later plays and overrides the other (idle is the fallback)

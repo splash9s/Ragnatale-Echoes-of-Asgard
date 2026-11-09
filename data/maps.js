@@ -27,6 +27,7 @@ const ROLE_CURVE = {
 // Boss template before makeBoss() (which then applies BOSS_HP_MULT and BOSS_ATK_MULT)
 const BOSS_CURVE = { hp: 3.0, atk: 0.60 };
 const CURVE_ATK_SPREAD = 0.13; // ATK range is unit ATK -13% to +13%
+const MONSTER_ATK_MULT = 2.0; // all monster and boss damage x2 (game was too easy)
 
 function curveUnit(level) {
     const L = Math.max(MONSTER_CURVE[0][0], Math.min(MONSTER_CURVE[MONSTER_CURVE.length - 1][0], level || 1));
@@ -42,6 +43,7 @@ function curveUnit(level) {
 }
 function curveRoleOf(t) { return t.role || (t.isRanged ? 'range' : 'melee'); }
 function curveAtkRange(atk) {
+    atk *= MONSTER_ATK_MULT;
     return { atkMin: Math.max(1, Math.floor(atk * (1 - CURVE_ATK_SPREAD))), atkMax: Math.max(1, Math.ceil(atk * (1 + CURVE_ATK_SPREAD))) };
 }
 // Monster hit and flee follow the map level (same as combatHitFlee in combat.js)
