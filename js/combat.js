@@ -398,6 +398,7 @@ function startExpedition(mode, opts = {}) {
     }
 
     switchView('combat');
+    document.getElementById('combat-player-sprite')?.classList.remove('player-fall'); // back up for a new battle
     player.inCombat = true;
     stageSummary = newStageSummary(currentStage);
     runeRefreshLeft = RUNE_REFRESH_MAX;
@@ -1319,7 +1320,9 @@ function monsterTurnTick() {
         player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
         player.hp = getDerivedStats().maxHp;
         updateUI();
-        showModal("Expedition Failed", '', buildMapSummaryHTML('lose'), () => switchView('expeditions'));
+        const defeatHtml = buildMapSummaryHTML('lose');
+        playPlayerFallAnim(); // the hero falls first, then the result shows
+        setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView('expeditions')), PLAYER_FALL_MS);
     }
     updateUI();
 }

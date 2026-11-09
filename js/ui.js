@@ -684,6 +684,15 @@ const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
 const COMBAT_PLAYER_CRIT_MS = 520;   // a critical attack holds its own pose longer
 const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
+// The hero falls over at the end of a battle (the sprite tips, darkens and fades)
+const PLAYER_FALL_MS = 1100;
+function playPlayerFallAnim() {
+    const el = document.getElementById('combat-player-sprite');
+    if (!el) return;
+    el.classList.remove('player-fall');
+    void el.offsetWidth; // restart the fall
+    el.classList.add('player-fall');
+}
 function playPlayerAttackAnim(isCrit) {
     const cri = combatPose().CRI;
     const criCount = Array.isArray(cri) ? cri.length : 1;
