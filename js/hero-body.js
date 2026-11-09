@@ -167,7 +167,7 @@ const HERO_BODY_POSES = {
     name: 'Left hand',
     src: 'assets/body/critical/dcriticallefthand.png',
     x: 222,
-    y: 51,
+    y: 66,
     sc: 0.8
    },
    {
@@ -368,8 +368,8 @@ const HERO_BODY_GEAR = {
    },
    lv80: {
     src: 'assets/body/gear/wear/ssattackarmorlv80.png',
-    x: 169,
-    y: 127,
+    x: 161,
+    y: 119,
     sc: 1
    },
    lv90: {
@@ -790,8 +790,8 @@ const HERO_BODY_GEAR = {
    },
    lv80: {
     src: 'assets/body/gear/wear/ssbasearmorlv80.png',
-    x: 163,
-    y: 122,
+    x: 142,
+    y: 144,
     sc: 1
    },
    lv90: {
@@ -858,8 +858,8 @@ const HERO_BODY_GEAR = {
    },
    lv80: {
     src: 'assets/body/gear/base/ssbaseswordlv80.png',
-    x: 40,
-    y: 136,
+    x: 32,
+    y: 126,
     sc: 1
    },
    lv90: {
@@ -1212,8 +1212,8 @@ const HERO_BODY_GEAR = {
    },
    lv80: {
     src: 'assets/body/gear/wear/ssblockarmorlv80.png',
-    x: 168,
-    y: 116,
+    x: 155,
+    y: 121,
     sc: 1
    },
    lv90: {
@@ -1634,8 +1634,8 @@ const HERO_BODY_GEAR = {
    },
    lv80: {
     src: 'assets/body/gear/wear/sscriticalarmorlv80.png',
-    x: 203,
-    y: 92,
+    x: 205,
+    y: 53,
     sc: 1
    },
    lv90: {
