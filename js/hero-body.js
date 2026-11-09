@@ -1654,38 +1654,38 @@ const HERO_BODY_GEAR = {
   sword: {
    lv1: {
     src: 'assets/body/gear/critical/sscriticalswordlv1.png',
-    x: 65,
-    y: 38,
+    x: 87,
+    y: 55,
     sc: 1
    },
    lv10: {
     src: 'assets/body/gear/critical/sscriticalsword.png',
-    x: 31,
-    y: 69,
+    x: 25,
+    y: 65,
     sc: 1
    },
    lv20: {
     src: 'assets/body/gear/critical/sscriticalswordlv20.png',
-    x: 31,
-    y: 69,
+    x: 85,
+    y: 48,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/critical/sscriticalswordlv30.png',
-    x: 31,
-    y: 69,
+    x: 89,
+    y: 57,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/critical/sscriticalswordlv40.png',
-    x: 31,
-    y: 69,
+    x: 92,
+    y: 60,
     sc: 1
    },
    lv50: {
     src: 'assets/body/gear/critical/sscriticalswordlv50.png',
-    x: 31,
-    y: 69,
+    x: 94,
+    y: 48,
     sc: 1
    },
    lv60: {
