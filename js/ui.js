@@ -256,7 +256,7 @@ async function startGameWithName() {
 // Combat animation: idle frames loop; after a hit, the damage frames play once (4 frames)
 // One damage picture, shown for 480ms after a hit
 const COMBAT_SLIME_DAMAGE_FRAMES = ['assets/combat/slime/slimedamaged_q85.webp'];
-const COMBAT_DAMAGE_FRAME_MS = 240; // monster damaged animation (half of the original 480)
+const COMBAT_DAMAGE_FRAME_MS = 360; // monster damaged animation (longer than before so the hit reads clearly)
 // Death: slime_dead_0001 to 0006 play once (150ms each), then the monster disappears
 const COMBAT_SLIME_DEATH_FRAMES = ['assets/combat/slime/slimedead_q85.webp'];
 const COMBAT_DEATH_FRAME_MS = 600;
@@ -910,7 +910,7 @@ setInterval(() => {
         if (hurtOn) { // the damaged pose always shows while it plays (a monster's own attack no longer hides it)
             if (hurt.length) setMonsterFrame(img, hurt[Math.min(hurt.length - 1, Math.floor(elapsed / COMBAT_DAMAGE_FRAME_MS))]);
             // Same red flash as the player's battle sprite (first 150ms of the hit)
-            img.style.filter = elapsed < 150 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
+            img.style.filter = elapsed < 320 ? 'brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5)' : '';
             return;
         }
         if (attackOn) {
