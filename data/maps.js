@@ -49,13 +49,15 @@ function curveHitFlee(level) { const L = level || 1; return { hit: L * 3 + 40, f
 
 // Rewards keep growing by LEVEL_GROWTH per level from the template's home level (lv), as before.
 const LEVEL_GROWTH = 1.0405;
+// Regular monsters (tank, melee, range, mage, healer) have 40% less HP. Bosses are not affected (curveBoss).
+const MONSTER_HP_CUT = 0.6;
 function levelScaled(t, level) {
     const L = level || 1;
     const role = curveRoleOf(t);
     const prof = ROLE_CURVE[role] || ROLE_CURVE.melee;
     const u = curveUnit(L);
     const pm = t.powerMult || 1; // events: x1.5 HP and ATK
-    const hp = Math.max(1, Math.round(u.hp * prof.hp * pm));
+    const hp = Math.max(1, Math.round(u.hp * prof.hp * pm * MONSTER_HP_CUT));
     const rr = v => Math.max(1, Math.round((v || 0) * Math.pow(LEVEL_GROWTH, L - (t.lv || 1))));
     const out = {
         ...t,
