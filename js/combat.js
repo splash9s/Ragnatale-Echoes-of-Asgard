@@ -1445,6 +1445,8 @@ function runCombatTick() {
         } else {
             critStreak = 0;
             playSound('sound/hit.mp3');
+            const atkIdx = monstersList.indexOf(targetEnemy);
+            if (atkIdx >= 0 && typeof playAtkFx === 'function') setTimeout(() => playAtkFx(`#monsters-lineup-container > div:nth-child(${atkIdx + 1}) img`), 0);
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
         }
         if (runeN('sharedDamage') > 0 && alive.length > 1) {

@@ -971,7 +971,8 @@ function syncCombatInfo() {
 function updateAvatarDisplay() {
     let container = document.getElementById('header-avatar-container');
     // The new-avatar alert stays until the player first clicks the avatar (remembered in the save)
-    document.getElementById('avatar-alert')?.classList.toggle('hidden', !!player.avatarClicked);
+    const avatarAlert = document.getElementById('avatar-alert');
+    if (avatarAlert) avatarAlert.style.display = player.avatarClicked ? 'none' : 'block'; // inline, so it does not depend on the stylesheet
     if (!container) return;
     container.innerHTML = avatarMarkup(player.avatar, 'w-full h-full object-cover');
 }

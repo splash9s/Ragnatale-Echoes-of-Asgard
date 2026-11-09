@@ -1,11 +1,11 @@
 // ==========================================
-// CRITICAL HIT EFFECT
-// When the player lands a critical hit: a slash animation over the monster that was hit,
-// a small screen shake, a blue vignette and a flash across the combat screen.
-// Called from the monster hit code in ui.js (only for critical hits).
+// HIT EFFECTS: slash over the monster that was hit.
+// Critical hit: crit slash frames, plus a small screen shake and a blue vignette and flash.
+// Normal hit: atkslay frames over the monster only.
+// Called from the monster hit code in combat.js.
 // ==========================================
 
-// Slash frames in play order. Width/height are the frames' own pixel sizes.
+// Crit slash frames in play order. Width/height are the frames' own pixel sizes.
 const CRIT_SLASH_FRAMES = [
     { src: 'assets/combat/crit/slash20_q85.webp', w: 235, h: 275 },
     { src: 'assets/combat/crit/slash21_q85.webp', w: 730, h: 521 },
@@ -14,8 +14,19 @@ const CRIT_SLASH_FRAMES = [
     { src: 'assets/combat/crit/slash24_q85.webp', w: 690, h: 496 },
     { src: 'assets/combat/crit/slash25_q85.webp', w: 664, h: 482 },
 ];
-const CRIT_SLASH_FRAME_MS = 80;  // time each frame stays on screen
+const CRIT_SLASH_FRAME_MS = 80;  // time each crit frame stays on screen
 const CRIT_SLASH_SCALE = 0.6;    // frames are drawn at this fraction of their own size (design px)
+
+// Normal attack slash frames (atkslay1-5)
+const ATK_SLASH_FRAMES = [
+    { src: 'assets/combat/atk/atkslay1_q85.webp', w: 800, h: 597 },
+    { src: 'assets/combat/atk/atkslay2_q85.webp', w: 800, h: 597 },
+    { src: 'assets/combat/atk/atkslay3_q85.webp', w: 800, h: 597 },
+    { src: 'assets/combat/atk/atkslay4_q85.webp', w: 800, h: 597 },
+    { src: 'assets/combat/atk/atkslay5_q85.webp', w: 800, h: 597 },
+];
+const ATK_SLASH_FRAME_MS = 60;
+const ATK_SLASH_SCALE = 0.4;
 
 let critSlashTimer = null;
 
@@ -26,7 +37,7 @@ function restartFxClass(el, cls) {
     el.classList.add(cls);
 }
 
-// The shine, vignette and flash layer over the whole combat screen (created once)
+// The vignette and flash layer over the whole combat screen (created once)
 function critFxLayer(stage) {
     let fx = stage.querySelector('.crit-fx-layer');
     if (!fx) {
@@ -38,8 +49,9 @@ function critFxLayer(stage) {
     return fx;
 }
 
-// selector: the monster image that was hit (same selector the damage numbers use)
-function playCritFx(selector) {
+// Plays a slash frame sequence over the monster at selector.
+// screenFx: also shake the screen and show the vignette and flash (critical hits only)
+function playSlashFx(selector, frames, frameMs, scale, screenFx) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
     const stage = document.getElementById('combat-stage');
@@ -47,9 +59,10 @@ function playCritFx(selector) {
     const anchor = document.querySelector(selector);
     if (!stage || !inner || !anchor) return;
 
-    // Screen effects
-    restartFxClass(stage, 'crit-shake');
-    restartFxClass(critFxLayer(stage), 'crit-on');
+    if (screenFx) {
+        restartFxClass(stage, 'crit-shake');
+        restartFxClass(critFxLayer(stage), 'crit-on');
+    }
 
     // Slash over the monster, in the stage's design coordinates
     const ib = inner.getBoundingClientRect();
@@ -67,8 +80,8 @@ function playCritFx(selector) {
     clearInterval(critSlashTimer);
     let f = 0;
     const show = () => {
-        const fr = CRIT_SLASH_FRAMES[f];
-        const w = fr.w * CRIT_SLASH_SCALE, h = fr.h * CRIT_SLASH_SCALE;
+        const fr = frames[f];
+        const w = fr.w * scale, h = fr.h * scale;
         img.src = fr.src;
         img.style.width = w + 'px';
         img.style.height = h + 'px';
@@ -79,11 +92,21 @@ function playCritFx(selector) {
     show();
     critSlashTimer = setInterval(() => {
         f++;
-        if (f >= CRIT_SLASH_FRAMES.length) {
+        if (f >= frames.length) {
             clearInterval(critSlashTimer);
             img.style.display = 'none';
             return;
         }
         show();
-    }, CRIT_SLASH_FRAME_MS);
+    }, frameMs);
+}
+
+// Critical hit: crit slash with screen shake, vignette and flash
+function playCritFx(selector) {
+    playSlashFx(selector, CRIT_SLASH_FRAMES, CRIT_SLASH_FRAME_MS, CRIT_SLASH_SCALE, true);
+}
+
+// Normal hit: atkslay slash only
+function playAtkFx(selector) {
+    playSlashFx(selector, ATK_SLASH_FRAMES, ATK_SLASH_FRAME_MS, ATK_SLASH_SCALE, false);
 }
