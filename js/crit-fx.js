@@ -1,6 +1,6 @@
 // ==========================================
 // HIT EFFECTS: slash over the monster that was hit.
-// Critical hit: crit slash frames, plus a small screen shake and a blue vignette and flash.
+// Critical hit: crit slash frames, plus a small screen shake and a blue flash.
 // Normal hit: atkslay frames over the monster only.
 // Called from the monster hit code in combat.js.
 // ==========================================
@@ -37,20 +37,20 @@ function restartFxClass(el, cls) {
     el.classList.add(cls);
 }
 
-// The vignette and flash layer over the whole combat screen (created once)
+// The flash layer over the whole combat screen (created once)
 function critFxLayer(stage) {
     let fx = stage.querySelector('.crit-fx-layer');
     if (!fx) {
         fx = document.createElement('div');
         fx.className = 'crit-fx-layer';
-        fx.innerHTML = '<div class="crit-vignette"></div><div class="crit-flash"></div>';
+        fx.innerHTML = '<div class="crit-flash"></div>';
         stage.appendChild(fx);
     }
     return fx;
 }
 
 // Plays a slash frame sequence over the monster at selector.
-// screenFx: also shake the screen and show the vignette and flash (critical hits only)
+// screenFx: also shake the screen and show the flash (critical hits only)
 function playSlashFx(selector, frames, frameMs, scale, screenFx) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
@@ -88,6 +88,7 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
         img.style.left = (cx - w / 2) + 'px';
         img.style.top = (cy - h / 2) + 'px';
         img.style.display = '';
+        restartFxClass(img, 'slash-lit'); // lighting pulse on every frame
     };
     show();
     critSlashTimer = setInterval(() => {
@@ -101,7 +102,7 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
     }, frameMs);
 }
 
-// Critical hit: crit slash with screen shake, vignette and flash
+// Critical hit: crit slash with screen shake and flash
 function playCritFx(selector) {
     playSlashFx(selector, CRIT_SLASH_FRAMES, CRIT_SLASH_FRAME_MS, CRIT_SLASH_SCALE, true);
 }

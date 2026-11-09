@@ -492,18 +492,18 @@
         @keyframes playerHurtFlash { 0% { filter: none; } 30% { filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 100% { filter: none; } }
         /* Keep the idle loop running while the hit flash plays (the flash must not replace the idle animation) */
         #combat-player-sprite.player-hurt { animation: playerIdle 2.4s infinite, playerHurtFlash .3s ease; }
-        /* Critical hit: short small screen shake, slash over the monster, blue vignette and flash across the screen */
+        /* Critical hit: short small screen shake, slash over the monster, blue flash across the screen */
         #combat-stage.crit-shake { animation: critShake .32s linear; }
         @keyframes critShake { 0%, 100% { transform: translate(0, 0); } 12% { transform: translate(-3px, 2px); } 25% { transform: translate(3px, -2px); } 37% { transform: translate(-2px, -1px); } 50% { transform: translate(2px, 1px); } 62% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, -1px); } 88% { transform: translate(0, 0); } }
         .crit-fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
-        .crit-vignette, .crit-flash { position: absolute; inset: 0; opacity: 0; }
-        .crit-vignette { background: radial-gradient(ellipse at center, rgba(60, 120, 255, 0) 55%, rgba(90, 110, 255, .55) 100%); }
+        .crit-flash { position: absolute; inset: 0; opacity: 0; }
         .crit-flash { background: rgba(120, 210, 255, .28); }
-                .crit-fx-layer.crit-on .crit-vignette { animation: critVignette .7s ease-out; }
-        .crit-fx-layer.crit-on .crit-flash { animation: critFlash .28s ease-out; }
-                @keyframes critVignette { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
-        @keyframes critFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
-                .crit-slash { position: absolute; pointer-events: none; z-index: 10; }
+                        .crit-fx-layer.crit-on .crit-flash { animation: critFlash .28s ease-out; }
+                        @keyframes critFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+                .crit-slash { position: absolute; pointer-events: none; z-index: 10; mix-blend-mode: screen; filter: drop-shadow(0 0 10px rgba(120, 220, 255, .95)) drop-shadow(0 0 22px rgba(90, 140, 255, .6)); }
+        /* Slash lighting: each frame flashes brighter, then settles */
+        .crit-slash.slash-lit { animation: slashLight .16s ease-out; }
+        @keyframes slashLight { 0% { filter: brightness(1.9) drop-shadow(0 0 14px rgba(160, 235, 255, 1)) drop-shadow(0 0 28px rgba(90, 140, 255, .8)); } 100% { filter: brightness(1) drop-shadow(0 0 10px rgba(120, 220, 255, .95)) drop-shadow(0 0 22px rgba(90, 140, 255, .6)); } }
         /* Keep the aspect ratio when a frame is not exactly the set size (some idle frames are 103x216) */
         #combat-player-sprite { object-fit: contain; }
         /* Monster colours by element: fire = fire slime, water (ice) = light blue slime, wind = grey slime. Earth keeps the base green. */
@@ -1248,8 +1248,8 @@
     <script src="js/hero-art.js?v=20261109v"></script>
     <script src="js/hero-body.js?v=20261109za"></script>
     <script src="js/combat.js?v=20261109c"></script>
-    <script src="js/crit-fx.js?v=20261109c"></script>
-    <script src="js/ui.js?v=20261109j"></script>
+    <script src="js/crit-fx.js?v=20261109d"></script>
+    <script src="js/ui.js?v=20261109k"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
     <script src="js/town.js?v=20261108a"></script>
