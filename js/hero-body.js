@@ -69,7 +69,7 @@ const HERO_BODY_POSES = {
     name: 'Head',
     src: 'assets/body/attack/dattackhead.png',
     x: 309,
-    y: 48,
+    y: 52,
     sc: 1
    },
    {
@@ -98,14 +98,14 @@ const HERO_BODY_POSES = {
     name: 'Leg',
     src: 'assets/body/block/dblockleg.png',
     x: 164,
-    y: 262,
+    y: 253,
     sc: 1
    },
    {
     id: 'armor',
     name: 'Armor',
     src: 'assets/body/block/dblockarmor.png',
-    x: 168,
+    x: 188,
     y: 119,
     sc: 1
    },
@@ -187,7 +187,7 @@ const HERO_BODY_GEAR = {
    shoplv10: {
     src: 'assets/body/gear/helmet/hatssattacklv10.png',
     x: 319,
-    y: 42,
+    y: 46,
     sc: 1
    },
    bosslv1: {
@@ -205,7 +205,7 @@ const HERO_BODY_GEAR = {
    bosslv20: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv20.png',
     x: 288,
-    y: 24,
+    y: 34,
     sc: 1
    },
    shoplv20: {
@@ -217,19 +217,19 @@ const HERO_BODY_GEAR = {
    bosslv30: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv30.png',
     x: 317,
-    y: 11,
+    y: 17,
     sc: 1
    },
    bosslv40: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv40.png',
     x: 320,
-    y: 39,
+    y: 50,
     sc: 1
    },
    bosslv50: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv50.png',
     x: 323,
-    y: 22,
+    y: 31,
     sc: 1
    },
    bosslv60: {
@@ -241,25 +241,25 @@ const HERO_BODY_GEAR = {
    bosslv70: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv70.png',
     x: 303,
-    y: -11,
+    y: 1,
     sc: 1
    },
    bosslv80: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv80.png',
     x: 322,
-    y: 24,
+    y: 31,
     sc: 1
    },
    bosslv90: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv90.png',
     x: 318,
-    y: 38,
+    y: 50,
     sc: 1
    },
    bosslv99: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv99.png',
     x: 316,
-    y: 24,
+    y: 28,
     sc: 1
    },
    shoplv30: {
@@ -344,8 +344,8 @@ const HERO_BODY_GEAR = {
    },
    lv40: {
     src: 'assets/body/gear/wear/ssattackarmorlv40.png',
-    x: 196,
-    y: 119,
+    x: 193,
+    y: 121,
     sc: 1
    },
    lv50: {
@@ -672,14 +672,14 @@ const HERO_BODY_GEAR = {
    },
    lv20: {
     src: 'assets/body/gear/base/ssbaseswordlv20.png',
-    x: 18,
-    y: 241,
+    x: 34,
+    y: 145,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/base/ssbaseswordlv30.png',
-    x: 18,
-    y: 241,
+    x: 37,
+    y: 139,
     sc: 1
    },
    lv40: {
@@ -690,8 +690,8 @@ const HERO_BODY_GEAR = {
    },
    lv50: {
     src: 'assets/body/gear/base/ssbaseswordlv50.png',
-    x: 18,
-    y: 241,
+    x: 40,
+    y: 136,
     sc: 1
    }
   },
@@ -821,7 +821,7 @@ const HERO_BODY_GEAR = {
    bosslv30: {
     src: 'assets/body/gear/helmet/boss/ssblockbosslv30.png',
     x: 247,
-    y: 7,
+    y: 15,
     sc: 1
    },
    bosslv40: {
@@ -918,7 +918,7 @@ const HERO_BODY_GEAR = {
   wear: {
    lv0: {
     src: 'assets/body/gear/wear/ssblockarmorlv0.png',
-    x: 154,
+    x: 160,
     y: 127,
     sc: 1
    },
@@ -936,25 +936,25 @@ const HERO_BODY_GEAR = {
    },
    lv20: {
     src: 'assets/body/gear/wear/ssblockarmorlv20.png',
-    x: 139,
-    y: 135,
+    x: 153,
+    y: 129,
     sc: 1
    },
    lv30: {
     src: 'assets/body/gear/wear/ssblockarmorlv30.png',
-    x: 157,
+    x: 168,
     y: 132,
     sc: 1
    },
    lv40: {
     src: 'assets/body/gear/wear/ssblockarmorlv40.png',
-    x: 163,
+    x: 170,
     y: 136,
     sc: 1
    },
    lv50: {
     src: 'assets/body/gear/wear/ssblockarmorlv50.png',
-    x: 159,
+    x: 168,
     y: 116,
     sc: 1
    }
@@ -969,7 +969,7 @@ const HERO_BODY_GEAR = {
    lv10: {
     src: 'assets/body/gear/block/ssblocksword.png',
     x: 120,
-    y: 206,
+    y: 212,
     sc: 1
    },
    lv20: {
@@ -1062,7 +1062,7 @@ const HERO_BODY_GEAR = {
    },
    lv30: {
     src: 'assets/body/gear/foot/ssblockfootlv30.png',
-    x: 162,
+    x: 160,
     y: 262,
     sc: 1
    },
