@@ -45,6 +45,8 @@ async function cloudStart() {
         }
         cloudPushProfile();
         if (typeof player !== 'undefined') syncServerMail();
+        cloudStatsStart();
+        cloudCheckAdmin();
         if (!cloudListening) {
             cloudListening = true;
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudFlush(); });
@@ -254,4 +256,47 @@ async function cloudDeleteSave() {
     } catch (e) {
         console.warn('Cloud reset failed:', e);
     }
+}
+
+// ---- Play stats and the developer check (needs supabase/admin.sql) ----
+
+// Counts the seconds the game is open and visible, and sends them about once a minute (client total)
+let statsPendingSec = 0;
+let statsLastFlushAt = 0;
+let statsTimer = null;
+function cloudStatsStart() {
+    if (statsTimer || !cloudClient) return;
+    statsTimer = setInterval(() => {
+        if (document.visibilityState === 'visible') statsPendingSec = Math.min(120, statsPendingSec + 1);
+        if (statsPendingSec >= 60) cloudStatsFlush();
+    }, 1000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudStatsFlush(); });
+    window.addEventListener('pagehide', cloudStatsFlush);
+    // A browser driven by automation (not a player): logged once per visit
+    if (navigator.webdriver) cloudLogSuspicious('webdriver');
+}
+function cloudStatsFlush() {
+    if (!statsPendingSec || !cloudClient || !cloudUserId || cloudDisabled) return;
+    // The server allows one call every 20 seconds; time waits until the next allowed call
+    if (Date.now() - statsLastFlushAt < 21000) return;
+    const secs = statsPendingSec;
+    statsPendingSec = 0;
+    statsLastFlushAt = Date.now();
+    cloudClient.rpc('touch_stats', { p_seconds: secs }).then(({ error }) => {
+        if (error) console.warn('Play stats not saved:', error.message);
+    });
+}
+function cloudLogSuspicious(kind) {
+    if (!cloudClient || !cloudUserId || cloudDisabled) return;
+    cloudClient.rpc('log_suspicious', { p_kind: kind, p_detail: null }).then(() => {});
+}
+// Loads the developer dashboard only when the server confirms the signed-in account is the owner
+function cloudCheckAdmin() {
+    if (!cloudClient || !cloudUserId || cloudDisabled) return;
+    cloudClient.rpc('admin_check').then(({ data, error }) => {
+        if (error || data !== true) return;
+        const s = document.createElement('script');
+        s.src = 'js/admin.js?v=20261110a';
+        document.head.appendChild(s);
+    });
 }
