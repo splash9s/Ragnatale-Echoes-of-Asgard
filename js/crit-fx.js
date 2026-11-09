@@ -16,7 +16,7 @@ const CRIT_SLASH_FRAMES = [
 ];
 const CRIT_SLASH_FRAME_MS = 80;  // time each crit frame stays on screen
 const CRIT_SLASH_SCALE = 0.6;    // frames are drawn at this fraction of their own size (design px)
-const SLASH_LIGHT_SIZE = 2400;   // diameter (design px) of the light a critical slash gives off
+const SLASH_LIGHT_SIZE = 1100;   // diameter (design px) of the light a critical slash gives off
 
 // Normal attack slash frames (atkslay1-5)
 const ATK_SLASH_FRAMES = [
