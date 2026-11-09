@@ -159,7 +159,7 @@ const HERO_BODY_POSES = {
     name: 'Head',
     src: 'assets/body/critical/dcriticalhead.png',
     x: 273,
-    y: 39,
+    y: 45,
     sc: 1
    },
    {
@@ -1009,7 +1009,7 @@ const HERO_BODY_GEAR = {
    bosslv1: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv1.png',
     x: 270,
-    y: 24,
+    y: 31,
     sc: 1
    },
    bosslv10: {
@@ -1021,7 +1021,7 @@ const HERO_BODY_GEAR = {
    bosslv20: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv20.png',
     x: 266,
-    y: 20,
+    y: 26,
     sc: 1
    },
    shoplv20: {
@@ -1033,13 +1033,13 @@ const HERO_BODY_GEAR = {
    bosslv30: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv30.png',
     x: 265,
-    y: -2,
+    y: 7,
     sc: 1
    },
    bosslv40: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv40.png',
     x: 267,
-    y: 38,
+    y: 46,
     sc: 1
    },
    bosslv50: {
@@ -1063,19 +1063,19 @@ const HERO_BODY_GEAR = {
    bosslv80: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv80.png',
     x: 269,
-    y: 3,
+    y: 14,
     sc: 1
    },
    bosslv90: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv90.png',
     x: 266,
-    y: 36,
+    y: 43,
     sc: 1
    },
    bosslv99: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv99.png',
     x: 269,
-    y: 21,
+    y: 29,
     sc: 1
    },
    shoplv30: {
@@ -1087,7 +1087,7 @@ const HERO_BODY_GEAR = {
    shoplv40: {
     src: 'assets/body/gear/helmet/shop/sscriticalshoplv40.png',
     x: 268,
-    y: 28,
+    y: 37,
     sc: 1
    },
    shoplv50: {
@@ -1111,27 +1111,27 @@ const HERO_BODY_GEAR = {
    shoplv80: {
     src: 'assets/body/gear/helmet/shop/sscriticalshoplv80.png',
     x: 270,
-    y: 18,
+    y: 26,
     sc: 1
    },
    shoplv90: {
     src: 'assets/body/gear/helmet/shop/sscriticalshoplv90.png',
     x: 270,
-    y: 24,
+    y: 34,
     sc: 1
    },
    shoplv99: {
     src: 'assets/body/gear/helmet/shop/sscriticalshoplv99.png',
     x: 270,
-    y: 27,
+    y: 34,
     sc: 1
    }
   },
   wear: {
    lv0: {
     src: 'assets/body/gear/wear/sscriticalarmorlv0.png',
-    x: 217,
-    y: 97,
+    x: 203,
+    y: 85,
     sc: 1
    },
    lv1: {
@@ -1142,8 +1142,8 @@ const HERO_BODY_GEAR = {
    },
    lv10: {
     src: 'assets/body/gear/wear/sscriticalarmorlv10.png',
-    x: 219,
-    y: 72,
+    x: 202,
+    y: 70,
     sc: 1
    },
    lv20: {
