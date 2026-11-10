@@ -2712,12 +2712,18 @@ function showEquippedDetail(slot) {
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
     if (!isPotion) actions += `<button onclick="unequipFromDetail('${slot}')" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
+    else actions += `<button onclick="unequipPotionFromDetail()" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
     actions += '</div>';
 
     const favBtn = !isPotion && slot !== 'pet'
         ? `<button onclick="toggleEquippedFavorite('${slot}')" class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-yellow-300 font-bold text-xs">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`
         : '';
     showModal(title, '', closeCornerHTML() + favBtn + body + actions);
+}
+
+function unequipPotionFromDetail() {
+    unequipPotionSlot();
+    if (!player.equipped.potionSlot || !player.equipped.potionSlot.name) closeModal();
 }
 
 function unequipFromDetail(slot) {
