@@ -399,7 +399,7 @@
         @keyframes earth3dSwayFar { 0%, 100% { translate: -14px 0; } 50% { translate: 14px -4px; } }
         @keyframes earth3dSwayMid { 0%, 100% { translate: -7px 0; } 50% { translate: 7px -2px; } }
         /* Sunlight through the leaves: dappled light and slanted shafts sweep from left to right now and then */
-        #sun-shafts { position: absolute; left: -300px; top: -60px; width: 2520px; height: 1200px; z-index: 3; pointer-events: none; mix-blend-mode: screen; opacity: 0; animation: sunShafts 30s ease-in-out infinite; background:
+        #sun-shafts, #sun-shafts-front { position: absolute; left: -300px; top: -60px; width: 2520px; height: 1200px; z-index: 3; pointer-events: none; mix-blend-mode: screen; opacity: 0; animation: sunShafts 30s ease-in-out infinite; background:
             radial-gradient(ellipse 70px 24px at 18% 22%, rgba(255,240,186,.75), transparent 70%),
             radial-gradient(ellipse 46px 18px at 31% 41%, rgba(255,240,186,.6), transparent 70%),
             radial-gradient(ellipse 90px 28px at 46% 17%, rgba(255,240,186,.7), transparent 70%),
@@ -411,8 +411,11 @@
         #guide-tip { position: absolute; z-index: 52; transform: translate(-50%, -100%); white-space: nowrap; background: #0f172a; border: 1px solid #fbbf24; color: #fde68a; padding: 6px 10px; border-radius: 10px; font-size: 14px; font-weight: 600; pointer-events: none; }
         .guide-flash-link { animation: guideGlow 1s steps(2, end) infinite; border-color: #fbbf24 !important; }
         @keyframes guideGlow { 0%, 100% { box-shadow: 0 0 18px 4px #fbbf24; } 50% { box-shadow: 0 0 2px 0 #fbbf24; } }
-        @keyframes sunShafts { 0% { transform: translateX(-30%); opacity: 0; } 6% { opacity: 1; } 30% { opacity: 1; } 36% { transform: translateX(30%); opacity: 0; } 100% { transform: translateX(30%); opacity: 0; } }
-        @media (prefers-reduced-motion: reduce) { #sun-shafts { animation: none; display: none; } }
+        @keyframes sunShafts { 0% { transform: translateX(-30%); opacity: 0; } 6% { opacity: .5; } 30% { opacity: .5; } 36% { transform: translateX(30%); opacity: 0; } 100% { transform: translateX(30%); opacity: 0; } }
+        /* Same light, drawn above the player, monsters and items: they brighten as the shaft passes over them (3D feel) */
+        #sun-shafts-front { z-index: 5; animation-name: sunShaftsFront; }
+        @keyframes sunShaftsFront { 0% { transform: translateX(-30%); opacity: 0; } 6% { opacity: .3; } 30% { opacity: .3; } 36% { transform: translateX(30%); opacity: 0; } 100% { transform: translateX(30%); opacity: 0; } }
+        @media (prefers-reduced-motion: reduce) { #sun-shafts, #sun-shafts-front { animation: none; display: none; } }
         @keyframes earth3dPanFar { from { margin-left: 60px; } to { margin-left: 0; } }
         @keyframes earth3dPanMid { from { margin-left: 32px; } to { margin-left: 0; } }
         #combat-stage.cam-punch { animation: camPunch .45s ease-out; }
@@ -1163,7 +1166,7 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img id="earth-bg" class="ts-bg" src="assets/combat/earthbg1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;">
                     <img id="earth-base" src="assets/combat/earthbase1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
-                    <div id="earth-light" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; background:radial-gradient(ellipse 900px 520px at 420px 80px, rgba(255,226,160,.6), rgba(255,226,160,0) 70%); mix-blend-mode:screen; opacity:.35;"></div>
+                    <div id="earth-light" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; background:radial-gradient(ellipse 900px 520px at 420px 80px, rgba(255,226,160,.6), rgba(255,226,160,0) 70%); mix-blend-mode:screen; opacity:.15;"></div>
                     <div id="sun-shafts" aria-hidden="true"></div>
                     <div class="combat-vignette"></div>
 
@@ -1258,6 +1261,7 @@
 
                     <!-- Enemies: six slots, positioned by CSS -->
                     <div id="monsters-lineup-container" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;"></div>
+                    <div id="sun-shafts-front" aria-hidden="true"></div>
 
                     <!-- Runes acquired (bottom centre) -->
                     <div id="combat-rune-list" style="position:absolute; left:395px; top:965px; width:820px; height:101px; display:flex; gap:14.5px; overflow-x:auto;"></div>
