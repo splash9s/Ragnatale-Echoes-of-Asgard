@@ -840,22 +840,6 @@ function playPlayerLunge(el, dx) {
         { transform: 'translateX(0px)' }
     ], { duration: 200, easing: 'ease-in-out' });
     lungeHat(el, dx);
-    cameraFollowLunge(dx);
-}
-// Camera follows the lunge: the earth layers slide the opposite way, nearer layers more (parallax).
-// Additive, so the layers keep their idle sway; the shift returns to 0 with the lunge.
-const CAMERA_FOLLOW_LAYERS = [['earth-bg', 0.2], ['earth-base', 0.5], ['earth-fg', 1]];
-function cameraFollowLunge(dx) {
-    CAMERA_FOLLOW_LAYERS.forEach(([id, factor]) => {
-        const el = document.getElementById(id);
-        if (!el || !el.animate) return;
-        const shift = -dx * factor;
-        el.animate([
-            { translate: '0px 0px' },
-            { translate: `${shift}px 0px`, offset: 0.5 },
-            { translate: '0px 0px' }
-        ], { duration: 200, easing: 'ease-in-out', composite: 'add' });
-    });
 }
 // The hat and the ground shadow move with the body during a lunge (the hat keeps its tilt)
 function lungeHat(el, dx) {
