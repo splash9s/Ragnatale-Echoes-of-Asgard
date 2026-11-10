@@ -2683,7 +2683,8 @@ function showItemDetail(index) {
             <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span>${favBtn}</div>
         </div>
         ${body}${actions}`;
-    panel.style.left = '0px'; // inventory items open on the left; equipped items use the right side
+    panel.style.left = '0px'; // inventory items keep their original place and width
+    panel.style.width = '756px';
     panel.style.display = 'block';
 }
 
@@ -2744,7 +2745,8 @@ function showEquippedPanel(item, title, favBtn, body, actions) {
             <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(item)}</span>
             <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span>${favInPanel}</div>
         </div>` + body + actions;
-    panel.style.left = '1164px';
+    panel.style.left = '700px'; // near side of the inventory bag (green box)
+    panel.style.width = '668px';
     panel.style.display = 'block';
 }
 
