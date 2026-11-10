@@ -1443,7 +1443,6 @@ function runCombatTick() {
         if (Date.now() < playerDebuffs.curseUntil) pDmg = Math.floor(pDmg * 0.8);
         if (targetEnemy.armor) pDmg = Math.floor(pDmg * (1 - targetEnemy.armor / 100));
         if (runeN('powerSurge') > 0) pDmg += Math.floor(runeN('powerSurgeBase') * runeN('powerSurge') / 100); // from the damage when picked
-        if (runeN('runeMastery') > 0) pDmg = Math.floor(pDmg * (1 + 0.2 * (player.currentRunRunes || []).length));
         if (targetEnemy.isBoss || targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + skillBonus('bossDmgPct') / 100));
         if (targetEnemy.iceShieldReady) {
             pDmg = Math.floor(pDmg * 0.8);

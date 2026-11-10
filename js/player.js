@@ -361,6 +361,8 @@ function getDerivedStats() {
     extra.atkPct += skillBonus('atkPct');
     extra.atkPct += (typeof stasisAtkPct === 'number' ? stasisAtkPct : 0); // Stasis Rune: +15% ATK per stage, for the whole map
     atk = Math.floor(atk * (1 + extra.atkPct / 100));
+    // Mastery Rune: +20% ATK for each rune you own, live (shown on the character page and used by every hit)
+    if (runeN('runeMastery') > 0) atk = Math.floor(atk * (1 + 0.2 * (player.currentRunRunes || []).length));
     def = Math.floor(def * (1 + (skillBonus('defPct') + extra.defPct) / 100));
     def += extra.def;
     maxHp = Math.floor(maxHp * (1 + (skillBonus('hpPct') + extra.hpPct) / 100));
