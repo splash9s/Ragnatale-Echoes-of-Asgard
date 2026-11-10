@@ -80,6 +80,12 @@ function curveBoss(t, level) {
     return { ...t, hp, maxHp: hp, ...curveAtkRange(u.atk * BOSS_CURVE.atk), armor: 0, ...curveHitFlee(level), curveLevel: level };
 }
 
+// Tunes a boss after the curve: hp and atk are multipliers (0.7 = 30% less HP, 1.3 = 30% more damage)
+function tuneBoss(b, m) {
+    const hp = Math.max(1, Math.round(b.hp * m.hp));
+    return { ...b, hp, maxHp: hp, atkMin: Math.round(b.atkMin * m.atk), atkMax: Math.round(b.atkMax * m.atk) };
+}
+
 // Mini boss: a tougher version of one base monster, scaled to the map level
 function makeMiniBoss(t, level) {
     const s = levelScaled(t, level);
@@ -181,7 +187,7 @@ const GAME_DATA = {
         map10: {
             title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, stageGrowth: 0.08, dropKey: 'map10',
             enemies: [...LV10_MAP_ENEMIES],
-            boss: curveBoss(MONSTERS_DATA.bossCavernBehemoth, 10),
+            boss: tuneBoss(curveBoss(MONSTERS_DATA.bossCavernBehemoth, 10), { hp: 0.7, atk: 1.3 }), // Lv. 10 boss: -30% HP, +30% damage
             miniBoss: makeMiniBoss(BASE_15.rockGolem, 10)
         },
         map20: {
