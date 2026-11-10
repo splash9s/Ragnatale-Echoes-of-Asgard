@@ -416,6 +416,7 @@ function loadGame() {
             if (typeof ensureDailyQuestsToday === 'function') ensureDailyQuestsToday();
             if (!player.materials) player.materials = { ironScraps: 0 };
             if (!player.beginnerQuest) player.beginnerQuest = { index: 0, flags: {} };
+            if (!player.guide) player.guide = { lowHp: false, death: false };
             player.runes = { ...defaultRunes(), ...(player.runes || {}) };
             if (!player.clearedMaps) {
                 player.clearedMaps = {};

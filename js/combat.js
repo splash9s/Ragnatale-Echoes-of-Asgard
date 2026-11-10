@@ -387,7 +387,7 @@ function startExpedition(mode, opts = {}) {
         logMessage(`[Daily] Daily Challenge started. Your level, skills and gear have no effect here.`, 'winlose');
     } else if (mode === 'voidtest') {
         // Void Test Map: one stage with 6 monsters, free access (test)
-        activeMap = { title: "Void Test Map", dropKey: 'map1', maxStages: 1, levelReq: 1, enemies: (GAME_DATA.maps.map1.enemies || []).map(t => ({ ...t })) };
+        activeMap = { title: "Void Test Map", dropKey: 'map1', maxStages: 1, levelReq: 99, enemies: (GAME_DATA.maps.map1.enemies || []).map(t => ({ ...t })) };
         currentStage = 1;
         maxStages = 1;
         if (tagEl) tagEl.innerText = "Void Test (Free)";
@@ -1132,6 +1132,7 @@ function takePlayerDamage(dmg, m, ignoreArmor = false) {
     logMessage(`[Combat] ${m.name} hits you for ${dmg} damage${absorbed ? ` (${absorbed} absorbed by armor)` : ''}`, 'combat');
     // Damage number on the player's sprite: the damage taken (armor-absorbed damage included)
     showCombatText('#combat-player-sprite', String(Math.max(0, Math.round(dmg))), ''); // shows 0 when fully blocked
+    checkGuideLowHp();
 
     if (!battleFirstDamageTaken) {
         battleFirstDamageTaken = true;
@@ -1197,6 +1198,7 @@ function voidPullPlayer(m) {
             player.hp -= d;
             showCombatText('#combat-player-sprite', String(d), '');
             logMessage(`[Void Pull] ${m.name} drains ${d} HP`, 'combat');
+            checkGuideLowHp();
         }, i * 1000);
     }
 }
@@ -1358,12 +1360,15 @@ function monsterTurnTick() {
         }
 
         stopCombatTimers(); combatRunId++;
+        removeGuideSpotlight();
         if (typeof resetMapRunes === 'function') resetMapRunes();
         logMessage(`[Defeat] You have been defeated... Returning to town`, 'winlose');
         player.deathCount = (player.deathCount || 0) + 1; // total defeats (avatar unlocks)
         player.hp = getDerivedStats().maxHp;
         updateUI();
-        const defeatHtml = buildMapSummaryHTML('lose');
+        const firstDeath = !guideFlag('death'); // first defeat ever: point to the Refining page and teach refining
+        if (firstDeath) markGuide('death');
+        const defeatHtml = buildMapSummaryHTML('lose', undefined, firstDeath);
         playPlayerFallAnim(); // the hero falls first, then the result shows
         const failReturn = (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
         setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView(failReturn)), PLAYER_FALL_MS);
@@ -1707,6 +1712,7 @@ function proceedToNextStage() {
 
 function returnToTown() {
     stopCombatTimers(); combatRunId++;
+    removeGuideSpotlight();
     combatPaused = false;
     updatePauseButton();
     if (typeof resetMapRunes === 'function') resetMapRunes();
@@ -1733,7 +1739,7 @@ function logClassFor(type) {
     return type === 'combat' ? "text-red-400" : (type === 'winlose' ? "text-blue-400 font-bold" : (type === 'drop' ? "text-yellow-400 font-bold" : (type === 'levelup' ? "text-purple-400 font-bold" : "text-slate-300")));
 }
 
-function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
+function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', guideHint = false) {
     const s = stageSummary || newStageSummary(currentStage);
     const label = escapeHtml(kind === 'win' && activeMap ? activeMap.title : (document.getElementById('node-title')?.innerText || `Stage ${s.stage}`));
     const fmt = n => Number(n).toLocaleString();
@@ -1755,8 +1761,8 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
     const returnBtn = `<button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
     const header = `<div class="flex items-center justify-between gap-3">${title}${returnBtn}</div>`;
     // After a defeat: the main page's refining menu icon links to the Refining page to improve gear
-    const powerBox = kind === 'win' ? '' : `<button onclick="goFromResult('blacksmith')" class="flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Improve your gear at the Refining page</span></button>`;
-    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
+    const powerBox = kind === 'win' ? '' : `<button onclick="goFromResult('blacksmith')" class="${guideHint ? 'guide-flash-link ' : ''}flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Improve your gear at the Refining page</span></button>`;
+    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}${guideHint ? refineTutorialHTML() : ''}<div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
 // Result-screen quick link: close the result without running its return action, then open the page
@@ -1909,4 +1915,82 @@ function grantVipDailyMail() {
     if (!player.mailBox) player.mailBox = [];
     player.mailBox.unshift({ id: Date.now(), title: "VIP Daily Reward", sender: "VIP Office", message: "Your VIP Pass grants 1 Resurrection Potion today.", rewards: { resurrection: 1 }, claimed: false, sentAt: Date.now() });
     return true;
+}
+
+// ---------- FIRST-TIME GUIDE ----------
+// Saved once per account in player.guide: lowHp (first time HP drops below 40%) and death (first defeat)
+function guideFlag(key) { return !!(player.guide && player.guide[key]); }
+function markGuide(key) {
+    if (!player.guide) player.guide = { lowHp: false, death: false };
+    player.guide[key] = true;
+    saveGame();
+}
+let guideLowHpActive = false;
+
+// Called after every hit on the player. Pauses the fight and points at the potion button the first time HP drops below 40%
+function checkGuideLowHp() {
+    if (guideLowHpActive || guideFlag('lowHp') || player.hp <= 0 || currentMode === 'daily') return;
+    const maxHp = getDerivedStats().maxHp;
+    if (player.hp >= maxHp * 0.4) return;
+    markGuide('lowHp');
+    guideLowHpActive = true;
+    stopCombatTimers();
+    const slot = player.equipped.potionSlot;
+    if (!slot || (slot.qty || 0) <= 0) {
+        // No potion equipped: give one Minor Healing Potion so the player can recover
+        player.equipped.potionSlot = { name: "Minor Healing Potion", type: "potion", heal: 200, qty: 1, desc: "Restores 200 HP" };
+        logMessage(`[Guide] A free Minor Healing Potion was added to your potion slot.`, 'drop');
+    }
+    updateUI();
+    showGuideSpotlight();
+}
+
+function showGuideSpotlight() {
+    removeGuideSpotlight();
+    const overlay = document.createElement('div');
+    overlay.id = 'guide-overlay';
+    const spot = document.createElement('button');
+    spot.id = 'guide-spot';
+    spot.type = 'button';
+    spot.title = 'Drink a potion';
+    spot.innerHTML = '<span class="guide-spot-tip">HP is low! Drink a potion to recover.</span>';
+    spot.onclick = guideDrinkPotion;
+    document.body.append(overlay, spot);
+    positionGuideSpot();
+    window.addEventListener('resize', positionGuideSpot);
+}
+// The spotlight sits on top of the real potion button (screen position), so the button stays usable
+function positionGuideSpot() {
+    const spot = document.getElementById('guide-spot');
+    const target = document.getElementById('combat-potion-btn');
+    if (!spot || !target) return;
+    const r = target.getBoundingClientRect();
+    spot.style.left = r.left + 'px';
+    spot.style.top = r.top + 'px';
+    spot.style.width = r.width + 'px';
+    spot.style.height = r.height + 'px';
+}
+function removeGuideSpotlight() {
+    document.getElementById('guide-overlay')?.remove();
+    document.getElementById('guide-spot')?.remove();
+    window.removeEventListener('resize', positionGuideSpot);
+    guideLowHpActive = false;
+}
+// Drinks one potion through the normal path, then resumes the fight
+function guideDrinkPotion() {
+    removeGuideSpotlight();
+    manualDrinkPotion();
+    if (player.hp > 0 && getAliveMonsters().length > 0) startCombatTimers(getDerivedStats());
+}
+
+// Refining lesson shown on the first defeat, under the result summary
+function refineTutorialHTML() {
+    return `<div class="bg-amber-950/40 border border-amber-600/50 rounded-xl p-3 text-left text-xs text-slate-200 flex flex-col gap-1.5">
+        <div class="font-bold text-amber-300">How to refine your weapon</div>
+        <div>1. Open the Refining page with the flashing link above.</div>
+        <div>2. Put your gear in the slot and press Refine.</div>
+        <div>3. Each refine costs (current level + 1) × 100 Gold and 1 Refining Stone.</div>
+        <div>4. +0 to +4 always succeed. From +5 the success chance drops 15% per level (minimum 10%).</div>
+        <div>5. A failed refine drops your gear by 1 level.</div>
+    </div>`;
 }
