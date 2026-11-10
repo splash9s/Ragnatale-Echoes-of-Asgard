@@ -672,8 +672,8 @@ function showCombatText(selector, text, variant, delayMs = 0) {
         const d = document.createElement('div');
         d.className = 'combat-dmg' + (variant ? ' ' + variant : '');
         d.textContent = text;
-        // Heal numbers sit to the right of damage numbers so the two never share a spot
-        const sideX = variant === 'heal' ? COMBAT_TEXT_STEP * 1.4 : 0;
+        // Heal and regen numbers sit to the left of damage numbers so the two never share a spot
+        const sideX = variant === 'heal' ? -COMBAT_TEXT_STEP * 1.4 : 0;
         d.style.left = ((b.left + b.width / 2 - ib.left) / sc + sideX) + 'px';
         d.style.top = (((b.top - ib.top) / sc) - slot * COMBAT_TEXT_STEP) + 'px';
         stage.appendChild(d);

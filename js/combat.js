@@ -1605,9 +1605,6 @@ function onStageCleared() {
     stageClearing = true;
     stopCombatTimers(); combatRunId++;
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
-    // Every stage end restores 10% of Max HP
-    healPlayer(Math.ceil(getDerivedStats().maxHp * 0.1), 'stage');
-    showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
     const sid = combatSessionId;
     const wasBossStage = isBossStage(); // read before the stage number moves on
 
@@ -1619,6 +1616,9 @@ function onStageCleared() {
         const proceedNext = () => {
             if (sid !== combatSessionId) return;
             stageClearing = false;
+            // Stage-end regen (10% Max HP) happens when the next round starts, before new monsters appear
+            healPlayer(Math.ceil(getDerivedStats().maxHp * 0.1), 'stage');
+            showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.add('hidden');
             currentStage++;
