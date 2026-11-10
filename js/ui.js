@@ -1209,6 +1209,7 @@ function flatArt(name, feet, monsterFeet) {
 //   'e1'   = hand-painted layers (far mountains, front trees, ground on top) with a blur and light glow
 //   'flat' = the old flat Earth image
 const EARTH_ART_MODE = '3d';
+const FIRE_ART_MODE = '3d'; // '3d' = Blender 2.5D layers (same style as Earth); anything else = the old flat fire image
 function earth3dArt() {
     // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
     const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
@@ -1217,6 +1218,17 @@ function earth3dArt() {
         base: ['assets/combat/earth3d/base.webp'],
         fg: ['assets/combat/earth3d/forest.webp'],
         layouts: { 'earth3d': flatLayout(feet, monsterFeet) }
+    };
+}
+// Fire combat art: same 3D layers as Earth (sky, tilted ground with the items flat on top, forest)
+function fire3dArt() {
+    // Same stand points as the Earth 3D stage (the fire ground is drawn in the same place)
+    const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
+    return {
+        bg: ['assets/combat/fire3d/sky.webp'],
+        base: ['assets/combat/fire3d/base.webp'],
+        fg: ['assets/combat/fire3d/forest.webp'],
+        layouts: { 'fire3d': flatLayout(feet, monsterFeet) }
     };
 }
 function earthNewArt() {
@@ -1231,7 +1243,7 @@ function earthNewArt() {
 }
 const COMBAT_ART = {
     earth: EARTH_ART_MODE === '3d' ? earth3dArt() : EARTH_ART_MODE === 'e1' ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
-    fire: flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
+    fire: FIRE_ART_MODE === '3d' ? fire3dArt() : flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
     wind: flatArt('wind', [500, 625], [[800, 620], [950, 630], [1150, 620], [1350, 630], [1550, 620], [1700, 615]]),
     water: flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
     final: flatArt('yggdrasil', [460, 600], [[800, 598], [950, 598], [1150, 592], [1350, 580], [1550, 580], [1700, 570]])
@@ -1277,7 +1289,7 @@ async function changeEarthLayers() {
     fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
     // New Earth art: the front trees sit between the far mountains and the ground, and the far mountains get a live blur
-    const is3d = nextBase.includes('/earth3d/');
+    const is3d = nextBase.includes('/earth3d/') || nextBase.includes('/fire3d/');
     const isNewEarth = is3d || nextBase.includes('/earth1/');
     base.style.zIndex = isNewEarth ? '2' : '';
     fg.style.zIndex = isNewEarth ? '1' : '';
