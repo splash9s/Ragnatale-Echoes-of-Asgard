@@ -1271,6 +1271,33 @@ function applyCombatEarthPositions() {
         card.style.top = p ? p[1] + 'px' : '';
     });
 }
+// Fire embers: small glowing sparks rise across the fire map at random moments
+function spawnFireSpark() {
+    const host = document.getElementById('fire-sparks');
+    if (!host || host.style.display === 'none') return;
+    const s = document.createElement('div');
+    s.className = 'fire-spark';
+    const dur = 2.5 + Math.random() * 2.5;
+    const size = 2 + Math.random() * 3;
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = (100 + Math.random() * 1700) + 'px';
+    s.style.top = (420 + Math.random() * 480) + 'px';
+    s.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px');
+    s.style.setProperty('--dy', (-(120 + Math.random() * 220)) + 'px');
+    s.style.animationDuration = dur + 's';
+    host.appendChild(s);
+    setTimeout(() => s.remove(), dur * 1000 + 100);
+}
+let fireSparkTimer = null;
+function scheduleFireSparks() {
+    clearTimeout(fireSparkTimer);
+    fireSparkTimer = setTimeout(() => {
+        spawnFireSpark();
+        if (Math.random() < 0.3) spawnFireSpark(); // sometimes two at once
+        scheduleFireSparks();
+    }, 500 + Math.random() * 3000); // random gap between 0.5 and 3.5 s
+}
+scheduleFireSparks();
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) { document.getElementById('view-combat')?.classList.remove('art-loading'); return; }
@@ -1300,6 +1327,9 @@ async function changeEarthLayers() {
     const light = document.getElementById('earth-light');
     if (light) light.style.display = isForest ? '' : 'none';
     ['sun-shafts', 'sun-shafts-front'].forEach(id => { const s = document.getElementById(id); if (s) s.style.display = isForest ? '' : 'none'; });
+    // Fire map: embers drift up now and then (the spawner only adds them while this host is visible)
+    const sparks = document.getElementById('fire-sparks');
+    if (sparks) { sparks.style.display = nextBase.includes('/fire3d/') ? '' : 'none'; if (sparks.style.display === 'none') sparks.innerHTML = ''; }
     // 3D art is rendered 128x72px larger than the screen, so the far layers have room to drift
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
