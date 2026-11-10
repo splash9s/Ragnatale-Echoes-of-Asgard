@@ -116,12 +116,12 @@ function manualSaveGame() {
 }
 
 function resetSaveGame() {
-    if (confirm("Are you sure you want to reset all save data?")) {
+    showGameConfirm("Reset Save", "Are you sure you want to reset all save data?", "Reset", () => {
         localStorage.removeItem('ragnatale_save');
         localStorage.removeItem('ragnatale_save_at');
         const done = typeof cloudDeleteSave === 'function' ? cloudDeleteSave() : Promise.resolve();
         done.finally(() => location.reload());
-    }
+    });
 }
 
 // Unlock check for an avatar path. Custom uploads and unknown paths are always open.
@@ -2835,7 +2835,7 @@ function getSellPrice(item) {
 }
 
 // ---- Confirm dialog helpers ----
-// Stats the item carries (base + buffs + debuffs), as plain text for confirm()
+// Stats the item carries (base + buffs + debuffs), as plain text for the confirm window
 function confirmStatText(item) {
     const entries = Object.entries(effectiveStats(item)).filter(([, v]) => v !== 0);
     return entries.length ? entries.map(([k, v]) => formatStatLine(k, v)).join(', ') : 'no stats';
@@ -2859,13 +2859,17 @@ function sellInventoryItem(index) {
     const total = getSellPrice(item);
     const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
     const sellMsg = `Sell ${item.name}${qtyText}?\n\nYou get: ${total} Gold\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
-    if (!confirm(sellMsg)) return false;
-    player.gold += total;
-    player.inventory[index] = null;
-    logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Gold`, 'drop');
-    updateUI();
-    saveGame();
-    return true;
+    // Sale happens only after the player confirms in the game window
+    showGameConfirm("Sell Item", sellMsg, "Sell", () => {
+        if (player.inventory[index] !== item) return; // the slot changed while the window was open
+        player.gold += total;
+        player.inventory[index] = null;
+        logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Gold`, 'drop');
+        if (window.invDetailIndex === index) closeInvDetail();
+        updateUI();
+        saveGame();
+    });
+    return false;
 }
 
 // Two-handed weapons (knuckles, and older saved two-handed swords named "(2H)") take the shield slot
@@ -2939,17 +2943,19 @@ function salvageEquipmentItem(index) {
     if (item.favorite) { showFloatNotice("Favorite items cannot be salvaged. Unmark it first."); return; }
     let scrapGain = salvageScrapGain(item);
     const salvageMsg = `Salvage ${item.name}?\n\nYou get: ${scrapGain} Iron Scrap\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
-    if (item.rarity >= 3 && !confirm(salvageMsg)) return;
-
-    player.inventory[index] = null;
-    if (!addScraps(scrapGain)) {
-        player.inventory[index] = item;
-        showFloatNotice("Inventory is full! Cannot salvage.");
-        return;
-    }
-    logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
-    updateUI();
-    saveGame();
+    const doSalvage = () => {
+        player.inventory[index] = null;
+        if (!addScraps(scrapGain)) {
+            player.inventory[index] = item;
+            showFloatNotice("Inventory is full! Cannot salvage.");
+            return;
+        }
+        logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
+        updateUI();
+        saveGame();
+    };
+    if (item.rarity >= 3) { showGameConfirm("Salvage Item", salvageMsg, "Salvage", doSalvage); return; }
+    doSalvage();
 }
 
 // Bag equipment that Salvage All / Sell All may touch: not favorites, not pets
@@ -2993,12 +2999,13 @@ function sellAllEquipment() {
     const targets = bulkEquipTargets().filter(({ it }) => (it.levelReq || 1) < 99);
     if (targets.length === 0) { showFloatNotice("No equipment to sell."); return; }
     const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
-    if (!confirm(`Sell ${targets.length} equipment item(s)?\n\nYou get: ${total} Gold\n\n${confirmItemList(targets)}\n\nFavorites and Lv 99 gear are kept. This cannot be undone.`)) return;
-    targets.forEach(({ i }) => { player.inventory[i] = null; });
-    player.gold += total;
-    logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
-    updateUI();
-    saveGame();
+    showGameConfirm("Sell All", `Sell ${targets.length} equipment item(s)?\n\nYou get: ${total} Gold\n\n${confirmItemList(targets)}\n\nFavorites and Lv 99 gear are kept. This cannot be undone.`, "Sell All", () => {
+        targets.forEach(({ i }) => { player.inventory[i] = null; });
+        player.gold += total;
+        logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
+        updateUI();
+        saveGame();
+    });
 }
 
 function manualDrinkPotion() {
