@@ -2957,11 +2957,27 @@ function bulkEquipTargets() {
     return player.inventory.map((it, i) => ({ it, i })).filter(({ it }) => it && it.slot && it.slot !== 'pet' && !it.favorite);
 }
 
+// In-game confirmation window (replaces the browser confirm box). onConfirm runs only when the player presses the confirm button.
+function showGameConfirm(title, message, confirmLabel, onConfirm) {
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : (x => x);
+    const html = `<div class="flex flex-col gap-3 text-left">
+        <p class="text-xs text-slate-200 whitespace-pre-line">${esc(message)}</p>
+        <div class="flex gap-2 justify-end">
+            <button onclick="closeModal()" class="px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-100 font-bold text-xs cursor-pointer">Cancel</button>
+            <button id="game-confirm-yes" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-slate-100 font-bold text-xs cursor-pointer">${esc(confirmLabel)}</button>
+        </div></div>`;
+    showModal(title, '', html, null);
+    const yes = document.getElementById('game-confirm-yes');
+    if (yes) yes.onclick = () => { closeModal(); onConfirm(); };
+}
+
 function salvageAllEquipment() {
     const targets = bulkEquipTargets();
     if (targets.length === 0) { showFloatNotice("No equipment to salvage."); return; }
     const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
-    if (!confirm(`Salvage ${targets.length} equipment item(s)?\n\nYou get: ${gain} Iron Scrap\n\n${confirmItemList(targets)}\n\nFavorites are kept. This cannot be undone.`)) return;
+    showGameConfirm("Salvage All", `Salvage ${targets.length} equipment item(s)?\n\nYou get: ${gain} Iron Scrap\n\n${confirmItemList(targets)}\n\nFavorites are kept. This cannot be undone.`, "Salvage All", () => doSalvageAll(targets, gain));
+}
+function doSalvageAll(targets, gain) {
     targets.forEach(({ i }) => { player.inventory[i] = null; });
     if (!addScraps(gain)) {
         targets.forEach(({ it, i }) => { player.inventory[i] = it; });
