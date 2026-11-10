@@ -1947,46 +1947,32 @@ function checkGuideLowHp() {
 
 function showGuideSpotlight() {
     removeGuideSpotlight();
+    // The dim layer lives inside the scaled combat screen, under the real potion button, which is raised above it
+    const inner = document.querySelector('#combat-stage .ts-inner');
+    const btn = document.getElementById('combat-potion-btn');
+    if (!inner || !btn) return;
     const overlay = document.createElement('div');
     overlay.id = 'guide-overlay';
-    // The spotlight is a copy of the real potion button, lifted above the dim overlay so it is not shadowed
-    const target = document.getElementById('combat-potion-btn');
-    const spot = target ? target.cloneNode(true) : document.createElement('button');
-    spot.removeAttribute('id');
-    spot.removeAttribute('onclick');
-    spot.id = 'guide-spot';
-    spot.type = 'button';
-    spot.title = 'Drink a potion';
-    spot.classList.remove('combat-slot-btn');
-    spot.classList.add('combat-slot-btn');
-    spot.querySelector('.guide-spot-tip')?.remove();
-    spot.insertAdjacentHTML('beforeend', '<span class="guide-spot-tip">HP is low! Drink a potion to recover.</span>');
-    spot.onclick = guideDrinkPotion;
-    document.body.append(overlay, spot);
-    positionGuideSpot();
-    window.addEventListener('resize', positionGuideSpot);
-}
-// The spotlight sits on top of the real potion button (screen position), so the button stays usable
-function positionGuideSpot() {
-    const spot = document.getElementById('guide-spot');
-    const target = document.getElementById('combat-potion-btn');
-    if (!spot || !target) return;
-    const r = target.getBoundingClientRect();
-    // Same size and place on screen as the real button (the stage is scaled, so the copy is scaled to match)
-    const k = r.width / (target.offsetWidth || r.width);
-    spot.style.position = 'fixed';
-    spot.style.left = r.left + 'px';
-    spot.style.top = r.top + 'px';
-    spot.style.width = (target.offsetWidth || r.width) + 'px';
-    spot.style.height = (target.offsetHeight || r.height) + 'px';
-    spot.style.transformOrigin = 'top left';
-    spot.style.transform = `scale(${k})`;
-    spot.style.margin = '0';
+    inner.appendChild(overlay);
+    btn.classList.add('guide-lit');
+    btn.dataset.guideOnclick = btn.getAttribute('onclick') || '';
+    btn.setAttribute('onclick', 'guideDrinkPotion()');
+    const tip = document.createElement('div');
+    tip.id = 'guide-tip';
+    tip.textContent = 'HP is low! Drink a potion to recover.';
+    tip.style.left = ((parseFloat(btn.style.left) || 0) + (parseFloat(btn.style.width) || 0) / 2) + 'px';
+    tip.style.top = ((parseFloat(btn.style.top) || 0) - 12) + 'px';
+    inner.appendChild(tip);
 }
 function removeGuideSpotlight() {
     document.getElementById('guide-overlay')?.remove();
-    document.getElementById('guide-spot')?.remove();
-    window.removeEventListener('resize', positionGuideSpot);
+    document.getElementById('guide-tip')?.remove();
+    const btn = document.getElementById('combat-potion-btn');
+    if (btn) {
+        btn.classList.remove('guide-lit');
+        if (btn.dataset.guideOnclick !== undefined && btn.dataset.guideOnclick !== '') btn.setAttribute('onclick', btn.dataset.guideOnclick);
+        delete btn.dataset.guideOnclick;
+    }
     guideLowHpActive = false;
 }
 // Drinks one potion through the normal path, then resumes the fight
