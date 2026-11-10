@@ -1174,8 +1174,20 @@ function flatArt(name, feet, monsterFeet) {
         layouts: { [`${name}_flat`]: flatLayout(feet, monsterFeet) }
     };
 }
+// New hand-painted Earth forest (e1): far mountains behind, front trees in the middle, ground on top,
+// with a live blur on the far mountains and a warm light glow. Set to false to go back to the flat Earth image.
+const USE_NEW_EARTH_ART = true;
+function earthNewArt() {
+    const feet = [500, 650], monsterFeet = [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]];
+    return {
+        bg: ['assets/combat/earth1/e1bg.webp'],
+        base: ['assets/combat/earth1/e1base.webp'],
+        fg: ['assets/combat/earth1/e1mg.webp'],
+        layouts: { 'e1base': flatLayout(feet, monsterFeet) }
+    };
+}
 const COMBAT_ART = {
-    earth: flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
+    earth: USE_NEW_EARTH_ART ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
     fire: flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
     wind: flatArt('wind', [500, 625], [[800, 620], [950, 630], [1150, 620], [1350, 630], [1550, 620], [1700, 615]]),
     water: flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
@@ -1221,6 +1233,13 @@ async function changeEarthLayers() {
     // No foreground: keep a valid 1x1 transparent image (an empty src fires an error) and hide it
     fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
+    // New Earth art: the front trees sit between the far mountains and the ground, and the far mountains get a live blur
+    const isNewEarth = nextBase.includes('/earth1/');
+    base.style.zIndex = isNewEarth ? '2' : '';
+    fg.style.zIndex = isNewEarth ? '1' : '';
+    bg.style.filter = isNewEarth ? 'blur(3px)' : '';
+    const light = document.getElementById('earth-light');
+    if (light) light.style.display = isNewEarth ? '' : 'none';
     const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k) || nextBg.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
