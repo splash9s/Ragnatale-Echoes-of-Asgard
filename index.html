@@ -387,7 +387,8 @@
         #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion_q85.webp'); }
         /* Damage numbers: white for normal, red for critical */
         .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 26px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
-        .combat-dmg.crit { color: #ff9800; font-size: 72px; }
+        .combat-dmg.crit { color: #fffbeb; font-size: 72px; text-shadow: 0 3px 4px #000, 0 0 8px #7c2d12; }
+        .combat-dmg.crit::before { content: ''; position: absolute; left: 50%; top: 50%; width: 4.4em; height: 3.9em; transform: translate(-50%, -50%); background: #ff9800; border: 0; clip-path: polygon(50% 0%, 61% 34%, 98% 35%, 68% 57%, 79% 92%, 50% 71%, 21% 92%, 32% 57%, 2% 35%, 39% 34%); z-index: -1; box-shadow: 0 0 0 0 transparent; }
         /* 3D Earth art: slow parallax sway (forest less, sky more), a pan when a stage starts, a push-in on crits */
         #earth-bg.earth3d-far { animation: earth3dSwayFar 11s ease-in-out infinite; }
         #earth-fg.earth3d-mid { animation: earth3dSwayMid 11s ease-in-out infinite; }
