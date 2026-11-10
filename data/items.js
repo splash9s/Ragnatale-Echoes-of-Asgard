@@ -299,3 +299,13 @@ const SHOP_TIER50_PRICE = { weapon: 5000, shield: 4500, armor: 6500, garment: 38
         SHOP_ITEMS.push({ id: `shop_${i.id}`, name: i.name, slot: i.slot, levelReq: lv, price: Math.round(SHOP_TIER50_PRICE[i.slot] * mult), stats: i.stats, desc: statText(i.stats) });
     });
 });
+
+// Gear power cut for tiers 10-50 (tuned with the run simulator so a player 5 levels below a map
+// clears about half the time and 10 levels below fails). Tiers 60+ are unchanged. Descriptions follow.
+const GEAR_TIER_CUT = { 10: 0.5, 20: 0.6, 30: 0.75, 40: 0.75, 50: 0.75 };
+SHOP_ITEMS.forEach(i => {
+    const f = GEAR_TIER_CUT[i.levelReq];
+    if (f === undefined || !i.stats) return;
+    i.stats = Object.fromEntries(Object.entries(i.stats).map(([k, v]) => [k, Math.max(1, Math.round(v * f))]));
+    i.desc = statText(i.stats);
+});
