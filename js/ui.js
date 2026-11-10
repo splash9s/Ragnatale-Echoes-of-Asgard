@@ -655,7 +655,7 @@ function showCombatText(selector, text, variant) {
     d.style.left = ((b.left + b.width / 2 - ib.left) / sc) + 'px';
     d.style.top = ((b.top - ib.top) / sc) + 'px';
     stage.appendChild(d);
-    setTimeout(() => d.remove(), 900);
+    setTimeout(() => d.remove(), variant === 'crit' ? 1400 : 900); // crit numbers stay 0.5s longer
 }
 
 // Green number floating over a healed combat sprite (monster or player)
@@ -1263,7 +1263,7 @@ async function changeEarthLayers() {
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
         el.style.top = is3d ? '-36px' : '0px';
-        el.style.width = is3d ? (earthStageWidth() + 128) + 'px' : '1920px';
+        el.style.width = is3d ? 'calc(100% + 128px)' : '1920px'; // 3D layers follow the stage width (containing block = .ts-inner)
         el.style.height = is3d ? '1152px' : '1080px';
     });
     // Parallax: the ground (with the fighters on it) stays still; the forest and sky drift against it, the sky more
