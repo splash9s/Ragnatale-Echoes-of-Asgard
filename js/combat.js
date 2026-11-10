@@ -1609,6 +1609,7 @@ function onStageCleared() {
     healPlayer(Math.ceil(getDerivedStats().maxHp * 0.1), 'stage');
     showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
     const sid = combatSessionId;
+    const wasBossStage = isBossStage(); // read before the stage number moves on
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
     const bossStayLeft = monstersList.reduce((t, x) => (monsterIsBoss(x) && x.hp <= 0)
@@ -1688,16 +1689,25 @@ function onStageCleared() {
             });
         };
 
-        if (isRuneDueAfter(currentStage) && currentStage < maxStages) {
-            checkRuneSelectionPrompt(proceedNext);
-        } else {
-            window.pendingStageProceed = proceedNext;
-            if (isVipActive() || runeN('swiftRun') > 0) { // Swift Feet: move on automatically
-                proceedToNextStage();
-                return;
+        const continueRun = () => {
+            if (isRuneDueAfter(currentStage) && currentStage < maxStages) {
+                checkRuneSelectionPrompt(proceedNext);
+            } else {
+                window.pendingStageProceed = proceedNext;
+                if (isVipActive() || runeN('swiftRun') > 0) { // Swift Feet: move on automatically
+                    proceedToNextStage();
+                    return;
+                }
+                const nextBtn = document.getElementById('next-stage-btn');
+                if (nextBtn) nextBtn.classList.remove('hidden');
             }
-            const nextBtn = document.getElementById('next-stage-btn');
-            if (nextBtn) nextBtn.classList.remove('hidden');
+        };
+        if (wasBossStage) {
+            // Boss stage completed: show the combat result right away; closing it moves on
+            showModal("Boss Defeated!", '', buildMapSummaryHTML('win', currentStage < maxStages ? `Continue to Stage ${currentStage + 1}` : 'Continue', false, 'Boss Defeated'), () => continueRun());
+            playSound('sound/mvp.mp3');
+        } else {
+            continueRun();
         }
     }, Math.max(stageDelay(), bossStayLeft));
 }
@@ -1739,7 +1749,7 @@ function logClassFor(type) {
     return type === 'combat' ? "text-red-400" : (type === 'winlose' ? "text-blue-400 font-bold" : (type === 'drop' ? "text-yellow-400 font-bold" : (type === 'levelup' ? "text-purple-400 font-bold" : "text-slate-300")));
 }
 
-function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', guideHint = false) {
+function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', guideHint = false, headerText = '') {
     const s = stageSummary || newStageSummary(currentStage);
     const label = escapeHtml(kind === 'win' && activeMap ? activeMap.title : (document.getElementById('node-title')?.innerText || `Stage ${s.stage}`));
     const fmt = n => Number(n).toLocaleString();
@@ -1752,7 +1762,7 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', g
         ? card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300') + card('Items', s.items.length, 'text-amber-300') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300')
         : card('Killed by', escapeHtml(lastHitBy || 'Unknown'), 'text-red-300') + card('Stage Died', `Stage ${currentStage}${currentMode !== 'endless' && maxStages < 999 ? ' / ' + maxStages : ''}`, 'text-slate-200') + card('Base EXP', `+${fmt(s.baseExp)}`, 'text-blue-300') + card('Job EXP', `+${fmt(s.jobExp)}`, 'text-purple-300') + card('Gold', `+${fmt(s.gold)}`, 'text-yellow-300');
     const title = kind === 'win'
-        ? `<h3 class="font-bold text-sm text-emerald-300">Map Cleared</h3>`
+        ? `<h3 class="font-bold text-sm text-emerald-300">${escapeHtml(headerText || 'Map Cleared')}</h3>`
         : `<h3 class="font-bold text-sm text-red-300">Defeated</h3>`;
     // All three sections start collapsed; the Return button sits in the window's top-right corner (see showModal)
     const sections = kind === 'win'
