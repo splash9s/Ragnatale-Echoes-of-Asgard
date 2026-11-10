@@ -2006,7 +2006,7 @@ function renderBlacksmithSlot() {
     const gear = blacksmithSelectedSlot ? player.equipped[blacksmithSelectedSlot] : null;
     if (!gear) {
         slotEl.innerHTML = '<span style="opacity:.6">Empty</span>';
-        if (refineBtn) { refineBtn.disabled = true; refineBtn.style.opacity = '.5'; refineBtn.innerHTML = 'Refine'; }
+        if (refineBtn) { refineBtn.disabled = true; refineBtn.style.opacity = '.5'; refineBtn.innerHTML = 'Refine'; refineBtn.classList.remove('guide-flash-link'); }
         const rateEl0 = document.getElementById('bs-success-rate');
         if (rateEl0) rateEl0.textContent = '';
         return;
@@ -2020,7 +2020,8 @@ function renderBlacksmithSlot() {
     if (refineBtn) {
         refineBtn.disabled = isMax;
         refineBtn.style.opacity = isMax ? '.5' : '1';
-        refineBtn.innerHTML = isMax ? 'MAX LEVEL' : `Refine<br>${cost} Gold`;
+        refineBtn.innerHTML = isMax ? 'MAX LEVEL' : (refineIsFree() ? 'Refine<br>FREE' : `Refine<br>${cost} Gold`);
+        refineBtn.classList.toggle('guide-flash-link', !isMax && refineIsFree());
     }
 }
 
@@ -2052,18 +2053,21 @@ function renderRefiningUI() {
         let costGold = (currentRefine + 1) * 100;
         let selected = blacksmithSelectedSlot === slot;
         container.innerHTML += `
-            <div onclick="blacksmithSelect('${slot}')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900/80 border-slate-700 hover:border-amber-600'}">
+            <div onclick="blacksmithSelect('${slot}')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${!blacksmithSelectedSlot && refineIsFree() ? 'guide-flash-link ' : ''}${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900/80 border-slate-700 hover:border-amber-600'}">
                 <div>
                     <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(gear, 36)} ${gear.name} ${currentRefine > 0 ? '+' + currentRefine : ''}</span>
                     <span class="text-[10px] text-slate-400 block capitalize">Slot: ${slot} | Success Rate: ${isMax ? 'MAX' : successRate + '%'}</span>
                 </div>
-                <span class="text-[10px] text-slate-300 whitespace-nowrap">${isMax ? 'MAX LEVEL' : costGold + ' Gold + 1 Stone'}</span>
+                <span class="text-[10px] text-slate-300 whitespace-nowrap">${isMax ? 'MAX LEVEL' : (refineIsFree() ? 'First refine FREE' : costGold + ' Gold + 1 Stone')}</span>
             </div>
         `;
     }
     if (!any) container.innerHTML += '<div class="text-xs text-slate-400">No equipped gear to refine.</div>';
     renderBlacksmithSlot();
 }
+
+// The very first refine is free (no Gold, no Refining Stone); until then the gear and Refine button blink
+function refineIsFree() { return !(player.guide && player.guide.refine); }
 
 function refineEquipment(slot) {
     let gear = player.equipped[slot];
@@ -2073,14 +2077,20 @@ function refineEquipment(slot) {
     if (gear.refineLevel >= 10) return;
 
     let current = gear.refineLevel;
-    let costGold = (current + 1) * 100;
-    if (player.gold < costGold || (player.refiningStones || 0) < 1) {
+    const free = refineIsFree();
+    let costGold = free ? 0 : (current + 1) * 100;
+    if (!free && (player.gold < costGold || (player.refiningStones || 0) < 1)) {
         showFloatNotice(`Refining needs ${costGold} Gold and 1 Refining Stone.`);
         return;
     }
 
-    player.gold -= costGold;
-    player.refiningStones = Math.max(0, (player.refiningStones || 0) - 1);
+    if (free) {
+        if (!player.guide) player.guide = { lowHp: false, death: false };
+        player.guide.refine = true;
+    } else {
+        player.gold -= costGold;
+        player.refiningStones = Math.max(0, (player.refiningStones || 0) - 1);
+    }
 
     let successRate = refineSuccessRate(current);
     if (Math.random() * 100 <= successRate) {

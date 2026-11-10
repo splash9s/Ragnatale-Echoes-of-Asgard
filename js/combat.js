@@ -1762,7 +1762,7 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', g
     const header = `<div class="flex items-center justify-between gap-3">${title}${returnBtn}</div>`;
     // After a defeat: the main page's refining menu icon links to the Refining page to improve gear
     const powerBox = kind === 'win' ? '' : `<button onclick="goFromResult('blacksmith')" class="${guideHint ? 'guide-flash-link ' : ''}flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Improve your gear at the Refining page</span></button>`;
-    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}${guideHint ? refineTutorialHTML() : ''}<div class="flex flex-col gap-2">${sections}</div></div>`;
+    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
 // Result-screen quick link: close the result without running its return action, then open the page
@@ -1981,16 +1981,4 @@ function guideDrinkPotion() {
     removeGuideSpotlight();
     manualDrinkPotion();
     if (player.hp > 0 && getAliveMonsters().length > 0) startCombatTimers(getDerivedStats());
-}
-
-// Refining lesson shown on the first defeat, under the result summary
-function refineTutorialHTML() {
-    return `<div class="bg-amber-950/40 border border-amber-600/50 rounded-xl p-3 text-left text-xs text-slate-200 flex flex-col gap-1.5">
-        <div class="font-bold text-amber-300">How to refine your weapon</div>
-        <div>1. Open the Refining page with the flashing link above.</div>
-        <div>2. Put your gear in the slot and press Refine.</div>
-        <div>3. Each refine costs (current level + 1) × 100 Gold and 1 Refining Stone.</div>
-        <div>4. +0 to +4 always succeed. From +5 the success chance drops 15% per level (minimum 10%).</div>
-        <div>5. A failed refine drops your gear by 1 level.</div>
-    </div>`;
 }
