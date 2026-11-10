@@ -2683,6 +2683,7 @@ function showItemDetail(index) {
             <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span>${favBtn}</div>
         </div>
         ${body}${actions}`;
+    panel.style.left = '0px'; // inventory items open on the left; equipped items use the right side
     panel.style.display = 'block';
 }
 
@@ -2728,17 +2729,33 @@ function showEquippedDetail(slot) {
     const favBtn = !isPotion && slot !== 'pet'
         ? `<button onclick="toggleEquippedFavorite('${slot}')" class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-yellow-300 font-bold text-xs">${item.favorite ? '★ Unfavorite' : '☆ Favorite'}</button>`
         : '';
-    showModal(title, '', closeCornerHTML() + favBtn + body + actions);
+    showEquippedPanel(item, title, favBtn, body, actions);
+}
+
+// Equipped gear, pet and potion open in the same detail panel as inventory items, on the right side of the window
+function showEquippedPanel(item, title, favBtn, body, actions) {
+    const panel = document.getElementById('inv-detail-panel');
+    if (!panel) return;
+    window.invDetailIndex = null;
+    const favInPanel = favBtn ? favBtn.replace('absolute top-3 left-3 ', '') : '';
+    panel.innerHTML = `
+        <button id="inv-detail-close" onclick="closeInvDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
+        <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
+            <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(item)}</span>
+            <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span>${favInPanel}</div>
+        </div>` + body + actions;
+    panel.style.left = '1164px';
+    panel.style.display = 'block';
 }
 
 function unequipPotionFromDetail() {
     unequipPotionSlot();
-    if (!player.equipped.potionSlot || !player.equipped.potionSlot.name) closeModal();
+    if (!player.equipped.potionSlot || !player.equipped.potionSlot.name) closeInvDetail();
 }
 
 function unequipFromDetail(slot) {
     unequipItem(slot);
-    if (!player.equipped[slot]) closeModal();
+    if (!player.equipped[slot]) closeInvDetail();
 }
 
 function useInventoryPotion(index) {
