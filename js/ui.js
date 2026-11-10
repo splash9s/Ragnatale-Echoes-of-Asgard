@@ -1223,7 +1223,7 @@ function earth3dArt() {
 // Fire combat art: same 3D layers as Earth (sky, tilted ground with the items flat on top, forest)
 function fire3dArt() {
     // Same stand points as the Earth 3D stage (the fire ground is drawn in the same place)
-    const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
+    const feet = [500, 690], monsterFeet = [[820, 690], [960, 680], [1150, 675], [1350, 675], [1550, 680], [1740, 685]];
     return {
         bg: ['assets/combat/fire3d/sky.webp'],
         base: ['assets/combat/fire3d/base.webp'],
