@@ -309,7 +309,7 @@ function maxHpCounts() {
 function stageMaxHpAdd() {
     const st = player.mhpStart;
     if (!st) return 0;
-    let add = 0.5 * (runeN('maxHpBonus') / 50 - st.vit);                        // Vitality: +50% per pick
+    let add = 0; // Vitality now adds a flat amount (see getDerivedStats), not a % of stage-start Max HP
     add += (runeN('fortitude') / 100) * (runeN('fortitudeStacks') - st.fort);      // Fortitude: per proc
     add += (runeN('bloodlust') / 100) * (runeN('killCount') - st.kill);            // Bloodlust: per kill
     if (runeN('runeScholar') > 0) add += 0.05 * ((player.currentRunRunes || []).length - st.runes); // Scholar: per rune picked
@@ -326,7 +326,7 @@ function getDerivedStats() {
 
     // Max HP runes (Vitality, Fortitude, Bloodlust, Scholar) add a % of the Max HP at the start of the stage
     const baseMaxHp = 100 + (ST.vit * 15) + (lvl * 10);
-    let maxHp = Math.floor(baseMaxHp * (player.mhpCarry || 1) * (1 + stageMaxHpAdd()));
+    let maxHp = Math.floor(baseMaxHp * (player.mhpCarry || 1) * (1 + stageMaxHpAdd())) + runeN('vitalityFlat');
     let atk = 10 + (ST.str * 2) + Math.floor(ST.luk / 3) + (!daily && player.baseLv === 1 ? 5 : 0); // base level 1: +5 ATK
     let def = 2 + (ST.vit * 1);
     let hit = 100 + lvl + ST.dex;

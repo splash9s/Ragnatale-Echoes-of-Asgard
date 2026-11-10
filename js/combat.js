@@ -92,7 +92,7 @@ const RUNE_DEFS = {
     zeroArmor: { name: "Bare Steel Rune", rarity: 2, flag: true, desc: "No armor: +10 Flee. Armor above 0: take 10% less damage", text: () => "No armor: +10 Flee. Armor above 0: take 10% less damage" },
     swiftRun: { name: "Swift Feet Rune", rarity: 1, flag: true, desc: "Move to the next stage automatically when a stage ends", text: () => "Move to the next stage automatically when a stage ends" },
     focus: { name: "Inner Calm Rune", rarity: 1, add: 10, desc: "Missing restores 10% HP", text: v => `Missing restores ${v}% HP` },
-    maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% Max HP per pick (from Max HP at stage start)", text: () => "+50% Max HP per pick (from Max HP at stage start)" },
+    maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% of your current HP added to Max HP when picked", text: () => "+50% of your current HP added to Max HP when picked", onApply: () => { player.runes.vitalityFlat = (player.runes.vitalityFlat || 0) + Math.floor(player.hp * 0.5); } },
     firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "First hit on each enemy: +50% damage", text: v => `First hit on each enemy: +${v}% damage` },
     randomHitCount: { name: "Chaos Rune", rarity: 2, add: 1, once: true, desc: "50% of attacks hit a random enemy", text: () => "50% of attacks hit a random enemy" },
     thorn: { name: "Briar Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage", text: v => `Reflect ${v}% of melee damage` },
@@ -126,7 +126,7 @@ const RUNE_DEFS = {
     glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 20, once: true, desc: "Max armor 0, +20% crit chance", text: v => `Max armor 0, +${v}% crit chance` },
     runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% Max HP per rune picked (from Max HP at stage start)", text: () => "+5% Max HP per rune picked (from Max HP at stage start)" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each rune you own", text: () => "+20% damage for each rune you own" },
-    powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "+50% damage", text: v => `+${v}% damage` },
+    powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "+50% of the damage you had when picked, added to every hit", text: v => `+${v}% of the damage you had when picked, added to every hit`, onApply: () => { player.runes.powerSurgeBase = getDerivedStats().atk; } },
     giantSlayer: { name: "Giant Slayer Rune", rarity: 3, add: 25, once: true, desc: "+25% damage vs bosses and mini-bosses", text: v => `+${v}% damage vs bosses and mini-bosses` },
     monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 50, once: true, desc: "+50% damage vs normal monsters", text: v => `+${v}% damage vs normal monsters` },
     ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0: 3x damage", text: () => "While armor is above 0: 3x damage" },
@@ -1442,7 +1442,7 @@ function runCombatTick() {
         let pDmg = Math.floor((derived.atk + bonusDmg) * elemMult);
         if (Date.now() < playerDebuffs.curseUntil) pDmg = Math.floor(pDmg * 0.8);
         if (targetEnemy.armor) pDmg = Math.floor(pDmg * (1 - targetEnemy.armor / 100));
-        if (runeN('powerSurge') > 0) pDmg = Math.floor(pDmg * (1 + runeN('powerSurge') / 100));
+        if (runeN('powerSurge') > 0) pDmg += Math.floor(runeN('powerSurgeBase') * runeN('powerSurge') / 100); // from the damage when picked
         if (runeN('runeMastery') > 0) pDmg = Math.floor(pDmg * (1 + 0.2 * (player.currentRunRunes || []).length));
         if (targetEnemy.isBoss || targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + skillBonus('bossDmgPct') / 100));
         if (targetEnemy.iceShieldReady) {
