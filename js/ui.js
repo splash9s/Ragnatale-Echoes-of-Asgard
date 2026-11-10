@@ -646,26 +646,47 @@ function earthStageInnerWidth() {
     const inn = document.querySelector('#combat-stage .ts-inner');
     return (inn && parseFloat(inn.style.width)) || 1920;
 }
-function showCombatText(selector, text, variant) {
+// Each floating number takes a free slot above its sprite, so numbers that land together stack instead of overlapping
+const combatTextSlots = {}; // anchor selector -> Set of slots in use
+const COMBAT_TEXT_STEP = 40; // design px between stacked numbers
+function takeCombatTextSlot(key) {
+    const used = combatTextSlots[key] || (combatTextSlots[key] = new Set());
+    let i = 0;
+    while (used.has(i)) i++;
+    used.add(i);
+    return i;
+}
+function freeCombatTextSlot(key, i) { if (combatTextSlots[key]) combatTextSlots[key].delete(i); }
+
+// delayMs: show the number later (heal numbers wait so they do not cover the hit that caused them)
+function showCombatText(selector, text, variant, delayMs = 0) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
-    const anchor = document.querySelector(selector);
-    const stage = document.querySelector('#combat-stage .ts-inner');
-    if (!anchor || !stage) return;
-    const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
-    const b = anchor.getBoundingClientRect(), ib = stage.getBoundingClientRect();
-    const d = document.createElement('div');
-    d.className = 'combat-dmg' + (variant ? ' ' + variant : '');
-    d.textContent = text;
-    d.style.left = ((b.left + b.width / 2 - ib.left) / sc) + 'px';
-    d.style.top = ((b.top - ib.top) / sc) + 'px';
-    stage.appendChild(d);
-    setTimeout(() => d.remove(), variant === 'crit' ? 1400 : 900); // crit numbers stay 0.5s longer
+    const spawn = () => {
+        const anchor = document.querySelector(selector);
+        const stage = document.querySelector('#combat-stage .ts-inner');
+        if (!anchor || !stage) return;
+        const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
+        const b = anchor.getBoundingClientRect(), ib = stage.getBoundingClientRect();
+        const slot = takeCombatTextSlot(selector);
+        const d = document.createElement('div');
+        d.className = 'combat-dmg' + (variant ? ' ' + variant : '');
+        d.textContent = text;
+        // Heal numbers sit to the right of damage numbers so the two never share a spot
+        const sideX = variant === 'heal' ? COMBAT_TEXT_STEP * 1.4 : 0;
+        d.style.left = ((b.left + b.width / 2 - ib.left) / sc + sideX) + 'px';
+        d.style.top = (((b.top - ib.top) / sc) - slot * COMBAT_TEXT_STEP) + 'px';
+        stage.appendChild(d);
+        setTimeout(() => { d.remove(); freeCombatTextSlot(selector, slot); }, variant === 'crit' ? 1400 : 900); // crit numbers stay 0.5s longer
+    };
+    if (delayMs > 0) setTimeout(spawn, delayMs);
+    else spawn();
 }
 
 // Green number floating over a healed combat sprite (monster or player)
+const HEAL_NUMBER_DELAY_MS = 450; // heal numbers appear after the hit numbers
 function showHealNumber(selector, amount) {
-    if (amount > 0 && selector) showCombatText(selector, '+' + amount, 'heal');
+    if (amount > 0 && selector) showCombatText(selector, '+' + amount, 'heal', HEAL_NUMBER_DELAY_MS);
 }
 // Green aura over a combat sprite when it is healed (monster or player). Same placement as the damage numbers.
 function showHealAura(selector) {
