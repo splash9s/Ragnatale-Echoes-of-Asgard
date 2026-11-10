@@ -18,9 +18,28 @@
         const s = Math.min(window.innerWidth / W, window.innerHeight / H);
         if (!inn || !s) return;
         inn.style.transform = `scale(${s})`;
-        st.style.width = (W * s) + 'px';
+        // data-fill stages stretch to the full window width (the extra width is added on the right)
+        const DW = st.dataset.fill ? Math.max(W, window.innerWidth / s) : W;
+        inn.style.width = DW + 'px';
+        st.dataset.dw = DW;
+        st.style.width = (DW * s) + 'px';
         st.style.height = (H * s) + 'px';
+        if (st.id === 'combat-stage') {
+            document.querySelectorAll('#combat-stage .combat-vignette, #combat-stage #earth-light').forEach(el => { el.style.width = DW + 'px'; });
+            const bgEl = document.getElementById('earth-bg');
+            if (bgEl && bgEl.classList.contains('earth3d-far')) {
+                ['earth-bg', 'earth-base', 'earth-fg'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.width = (DW + 128) + 'px';
+                });
+            }
+        }
     }
+    // Width of the combat stage in design pixels (used to stretch the 3D earth layers)
+    window.earthStageWidth = function () {
+        const st = document.getElementById('combat-stage');
+        return Number(st && st.dataset.dw) || 1920;
+    };
     function fitTown() {
         document.querySelectorAll('.town-stage').forEach(fitStage);
     }

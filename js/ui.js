@@ -1263,7 +1263,7 @@ async function changeEarthLayers() {
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
         el.style.top = is3d ? '-36px' : '0px';
-        el.style.width = is3d ? '2048px' : '1920px';
+        el.style.width = is3d ? (earthStageWidth() + 128) + 'px' : '1920px';
         el.style.height = is3d ? '1152px' : '1080px';
     });
     // Parallax: the ground (with the fighters on it) stays still; the forest and sky drift against it, the sky more
