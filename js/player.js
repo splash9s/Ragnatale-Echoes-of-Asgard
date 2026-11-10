@@ -253,7 +253,7 @@ function defaultRunes() {
         critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0,
         randomHitCount: 0, resurrectionUsed: false,
         dodge: 0, swiftRun: 0, focus: 0, thorn: 0, critHeal: 0, lifeline: 0, fortify: 0, evasion: 0,
-        vampire: 0, divineLight: 0, momentum: 0, retribution: 0,
+        vampire: 0, babyVampire: 0, tenfold: false, instantKill: false, divineLight: 0, momentum: 0, retribution: 0,
         killBlast: 0, elementIgnore: false, bulwark: 0, lastStand: 0, angelOfDeath: false
     };
 }
