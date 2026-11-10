@@ -1771,7 +1771,10 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', g
     const returnBtn = `<button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
     const header = `<div class="flex items-center justify-between gap-3">${title}${returnBtn}</div>`;
     // After a defeat: the main page's refining menu icon links to the Refining page to improve gear
-    const powerBox = kind === 'win' ? '' : `<button onclick="goFromResult('blacksmith')" class="${guideHint ? 'guide-flash-link ' : ''}flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Improve your gear at the Refining page</span></button>`;
+    const powerBox = kind === 'win' ? '' : `<div class="flex flex-col gap-2">`
+        + `<button onclick="goFromResult('blacksmith')" class="${guideHint ? 'guide-flash-link ' : ''}flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Make your gear stronger at the Refining page.</span></button>`
+        + `<button onclick="goFromResult('character')" class="flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><span class="text-xs font-bold text-amber-300">Check your upgrade status and skills on the Character page.</span></button>`
+        + `</div>`;
     return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
