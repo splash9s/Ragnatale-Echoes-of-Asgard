@@ -330,8 +330,8 @@ const MONSTER_SPRITES = {
         shift: {
             'assets/combat/cavebeast/cavebeastattack_q85.webp': [0, -3],
             'assets/combat/cavebeast/cavebeastdamaged_q85.webp': [0, 0],
-            'assets/combat/cavebeast/cavebeastdead1_q85.webp': [0, 0],
-            'assets/combat/cavebeast/cavebeastdead2_q85.webp': [0, -1]
+            'assets/combat/cavebeast/cavebeastdead1_q85.webp': [0, 50],
+            'assets/combat/cavebeast/cavebeastdead2_q85.webp': [0, 49]
         }
     },
     M012: { // Sand King (boss, map lv 20): natural size; shift is [dx, dy] px so the feet stay on the same spot
