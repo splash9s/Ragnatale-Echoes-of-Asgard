@@ -1295,8 +1295,11 @@ async function changeEarthLayers() {
     fg.style.zIndex = isNewEarth ? '1' : '';
     bg.style.filter = is3d ? 'blur(2.5px)' : isNewEarth ? 'blur(3px)' : '';
     fg.style.filter = is3d ? 'blur(1px)' : '';
+    // Sunlight only on the forest (Earth) map: the glow and both shaft layers
+    const isForest = nextBase.includes('/earth3d/');
     const light = document.getElementById('earth-light');
-    if (light) light.style.display = isNewEarth ? '' : 'none';
+    if (light) light.style.display = isForest ? '' : 'none';
+    ['sun-shafts', 'sun-shafts-front'].forEach(id => { const s = document.getElementById(id); if (s) s.style.display = isForest ? '' : 'none'; });
     // 3D art is rendered 128x72px larger than the screen, so the far layers have room to drift
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
