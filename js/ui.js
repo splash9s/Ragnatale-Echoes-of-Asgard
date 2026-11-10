@@ -1211,7 +1211,7 @@ function flatArt(name, feet, monsterFeet) {
 const EARTH_ART_MODE = '3d';
 function earth3dArt() {
     // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
-    const feet = [500, 765], monsterFeet = [[820, 765], [960, 755], [1150, 750], [1350, 750], [1550, 755], [1740, 760]];
+    const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
     return {
         bg: ['assets/combat/earth3d/sky.webp'],
         base: ['assets/combat/earth3d/base.webp'],
