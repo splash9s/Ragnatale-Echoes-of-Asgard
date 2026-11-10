@@ -1178,7 +1178,8 @@ function flatArt(name, feet, monsterFeet) {
 // with a live blur on the far mountains and a warm light glow. Set to false to go back to the flat Earth image.
 const USE_NEW_EARTH_ART = true;
 function earthNewArt() {
-    const feet = [500, 750] // player stands 100px lower than the flat Earth art, monsterFeet = [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]];
+    // Player stands 100px lower than on the flat Earth art
+    const feet = [500, 750], monsterFeet = [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]];
     return {
         bg: ['assets/combat/earth1/e1bg.webp'],
         base: ['assets/combat/earth1/e1base.webp'],
