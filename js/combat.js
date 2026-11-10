@@ -1722,9 +1722,18 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
         : section('Fight Log', s.log.length, logBody, false) + section('Item Drop', s.items.length, itemBody, false) + section('Rune Picked', s.runes.length, runeBody, false);
     const returnBtn = `<button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
     const header = `<div class="flex items-center justify-between gap-3">${title}${returnBtn}</div>`;
-    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div><div class="flex flex-col gap-2">${sections}</div></div>`;
+    // After a defeat: quick links to power up before the next try
+    const powerBtn = (label, view) => `<button onclick="goFromResult('${view}')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer border border-slate-700">${label}</button>`;
+    const powerBox = kind === 'win' ? '' : `<div class="bg-slate-950 border border-amber-700/50 rounded-xl p-3 flex flex-col gap-2"><div class="text-xs font-bold text-amber-300">Improve your power</div><div class="grid grid-cols-2 gap-2">${powerBtn('Refining', 'blacksmith')}${powerBtn('Skills', 'skills')}${powerBtn('Upgrade Stats', 'character')}${powerBtn('Buy New Gear', 'shop')}</div></div>`;
+    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
+// Result-screen quick link: close the result without running its return action, then open the page
+function goFromResult(view) {
+    window.modalCallback = null;
+    closeModal();
+    switchView(view);
+}
 // VIP auto-rune: when the rune window opens, a random offered rune is picked for the player
 function scheduleVipAutoRune(choices) {
     if (!player.vipAutoRune || !isVipActive() || !choices || choices.length === 0) return;
