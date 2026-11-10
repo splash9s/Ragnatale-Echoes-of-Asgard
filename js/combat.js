@@ -385,6 +385,22 @@ function startExpedition(mode, opts = {}) {
         if (tagEl) tagEl.innerText = "Daily Challenge";
         if (titleEl) titleEl.innerText = `Daily Challenge — Stage ${currentStage} / ${maxStages}`;
         logMessage(`[Daily] Daily Challenge started. Your level, skills and gear have no effect here.`, 'winlose');
+    } else if (mode === 'voidtest') {
+        // Void Test Map: one stage with 6 monsters, free access (test)
+        activeMap = { title: "Void Test Map", dropKey: 'map1', maxStages: 1, levelReq: 1, enemies: (GAME_DATA.maps.map1.enemies || []).map(t => ({ ...t })) };
+        currentStage = 1;
+        maxStages = 1;
+        if (tagEl) tagEl.innerText = "Void Test (Free)";
+        if (titleEl) titleEl.innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages}`;
+        logMessage(`[Expedition] Entering the Void Test Map (free test).`, 'winlose');
+    } else if (mode === 'bossmap') {
+        // Boss Gauntlet: every stage is a boss, one per level from 1 to 99
+        activeMap = { title: "Boss Gauntlet", dropKey: 'map99', maxStages: 99, levelReq: 1, enemies: [] };
+        currentStage = 1;
+        maxStages = 99;
+        if (tagEl) tagEl.innerText = "Boss Gauntlet";
+        if (titleEl) titleEl.innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages} (Boss)`;
+        logMessage(`[Expedition] Entering the Boss Gauntlet. Every stage is a boss.`, 'winlose');
     } else {
         activeMap = {
             title: "Endless Void Tower (Test)",
@@ -521,6 +537,7 @@ function spawnFinalStage() {
 }
 
 function isBossStage() {
+    if (currentMode === 'bossmap') return true;
     if (activeMap && activeMap.finalMap) return currentStage % 2 === 0 || currentStage === maxStages;
     if (currentMode === 'campaign' || currentMode === 'event') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
     if (currentMode === 'daily') return DAILY_BOSS_STAGES.includes(currentStage);
@@ -528,6 +545,11 @@ function isBossStage() {
 }
 
 function getBossTemplate() {
+    if (currentMode === 'bossmap') {
+        // Boss Gauntlet: stage N uses a boss scaled to level N, cycling through the map bosses
+        const pool = Object.values(GAME_DATA.maps).map(m => m.boss).filter(Boolean);
+        return curveBoss(pool[(currentStage - 1) % pool.length], currentStage);
+    }
     if (currentMode === 'campaign' || currentMode === 'event') return activeMap.boss;
     const key = ['map1', 'map10', 'map20'][Math.floor(currentStage / 10) - 1];
     return GAME_DATA.maps[key].boss;
@@ -604,7 +626,7 @@ function spawnStageMonsters() {
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : currentMode === 'endless' ? [MONSTERS_DATA.slime] : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
-            const count = currentMode === 'endless' ? 1 : Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
+            const count = currentMode === 'endless' ? 1 : currentMode === 'voidtest' ? 6 : Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
             const mult = currentMode === 'endless' ? 1 : stageMultiplier(); // Void Tower: one level 1 slime per stage
             for (let i = 0; i < count; i++) {
                 let picked = pool[Math.floor(Math.random() * pool.length)];
@@ -1343,7 +1365,8 @@ function monsterTurnTick() {
         updateUI();
         const defeatHtml = buildMapSummaryHTML('lose');
         playPlayerFallAnim(); // the hero falls first, then the result shows
-        setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView('expeditions')), PLAYER_FALL_MS);
+        const failReturn = (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
+        setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView(failReturn)), PLAYER_FALL_MS);
     }
     updateUI();
 }
@@ -1604,6 +1627,15 @@ function onStageCleared() {
                 return;
             }
 
+            if ((currentMode === 'voidtest' || currentMode === 'bossmap') && currentStage > maxStages) {
+                if (typeof resetMapRunes === 'function') resetMapRunes();
+                showModal(currentMode === 'bossmap' ? "Boss Gauntlet Cleared!" : "Void Test Map Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
+                playSound('sound/mvp.mp3');
+                updateUI();
+                saveGame();
+                return;
+            }
+
             if (currentMode === 'campaign' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 if (!player.clearedMaps) player.clearedMaps = {};
@@ -1722,9 +1754,8 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates') {
         : section('Fight Log', s.log.length, logBody, false) + section('Item Drop', s.items.length, itemBody, false) + section('Rune Picked', s.runes.length, runeBody, false);
     const returnBtn = `<button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">${escapeHtml(returnLabel)}</button>`;
     const header = `<div class="flex items-center justify-between gap-3">${title}${returnBtn}</div>`;
-    // After a defeat: quick links to power up before the next try
-    const powerBtn = (label, view) => `<button onclick="goFromResult('${view}')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer border border-slate-700">${label}</button>`;
-    const powerBox = kind === 'win' ? '' : `<div class="bg-slate-950 border border-amber-700/50 rounded-xl p-3 flex flex-col gap-2"><div class="text-xs font-bold text-amber-300">Improve your power</div><div class="grid grid-cols-2 gap-2">${powerBtn('Refining', 'blacksmith')}${powerBtn('Skills', 'skills')}${powerBtn('Upgrade Stats', 'character')}${powerBtn('Buy New Gear', 'shop')}</div></div>`;
+    // After a defeat: the main page's refining menu icon links to the Refining page to improve gear
+    const powerBox = kind === 'win' ? '' : `<button onclick="goFromResult('blacksmith')" class="flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Improve your gear at the Refining page</span></button>`;
     return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
