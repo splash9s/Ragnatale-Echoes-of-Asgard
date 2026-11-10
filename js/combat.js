@@ -1949,11 +1949,18 @@ function showGuideSpotlight() {
     removeGuideSpotlight();
     const overlay = document.createElement('div');
     overlay.id = 'guide-overlay';
-    const spot = document.createElement('button');
+    // The spotlight is a copy of the real potion button, lifted above the dim overlay so it is not shadowed
+    const target = document.getElementById('combat-potion-btn');
+    const spot = target ? target.cloneNode(true) : document.createElement('button');
+    spot.removeAttribute('id');
+    spot.removeAttribute('onclick');
     spot.id = 'guide-spot';
     spot.type = 'button';
     spot.title = 'Drink a potion';
-    spot.innerHTML = '<span class="guide-spot-tip">HP is low! Drink a potion to recover.</span>';
+    spot.classList.remove('combat-slot-btn');
+    spot.classList.add('combat-slot-btn');
+    spot.querySelector('.guide-spot-tip')?.remove();
+    spot.insertAdjacentHTML('beforeend', '<span class="guide-spot-tip">HP is low! Drink a potion to recover.</span>');
     spot.onclick = guideDrinkPotion;
     document.body.append(overlay, spot);
     positionGuideSpot();
@@ -1965,10 +1972,16 @@ function positionGuideSpot() {
     const target = document.getElementById('combat-potion-btn');
     if (!spot || !target) return;
     const r = target.getBoundingClientRect();
+    // Same size and place on screen as the real button (the stage is scaled, so the copy is scaled to match)
+    const k = r.width / (target.offsetWidth || r.width);
+    spot.style.position = 'fixed';
     spot.style.left = r.left + 'px';
     spot.style.top = r.top + 'px';
-    spot.style.width = r.width + 'px';
-    spot.style.height = r.height + 'px';
+    spot.style.width = (target.offsetWidth || r.width) + 'px';
+    spot.style.height = (target.offsetHeight || r.height) + 'px';
+    spot.style.transformOrigin = 'top left';
+    spot.style.transform = `scale(${k})`;
+    spot.style.margin = '0';
 }
 function removeGuideSpotlight() {
     document.getElementById('guide-overlay')?.remove();
