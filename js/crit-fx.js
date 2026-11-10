@@ -118,6 +118,9 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
 // Critical hit: crit slash with screen shake and flash
 function playCritFx(selector) {
     playSlashFx(selector, CRIT_SLASH_FRAMES, CRIT_SLASH_FRAME_MS, CRIT_SLASH_SCALE, true);
+    // 3D Earth art: a quick camera push-in on crits
+    const stage = document.getElementById('combat-stage');
+    if (stage && document.getElementById('earth-bg')?.classList.contains('earth3d-far')) restartFxClass(stage, 'cam-punch');
 }
 
 // Boss Heavy Strike: dark vignette and a screen shake

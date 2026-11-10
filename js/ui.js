@@ -1174,9 +1174,22 @@ function flatArt(name, feet, monsterFeet) {
         layouts: { [`${name}_flat`]: flatLayout(feet, monsterFeet) }
     };
 }
-// New hand-painted Earth forest (e1): far mountains behind, front trees in the middle, ground on top,
-// with a live blur on the far mountains and a warm light glow. Set to false to go back to the flat Earth image.
-const USE_NEW_EARTH_ART = true;
+// Earth combat art:
+//   '3d'   = Blender 2.5D layers (sky, forest, tilted ground), with depth blur, a slow parallax sway,
+//            a pan at stage start and a small zoom on crits
+//   'e1'   = hand-painted layers (far mountains, front trees, ground on top) with a blur and light glow
+//   'flat' = the old flat Earth image
+const EARTH_ART_MODE = '3d';
+function earth3dArt() {
+    // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
+    const feet = [500, 790], monsterFeet = [[820, 790], [960, 780], [1150, 775], [1350, 775], [1550, 780], [1740, 785]];
+    return {
+        bg: ['assets/combat/earth3d/sky.webp'],
+        base: ['assets/combat/earth3d/base.webp'],
+        fg: ['assets/combat/earth3d/forest.webp'],
+        layouts: { 'earth3d': flatLayout(feet, monsterFeet) }
+    };
+}
 function earthNewArt() {
     // Player stands 100px lower than on the flat Earth art
     const feet = [500, 750], monsterFeet = [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]];
@@ -1188,7 +1201,7 @@ function earthNewArt() {
     };
 }
 const COMBAT_ART = {
-    earth: USE_NEW_EARTH_ART ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
+    earth: EARTH_ART_MODE === '3d' ? earth3dArt() : EARTH_ART_MODE === 'e1' ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
     fire: flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
     wind: flatArt('wind', [500, 625], [[800, 620], [950, 630], [1150, 620], [1350, 630], [1550, 620], [1700, 615]]),
     water: flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
@@ -1235,12 +1248,26 @@ async function changeEarthLayers() {
     fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
     // New Earth art: the front trees sit between the far mountains and the ground, and the far mountains get a live blur
-    const isNewEarth = nextBase.includes('/earth1/');
+    const is3d = nextBase.includes('/earth3d/');
+    const isNewEarth = is3d || nextBase.includes('/earth1/');
     base.style.zIndex = isNewEarth ? '2' : '';
     fg.style.zIndex = isNewEarth ? '1' : '';
-    bg.style.filter = isNewEarth ? 'blur(3px)' : '';
+    bg.style.filter = is3d ? 'blur(2.5px)' : isNewEarth ? 'blur(3px)' : '';
+    fg.style.filter = is3d ? 'blur(1px)' : '';
     const light = document.getElementById('earth-light');
     if (light) light.style.display = isNewEarth ? '' : 'none';
+    // 3D art is rendered 128x72px larger than the screen, so the far layers have room to drift
+    [bg, base, fg].forEach(el => {
+        el.style.left = is3d ? '-64px' : '0px';
+        el.style.top = is3d ? '-36px' : '0px';
+        el.style.width = is3d ? '2048px' : '1920px';
+        el.style.height = is3d ? '1152px' : '1080px';
+    });
+    // Parallax: the ground (with the fighters on it) stays still; the forest and sky drift against it, the sky more
+    bg.classList.toggle('earth3d-far', is3d);
+    fg.classList.toggle('earth3d-mid', is3d);
+    if (is3d) [bg, fg].forEach(el => { el.classList.remove('earth3d-pan'); void el.offsetWidth; el.classList.add('earth3d-pan'); });
+    else [bg, fg].forEach(el => el.classList.remove('earth3d-pan'));
     const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k) || nextBg.includes(k));
     const layout = layoutKey ? art.layouts[layoutKey] : null;
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };

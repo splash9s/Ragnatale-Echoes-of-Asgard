@@ -388,6 +388,18 @@
         /* Damage numbers: white for normal, red for critical */
         .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 26px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
         .combat-dmg.crit { color: #ff9800; font-size: 36px; }
+        /* 3D Earth art: slow parallax sway (forest less, sky more), a pan when a stage starts, a push-in on crits */
+        #earth-bg.earth3d-far { animation: earth3dSwayFar 11s ease-in-out infinite; }
+        #earth-fg.earth3d-mid { animation: earth3dSwayMid 11s ease-in-out infinite; }
+        #earth-bg.earth3d-far.earth3d-pan { animation: earth3dSwayFar 11s ease-in-out infinite, earth3dPanFar 1.4s ease-out; }
+        #earth-fg.earth3d-mid.earth3d-pan { animation: earth3dSwayMid 11s ease-in-out infinite, earth3dPanMid 1.4s ease-out; }
+        @keyframes earth3dSwayFar { 0%, 100% { translate: -14px 0; } 50% { translate: 14px -4px; } }
+        @keyframes earth3dSwayMid { 0%, 100% { translate: -7px 0; } 50% { translate: 7px -2px; } }
+        @keyframes earth3dPanFar { from { margin-left: 60px; } to { margin-left: 0; } }
+        @keyframes earth3dPanMid { from { margin-left: 32px; } to { margin-left: 0; } }
+        #combat-stage.cam-punch { animation: camPunch .45s ease-out; }
+        @keyframes camPunch { 0% { scale: 1; } 30% { scale: 1.03; } 100% { scale: 1; } }
+        @media (prefers-reduced-motion: reduce) { #earth-bg.earth3d-far, #earth-fg.earth3d-mid, #combat-stage.cam-punch { animation: none; } }
         .float-notice { position: fixed; z-index: 99999; transform: translate(-50%, -100%); color: #ff3b30; font-size: 22px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp 1.3s ease-out forwards; }
         /* Green aura on heal (monster or player) */
         .heal-aura { position: absolute; z-index: 5; border-radius: 50%; pointer-events: none; transform: translate(0, 0); background: radial-gradient(circle, rgba(74,222,128,.75) 0%, rgba(74,222,128,.35) 45%, rgba(74,222,128,0) 70%); mix-blend-mode: screen; animation: healAura .8s ease-out forwards; }
@@ -498,6 +510,7 @@
         @keyframes playerFall { 0% { opacity: 1; filter: brightness(1.8) sepia(1) hue-rotate(-50deg) saturate(5); } 15% { opacity: 1; filter: none; } 100% { opacity: 0; filter: none; } }
         /* Critical hit: short small screen shake, slash over the monster, blue flash across the screen */
         #combat-stage.crit-shake { animation: critShake .32s linear; }
+        #combat-stage.crit-shake.cam-punch { animation: critShake .32s linear, camPunch .45s ease-out; }
         @keyframes critShake { 0%, 100% { transform: translate(0, 0); } 12% { transform: translate(-3px, 2px); } 25% { transform: translate(3px, -2px); } 37% { transform: translate(-2px, -1px); } 50% { transform: translate(2px, 1px); } 62% { transform: translate(-1px, 1px); } 75% { transform: translate(1px, -1px); } 88% { transform: translate(0, 0); } }
         .crit-fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
         .crit-flash { position: absolute; inset: 0; opacity: 0; }
@@ -1266,12 +1279,12 @@
     <script src="js/hero-art.js?v=20261109v"></script>
     <script src="js/hero-body.js?v=20261109za"></script>
     <script src="js/combat.js?v=20261110h"></script>
-    <script src="js/crit-fx.js?v=20261110d"></script>
-    <script src="js/ui.js?v=20261110j"></script>
+    <script src="js/crit-fx.js?v=20261110e"></script>
+    <script src="js/ui.js?v=20261110k"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
     <script src="js/town.js?v=20261110a"></script>
-    <script src="js/loader.js?v=20261110a"></script>
+    <script src="js/loader.js?v=20261110b"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading
