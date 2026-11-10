@@ -641,6 +641,11 @@ function showFloatNotice(text, anchorSel) {
     document.body.appendChild(d);
     setTimeout(() => d.remove(), 1400);
 }
+// Width of the combat stage in design pixels (the .ts-inner box, which is scaled by fitStage)
+function earthStageInnerWidth() {
+    const inn = document.querySelector('#combat-stage .ts-inner');
+    return (inn && parseFloat(inn.style.width)) || 1920;
+}
 function showCombatText(selector, text, variant) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
@@ -1263,7 +1268,7 @@ async function changeEarthLayers() {
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
         el.style.top = is3d ? '-36px' : '0px';
-        el.style.width = is3d ? 'calc(100% + 128px)' : '1920px'; // 3D layers follow the stage width (containing block = .ts-inner)
+        el.style.width = is3d ? (earthStageInnerWidth() + 128) + 'px' : '1920px';
         el.style.height = is3d ? '1152px' : '1080px';
     });
     // Parallax: the ground (with the fighters on it) stays still; the forest and sky drift against it, the sky more

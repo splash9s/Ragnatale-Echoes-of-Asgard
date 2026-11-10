@@ -25,6 +25,11 @@
         st.style.width = (DW * s) + 'px';
         st.style.height = (H * s) + 'px';
         if (st.id === 'combat-stage') {
+            // keep the 3D earth layers as wide as the stage when the window changes size
+            const bgEl = document.getElementById('earth-bg');
+            if (bgEl && bgEl.classList.contains('earth3d-far')) {
+                ['earth-bg', 'earth-base', 'earth-fg'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = (DW + 128) + 'px'; });
+            }
             document.querySelectorAll('#combat-stage .combat-vignette, #combat-stage #earth-light').forEach(el => { el.style.width = DW + 'px'; });
         }
     }
