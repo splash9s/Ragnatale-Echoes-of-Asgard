@@ -4693,7 +4693,7 @@ function strawAttack() {
 }
 
 // Blacksmith at the smithy on the main page: mostly idle; now and then the hammer swing plays once. Click him to open refinement.
-const SMITH_IDLE_FRAME = 5, SMITH_FRAME_MS = 110;
+const SMITH_IDLE_FRAME = 1, SMITH_FRAME_MS = 110;
 let smithSwinging = false;
 function setSmithFrame(i) {
     const el = document.getElementById('town-smith');
@@ -4702,8 +4702,8 @@ function setSmithFrame(i) {
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, SMITH_IDLE_FRAME].forEach((f, k) => setTimeout(() => setSmithFrame(f), k * SMITH_FRAME_MS));
-    setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, 10 * SMITH_FRAME_MS);
+    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((f, k) => setTimeout(() => setSmithFrame(f), k * SMITH_FRAME_MS));
+    setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, 9 * SMITH_FRAME_MS);
 }
 function scheduleSmithSwing() {
     setTimeout(() => {
