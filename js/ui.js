@@ -726,14 +726,42 @@ const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
 const COMBAT_PLAYER_CRIT_MS = 520;   // a critical attack holds its own pose longer
 const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
-// The hero falls over at the end of a battle (the sprite tips, darkens and fades)
-const PLAYER_FALL_MS = 1100;
+// The hero dies at the end of a lost battle: the fall (dead) pose shows for 2 seconds, then the result.
+// Without the fall art (still loading) the old fade plays instead.
+const PLAYER_FALL_MS = 2000;
+let combatPlayerDeadAt = 0;
 function playPlayerFallAnim() {
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
+    combatPlayerDeadAt = Date.now();
+    const dead = combatDeadFrame();
+    if (dead) {
+        applyPlayerFrame(el, dead);
+        flashPlayerHurt();
+        return;
+    }
     el.classList.remove('player-fall');
     void el.offsetWidth; // restart the fall
     el.classList.add('player-fall');
+}
+// A frame placed so its torso is where the reference frame's torso is (the feet stay on the ground)
+function alignTorso(f, ref) {
+    if (!f || !ref || f === ref || f.tx === undefined || ref.tx === undefined) return f;
+    return Object.assign({}, f, { fx: f.tx - (ref.tx - ref.fx) });
+}
+// The frame of an attack: attack, then attack02; critical, then critical02 (second half of the pose time)
+function combatAttackFrame(attack, elapsed) {
+    const total = attack.crit ? COMBAT_PLAYER_CRIT_MS : COMBAT_PLAYER_ATTACK_MS;
+    const second = elapsed >= total / 2;
+    const P = combatPose();
+    const first = attack.crit ? combatCriFrame(attack) : P.ATTACK;
+    if (!second) return first;
+    return alignTorso(attack.crit ? (P.CRI2 || first) : (P.ATTACK2 || first), first);
+}
+// The dead pose, placed where the idle body stands
+function combatDeadFrame() {
+    const P = combatPose();
+    return alignTorso(P.DEAD, P.IDLE);
 }
 function playPlayerAttackAnim(isCrit) {
     const cri = combatPose().CRI;
@@ -742,7 +770,7 @@ function playPlayerAttackAnim(isCrit) {
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
     el.dataset.lungeAt = String(combatPlayerAttack.at);
-    applyPlayerFrame(el, combatPlayerAttack.crit ? combatCriFrame(combatPlayerAttack) : combatPose().ATTACK);
+    applyPlayerFrame(el, combatAttackFrame(combatPlayerAttack, 0));
     playPlayerLunge(el, COMBAT_PLAYER_LUNGE_PX);
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
@@ -904,6 +932,12 @@ setInterval(() => {
     const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
         if (img.id === 'combat-player-sprite') {
+            if (combatPlayerDeadAt && !img.classList.contains('player-fall')) {
+                // Dead: the fall pose stays until the next battle
+                const dead = combatDeadFrame();
+                if (dead) applyPlayerFrame(img, dead);
+                return;
+            }
             const ae = now - combatPlayerAttack.at;
             if (combatPlayerAttack.at && ae >= 0 && ae < (combatPlayerAttack.crit ? COMBAT_PLAYER_CRIT_MS : COMBAT_PLAYER_ATTACK_MS)) {
                 // Attack: the attack pose plays and the sprite lunges forward once per attack
@@ -911,7 +945,7 @@ setInterval(() => {
                     img.dataset.lungeAt = String(combatPlayerAttack.at);
                     playPlayerLunge(img, COMBAT_PLAYER_LUNGE_PX);
                 }
-                applyPlayerFrame(img, combatPlayerAttack.crit ? combatCriFrame(combatPlayerAttack) : combatPose().ATTACK);
+                applyPlayerFrame(img, combatAttackFrame(combatPlayerAttack, ae));
                 return;
             }
             const re = now - combatPlayerReact.at;

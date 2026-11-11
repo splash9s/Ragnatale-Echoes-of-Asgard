@@ -419,6 +419,7 @@ function startExpedition(mode, opts = {}) {
 
     switchView('combat');
     document.getElementById('combat-player-sprite')?.classList.remove('player-fall'); // back up for a new battle
+    if (typeof combatPlayerDeadAt !== 'undefined') combatPlayerDeadAt = 0; // alive again
     player.inCombat = true;
     stageSummary = newStageSummary(currentStage);
     runeRefreshLeft = RUNE_REFRESH_MAX;
