@@ -1225,8 +1225,8 @@ function ice3dArt() {
 const WIND_ART_MODE = '3d'; // '3d' = Blender 2.5D layers (same style as Earth); anything else = the old flat wind image
 // Wind combat art: same 3D layers as the other maps (sky, tilted ground with the items flat on top, forest)
 function wind3dArt() {
-    // Same stand points as the Ice 3D stage (default; adjust in the game if needed)
-    const feet = [500, 790], monsterFeet = [[820, 790], [960, 780], [1150, 775], [1350, 775], [1550, 780], [1740, 785]];
+    // Ice 3D stand points moved up 70px
+    const feet = [500, 720], monsterFeet = [[820, 720], [960, 710], [1150, 705], [1350, 705], [1550, 710], [1740, 715]];
     return {
         bg: ['assets/combat/wind3d/sky.webp'],
         base: ['assets/combat/wind3d/base.webp'],
@@ -1236,7 +1236,7 @@ function wind3dArt() {
 }
 function earth3dArt() {
     // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
-    const feet = [500, 670], monsterFeet = [[820, 670], [960, 660], [1150, 655], [1350, 655], [1550, 660], [1740, 665]];
+    const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
     return {
         bg: ['assets/combat/earth3d/sky.webp'],
         base: ['assets/combat/earth3d/base.webp'],
