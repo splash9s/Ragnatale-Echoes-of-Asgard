@@ -177,8 +177,8 @@
         @keyframes townSparkle { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 20% { opacity: 1; transform: translate(calc(var(--dx) * .2), calc(var(--dy) * .2)) scale(1); } 100% { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
         @media (prefers-reduced-motion: reduce) { #town-sparkles { display: none !important; } }
         #town-hero-wrap { position: absolute; left: 891px; top: 616px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
-        /* Cart man: walks from the left edge to the right edge, behind the foreground layer (it is placed before .ts-fg). Frames are 400x270 with the feet at (200, 262), shown at 0.79 (about the player's height) */
-        #town-cartman { position: absolute; left: -320px; top: 628px; width: 316px; height: 213px; pointer-events: none; z-index: 0; display: none; image-rendering: auto; }
+        /* Cart man: walks from the left edge to the right edge, behind the foreground layer (it is placed before .ts-fg). Frames are 400x270 with the feet at (200, 262), shown at 0.80 so his head-to-feet height matches the player (about 193px), feet 110px below the player's ground line (915) */
+        #town-cartman { position: absolute; left: -320px; top: 705px; width: 320px; height: 216px; pointer-events: none; z-index: 0; display: none; image-rendering: auto; }
         /* Blacksmith at the smithy: frames are 480x320 with the anvil stump centre at (290, 305), shown at 0.71 so he is the player's height (about 193px). Loops the hammer swing (js/ui.js) */
         #town-smith { position: absolute; left: 194px; top: 588px; width: 341px; height: 227px; pointer-events: auto; cursor: pointer; z-index: 1; image-rendering: auto; }
         /* Straw man (training dummy): frames are 256x310 with the base centre at (128, 300); shown at the player's visible height. Click it to attack (see js/ui.js) */
@@ -1358,7 +1358,7 @@
     <script src="js/hero-body.js?v=20261112b"></script>
     <script src="js/combat.js?v=20261112b"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112n"></script>
+    <script src="js/ui.js?v=20261112r"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
