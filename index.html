@@ -173,6 +173,8 @@
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
         #town-shadow { position: absolute; left: 879px; top: 770px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; }
         #town-hero-wrap { position: absolute; left: 891px; top: 616px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
+        /* Straw man: feet on the hero's ground line, 50px right of the hero's feet point (its feet are at x 101 of 202, y 290 of 294) */
+        #town-dummy { position: absolute; left: 912px; top: 515px; width: 202px; height: 294px; pointer-events: none; z-index: 1; image-rendering: auto; }
         /* Main page foreground: props in front of the background, blurred a little for depth */
         .ts-inner .ts-fg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; pointer-events: none; z-index: 0; filter: blur(2px); }
         #town-hero { position: absolute; left: 0; top: 0; width: 95px; height: 193px; image-rendering: pixelated; }
@@ -665,7 +667,7 @@
         <div id="view-town" class="flex flex-col flex-1">
             <div id="town-stage" class="town-stage">
                 <div class="ts-inner">
-                    <img class="ts-bg" src="assets/page01/mainbg02_q85.webp" alt="" onerror="townSwap(this,'mainbg02.png')">
+                    <img class="ts-bg" src="assets/page01/mainbg03_q85.webp" alt="" onerror="townSwap(this,'mainbg03.png')">
                     <img class="ts-fg" src="assets/page01/mainfg02_q85.webp" alt="" aria-hidden="true">
                     <!-- (the foreground sits above the background and below the hero and buttons; it never takes clicks) -->
 
@@ -725,7 +727,8 @@
             <div class="ui round" data-action="expedition" style="left:1482px; top:643px; width:428px; height:428px;">
                 <img src="assets/page01/expeditionbutton_q85.webp" alt="" onerror="townSwap(this,'expeditionbutton.png')">
             </div>
-                    <img id="town-shadow" alt="" src="assets/cha/chashadow_q85.webp">
+                    <img id="town-shadow" alt="" src="assets/cha/shadowclean_q85.webp">
+                    <img id="town-dummy" alt="" src="assets/page01/strawman_q85.webp" aria-hidden="true">
                     <div id="town-hero-wrap" onclick="switchView('character')" title="Character">
                         <img id="town-hero" class="player-idle" alt="" src="">
                     <img id="town-pet" class="pet-idle" alt="" src="assets/combat/slime/slimebase_q85.webp" style="position:absolute; left:0; top:0; width:87px; height:73px; display:none; max-width:none; max-height:none; image-rendering:pixelated; pointer-events:none; z-index:3;">
@@ -1349,7 +1352,7 @@
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
     <script src="js/town.js?v=20261110e"></script>
-    <script src="js/loader.js?v=20261111b"></script>
+    <script src="js/loader.js?v=20261112b"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading
