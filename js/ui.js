@@ -1214,7 +1214,7 @@ const ICE_ART_MODE = '3d'; // switch to '3d' once assets/combat/ice3d/*.webp are
 // Ice combat art: same 3D layers as Fire (sky, tilted ground with the items flat on top, forest)
 function ice3dArt() {
     // Fire stand points moved up 50px
-    const feet = [500, 640], monsterFeet = [[820, 640], [960, 630], [1150, 625], [1350, 625], [1550, 630], [1740, 635]];
+    const feet = [500, 790], monsterFeet = [[820, 790], [960, 780], [1150, 775], [1350, 775], [1550, 780], [1740, 785]];
     return {
         bg: ['assets/combat/ice3d/sky.webp'],
         base: ['assets/combat/ice3d/base.webp'],
