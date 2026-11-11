@@ -1210,7 +1210,7 @@ function flatArt(name, feet, monsterFeet) {
 //   'flat' = the old flat Earth image
 const EARTH_ART_MODE = '3d';
 const FIRE_ART_MODE = '3d'; // '3d' = Blender 2.5D layers (same style as Earth); anything else = the old flat fire image
-const ICE_ART_MODE = 'flat'; // switch to '3d' once assets/combat/ice3d/*.webp are rendered
+const ICE_ART_MODE = '3d'; // switch to '3d' once assets/combat/ice3d/*.webp are rendered
 // Ice combat art: same 3D layers as Fire (sky, tilted ground with the items flat on top, forest)
 function ice3dArt() {
     // Fire stand points moved up 50px
