@@ -4641,7 +4641,7 @@ function spawnTownSparkle() {
 }
 setInterval(() => { if (Math.random() < 0.8) spawnTownSparkle(); }, 250);
 
-// Straw man (training dummy) on the main page. Click it: the hero attacks it, it reacts with one of two hurt sets, and it plays the combat hit sound (no slash effect).
+// Straw man (training dummy) on the main page. Click it: the hero attacks it, it reacts with one of two hurt sets, and it shows the damage from the player's own stats (defence 0, unlimited HP). A hit can be a critical, with the combat crit sound and slash.
 const STRAW_FRAME_MS = 100;
 const STRAW_HURT_SETS = [[1, 2, 3], [4, 5, 6, 7, 8]]; // one set is picked at random per hit
 const TOWN_HERO_LUNGE_PX = 36, TOWN_HERO_WINDUP_PX = -11; // the combat lunge, at the main page's hero scale
@@ -4681,9 +4681,79 @@ function playTownHeroAttack() {
         { transform: 'translateX(0px)' }
     ], { duration: 350, easing: 'linear' });
     setTimeout(() => {
-        playSound('sound/hit.mp3'); // the combat hit sound; no slash effect
+        strawHit();
         playStrawHurt();
     }, 190);
+}
+
+// Damage the straw man takes, from the player's own attack and crit. It has no defence and unlimited HP, so every hit counts in full.
+function strawHitDamage() {
+    const d = getDerivedStats();
+    const crit = Math.random() * 100 < d.crit;
+    let dmg = Math.max(1, Math.floor(d.atk));
+    if (crit) dmg = Math.max(1, Math.floor(dmg * (1.5 + (skillBonus('critDmgPct') + setStat('critDmgPct')) / 100)));
+    return { dmg, crit };
+}
+// Floating damage number over the straw man on the main page (white normal, orange critical, as in combat)
+function showStrawDamage(text, crit) {
+    const dummy = document.getElementById('town-dummy');
+    const stage = document.querySelector('#view-town .ts-inner');
+    if (!dummy || !stage) return;
+    const ib = stage.getBoundingClientRect(), b = dummy.getBoundingClientRect();
+    const sc = (ib.width / stage.offsetWidth) || 1;
+    const el = document.createElement('div');
+    el.className = 'combat-dmg' + (crit ? ' crit' : '');
+    el.textContent = text;
+    el.style.left = ((b.left + b.width / 2 - ib.left) / sc) + 'px';
+    el.style.top = ((b.top - ib.top) / sc - 20) + 'px';
+    stage.appendChild(el);
+    setTimeout(() => el.remove(), crit ? 1400 : 900);
+}
+// The combat slash over the straw man: the normal slash, or the crit slash for a critical hit
+function playStrawSlash(crit) {
+    const dummy = document.getElementById('town-dummy');
+    const stage = document.querySelector('#view-town .ts-inner');
+    if (!dummy || !stage) return;
+    const cfg = crit
+        ? { frames: CRIT_SLASH_FRAMES, ms: CRIT_SLASH_FRAME_MS, scale: 0.35 }
+        : { frames: ATK_SLASH_FRAMES, ms: ATK_SLASH_FRAME_MS, scale: 0.25 };
+    const ib = stage.getBoundingClientRect(), b = dummy.getBoundingClientRect();
+    const sc = (ib.width / stage.offsetWidth) || 1;
+    const cx = (b.left + b.width / 2 - ib.left) / sc, cy = (b.top + b.height / 2 - ib.top) / sc;
+    let img = stage.querySelector('.straw-slash');
+    if (!img) {
+        img = document.createElement('img');
+        img.className = 'straw-slash';
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        img.style.cssText = 'position:absolute; pointer-events:none; z-index:4;';
+        stage.appendChild(img);
+    }
+    clearInterval(img._slashTimer);
+    let f = 0;
+    const show = () => {
+        const fr = cfg.frames[f];
+        const w = fr.w * cfg.scale, h = fr.h * cfg.scale;
+        img.src = fr.src;
+        img.style.width = w + 'px';
+        img.style.height = h + 'px';
+        img.style.left = (cx - w / 2) + 'px';
+        img.style.top = (cy - h / 2) + 'px';
+        img.style.display = '';
+    };
+    show();
+    img._slashTimer = setInterval(() => {
+        f++;
+        if (f >= cfg.frames.length) { clearInterval(img._slashTimer); img.style.display = 'none'; return; }
+        show();
+    }, cfg.ms);
+}
+// One straw hit: damage number, slash, and the combat hit or crit sound
+function strawHit() {
+    const { dmg, crit } = strawHitDamage();
+    showStrawDamage(String(dmg), crit);
+    playStrawSlash(crit);
+    playSound(crit ? 'sound/critical.mp3' : 'sound/hit.mp3');
 }
 function strawAttack() {
     if (strawBusy) return;
