@@ -1236,7 +1236,7 @@ function wind3dArt() {
 }
 function earth3dArt() {
     // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
-    const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
+    const feet = [500, 670], monsterFeet = [[820, 670], [960, 660], [1150, 655], [1350, 655], [1550, 660], [1740, 665]];
     return {
         bg: ['assets/combat/earth3d/sky.webp'],
         base: ['assets/combat/earth3d/base.webp'],

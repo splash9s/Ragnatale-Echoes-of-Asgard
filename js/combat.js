@@ -612,6 +612,7 @@ function spawnStageMonsters() {
         const mini = { ...activeMap.miniBoss, ...combatHitFlee(activeMap.miniBoss), rewarded: false, ailments: {}, isMiniBoss: true, lineupSlot: BOSS_LINEUP_SLOT };
         monstersList.push(mini);
         logMessage(`[Mini Boss] ${mini.name} appears!`, 'winlose');
+        if (typeof showBossBalloon === 'function') showBossBalloon('Mini Boss appeared!');
     } else if (isBossStage()) {
         const boss = makeBoss(getBossTemplate());
         // Level 1 map bosses start at 70% of their max HP
@@ -620,6 +621,7 @@ function spawnStageMonsters() {
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
         monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
         if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
+        if (typeof showBossBalloon === 'function') showBossBalloon('Boss appeared!');
         logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
     } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
         spawnWaveFromSet(dailyScale, scaled);
