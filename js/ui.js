@@ -4729,10 +4729,14 @@ function walkCartMan() {
         i = (i + 1) % CART_FRAMES;
         el.src = `assets/page01/cart/c${i + 1}_q85.webp`;
     }, CART_FRAME_MS);
+    // The shadow runs the same walk as the cart, so it stays under its wheels
+    const shadow = document.getElementById('town-cart-shadow');
+    if (shadow) { shadow.style.display = 'block'; shadow.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CART_WALK_MS, easing: 'linear' }); }
     const walk = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CART_WALK_MS, easing: 'linear' });
     walk.onfinish = () => {
         clearInterval(timer);
         el.style.display = 'none';
+        if (shadow) shadow.style.display = 'none';
         el.src = 'assets/page01/cart/c1_q85.webp';
         townWalker = null;
         scheduleCartMan(60000); // one walk every minute

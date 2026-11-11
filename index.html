@@ -181,6 +181,7 @@
         #town-cartman { position: absolute; left: -260px; top: 725px; width: 260px; height: 200px; pointer-events: none; z-index: 3; display: none; image-rendering: auto; }
         #town-cat { position: absolute; left: -200px; top: 795px; width: 193px; height: 120px; pointer-events: none; z-index: 3; display: none; image-rendering: auto; }
         #town-smith-shadow { position: absolute; left: 274px; top: 768px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; opacity: 0.4; }
+        #town-cart-shadow { position: absolute; left: -220px; top: 879px; width: 180px; height: 72px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
         #town-cat-shadow { position: absolute; left: -179px; top: 885px; width: 150px; height: 60px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
         /* Blacksmith at the smithy: frames are 480x320 with the anvil stump centre at (290, 305), shown at 0.71 so he is the player's height (about 193px). Loops the hammer swing (js/ui.js) */
         #town-smith { position: absolute; left: 194px; top: 588px; width: 341px; height: 227px; pointer-events: auto; cursor: pointer; z-index: 1; image-rendering: auto; }
@@ -681,6 +682,7 @@
             <div id="town-stage" class="town-stage">
                 <div class="ts-inner">
                     <img class="ts-bg" src="assets/page01/mainbg03_q85.webp" alt="" onerror="townSwap(this,'mainbg03.png')">
+                    <img id="town-cart-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
                     <img id="town-cartman" alt="" aria-hidden="true" src="assets/page01/cart/c1_q85.webp">
                     <img id="town-cat-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
                     <img id="town-cat" alt="" aria-hidden="true" src="assets/page01/cat/c1_q85.webp">
@@ -1366,7 +1368,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112b"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112v"></script>
+    <script src="js/ui.js?v=20261112w"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
