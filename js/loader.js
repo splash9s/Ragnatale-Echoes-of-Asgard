@@ -331,23 +331,38 @@ function preloadSound(src) {
     return fetch(src).then(r => r.blob()).catch(() => {}); // cached by the browser for later playback
 }
 
+// Only the art the town needs is loaded before the game starts (main page, hero, cart, shared buttons).
+// Everything else loads in the background after the game has started.
+const CRITICAL_IMAGE_PREFIXES = ['assets/page01/', 'assets/cha/', 'assets/icons/', 'assets/page/'];
+function isCriticalImage(src) {
+    return CRITICAL_IMAGE_PREFIXES.some(prefix => src.startsWith(prefix));
+}
+
 function runPreload() {
-    const groups = [
-        { label: 'Loading images', items: LOADING_IMAGES, load: preloadImage },
-        { label: 'Loading sounds', items: LOADING_SOUNDS, load: preloadSound }
-    ];
-    const total = groups.reduce((n, g) => n + g.items.length, 0);
+    const critical = LOADING_IMAGES.filter(isCriticalImage);
+    const total = critical.length;
     let done = 0;
-    let chain = Promise.resolve();
-    groups.forEach(g => {
-        chain = chain.then(() => Promise.all(g.items.map(src =>
-            g.load(src).then(() => {
-                done++;
-                setLoading((done / total) * 100, `${g.label}: ${src} (${done} / ${total})`);
-            })
-        )));
-    });
-    return chain;
+    return Promise.all(critical.map(src =>
+        preloadImage(src).then(() => {
+            done++;
+            setLoading((done / total) * 100, `Loading images: ${src} (${done} / ${total})`);
+        })
+    ));
+}
+
+// Loads the rest of the images and all sounds in the background, a few at a time, with no progress bar.
+// A file that is not loaded yet still loads when its page opens, so nothing waits on this.
+function preloadRest() {
+    const rest = LOADING_IMAGES.filter(src => !isCriticalImage(src))
+        .map(src => () => preloadImage(src))
+        .concat(LOADING_SOUNDS.map(src => () => preloadSound(src)));
+    let next = 0;
+    const worker = () => {
+        if (next >= rest.length) return Promise.resolve();
+        const job = rest[next++];
+        return job().then(worker, worker);
+    };
+    for (let k = 0; k < 3; k++) worker();
 }
 
 function hideLoading() {
@@ -368,7 +383,8 @@ window.addEventListener('load', () => {
     runPreload()
         .then(() => setLoading(100, 'Preparing town...'))
         .catch(err => console.log('Preload failed:', err))
-        .then(start);
+        .then(start)
+        .then(preloadRest);
 });
 
 // Phone browsers (Chrome): go full screen on a touch, since Chrome does not do it by itself.
