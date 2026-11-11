@@ -414,7 +414,10 @@
         /* Fire embers: small glowing sparks that rise and drift (spawned by js/ui.js on the fire map) */
         .fire-spark { position: absolute; border-radius: 50%; background: #ffd27a; box-shadow: 0 0 6px 2px rgba(255, 120, 30, .8); opacity: 0; animation: fireSpark linear forwards; }
         @keyframes fireSpark { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
-        @media (prefers-reduced-motion: reduce) { #fire-sparks, #snow-flakes { display: none !important; } }
+        /* Wind gust: a light streak that blows across the wind map (spawned by js/ui.js) */
+        .wind-streak { position: absolute; height: 2px; border-radius: 2px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(235,245,255,.75), rgba(255,255,255,0)); opacity: 0; animation: windGust linear forwards; }
+        @keyframes windGust { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: .8; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+        @media (prefers-reduced-motion: reduce) { #fire-sparks, #snow-flakes, #wind-gusts { display: none !important; } }
         /* Ice snow: soft white flakes that drift down (spawned by js/ui.js on the ice map) */
         .snow-flake { position: absolute; border-radius: 50%; background: #ffffff; box-shadow: 0 0 4px 1px rgba(200, 230, 255, .7); opacity: 0; animation: snowFall linear forwards; }
         @keyframes snowFall { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: .9; } 85% { opacity: .8; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
@@ -1177,6 +1180,7 @@
                     <div id="sun-shafts" aria-hidden="true" style="display:none;"></div>
                     <div id="fire-sparks" aria-hidden="true" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; overflow:hidden;"></div>
                     <div id="snow-flakes" aria-hidden="true" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; overflow:hidden;"></div>
+                    <div id="wind-gusts" aria-hidden="true" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; overflow:hidden;"></div>
                     <div class="combat-vignette"></div>
 
                     <!-- Stage title (top centre) -->
@@ -1326,7 +1330,7 @@
     <script src="js/hero-body.js?v=20261109za"></script>
     <script src="js/combat.js?v=20261111d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261111n"></script>
+    <script src="js/ui.js?v=20261111o"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
     <script src="js/town.js?v=20261110e"></script>
