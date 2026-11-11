@@ -4853,7 +4853,7 @@ function walkCat() {
 // The walk is paused (not restarted), so it carries on from the same spot.
 const CAT_LICK_IDLE_MS = 500, CAT_LICK_REST_MS = 1000, CAT_LICK_FRAME_MS = 350;
 const CAT_LICK_SEQ = [2, 3, 4, 3, 4]; // after the sitting idle frame (1)
-const CAT_LICK_W = 170, CAT_LICK_H = 152, CAT_FEET_Y = 915;
+const CAT_LICK_W = 134, CAT_LICK_H = 120, CAT_FEET_Y = 915;
 let catWalkAnim = null, catShadowAnim = null, catFrameTimer = null, catWalkFrame = 0, catLicking = false;
 function catClick() {
     if (catLicking || townWalker !== 'cat' || !catWalkAnim) return;
