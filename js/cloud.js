@@ -295,6 +295,7 @@ function cloudCheckAdmin() {
     if (!cloudClient || !cloudUserId || cloudDisabled) return;
     cloudClient.rpc('admin_check').then(({ data, error }) => {
         if (error || data !== true) return;
+        window.isOwnerAccount = true; // the admin account is not shaded or locked by the intro guide
         const s = document.createElement('script');
         s.src = 'js/admin.js?v=20261110a';
         document.head.appendChild(s);

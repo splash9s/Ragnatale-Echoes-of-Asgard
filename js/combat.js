@@ -311,6 +311,7 @@ function selectRuneChoice(runeId, callback) {
 
 // ---------- EXPEDITION SETUP ----------
 function startExpedition(mode, opts = {}) {
+    if (mode === 'campaign' && typeof guideIntroDone === 'function') guideIntroDone(); // first campaign run ends the intro guide
     if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
         showModal("World-Eater", "Locked.");
         return;
@@ -570,8 +571,14 @@ function makeBoss(t) {
         maxHp: Math.floor(t.maxHp * (t.bossHpMult || BOSS_HP_MULT)),
         atkMin: Math.floor(t.atkMin * BOSS_ATK_MULT),
         atkMax: Math.floor(t.atkMax * BOSS_ATK_MULT),
-        isBoss: true, rewarded: false, ailments: {}, attackCount: 0, enraged: false
+        isBoss: true, rewarded: false, ailments: {}, attackCount: 0, enraged: false,
+        elemSupport: true // Elemental Support: cast at the start of the boss stage, element effects x2 for its hits and when it is hit
     };
+}
+// Elemental Support doubles the effect of an element: a x1.25 advantage becomes x1.5, a x0.75 resist becomes x0.5
+function supportedElemMult(mult, m) {
+    if (!m || !m.elemSupport) return mult;
+    return Math.max(0, 1 + (mult - 1) * 2);
 }
 
 function spawnStageMonsters() {
@@ -622,7 +629,9 @@ function spawnStageMonsters() {
         monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
         if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
         if (typeof showBossBalloon === 'function') showBossBalloon('Boss appeared!');
-        logMessage(`[Boss] ${boss.name} appears! Skills: Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
+        logMessage(`[Boss] ${boss.name} appears! Skills: Elemental Support (element effects x2), Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
+        logMessage(`[Boss Skill] ${boss.name} casts Elemental Support! Element effects are doubled for its hits and when it is hit, until the map ends.`, 'winlose');
+        setTimeout(() => { if (typeof showBossBalloon === 'function' && monstersList[0] === boss) showBossBalloon('Elemental Support! Element effects x2'); }, 3200);
     } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
         spawnWaveFromSet(dailyScale, scaled);
     } else {
@@ -1121,7 +1130,7 @@ function takePlayerDamage(dmg, m, ignoreArmor = false) {
     lastHitBy = m.name;
     dmg = Math.floor(dmg * (1 - skillBonus('dmgReducePct') / 100));
     // Element resistance from gear: a negative value means extra damage from that element
-    const incomingRes = m && m.element ? (getDerivedStats().elemRes[m.element] || 0) : 0;
+    const incomingRes = m && m.element ? (getDerivedStats().elemRes[m.element] || 0) * (m.elemSupport ? 2 : 1) : 0; // Elemental Support doubles the boss's element effect
     dmg = Math.floor(dmg * (1 - incomingRes / 100));
     let remaining = dmg;
     let absorbed = 0;
@@ -1437,7 +1446,7 @@ function runCombatTick() {
         const firstOnThis = !targetEnemy._struck; // Stunning Strike: first hit against each enemy
         targetEnemy._struck = true;
         const bonusDmg = (firstOnThis ? Math.floor(derived.atk * runeN('firstHitBonus') / 100) : 0);
-        const elemMult = player.runes.elementIgnore ? 1 : getElementMultiplier(player.equipped.weapon?.element, targetEnemy.element);
+        const elemMult = player.runes.elementIgnore ? 1 : supportedElemMult(getElementMultiplier(player.equipped.weapon?.element, targetEnemy.element), targetEnemy);
         if (elemMult !== 1 && !player.runes.elementIgnore) {
             logMessage(`[Element] ${elemMult > 1 ? 'Advantage' : 'Resisted'} x${elemMult} vs ${targetEnemy.name}`, elemMult > 1 ? 'drop' : 'combat');
         }
