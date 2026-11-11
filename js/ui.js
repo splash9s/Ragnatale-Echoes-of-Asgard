@@ -4721,6 +4721,8 @@ function walkCartMan() {
     const el = document.getElementById('town-cartman');
     const town = document.getElementById('view-town');
     if (!el || !town || town.classList.contains('hidden')) { scheduleCartMan(3000); return; }
+    if (townWalker) { scheduleCartMan(2000); return; } // the cat is on screen: wait our turn
+    townWalker = 'cart';
     el.style.display = 'block';
     let i = 0;
     const timer = setInterval(() => {
@@ -4732,7 +4734,36 @@ function walkCartMan() {
         clearInterval(timer);
         el.style.display = 'none';
         el.src = 'assets/page01/cart/c1_q85.webp';
+        townWalker = null;
         scheduleCartMan(60000); // one walk every minute
     };
 }
 scheduleCartMan(5000 + Math.random() * 40000); // first walk at a random time
+
+// Orange cat: same route and layering as the cart, on its own once-a-minute schedule.
+// Only one of them walks at a time (townWalker), so the cat and the cart never appear together.
+let townWalker = null;
+const CAT_FRAME_MS = 220, CAT_WALK_MS = 14000, CAT_FRAMES = 6; // slower frame rate than the cart's
+function scheduleCatWalk(ms) { setTimeout(walkCat, ms); }
+function walkCat() {
+    const el = document.getElementById('town-cat');
+    const town = document.getElementById('view-town');
+    if (!el || !town || town.classList.contains('hidden')) { scheduleCatWalk(3000); return; }
+    if (townWalker) { scheduleCatWalk(2000); return; } // the cart is on screen: wait our turn
+    townWalker = 'cat';
+    el.style.display = 'block';
+    let i = 0;
+    const timer = setInterval(() => {
+        i = (i + 1) % CAT_FRAMES;
+        el.src = `assets/page01/cat/c${i + 1}_q85.webp`;
+    }, CAT_FRAME_MS);
+    const walk = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CAT_WALK_MS, easing: 'linear' });
+    walk.onfinish = () => {
+        clearInterval(timer);
+        el.style.display = 'none';
+        el.src = 'assets/page01/cat/c1_q85.webp';
+        townWalker = null;
+        scheduleCatWalk(60000); // one walk every minute
+    };
+}
+scheduleCatWalk(5000 + Math.random() * 40000); // first walk at a random time
