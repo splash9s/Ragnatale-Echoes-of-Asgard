@@ -4639,4 +4639,55 @@ function spawnTownSparkle() {
     host.appendChild(s);
     setTimeout(() => s.remove(), 2800);
 }
-setInterval(() => { if (Math.random() < 0.6) spawnTownSparkle(); }, 450);
+setInterval(() => { if (Math.random() < 0.8) spawnTownSparkle(); }, 250);
+
+// Straw man (training dummy) on the main page. Click it: the hero attacks it, it reacts with one of two hurt sets, and it plays the combat hit sound (no slash effect).
+const STRAW_FRAME_MS = 100;
+const STRAW_HURT_SETS = [[1, 2, 3], [4, 5, 6, 7, 8]]; // one set is picked at random per hit
+const TOWN_HERO_LUNGE_PX = 36, TOWN_HERO_WINDUP_PX = -11; // the combat lunge, at the main page's hero scale
+let strawBusy = false;
+function setStrawFrame(i) {
+    const el = document.getElementById('town-dummy');
+    if (el) el.src = `assets/page01/straw/s${i}_q85.webp`;
+}
+function playStrawHurt() {
+    const set = STRAW_HURT_SETS[Math.random() < 0.5 ? 0 : 1];
+    set.forEach((f, k) => setTimeout(() => setStrawFrame(f), k * STRAW_FRAME_MS));
+    setTimeout(() => setStrawFrame(1), set.length * STRAW_FRAME_MS); // back to rest
+}
+// Main page hero frame, placed the same way as syncHeroSprites (feet on the same spot, same scale)
+function setTownHeroFrame(f) {
+    const el = document.getElementById('town-hero');
+    if (!el || !f) return;
+    const s = HERO_PAGE_SCALE * 0.9;
+    const o = HERO_PAGE_ORIGIN['town-hero'];
+    if (el.getAttribute('src') !== f.src) el.src = f.src;
+    el.style.width = f.w * s + 'px';
+    el.style.height = f.h * s + 'px';
+    el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx * s) + 'px';
+    el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy * s) + 'px';
+}
+function playTownHeroAttack() {
+    const P = combatPose();
+    const wrap = document.getElementById('town-hero-wrap');
+    if (!P.IDLE || !wrap) return;
+    setTownHeroFrame(alignTorso(P.ATTACK, P.IDLE));                       // wind-up
+    setTimeout(() => setTownHeroFrame(alignTorso(P.ATTACK2 || P.ATTACK, P.IDLE)), 100); // strike
+    setTimeout(() => syncHeroSprites(), 350);                             // back to idle
+    wrap.animate([
+        { transform: 'translateX(0px)' },
+        { transform: `translateX(${TOWN_HERO_WINDUP_PX}px)`, offset: 100 / 350 },
+        { transform: `translateX(${TOWN_HERO_LUNGE_PX}px)`, offset: 190 / 350 },
+        { transform: 'translateX(0px)' }
+    ], { duration: 350, easing: 'linear' });
+    setTimeout(() => {
+        playSound('sound/hit.mp3'); // the combat hit sound; no slash effect
+        playStrawHurt();
+    }, 190);
+}
+function strawAttack() {
+    if (strawBusy) return;
+    strawBusy = true;
+    playTownHeroAttack();
+    setTimeout(() => { strawBusy = false; }, 500);
+}
