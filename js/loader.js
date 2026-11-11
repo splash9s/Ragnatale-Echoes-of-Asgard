@@ -347,7 +347,7 @@ function runPreload() {
             done++;
             setLoading((done / total) * 100, `Loading images: ${src} (${done} / ${total})`);
         })
-    ));
+    )).then(() => loadHeroArtBands(HERO_ART_EARLY_BANDS)); // the hero's early gear art is needed on the town page
 }
 
 // Loads the rest of the images and all sounds in the background, a few at a time, with no progress bar.
@@ -384,7 +384,8 @@ window.addEventListener('load', () => {
         .then(() => setLoading(100, 'Preparing town...'))
         .catch(err => console.log('Preload failed:', err))
         .then(start)
-        .then(preloadRest);
+        .then(preloadRest)
+        .then(() => loadHeroArtBands(HERO_ART_LATER_BANDS)); // higher gear art, in level order, after the game starts
 });
 
 // Phone browsers (Chrome): go full screen on a touch, since Chrome does not do it by itself.

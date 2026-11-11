@@ -2234,15 +2234,24 @@ const HERO_BODY_SLOT_HIDES = { helmet: ['head'], wear: ['armor'], sword: ['lefth
 // Body parts that are never drawn
 const HERO_BODY_ALWAYS_HIDDEN = ['righthand'];
 
-// One Image per file, started when this script loads
+// One Image per file. The art is a data URL from hero-art.js or one of its gear bands. An image whose band has not
+// loaded yet stays empty until heroBodyAttachArt() gives it the art, so no file is fetched from assets/body/.
 const heroBodyImgs = {};
 function heroBodyImage(src) {
     if (!heroBodyImgs[src]) {
         const img = new Image();
-        img.src = (typeof HERO_ART !== 'undefined' && HERO_ART[src]) || src; // data URL on file:// pages
+        if (typeof HERO_ART !== 'undefined' && HERO_ART[src]) img.src = HERO_ART[src]; // data URL on file:// pages
         heroBodyImgs[src] = img;
     }
     return heroBodyImgs[src];
+}
+// Called when a gear band loads: gives its art to the images that were waiting for it
+function heroBodyAttachArt() {
+    if (typeof HERO_ART === 'undefined') return;
+    for (const src in heroBodyImgs) {
+        const img = heroBodyImgs[src];
+        if (!img.getAttribute('src') && HERO_ART[src]) img.src = HERO_ART[src];
+    }
 }
 HERO_BODY_SRCS.forEach(heroBodyImage);
 function heroBodyLoaded(img) { return img.complete && img.naturalWidth > 0; }
