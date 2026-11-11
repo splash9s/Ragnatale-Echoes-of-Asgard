@@ -123,7 +123,7 @@ const RUNE_DEFS = {
     shadowStep: { name: "Shadow Step Rune", rarity: 2, add: 0.5, once: true, desc: "Kill: +0.5 Flee", text: v => `Kill: +${v} Flee` },
     reaper: { name: "Reaper Rune", rarity: 2, add: 10, once: true, desc: "Kill restores 10% HP", text: v => `Kill restores ${v}% HP` },
     fortitude: { name: "Fortitude Rune", rarity: 2, add: 2, once: true, desc: "Crit: 50% chance to add +2% Max HP (from Max HP at stage start)", text: v => `Crit: 50% chance to add +${v}% Max HP (from Max HP at stage start)` },
-    glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 20, once: true, desc: "Max armor 0, +20% crit chance", text: v => `Max armor 0, +${v}% crit chance` },
+    glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 10, once: true, desc: "Max armor 0, +10% crit chance", text: v => `Max armor 0, +${v}% crit chance` },
     runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% Max HP per rune picked (from Max HP at stage start)", text: () => "+5% Max HP per rune picked (from Max HP at stage start)" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each rune you own", text: () => "+20% damage for each rune you own" },
     powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "+50% of the damage you had when picked, added to every hit", text: v => `+${v}% of the damage you had when picked, added to every hit`, onApply: () => { player.runes.powerSurgeBase = getDerivedStats().atk; } },
