@@ -4622,3 +4622,21 @@ function toggleCharStats(open) {
     if (!view) return;
     view.classList.toggle('stats-hidden', !open);
 }
+
+// Main page sparkles: small golden glints drift up across the town scene now and then.
+// They only spawn while the main page is showing.
+function spawnTownSparkle() {
+    const host = document.getElementById('town-sparkles');
+    const town = document.getElementById('view-town');
+    if (!host || !town || town.classList.contains('hidden')) return;
+    const s = document.createElement('span');
+    s.className = 'town-sparkle';
+    s.style.left = (80 + Math.random() * 1760) + 'px';
+    s.style.top = (300 + Math.random() * 700) + 'px';
+    s.style.setProperty('--dx', (Math.random() * 40 - 20).toFixed(1) + 'px');
+    s.style.setProperty('--dy', (-30 - Math.random() * 40).toFixed(1) + 'px');
+    s.style.animationDuration = (1.4 + Math.random() * 1.2).toFixed(2) + 's';
+    host.appendChild(s);
+    setTimeout(() => s.remove(), 2800);
+}
+setInterval(() => { if (Math.random() < 0.6) spawnTownSparkle(); }, 450);
