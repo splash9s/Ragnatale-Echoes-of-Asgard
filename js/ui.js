@@ -1226,7 +1226,7 @@ const WIND_ART_MODE = '3d'; // '3d' = Blender 2.5D layers (same style as Earth);
 // Wind combat art: same 3D layers as the other maps (sky, tilted ground with the items flat on top, forest)
 function wind3dArt() {
     // Ice 3D stand points moved up 70px
-    const feet = [500, 650], monsterFeet = [[820, 650], [960, 640], [1150, 635], [1350, 635], [1550, 640], [1740, 645]];
+    const feet = [500, 670], monsterFeet = [[820, 670], [960, 660], [1150, 655], [1350, 655], [1550, 660], [1740, 665]];
     return {
         bg: ['assets/combat/wind3d/sky.webp'],
         base: ['assets/combat/wind3d/base.webp'],
