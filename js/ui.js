@@ -4692,13 +4692,24 @@ function strawAttack() {
     setTimeout(() => { strawBusy = false; }, 500);
 }
 
-// Blacksmith at the smithy on the main page: the hammer swing loops (9 frames), only while the main page is showing.
-const SMITH_FRAME_MS = 110;
-let smithFrame = 0;
-setInterval(() => {
+// Blacksmith at the smithy on the main page: mostly idle; now and then the hammer swing plays once. Click him to open refinement.
+const SMITH_IDLE_FRAME = 5, SMITH_FRAME_MS = 110;
+let smithSwinging = false;
+function setSmithFrame(i) {
     const el = document.getElementById('town-smith');
-    const town = document.getElementById('view-town');
-    if (!el || !town || town.classList.contains('hidden')) return;
-    smithFrame = (smithFrame + 1) % 9;
-    el.src = `assets/page01/smith/k${smithFrame + 1}_q85.webp`;
-}, SMITH_FRAME_MS);
+    if (el) el.src = `assets/page01/smith/k${i}_q85.webp`;
+}
+function playSmithSwing() {
+    if (smithSwinging) return;
+    smithSwinging = true;
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, SMITH_IDLE_FRAME].forEach((f, k) => setTimeout(() => setSmithFrame(f), k * SMITH_FRAME_MS));
+    setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, 10 * SMITH_FRAME_MS);
+}
+function scheduleSmithSwing() {
+    setTimeout(() => {
+        const town = document.getElementById('view-town');
+        if (town && !town.classList.contains('hidden')) playSmithSwing();
+        scheduleSmithSwing();
+    }, 5000 + Math.random() * 9000);
+}
+scheduleSmithSwing();
