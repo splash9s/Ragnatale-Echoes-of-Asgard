@@ -171,10 +171,10 @@
         .ts-inner .ui, .ts-inner .art-frame, .ts-inner .art-panel { animation: itemFadeIn .2s ease .2s both; }
         .ts-inner .ui.round { border-radius: 50%; }
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
-        #town-shadow { position: absolute; left: 879px; top: 770px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; }
+        #town-shadow { position: absolute; left: 879px; top: 770px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; opacity: 0.2; }
         #town-hero-wrap { position: absolute; left: 891px; top: 616px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
-        /* Straw man: feet on the hero's ground line, 50px right of the hero's feet point (its feet are at x 101 of 202, y 290 of 294) */
-        #town-dummy { position: absolute; left: 912px; top: 515px; width: 202px; height: 294px; pointer-events: none; z-index: 1; image-rendering: auto; }
+        /* Straw man: same visible height as the player (about 193px on the page), feet on the player's ground line, 50px right of the player's feet point */
+        #town-dummy { position: absolute; left: 948px; top: 607px; width: 135px; height: 197px; pointer-events: none; z-index: 1; image-rendering: auto; }
         /* Main page foreground: props in front of the background, blurred a little for depth */
         .ts-inner .ts-fg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; pointer-events: none; z-index: 0; filter: blur(2px); }
         #town-hero { position: absolute; left: 0; top: 0; width: 95px; height: 193px; image-rendering: pixelated; }
