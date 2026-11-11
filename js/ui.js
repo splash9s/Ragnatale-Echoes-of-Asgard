@@ -1234,6 +1234,16 @@ function wind3dArt() {
         layouts: { 'wind3d': flatLayout(feet, monsterFeet) }
     };
 }
+const YGG_ART_MODE = '3d'; // '3d' = Blender 2.5D layers (same style as Wind); anything else = the old flat Yggdrasil image
+function yggdrasil3dArt() {
+    const feet = [500, 650], monsterFeet = [[820, 650], [960, 640], [1150, 635], [1350, 635], [1550, 640], [1740, 645]];
+    return {
+        bg: ['assets/combat/yggdrasil3d/sky.webp'],
+        base: ['assets/combat/yggdrasil3d/base.webp'],
+        fg: ['assets/combat/yggdrasil3d/forest.webp'],
+        layouts: { 'yggdrasil3d': flatLayout(feet, monsterFeet) }
+    };
+}
 function earth3dArt() {
     // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
     const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
@@ -1270,7 +1280,7 @@ const COMBAT_ART = {
     fire: FIRE_ART_MODE === '3d' ? fire3dArt() : flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
     wind: WIND_ART_MODE === '3d' ? wind3dArt() : flatArt('wind', [500, 625], [[800, 620], [950, 630], [1150, 620], [1350, 630], [1550, 620], [1700, 615]]),
     water: ICE_ART_MODE === '3d' ? ice3dArt() : flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
-    final: flatArt('yggdrasil', [460, 600], [[800, 598], [950, 598], [1150, 592], [1350, 580], [1550, 580], [1700, 570]])
+    final: YGG_ART_MODE === '3d' ? yggdrasil3dArt() : flatArt('yggdrasil', [460, 600], [[800, 598], [950, 598], [1150, 592], [1350, 580], [1550, 580], [1700, 570]])
 };
 // Each stage picks a new background, base layer and foreground.
 // New images are loaded and decoded first, then all of them swap in the same step (no fade).
@@ -1376,6 +1386,33 @@ function scheduleWindGusts() {
     }, 1000 + Math.random() * 3000); // random gap between 1 and 4 s
 }
 scheduleWindGusts();
+// Yggdrasil spirit lights: soft teal motes rise and pulse at random moments (spawner only adds them while the host is visible)
+function spawnSpiritMote() {
+    const host = document.getElementById('spirit-motes');
+    if (!host || host.style.display === 'none') return;
+    const s = document.createElement('div');
+    s.className = 'spirit-mote';
+    const dur = 4 + Math.random() * 3;
+    const size = 4 + Math.random() * 5;
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = (150 + Math.random() * 1650) + 'px';
+    s.style.top = (480 + Math.random() * 420) + 'px';
+    s.style.setProperty('--dx', (Math.random() * 100 - 50) + 'px');
+    s.style.setProperty('--dy', (-(160 + Math.random() * 260)) + 'px');
+    s.style.animationDuration = dur + 's';
+    host.appendChild(s);
+    setTimeout(() => s.remove(), dur * 1000 + 100);
+}
+let spiritTimer = null;
+function scheduleSpiritMotes() {
+    clearTimeout(spiritTimer);
+    spiritTimer = setTimeout(() => {
+        spawnSpiritMote();
+        if (Math.random() < 0.3) spawnSpiritMote();
+        scheduleSpiritMotes();
+    }, 700 + Math.random() * 2800); // random gap between 0.7 and 3.5 s
+}
+scheduleSpiritMotes();
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) { document.getElementById('view-combat')?.classList.remove('art-loading'); return; }
@@ -1394,7 +1431,7 @@ async function changeEarthLayers() {
     fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
     // New Earth art: the front trees sit between the far mountains and the ground, and the far mountains get a live blur
-    const is3d = nextBase.includes('/earth3d/') || nextBase.includes('/fire3d/') || nextBase.includes('/ice3d/') || nextBase.includes('/wind3d/');
+    const is3d = nextBase.includes('/earth3d/') || nextBase.includes('/fire3d/') || nextBase.includes('/ice3d/') || nextBase.includes('/wind3d/') || nextBase.includes('/yggdrasil3d/');
     const isNewEarth = is3d || nextBase.includes('/earth1/');
     base.style.zIndex = isNewEarth ? '2' : '';
     fg.style.zIndex = isNewEarth ? '1' : '';
@@ -1414,6 +1451,9 @@ async function changeEarthLayers() {
     // Wind map: gusts blow across now and then
     const gusts = document.getElementById('wind-gusts');
     if (gusts) { gusts.style.display = nextBase.includes('/wind3d/') ? '' : 'none'; if (gusts.style.display === 'none') gusts.innerHTML = ''; }
+    // Yggdrasil map: spirit lights drift up now and then
+    const motes = document.getElementById('spirit-motes');
+    if (motes) { motes.style.display = nextBase.includes('/yggdrasil3d/') ? '' : 'none'; if (motes.style.display === 'none') motes.innerHTML = ''; }
     // 3D art is rendered 128x72px larger than the screen, so the far layers have room to drift
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
