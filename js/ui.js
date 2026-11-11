@@ -4667,12 +4667,16 @@ function setTownHeroFrame(f) {
     el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx * s) + 'px';
     el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy * s) + 'px';
 }
-function playTownHeroAttack() {
+function playTownHeroAttack(hit) {
     const P = combatPose();
     const wrap = document.getElementById('town-hero-wrap');
     if (!P.IDLE || !wrap) return;
-    setTownHeroFrame(alignTorso(P.ATTACK, P.IDLE));                       // wind-up
-    setTimeout(() => setTownHeroFrame(alignTorso(P.ATTACK2 || P.ATTACK, P.IDLE)), 100); // strike
+    // A critical uses the critical poses, as in combat; otherwise the attack poses
+    const first = f => (Array.isArray(f) ? f[0] : f);
+    const windup = hit.crit ? first(P.CRI) : P.ATTACK;
+    const strike = hit.crit ? (first(P.CRI2) || first(P.CRI)) : (P.ATTACK2 || P.ATTACK);
+    setTownHeroFrame(alignTorso(windup, P.IDLE));                         // wind-up
+    setTimeout(() => setTownHeroFrame(alignTorso(strike, P.IDLE)), 100);  // strike
     setTimeout(() => syncHeroSprites(), 350);                             // back to idle
     wrap.animate([
         { transform: 'translateX(0px)' },
@@ -4681,7 +4685,7 @@ function playTownHeroAttack() {
         { transform: 'translateX(0px)' }
     ], { duration: 350, easing: 'linear' });
     setTimeout(() => {
-        strawHit();
+        strawHit(hit);
         playStrawHurt();
     }, 190);
 }
@@ -4749,8 +4753,8 @@ function playStrawSlash(crit) {
     }, cfg.ms);
 }
 // One straw hit: damage number, slash, and the combat hit or crit sound
-function strawHit() {
-    const { dmg, crit } = strawHitDamage();
+function strawHit(hit) {
+    const { dmg, crit } = hit;
     showStrawDamage(String(dmg), crit);
     playStrawSlash(crit);
     playSound(crit ? 'sound/critical.mp3' : 'sound/hit.mp3');
@@ -4758,7 +4762,7 @@ function strawHit() {
 function strawAttack() {
     if (strawBusy) return;
     strawBusy = true;
-    playTownHeroAttack();
+    playTownHeroAttack(strawHitDamage()); // the crit roll decides the pose and the damage together
     setTimeout(() => { strawBusy = false; }, 500);
 }
 
