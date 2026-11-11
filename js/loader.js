@@ -213,7 +213,7 @@ const LOADING_IMAGES = [
     "assets/combat/runes/r4_q85.webp",
     "assets/combat/runes/r5_q85.webp",
     "assets/compaign/compaign_q85.webp",
-    "assets/compaign/compaign2_q85.webp",
+    "assets/compaign/mapselect02_q85.webp",
     "assets/compaign/mapbutton_q85.webp",
     "assets/compaign/mapbuttonoff_q85.webp",
     "assets/cha/button/returnbuttonsmall_q85.webp",

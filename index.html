@@ -591,7 +591,7 @@
 
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
     <!-- LOADING SCREEN: shown while images and sounds are preloaded (see js/loader.js) -->
-    <div id="loading-screen" style="position:fixed; inset:0; z-index:200; background:linear-gradient(rgba(5,10,20,.35), rgba(5,10,20,.55)), url(assets/page/loadscreen_q85.webp) center / cover no-repeat #050a14; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#e2e8f0; font-family:sans-serif; transition:opacity .4s;">
+    <div id="loading-screen" style="position:fixed; inset:0; z-index:200; background:linear-gradient(rgba(5,10,20,.35), rgba(5,10,20,.55)), url(assets/page/loadscreen02_q85.webp) center / cover no-repeat #050a14; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#e2e8f0; font-family:sans-serif; transition:opacity .4s;">
         <div style="font-size:30px; font-weight:800; color:#c9a227; letter-spacing:3px;">RAGNATALE</div>
         <div style="font-size:12px; color:#94a3b8; letter-spacing:1px;">Echoes of Asgard</div>
         <div style="width:min(420px,80vw); height:14px; background:#0f172a; border:1px solid #334155; border-radius:999px; overflow:hidden; margin-top:12px;">
@@ -797,7 +797,7 @@
         <div id="view-expeditions" class="hidden art-dark">
             <div id="expo-stage" class="town-stage">
                 <div class="ts-inner">
-                    <img class="ts-bg" src="assets/compaign/compaign2_q85.webp" alt="" style="width:1920px; height:1080px; object-fit:fill;" onerror="townSwap(this,'compaign2.png')">
+                    <img class="ts-bg" src="assets/compaign/mapselect02_q85.webp" alt="" style="width:1920px; height:1080px; object-fit:fill;" onerror="townSwap(this,'mapselect02.png')">
                     <div class="expo-node" id="expo-node-earth" style="left:532px; top:390px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div class="expo-node" id="expo-node-final" style="left:939px; top:132px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div class="expo-node" id="expo-node-fire" style="left:1351px; top:388px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
@@ -806,11 +806,9 @@
                     <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div id="campaign-panel" class="expo-panel hidden">
                         <div class="expo-inner">
-                        <div class="flex justify-between items-center mb-3">
-                            <div>
-                                <h2 class="page-title text-base font-bold text-amber-400">Campaign Dungeons</h2>
-                            </div>
+                        <div class="flex justify-between items-center mb-3" style="display:flex; width:100%; justify-content:space-between; align-items:center;">
                             <button onclick="closeCampaignPanel()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs cursor-pointer">Close</button>
+                            <button onclick="startExpedition('campaign')" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
                         </div>
                         <div class="flex flex-col gap-3">
                             <div id="campaign-path-list" class="grid grid-cols-2 gap-2 mb-2"></div>
@@ -820,7 +818,6 @@
                         <option value="map10">Ashmere Forest (Lv. 10)</option>
                         <option value="map20">Runeholt Academy (Lv. 20)</option>
                     </select>
-                            <button onclick="startExpedition('campaign')" class="py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow">Start Campaign</button>
                         </div>
                         
                     </div>
@@ -1347,7 +1344,7 @@
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
     <script src="js/town.js?v=20261110e"></script>
-    <script src="js/loader.js?v=20261110b"></script>
+    <script src="js/loader.js?v=20261111b"></script>
 
 <script>
     // Called by js/loader.js once the loading screen has finished preloading
