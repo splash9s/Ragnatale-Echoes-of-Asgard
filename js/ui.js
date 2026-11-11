@@ -2949,7 +2949,6 @@ function showEquippedDetail(slot) {
     body += `<div class="flex justify-between items-center">
         <span>${rarity ? reqLevelHTML(item, item.levelReq) : ''}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '<span class="text-yellow-300 font-bold">★ Favorite</span> · ' : ''}Equipped · ${slot}</span></div>`;
-    if (item.desc && !isPotion) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
     if (item.stats && Object.keys(item.stats).length) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
