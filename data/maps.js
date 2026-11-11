@@ -253,8 +253,8 @@ const GAME_DATA = {
             bossSupport: [{ pos: 2, role: 'range' }, { pos: 3, role: 'healer' }, { pos: 4, role: 'healer' }]
         },
         finalMap: {
-            title: "Final Map Lv. 110", levelReq: 110, campaignStages: 25, miniStage: 0, dropKey: 'map99', finalMap: true, stageGrowth: 0,
-            enemies: [], boss: curveBoss(MONSTERS_DATA.bossWorldEater, 110), miniBoss: null, bossSupport: []
+            title: "Final Map Lv. 99", levelReq: 99, campaignStages: 25, miniStage: 0, dropKey: 'map99', finalMap: true, stageGrowth: 0,
+            enemies: [], boss: curveBoss(MONSTERS_DATA.bossWorldEater, 99), miniBoss: null, bossSupport: []
         }
     },
     paths: {}
@@ -264,7 +264,7 @@ const GAME_DATA = {
 const STAGE_GROWTH = 0.10;
 
 // Campaign paths: each path has its own element and its own progress through the maps
-const CAMPAIGN_MAP_KEYS = ['map1', 'map10', 'map20', 'map30', 'map40', 'map50', 'map60', 'map70', 'map80', 'map90', 'map99'];
+const CAMPAIGN_MAP_KEYS = ['map1', 'map10', 'map20', 'map30', 'map40', 'map50', 'map60', 'map70', 'map80', 'map90'];
 const CAMPAIGN_STAGES = 11; // Fallback only. Every map sets campaignStages on its own.
 
 const CAMPAIGN_PATHS = {

@@ -205,6 +205,13 @@
         #town-diamond-pill { border-color: #a77bff; color: #d9c2ff; cursor: pointer; }
         #view-expeditions:not(.hidden) { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: #050a14; overflow: hidden; }
         #view-expeditions .town-stage { flex: none; }
+        /* Map select page: bigger text (the stage is 1920px wide, so these are stage pixels) */
+        #view-expeditions .text-\[10px\] { font-size: 16px !important; }
+        #view-expeditions .text-xs { font-size: 19px !important; line-height: 1.35 !important; }
+        #view-expeditions .text-sm { font-size: 21px !important; }
+        #view-expeditions .text-base { font-size: 24px !important; }
+        #view-expeditions .text-lg { font-size: 28px !important; }
+        #view-expeditions .text-xl { font-size: 32px !important; }
         .expo-node { position: absolute; width: 48px; height: 48px; cursor: pointer; z-index: 3; }
         .expo-node img { width: 100%; height: 100%; display: block; pointer-events: none; }
         .expo-node:hover img { filter: brightness(1.3); }
@@ -1323,7 +1330,7 @@
     <!-- SCRIPTS -->
     <script src="data/items.js?v=20261110a"></script>
     <script src="data/monsters.js?v=20261105j"></script>
-    <script src="data/maps.js?v=20261111b"></script>
+    <script src="data/maps.js?v=20261111c"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261111d"></script>
@@ -1331,7 +1338,7 @@
     <script src="js/cloud.js?v=20261111a"></script>
     <script src="js/hero-art.js?v=20261111x"></script>
     <script src="js/hero-body.js?v=20261109za"></script>
-    <script src="js/combat.js?v=20261111h"></script>
+    <script src="js/combat.js?v=20261111i"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
     <script src="js/ui.js?v=20261111v"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>

@@ -482,14 +482,14 @@ function toggleResurrectionUse() {
 }
 
 // ---------- FINAL MAP (Lv 110) ----------
-// Unlocked after Map Lv. 99 is cleared on all four paths. 25 stages: odd stages are monsters, even stages are bosses, stage 25 is the final boss.
+// Unlocked after Map Lv. 90 is cleared on all four paths (Map Lv. 99 is no longer a path map). 25 stages: odd stages are monsters, even stages are bosses, stage 25 is the final boss.
 const FINAL_PATH_KEYS = ['fire', 'water', 'earth', 'wind'];
 const FINAL_BOSS_MULT = 1.2;
-const FINAL_STAGE_LEVELS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 100];
-const FINAL_LEVEL_MAPS = { 1: 'map1', 10: 'map10', 20: 'map20', 30: 'map30', 40: 'map40', 50: 'map50', 60: 'map60', 70: 'map70', 80: 'map80', 90: 'map90', 100: 'map99' };
+const FINAL_STAGE_LEVELS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99, 99];
+const FINAL_LEVEL_MAPS = { 1: 'map1', 10: 'map10', 20: 'map20', 30: 'map30', 40: 'map40', 50: 'map50', 60: 'map60', 70: 'map70', 80: 'map80', 90: 'map90', 99: 'map99' };
 
 function isFinalMapUnlocked() {
-    return FINAL_PATH_KEYS.every(pk => !!(player.clearedMaps && player.clearedMaps[`${pk}:map99`]));
+    return FINAL_PATH_KEYS.every(pk => !!(player.clearedMaps && player.clearedMaps[`${pk}:map90`]));
 }
 
 function finalStageLevel(stage) {
@@ -510,7 +510,7 @@ function finalStageMult(stage) {
 function spawnFinalStage() {
     const mult = finalStageMult(currentStage);
     if (currentStage === maxStages) {
-        const boss = makeBoss(curveBoss(MONSTERS_DATA.bossWorldEater, 110)); // final boss: top of the level curve, then FINAL_BOSS_MULT
+        const boss = makeBoss(curveBoss(MONSTERS_DATA.bossWorldEater, 99)); // final boss: top of the level curve, then FINAL_BOSS_MULT
         const up = v => Math.floor(v * FINAL_BOSS_MULT);
         const finalBoss = { ...boss, hp: up(boss.hp), maxHp: up(boss.maxHp), atkMin: up(boss.atkMin), atkMax: up(boss.atkMax), isFinalBoss: true };
         const escorts = [
