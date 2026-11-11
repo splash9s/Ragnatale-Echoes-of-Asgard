@@ -87,8 +87,8 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
-    { id: 'exp_2x_1h', name: "2x EXP (1 hour)", price: 10, type: 'boost', boost: 'exp', ms: 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 1 hour.", icon: 'assets/shop/diamond/expmulti.png' },
-    { id: 'gold_2x_1h', name: "2x Gold (1 hour)", price: 10, type: 'boost', boost: 'gold', ms: 60 * 60 * 1000, desc: "Double gold from kills for 1 hour.", icon: 'assets/shop/diamond/goldmulti.png' },
+    { id: 'exp_2x_3h', name: "2x EXP (3 hours)", price: 10, type: 'boost', boost: 'exp', ms: 3 * 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 3 hours.", icon: 'assets/shop/diamond/expmulti.png' },
+    { id: 'gold_2x_3h', name: "2x Gold (3 hours)", price: 5, type: 'boost', boost: 'gold', ms: 3 * 60 * 60 * 1000, desc: "Double gold from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
     { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "", icon: 'assets/shop/diamond/copperchest.png' },
@@ -2193,7 +2193,7 @@ function buyDiamondItem(itemId) {
         showModal("VIP Activated", `${item.name} active. Check your mailbox for today's Resurrection Potion.`);
     } else if (item.type === 'boost') {
         startBoost(item.boost, item.ms);
-        showModal("Boost Active", `${item.name} started. It lasts 1 hour from now.`);
+        showModal("Boost Active", `${item.name} started. It lasts ${item.ms / (60 * 60 * 1000)} hours from now.`);
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
         floatSuccessAt("Purchased!");
