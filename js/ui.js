@@ -722,9 +722,13 @@ function combatCriFrame(attack) {
     if (!Array.isArray(cri)) return cri;
     return cri[attack.criIdx || 0];
 }
-const COMBAT_PLAYER_ATTACK_MS = 300; // how long the attack pose is shown
-const COMBAT_PLAYER_CRIT_MS = 520;   // a critical attack holds its own pose longer
-const COMBAT_PLAYER_LUNGE_PX = 40;   // attack lunges forward this far and back
+// An attack: a short wind-up (attack pose, the hero draws back), then the strike (attack02 pose, lunges forward and holds).
+// A critical does the same with critical and critical02, and holds the strike longer.
+const COMBAT_PLAYER_WINDUP_MS = 100;  // wind-up: first pose, drawing back
+const COMBAT_PLAYER_ATTACK_MS = 350;  // whole attack: wind-up + attack02 (250 ms)
+const COMBAT_PLAYER_CRIT_MS = 520;    // whole critical: wind-up + critical02 (420 ms)
+const COMBAT_PLAYER_WINDUP_PX = -12;  // wind-up draws back this far
+const COMBAT_PLAYER_LUNGE_PX = 40;    // the strike lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
 // The hero dies at the end of a lost battle: the fall (dead) pose shows for 2 seconds, then the result.
 // Without the fall art (still loading) the old fade plays instead.
@@ -749,10 +753,9 @@ function alignTorso(f, ref) {
     if (!f || !ref || f === ref || f.tx === undefined || ref.tx === undefined) return f;
     return Object.assign({}, f, { fx: f.tx - (ref.tx - ref.fx) });
 }
-// The frame of an attack: attack, then attack02; critical, then critical02 (second half of the pose time)
+// The frame of an attack: attack (wind-up), then attack02; critical (wind-up), then critical02
 function combatAttackFrame(attack, elapsed) {
-    const total = attack.crit ? COMBAT_PLAYER_CRIT_MS : COMBAT_PLAYER_ATTACK_MS;
-    const second = elapsed >= total / 2;
+    const second = elapsed >= COMBAT_PLAYER_WINDUP_MS;
     const P = combatPose();
     const first = attack.crit ? combatCriFrame(attack) : P.ATTACK;
     if (!second) return first;
@@ -771,7 +774,7 @@ function playPlayerAttackAnim(isCrit) {
     if (!el) return;
     el.dataset.lungeAt = String(combatPlayerAttack.at);
     applyPlayerFrame(el, combatAttackFrame(combatPlayerAttack, 0));
-    playPlayerLunge(el, COMBAT_PLAYER_LUNGE_PX);
+    playPlayerAttackLunge(el, combatPlayerAttack.crit);
 }
 // Player reactions: 'block' when hit, 'dodge' when an attack is evaded. Each shows one frame for a short time (exact file size).
 // Place a battle frame so its feet point sits on the player's feet (exact size)
@@ -869,6 +872,22 @@ function playPlayerLunge(el, dx) {
     ], { duration: 200, easing: 'ease-in-out' });
     lungeHat(el, dx);
 }
+// Attack movement: draw back during the wind-up, then lunge forward on the strike and return by the end
+function playPlayerAttackLunge(el, crit) {
+    if (!el || !el.animate) return;
+    const T = crit ? COMBAT_PLAYER_CRIT_MS : COMBAT_PLAYER_ATTACK_MS;
+    const w = COMBAT_PLAYER_WINDUP_MS / T;
+    const peak = (COMBAT_PLAYER_WINDUP_MS + 90) / T; // the strike reaches its furthest point 90 ms after the wind-up
+    const frames = [
+        { transform: 'translateX(0px)', offset: 0, easing: 'ease-out' },
+        { transform: `translateX(${COMBAT_PLAYER_WINDUP_PX}px)`, offset: w, easing: 'ease-out' },
+        { transform: `translateX(${COMBAT_PLAYER_LUNGE_PX}px)`, offset: peak, easing: 'ease-in-out' },
+        { transform: 'translateX(0px)', offset: 1 }
+    ];
+    el.animate(frames, { duration: T });
+    const shadow = document.getElementById('combat-player-shadow');
+    if (shadow && shadow.animate) shadow.animate(frames, { duration: T });
+}
 // The hat and the ground shadow move with the body during a lunge (the hat keeps its tilt)
 function lungeHat(el, dx) {
     const shadow = document.getElementById('combat-player-shadow');
@@ -943,7 +962,7 @@ setInterval(() => {
                 // Attack: the attack pose plays and the sprite lunges forward once per attack
                 if (img.dataset.lungeAt !== String(combatPlayerAttack.at)) {
                     img.dataset.lungeAt = String(combatPlayerAttack.at);
-                    playPlayerLunge(img, COMBAT_PLAYER_LUNGE_PX);
+                    playPlayerAttackLunge(img, combatPlayerAttack.crit);
                 }
                 applyPlayerFrame(img, combatAttackFrame(combatPlayerAttack, ae));
                 return;
