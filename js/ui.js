@@ -4691,3 +4691,14 @@ function strawAttack() {
     playTownHeroAttack();
     setTimeout(() => { strawBusy = false; }, 500);
 }
+
+// Blacksmith at the smithy on the main page: the hammer swing loops (9 frames), only while the main page is showing.
+const SMITH_FRAME_MS = 110;
+let smithFrame = 0;
+setInterval(() => {
+    const el = document.getElementById('town-smith');
+    const town = document.getElementById('view-town');
+    if (!el || !town || town.classList.contains('hidden')) return;
+    smithFrame = (smithFrame + 1) % 9;
+    el.src = `assets/page01/smith/k${smithFrame + 1}_q85.webp`;
+}, SMITH_FRAME_MS);
