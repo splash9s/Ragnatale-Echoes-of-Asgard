@@ -258,8 +258,8 @@ const HERO_BODY_GEAR = {
    },
    bosslv99: {
     src: 'assets/body/gear/helmet/boss/ssattackbosslv99.png',
-    x: 316,
-    y: 28,
+    x: 298,
+    y: 11,
     sc: 1
    },
    shoplv30: {
@@ -306,8 +306,8 @@ const HERO_BODY_GEAR = {
    },
    shoplv99: {
     src: 'assets/body/gear/helmet/shop/ssattackshoplv99.png',
-    x: 314,
-    y: 31,
+    x: 296,
+    y: 11,
     sc: 1
    }
   },
@@ -380,8 +380,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/wear/ssattackarmorlv99.png',
-    x: 160,
-    y: 127,
+    x: 144,
+    y: 110,
     sc: 1
    }
   },
@@ -516,8 +516,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/shield/ssattackshieldlv99.png',
-    x: 393,
-    y: 159,
+    x: 376,
+    y: 142,
     sc: 1
    }
   },
@@ -590,8 +590,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/foot/ssattackfootlv99.png',
-    x: 171,
-    y: 250,
+    x: 155,
+    y: 231,
     sc: 1
    },
   },
@@ -680,8 +680,8 @@ const HERO_BODY_GEAR = {
    },
    bosslv99: {
     src: 'assets/body/gear/helmet/boss/ssbasebosslv99.png',
-    x: 213,
-    y: 20,
+    x: 195,
+    y: 14,
     sc: 1
    },
    shoplv30: {
@@ -728,8 +728,8 @@ const HERO_BODY_GEAR = {
    },
    shoplv99: {
     src: 'assets/body/gear/helmet/shop/ssbaseshoplv99.png',
-    x: 218,
-    y: 27,
+    x: 201,
+    y: 13,
     sc: 1
    }
   },
@@ -802,8 +802,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/wear/ssbasearmorlv99.png',
-    x: 146,
-    y: 139,
+    x: 130,
+    y: 122,
     sc: 1
    }
   },
@@ -938,8 +938,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/shield/ssbaseshieldlv99.png',
-    x: 320,
-    y: 149,
+    x: 303,
+    y: 130,
     sc: 1
    }
   },
@@ -1012,8 +1012,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/foot/ssbasefootlv99.png',
-    x: 190,
-    y: 256,
+    x: 172,
+    y: 240,
     sc: 1
    },
   },
@@ -1102,8 +1102,8 @@ const HERO_BODY_GEAR = {
    },
    bosslv99: {
     src: 'assets/body/gear/helmet/boss/ssblockbosslv99.png',
-    x: 255,
-    y: 18,
+    x: 238,
+    y: -1,
     sc: 1
    },
    shoplv30: {
@@ -1150,8 +1150,8 @@ const HERO_BODY_GEAR = {
    },
    shoplv99: {
     src: 'assets/body/gear/helmet/shop/ssblockshoplv99.png',
-    x: 255,
-    y: 30,
+    x: 238,
+    y: 13,
     sc: 1
    }
   },
@@ -1224,8 +1224,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/wear/ssblockarmorlv99.png',
-    x: 154,
-    y: 135,
+    x: 137,
+    y: 119,
     sc: 1
    }
   },
@@ -1360,8 +1360,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/shield/ssblockshieldlv99.png',
-    x: 338,
-    y: 144,
+    x: 322,
+    y: 128,
     sc: 1
    }
   },
@@ -1434,8 +1434,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/foot/ssblockfootlv99.png',
-    x: 162,
-    y: 268,
+    x: 146,
+    y: 237,
     sc: 1
    },
   },
@@ -1524,8 +1524,8 @@ const HERO_BODY_GEAR = {
    },
    bosslv99: {
     src: 'assets/body/gear/helmet/boss/sscriticalbosslv99.png',
-    x: 269,
-    y: 29,
+    x: 251,
+    y: 11,
     sc: 1
    },
    shoplv30: {
@@ -1572,8 +1572,8 @@ const HERO_BODY_GEAR = {
    },
    shoplv99: {
     src: 'assets/body/gear/helmet/shop/sscriticalshoplv99.png',
-    x: 270,
-    y: 34,
+    x: 252,
+    y: 17,
     sc: 1
    }
   },
@@ -1646,8 +1646,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/wear/sscriticalarmorlv99.png',
-    x: 208,
-    y: 60,
+    x: 192,
+    y: 45,
     sc: 1
    }
   },
@@ -1782,8 +1782,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/shield/sscriticalshieldlv99.png',
-    x: 352,
-    y: 150,
+    x: 336,
+    y: 132,
     sc: 1
    }
   },
@@ -1856,8 +1856,8 @@ const HERO_BODY_GEAR = {
    },
    lv99: {
     src: 'assets/body/gear/foot/sscriticalfootlv99.png',
-    x: 161,
-    y: 256,
+    x: 145,
+    y: 240,
     sc: 1
    },
   },
