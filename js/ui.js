@@ -1210,6 +1210,18 @@ function flatArt(name, feet, monsterFeet) {
 //   'flat' = the old flat Earth image
 const EARTH_ART_MODE = '3d';
 const FIRE_ART_MODE = '3d'; // '3d' = Blender 2.5D layers (same style as Earth); anything else = the old flat fire image
+const ICE_ART_MODE = 'flat'; // switch to '3d' once assets/combat/ice3d/*.webp are rendered
+// Ice combat art: same 3D layers as Fire (sky, tilted ground with the items flat on top, forest)
+function ice3dArt() {
+    // Fire stand points moved up 50px
+    const feet = [500, 640], monsterFeet = [[820, 640], [960, 630], [1150, 625], [1350, 625], [1550, 630], [1740, 635]];
+    return {
+        bg: ['assets/combat/ice3d/sky.webp'],
+        base: ['assets/combat/ice3d/base.webp'],
+        fg: ['assets/combat/ice3d/forest.webp'],
+        layouts: { 'ice3d': flatLayout(feet, monsterFeet) }
+    };
+}
 function earth3dArt() {
     // Feet stand on the tilted walkable surface (it runs from about y 690 at the back to 860 at the front edge)
     const feet = [500, 740], monsterFeet = [[820, 740], [960, 730], [1150, 725], [1350, 725], [1550, 730], [1740, 735]];
@@ -1245,7 +1257,7 @@ const COMBAT_ART = {
     earth: EARTH_ART_MODE === '3d' ? earth3dArt() : EARTH_ART_MODE === 'e1' ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
     fire: FIRE_ART_MODE === '3d' ? fire3dArt() : flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
     wind: flatArt('wind', [500, 625], [[800, 620], [950, 630], [1150, 620], [1350, 630], [1550, 620], [1700, 615]]),
-    water: flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
+    water: ICE_ART_MODE === '3d' ? ice3dArt() : flatArt('ice', [480, 670], [[800, 660], [950, 650], [1150, 660], [1350, 620], [1550, 630], [1700, 650]]),
     final: flatArt('yggdrasil', [460, 600], [[800, 598], [950, 598], [1150, 592], [1350, 580], [1550, 580], [1700, 570]])
 };
 // Each stage picks a new background, base layer and foreground.
@@ -1298,6 +1310,33 @@ function scheduleFireSparks() {
     }, 500 + Math.random() * 3000); // random gap between 0.5 and 3.5 s
 }
 scheduleFireSparks();
+// Ice snow: small flakes drift down now and then (the spawner only adds them while this host is visible)
+function spawnSnowFlake() {
+    const host = document.getElementById('snow-flakes');
+    if (!host || host.style.display === 'none') return;
+    const s = document.createElement('div');
+    s.className = 'snow-flake';
+    const dur = 4 + Math.random() * 4;
+    const size = 2 + Math.random() * 4;
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = (Math.random() * 1900) + 'px';
+    s.style.top = (-20 - Math.random() * 60) + 'px';
+    s.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+    s.style.setProperty('--dy', (900 + Math.random() * 200) + 'px');
+    s.style.animationDuration = dur + 's';
+    host.appendChild(s);
+    setTimeout(() => s.remove(), dur * 1000 + 100);
+}
+let snowTimer = null;
+function scheduleSnow() {
+    clearTimeout(snowTimer);
+    snowTimer = setTimeout(() => {
+        spawnSnowFlake();
+        if (Math.random() < 0.4) spawnSnowFlake();
+        scheduleSnow();
+    }, 300 + Math.random() * 2200); // random gap between 0.3 and 2.5 s
+}
+scheduleSnow();
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) { document.getElementById('view-combat')?.classList.remove('art-loading'); return; }
@@ -1316,7 +1355,7 @@ async function changeEarthLayers() {
     fg.src = nextFg || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     fg.style.display = nextFg ? '' : 'none';
     // New Earth art: the front trees sit between the far mountains and the ground, and the far mountains get a live blur
-    const is3d = nextBase.includes('/earth3d/') || nextBase.includes('/fire3d/');
+    const is3d = nextBase.includes('/earth3d/') || nextBase.includes('/fire3d/') || nextBase.includes('/ice3d/');
     const isNewEarth = is3d || nextBase.includes('/earth1/');
     base.style.zIndex = isNewEarth ? '2' : '';
     fg.style.zIndex = isNewEarth ? '1' : '';
@@ -1330,6 +1369,9 @@ async function changeEarthLayers() {
     // Fire map: embers drift up now and then (the spawner only adds them while this host is visible)
     const sparks = document.getElementById('fire-sparks');
     if (sparks) { sparks.style.display = nextBase.includes('/fire3d/') ? '' : 'none'; if (sparks.style.display === 'none') sparks.innerHTML = ''; }
+    // Ice map: snow falls now and then
+    const snow = document.getElementById('snow-flakes');
+    if (snow) { snow.style.display = nextBase.includes('/ice3d/') ? '' : 'none'; if (snow.style.display === 'none') snow.innerHTML = ''; }
     // 3D art is rendered 128x72px larger than the screen, so the far layers have room to drift
     [bg, base, fg].forEach(el => {
         el.style.left = is3d ? '-64px' : '0px';
