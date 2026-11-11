@@ -4743,7 +4743,7 @@ scheduleCartMan(5000 + Math.random() * 40000); // first walk at a random time
 // Orange cat: same route and layering as the cart, on its own once-a-minute schedule.
 // Only one of them walks at a time (townWalker), so the cat and the cart never appear together.
 let townWalker = null;
-const CAT_FRAME_MS = 220, CAT_WALK_MS = 14000, CAT_FRAMES = 6; // slower frame rate than the cart's
+const CAT_FRAME_MS = 220, CAT_WALK_MS = 24000, CAT_FRAMES = 6; // slower frame rate and slower walk than the cart's
 function scheduleCatWalk(ms) { setTimeout(walkCat, ms); }
 function walkCat() {
     const el = document.getElementById('town-cat');
@@ -4757,10 +4757,14 @@ function walkCat() {
         i = (i + 1) % CAT_FRAMES;
         el.src = `assets/page01/cat/c${i + 1}_q85.webp`;
     }, CAT_FRAME_MS);
+    // The shadow runs the same walk as the cat, so it stays under its feet
+    const shadow = document.getElementById('town-cat-shadow');
+    if (shadow) { shadow.style.display = 'block'; shadow.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CAT_WALK_MS, easing: 'linear' }); }
     const walk = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CAT_WALK_MS, easing: 'linear' });
     walk.onfinish = () => {
         clearInterval(timer);
         el.style.display = 'none';
+        if (shadow) shadow.style.display = 'none';
         el.src = 'assets/page01/cat/c1_q85.webp';
         townWalker = null;
         scheduleCatWalk(60000); // one walk every minute
