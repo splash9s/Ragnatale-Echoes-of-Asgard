@@ -1537,7 +1537,7 @@ async function changeEarthLayers() {
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
 const HERO_PAGE_FEET = { x: 71.5, y: 189 };
 const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the battle size
-const SHADOW_BASE = { 'town-shadow': { left: 906, top: 716 }, 'char-shadow': { left: 339, top: 684 } };
+const SHADOW_BASE = { 'town-shadow': { left: 879, top: 740 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
