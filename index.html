@@ -177,14 +177,16 @@
         @keyframes townSparkle { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 20% { opacity: 1; transform: translate(calc(var(--dx) * .2), calc(var(--dy) * .2)) scale(1); } 100% { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
         @media (prefers-reduced-motion: reduce) { #town-sparkles { display: none !important; } }
         #town-hero-wrap { position: absolute; left: 891px; top: 616px; width: 95px; height: 193px; pointer-events: auto; cursor: pointer; z-index: 2; }
-        /* Cart man: walks from the left edge to the right edge, behind the foreground layer (it is placed before .ts-fg). Frames are 400x270 with the feet at (200, 262), shown at 0.80 so his head-to-feet height matches the player (about 193px), feet 110px below the player's ground line (915) */
-        #town-cartman { position: absolute; left: -320px; top: 705px; width: 320px; height: 216px; pointer-events: none; z-index: 0; display: none; image-rendering: auto; }
+        /* Cart man (pixel boy pulling a cart): walks from the left edge to the right edge, above the characters but behind the foreground layer (z 3, the foreground is z 4). Frames are 260x200 with the feet at (130, 190), shown at 1.0 (about the player's height), feet at y 915 */
+        #town-cartman { position: absolute; left: -260px; top: 725px; width: 260px; height: 200px; pointer-events: none; z-index: 3; display: none; image-rendering: auto; }
         /* Blacksmith at the smithy: frames are 480x320 with the anvil stump centre at (290, 305), shown at 0.71 so he is the player's height (about 193px). Loops the hammer swing (js/ui.js) */
         #town-smith { position: absolute; left: 194px; top: 588px; width: 341px; height: 227px; pointer-events: auto; cursor: pointer; z-index: 1; image-rendering: auto; }
         /* Straw man (training dummy): frames are 256x310 with the base centre at (128, 300); shown at the player's visible height. Click it to attack (see js/ui.js) */
         #town-dummy { position: absolute; left: 997px; top: 602px; width: 171px; height: 207px; pointer-events: auto; cursor: pointer; z-index: 1; image-rendering: auto; -webkit-tap-highlight-color: transparent; }
         /* Main page foreground: props in front of the background, blurred a little for depth */
-        .ts-inner .ts-fg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; pointer-events: none; z-index: 0; filter: blur(2px); }
+        .ts-inner .ts-fg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; pointer-events: none; z-index: 4; filter: blur(2px); }
+        /* Main page buttons and panels stay above the foreground */
+        .ts-inner .ui { z-index: 5; }
         #town-hero { position: absolute; left: 0; top: 0; width: 95px; height: 193px; image-rendering: pixelated; }
         .town-panel { position: absolute; background: rgba(12, 24, 52, 0.78); border: 1px solid rgba(201, 162, 39, 0.55); border-radius: 14px; box-sizing: border-box; }
         .town-info { position: absolute; left: 43px; top: 40px; width: 416px; height: 172px; box-sizing: border-box; padding: 8px 10px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #e8d9b5; pointer-events: none; }
@@ -1358,7 +1360,7 @@
     <script src="js/hero-body.js?v=20261112b"></script>
     <script src="js/combat.js?v=20261112b"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112r"></script>
+    <script src="js/ui.js?v=20261112s"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>

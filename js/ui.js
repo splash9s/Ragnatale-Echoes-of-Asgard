@@ -4714,8 +4714,8 @@ function scheduleSmithSwing() {
 }
 scheduleSmithSwing();
 
-// Cart man on the main page: walks in from the left edge, across behind the foreground layer, and off the right edge. About once every 2 minutes at random times, while the main page is showing.
-const CART_FRAME_MS = 110, CART_WALK_MS = 16000;
+// Cart man on the main page: walks in from the left edge, across above the characters and behind the foreground, and off the right edge. Once every minute while the main page is showing.
+const CART_FRAME_MS = 110, CART_WALK_MS = 14000, CART_FRAMES = 6;
 function scheduleCartMan(ms) { setTimeout(walkCartMan, ms); }
 function walkCartMan() {
     const el = document.getElementById('town-cartman');
@@ -4724,7 +4724,7 @@ function walkCartMan() {
     el.style.display = 'block';
     let i = 0;
     const timer = setInterval(() => {
-        i = (i + 1) % 9;
+        i = (i + 1) % CART_FRAMES;
         el.src = `assets/page01/cart/c${i + 1}_q85.webp`;
     }, CART_FRAME_MS);
     const walk = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CART_WALK_MS, easing: 'linear' });
@@ -4732,7 +4732,7 @@ function walkCartMan() {
         clearInterval(timer);
         el.style.display = 'none';
         el.src = 'assets/page01/cart/c1_q85.webp';
-        scheduleCartMan(90000 + Math.random() * 60000); // about one walk every 2 minutes, at random times
+        scheduleCartMan(60000); // one walk every minute
     };
 }
-scheduleCartMan(10000 + Math.random() * 60000);
+scheduleCartMan(5000 + Math.random() * 40000); // first walk at a random time
