@@ -572,8 +572,15 @@ function makeBoss(t) {
         atkMin: Math.floor(t.atkMin * BOSS_ATK_MULT),
         atkMax: Math.floor(t.atkMax * BOSS_ATK_MULT),
         isBoss: true, rewarded: false, ailments: {}, attackCount: 0, enraged: false,
-        elemSupport: true // Elemental Support: cast at the start of the boss stage, element effects x2 for its hits and when it is hit
+        // Elemental Support: only on a campaign path whose element matches the boss's element.
+        // Cast at the start of the boss stage; element effects x2 for its hits and when it is hit
+        elemSupport: bossElementSupportOn(t)
     };
+}
+function bossElementSupportOn(t) {
+    if (currentMode !== 'campaign' || !t || !t.element) return false;
+    const pathEl = CAMPAIGN_PATHS[currentPath] && CAMPAIGN_PATHS[currentPath].element;
+    return !!pathEl && pathEl === t.element;
 }
 // Elemental Support doubles the effect of an element: a x1.25 advantage becomes x1.5, a x0.75 resist becomes x0.5
 function supportedElemMult(mult, m) {
@@ -629,9 +636,12 @@ function spawnStageMonsters() {
         monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
         if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
         if (typeof showBossBalloon === 'function') showBossBalloon('Boss appeared!');
-        logMessage(`[Boss] ${boss.name} appears! Skills: Elemental Support (element effects x2), Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
-        logMessage(`[Boss Skill] ${boss.name} casts Elemental Support! Element effects are doubled for its hits and when it is hit, until the map ends.`, 'winlose');
-        setTimeout(() => { if (typeof showBossBalloon === 'function' && monstersList[0] === boss) showBossBalloon('Elemental Support! Element effects x2'); }, 3200);
+        const supportTxt = boss.elemSupport ? 'Elemental Support (element effects x2), ' : '';
+        logMessage(`[Boss] ${boss.name} appears! Skills: ${supportTxt}Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
+        if (boss.elemSupport) {
+            logMessage(`[Boss Skill] ${boss.name} casts Elemental Support! Element effects are doubled for its hits and when it is hit, until the map ends.`, 'winlose');
+            setTimeout(() => { if (typeof showBossBalloon === 'function' && monstersList[0] === boss) showBossBalloon('Elemental Support! Element effects x2'); }, 3200);
+        }
     } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
         spawnWaveFromSet(dailyScale, scaled);
     } else {
