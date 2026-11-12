@@ -6,12 +6,24 @@
 // Workflow (each step waits for the one before it):
 //   1) Character button on the main page
 //   2) STATS tab on the character page
-//   3) Close button of the stat panel
-//   4) SKILLS button on the character page
-//   5) Close button of the skills page (back to the town)
-// Progress is kept in player.guide: upStats (stat panel was opened), upSkills (skills page was opened).
-// The guide ends for good (player.guide.upgrade) once the skills page is closed after step 4.
+//   3) Upgrade a stat (tap a + button)
+//   4) Close the stat panel
+//   5) SKILLS button on the character page
+//   6) Upgrade a skill (tap an upgrade button on the skills page)
+//   7) Close the skills page (back to the town)
+// Steps 2-4 are skipped when there are no stat points; steps 6 is skipped when there are no skill points.
+// Progress lives in player.guide: upStats / upSkills (panel or page was opened), upStatUp / upSkUp (a point was
+// put into a stat / skill). The guide ends for good (player.guide.upgrade) when the skills page is closed.
 // ==========================================
+
+function guideUpCharPage() { return guideViewVisible('view-character'); }
+function guideUpStatsHidden() { return !!document.getElementById('view-character')?.classList.contains('stats-hidden'); }
+function guideUpSkillsOpen() { return guideViewVisible('view-skills'); }
+function guideUpNeedStat() { return (player.statPoints || 0) > 0 && !guideFlag('upStatUp'); }
+function guideUpNeedSkill() { return (player.jobSp || 0) > 0 && !guideFlag('upSkUp'); }
+function guideUpStatBtn() { return document.querySelector('#view-character .char-stats-panel button[onclick^="addStat("]:not([disabled])'); }
+function guideUpSkillBtn() { return document.querySelector('#view-skills button[onclick^="upgradeSkill("]:not([disabled])'); }
+function guideUpPendingSkills() { return Object.values(pendingAlloc.skills || {}).reduce((a, b) => a + b, 0); }
 
 const GUIDE_UPGRADE_STEPS = [
     {
@@ -21,35 +33,42 @@ const GUIDE_UPGRADE_STEPS = [
     },
     {
         text: 'Tap STATS to raise your stats',
-        visible: () => guideUpCharPage() && guideUpStatsHidden() && !guideFlag('upStats'),
+        visible: () => guideUpCharPage() && guideUpStatsHidden() && guideUpNeedStat(),
         targets: () => [document.getElementById('char-stats-tab')]
     },
     {
+        text: 'Tap + to upgrade a stat',
+        visible: () => guideUpCharPage() && !guideUpStatsHidden() && guideUpNeedStat() && !!guideUpStatBtn(),
+        targets: () => [guideUpStatBtn()]
+    },
+    {
         text: 'Tap Close to leave the stats',
-        visible: () => guideUpCharPage() && !guideUpStatsHidden(),
+        visible: () => guideUpCharPage() && !guideUpStatsHidden() && !guideUpNeedStat(),
         targets: () => [document.querySelector('#view-character .char-stats-close')]
     },
     {
         text: 'Tap SKILLS to learn your job skills',
-        visible: () => guideUpCharPage() && guideUpStatsHidden() && guideFlag('upStats') && !guideFlag('upSkills'),
+        visible: () => guideUpCharPage() && guideUpStatsHidden() && !guideUpNeedStat() && !guideFlag('upSkills'),
         targets: () => [document.querySelector('#view-character .char-skills-btn')]
     },
     {
+        text: 'Tap an upgrade button to learn a skill',
+        visible: () => guideUpSkillsOpen() && guideUpNeedSkill() && !!guideUpSkillBtn(),
+        targets: () => [guideUpSkillBtn()]
+    },
+    {
         text: 'Tap the return button to leave the skills',
-        visible: () => guideViewVisible('view-skills'),
+        visible: () => guideUpSkillsOpen() && !guideUpNeedSkill(),
         targets: () => [document.querySelector('#view-skills .char-return')]
     }
 ];
-
-function guideUpCharPage() { return guideViewVisible('view-character'); }
-function guideUpStatsHidden() { return !!document.getElementById('view-character')?.classList.contains('stats-hidden'); }
 
 function guideUpgradeWanted() {
     if (typeof player === 'undefined' || !player) return false;
     if (player.guide && player.guide.upgrade) return false;
     if (!Object.keys(player.clearedMaps || {}).length) return false;
-    // Points are only needed to start; once the stat step has begun the guide runs to the end
-    if (guideFlag('upStats')) return true;
+    // Points start the guide; once it has begun it runs to the end
+    if (guideFlag('upStats') || guideFlag('upSkills')) return true;
     return (player.statPoints || 0) > 0 || (player.jobSp || 0) > 0;
 }
 
@@ -89,11 +108,13 @@ function guideUpTick() {
     if (!player) return;
     if (player.guide && player.guide.upgrade) { guideUpClear(); return; }
 
-    // Progress: the stat panel and the skills page were seen open
+    // Record progress as the player goes through the screens
     if (guideUpCharPage() && !guideUpStatsHidden() && !guideFlag('upStats')) markGuide('upStats');
-    if (guideViewVisible('view-skills') && !guideFlag('upSkills')) markGuide('upSkills');
+    if (guideUpCharPage() && !guideUpStatsHidden() && !guideFlag('upStatUp') && pendingStatTotal() > 0) markGuide('upStatUp');
+    if (guideUpSkillsOpen() && !guideFlag('upSkills')) markGuide('upSkills');
+    if (guideUpSkillsOpen() && !guideFlag('upSkUp') && guideUpPendingSkills() > 0) markGuide('upSkUp');
     // Skills page closed after it was opened: the whole guide is done
-    if (guideFlag('upSkills') && !guideViewVisible('view-skills')) { markGuide('upgrade'); guideUpClear(); return; }
+    if (guideFlag('upSkills') && !guideUpSkillsOpen()) { markGuide('upgrade'); guideUpClear(); return; }
 
     if (!guideUpgradeWanted()) { guideUpClear(); return; }
     if (!document.getElementById('game-modal')?.classList.contains('hidden') || guideViewVisible('view-combat')) { guideUpClear(); return; }
