@@ -257,7 +257,7 @@
         .art-screen .char-return:active .ret-press { display: block; }
         .art-screen .char-return:active .ret-normal { display: none; }
         /* Clear screen: hides equipment and inventory panels so only the background shows */
-        #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel { visibility: hidden !important; pointer-events: none !important; }
+        #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn, #view-character.screen-clear #char-hero, #view-character.screen-clear #char-shadow { visibility: hidden !important; pointer-events: none !important; }
         .art-screen .char-clear-toggle { cursor: pointer; z-index: 10; }
         .art-screen .char-clear-toggle img { display: block; width: 100%; height: 100%; }
         .art-screen .char-clear-toggle .clr-press { display: none; }
@@ -1024,7 +1024,7 @@
                     
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
-                    <button onclick="switchView('skills')" style="position:absolute; left:394px; top:152px; transform:translate(-50%, 0); box-sizing:border-box; height:46px; line-height:42px; padding:0 20px; white-space:nowrap; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
+                    <button class="char-skills-btn" onclick="switchView('skills')" style="position:absolute; left:394px; top:152px; transform:translate(-50%, 0); box-sizing:border-box; height:46px; line-height:42px; padding:0 20px; white-space:nowrap; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
