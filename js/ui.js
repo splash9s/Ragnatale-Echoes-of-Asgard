@@ -388,8 +388,8 @@ const MONSTER_SPRITES = {
         shift: {
             'assets/combat/fallenangel/fallenangelattack_q85.webp': [-124.6, -1.4],
             'assets/combat/fallenangel/fallenangeldamaged_q85.webp': [-50.8, 0.0],
-            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [-503.0, -1.4], // original position minus 300 px
-            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [-414.5, 6.3] // final death: 500 px left of the previous position
+            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [-303.0, -1.4], // death: 200 px right of the previous position
+            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [-214.5, 6.3] // final death: 200 px right of the previous position
         }
     },
     M024: { // Dusk World-Eater (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
