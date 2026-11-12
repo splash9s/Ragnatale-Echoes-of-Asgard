@@ -4951,10 +4951,18 @@ function attachTentLight(sprite) {
         sprite.parentElement.insertBefore(g, sprite.nextSibling);
         glows[key] = g;
     });
-    tentLightSprites.set(sprite.id, { sprite, glows });
     // Re-sync whenever the sprite's picture (src) or placement (style) changes
-    new MutationObserver(syncTentLights).observe(sprite, { attributes: true, attributeFilter: ['src', 'style'] });
+    const mo = new MutationObserver(syncTentLights);
+    mo.observe(sprite, { attributes: true, attributeFilter: ['src', 'style'] });
+    tentLightSprites.set(sprite.id, { sprite, glows, mo });
     syncTentLights();
+}
+function detachTentLight(sprite) {
+    const e = sprite && tentLightSprites.get(sprite.id);
+    if (!e) return;
+    e.mo.disconnect();
+    Object.values(e.glows).forEach(g => g.remove());
+    tentLightSprites.delete(sprite.id);
 }
 function syncTentLights() {
     tentLightSprites.forEach(({ sprite, glows }) => {
@@ -5396,3 +5404,154 @@ function catResume() {
     }, CAT_FRAME_MS);
 }
 scheduleCatWalk(5000 + Math.random() * 40000); // first walk at a random time
+
+// ---- Tent pets: the player picks up to 3 owned pets; they walk the tent floor with the same walk and lick as the tent cat ----
+const TENT_PETS_MAX = 3;
+const tentPetWalkers = new Map(); // slot k (0..2) -> walker
+let tentPetFrame = 0, tentPetFrameTimer = null;
+
+// Owned pets: the equipped pet (token 'eq') and the pets in the inventory (token = inventory index)
+function tentPetChoices() {
+    const list = [];
+    if (player.equipped && player.equipped.pet) list.push({ token: 'eq', name: player.equipped.pet.name });
+    (player.inventory || []).forEach((it, i) => { if (it && it.slot === 'pet') list.push({ token: i, name: it.name }); });
+    return list;
+}
+function tentPetSelection() {
+    const valid = new Set(tentPetChoices().map(c => String(c.token)));
+    player.tentPets = (player.tentPets || []).filter(t => valid.has(String(t))).slice(0, TENT_PETS_MAX);
+    return player.tentPets;
+}
+function openTentPetPicker() {
+    let box = document.getElementById('tent-pet-picker');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'tent-pet-picker';
+        box.style.cssText = 'position:fixed; inset:0; z-index:300; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center;';
+        document.body.appendChild(box);
+    }
+    renderTentPetPicker();
+}
+function renderTentPetPicker() {
+    const box = document.getElementById('tent-pet-picker');
+    if (!box) return;
+    const choices = tentPetChoices();
+    const sel = tentPetSelection().map(String);
+    const rows = choices.length ? choices.map(c => {
+        const on = sel.includes(String(c.token));
+        const tok = typeof c.token === 'string' ? `'${c.token}'` : c.token;
+        return `<button onclick="toggleTentPet(${tok})" style="display:flex; align-items:center; gap:12px; width:100%; padding:10px 14px; border-radius:10px; border:2px solid ${on ? '#c9a227' : '#b8945a'}; background:${on ? 'rgba(201,162,39,.35)' : 'rgba(214,190,140,.5)'}; color:#2a1a0e; font-size:22px; font-weight:800; cursor:pointer; text-align:left;">`
+            + `<img src="assets/shop/diamond/ocatpet_q85.webp" alt="" style="width:48px; height:43px; object-fit:contain;">`
+            + `<span style="flex:1;">${c.name}${c.token === 'eq' ? ' (equipped)' : ''}</span><span>${on ? 'Walking' : 'Select'}</span></button>`;
+    }).join('') : `<p style="color:#2a1a0e; font-size:22px;">You have no pets yet. Buy one in the shop.</p>`;
+    box.innerHTML = `<div style="width:620px; max-width:92vw; background:#e7d1aa; border:3px solid #b8945a; border-radius:18px; padding:22px; color:#2a1a0e;">`
+        + `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h3 style="font-size:28px; font-weight:900;">Pets on the tent floor</h3><span style="font-size:22px; font-weight:800;">${sel.length} / ${TENT_PETS_MAX}</span></div>`
+        + `<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">${rows}</div>`
+        + `<div style="display:flex; justify-content:flex-end; margin-top:16px;"><button onclick="closeTentPetPicker()" style="padding:8px 26px; font-size:24px; font-weight:800; border-radius:10px; border:2px solid #b8945a; background:#dbc5a0; color:#2a1a0e; cursor:pointer;">Done</button></div></div>`;
+}
+function toggleTentPet(token) {
+    const sel = tentPetSelection().slice();
+    const idx = sel.map(String).indexOf(String(token));
+    if (idx >= 0) sel.splice(idx, 1);
+    else if (sel.length >= TENT_PETS_MAX) { showFloatNotice(`You can choose up to ${TENT_PETS_MAX} pets.`); return; }
+    else sel.push(token);
+    player.tentPets = sel;
+    renderTentPetPicker();
+    syncTentPets();
+}
+function closeTentPetPicker() {
+    const box = document.getElementById('tent-pet-picker');
+    if (box) box.remove();
+    syncTentPets();
+    if (typeof saveGame === 'function') saveGame();
+}
+
+// Keep one walking pet on the floor for each chosen pet (up to 3)
+function syncTentPets() {
+    const stage = document.querySelector('#character-stage .ts-inner');
+    if (!stage || !player) return;
+    const count = tentPetSelection().length;
+    for (let k = 0; k < TENT_PETS_MAX; k++) {
+        if (k < count) { if (!tentPetWalkers.has(k)) createTentPetWalker(k, stage); }
+        else if (tentPetWalkers.has(k)) removeTentPetWalker(k);
+    }
+}
+function createTentPetWalker(k, stage) {
+    const shadow = document.createElement('img');
+    shadow.className = 'tent-pet-shadow';
+    shadow.alt = ''; shadow.setAttribute('aria-hidden', 'true');
+    shadow.src = 'assets/cha/shadowclean_q85.webp';
+    shadow.style.cssText = `position:absolute; left:0; top:0; width:${TENT_CAT.shadowW}px; height:${TENT_CAT.shadowH}px; z-index:3;`;
+    const cat = document.createElement('img');
+    cat.className = 'tent-pet'; cat.id = `tent-pet-${k}`;
+    cat.alt = ''; cat.setAttribute('aria-hidden', 'true');
+    cat.src = 'assets/page01/cat/c1_q85.webp';
+    cat.style.zIndex = '7';
+    const lick = document.createElement('img');
+    lick.className = 'tent-pet-lick'; lick.id = `tent-pet-lick-${k}`;
+    lick.alt = ''; lick.setAttribute('aria-hidden', 'true');
+    lick.src = 'assets/page01/cat/lick1_q85.webp';
+    lick.style.zIndex = '7';
+    stage.append(shadow, cat, lick);
+    // Spread the pets along the loop so they don't walk on top of each other
+    const walk = tentCatKeyframes(true), sh = tentCatKeyframes(false);
+    const delay = -((k + 1) * walk.ms) / (TENT_PETS_MAX + 1);
+    const w = { k, cat, shadow, lick, licking: false, walk: null, shadowWalk: null };
+    w.walk = cat.animate(walk.frames, { duration: walk.ms, iterations: Infinity, easing: 'linear', delay });
+    w.shadowWalk = shadow.animate(sh.frames, { duration: sh.ms, iterations: Infinity, easing: 'linear', delay });
+    cat.addEventListener('click', () => tentPetLick(w));
+    tentPetWalkers.set(k, w);
+    attachTentLight(cat);
+    attachTentLight(lick);
+    ensureTentPetFrameTimer();
+}
+function removeTentPetWalker(k) {
+    const w = tentPetWalkers.get(k);
+    if (!w) return;
+    w.walk.cancel(); w.shadowWalk.cancel();
+    detachTentLight(w.cat); detachTentLight(w.lick);
+    w.cat.remove(); w.shadow.remove(); w.lick.remove();
+    tentPetWalkers.delete(k);
+}
+function ensureTentPetFrameTimer() {
+    if (tentPetFrameTimer) return;
+    tentPetFrameTimer = setInterval(() => {
+        tentPetFrame = (tentPetFrame + 1) % TENT_CAT.frames;
+        tentPetWalkers.forEach(w => { if (!w.licking) w.cat.src = `assets/page01/cat/c${tentPetFrame + 1}_q85.webp`; });
+    }, TENT_CAT.frameMs);
+}
+// Click a walking pet: it stops, sits, licks, sits again, then walks on from the same spot
+function tentPetLick(w) {
+    if (w.licking || !w.walk) return;
+    w.licking = true;
+    w.walk.pause(); w.shadowWalk.pause();
+    const inner = w.cat.closest('.ts-inner');
+    const ir = inner.getBoundingClientRect(), k = (ir.width / 1920) || 1;
+    const cr = w.cat.getBoundingClientRect();
+    const feetX = (cr.left + cr.width / 2 - ir.left) / k;
+    const feetY = (cr.bottom - ir.top) / k - 10;
+    w.lick.style.transform = `translate(${feetX - 67}px, ${feetY - 120}px)`;
+    w.cat.style.display = 'none';
+    w.lick.style.display = 'block';
+    const show = n => { w.lick.src = `assets/page01/cat/lick${n}_q85.webp`; };
+    show(1);
+    setTimeout(() => {
+        let step = 0;
+        show(CAT_LICK_SEQ[step++]);
+        const timer = setInterval(() => {
+            if (step >= CAT_LICK_SEQ.length) {
+                clearInterval(timer);
+                show(1);
+                setTimeout(() => {
+                    w.lick.style.display = 'none';
+                    w.cat.style.display = '';
+                    w.licking = false;
+                    w.walk.play(); w.shadowWalk.play();
+                }, CAT_LICK_REST_MS);
+                return;
+            }
+            show(CAT_LICK_SEQ[step++]);
+        }, CAT_LICK_FRAME_MS);
+    }, CAT_LICK_IDLE_MS);
+}
+setInterval(syncTentPets, 1000);

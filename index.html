@@ -281,6 +281,15 @@
         #view-character #tent-cat-lick { position: absolute; left: 0; top: 0; display: none; width: 134px; height: 120px; cursor: pointer; }
         #view-character:not(.screen-clear) #tent-cat-lick { display: none !important; }
         #view-character.screen-clear #tent-cat, #view-character.screen-clear #tent-cat-shadow { display: block; }
+        /* Tent pets (chosen from owned pets, up to 3): walk the floor in clear screen only */
+        #view-character .tent-pet, #view-character .tent-pet-shadow { position: absolute; left: 0; top: 0; display: none; }
+        #view-character .tent-pet { width: 193px; height: 120px; cursor: pointer; }
+        #view-character .tent-pet-lick { position: absolute; left: 0; top: 0; display: none; width: 134px; height: 120px; cursor: pointer; }
+        #view-character.screen-clear .tent-pet, #view-character.screen-clear .tent-pet-shadow { display: block; }
+        #view-character:not(.screen-clear) .tent-pet-lick { display: none !important; }
+        /* Add Pet button: tent (clear screen) only, next to the clear button */
+        #view-character .tent-add-pet { position: absolute; left: 80px; top: 8px; z-index: 10; display: none; height: 52px; padding: 0 22px; border-radius: 10px; border: 2px solid #b8945a; background: #dbc5a0; color: #2a1a0e; font-size: 24px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        #view-character.screen-clear .tent-add-pet { display: block; }
         .art-screen .char-clear-toggle { cursor: pointer; z-index: 10; }
         .art-screen .char-clear-toggle img { display: block; width: 100%; height: 100%; }
         .art-screen .char-clear-toggle .clr-press { display: none; }
@@ -1060,6 +1069,7 @@
                     </div>
                     <div class="char-light-zone" id="char-light-left" style="position:absolute; left:530px; top:360px; width:130px; height:190px; z-index:6; cursor:pointer;" onclick="toggleCharLight('left')" title="Lamp"></div>
                     <div class="char-light-zone" id="char-light-right" style="position:absolute; left:1430px; top:530px; width:110px; height:130px; z-index:6; cursor:pointer;" onclick="toggleCharLight('right')" title="Lantern"></div>
+                    <button id="tent-add-pet" class="tent-add-pet" onclick="openTentPetPicker()">Add Pet</button>
                     <div class="ui char-clear-toggle" style="position:absolute; left:2px; top:2px; width:66px; height:67px;" onclick="toggleCharClear()" title="Clear screen">
                         <img class="clr-normal" src="assets/cha/button/clearscreen_q85.webp" alt="">
                         <img class="clr-press" src="assets/cha/button/clearscreenpress_q85.webp" alt="">
@@ -1432,7 +1442,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112bb"></script>
+    <script src="js/ui.js?v=20261112bc"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
