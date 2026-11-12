@@ -5406,11 +5406,90 @@ function walkCartMan() {
 }
 scheduleCartMan(5000 + Math.random() * 40000); // first walk at a random time
 
-// The cart and the stray cat share one lane (townWalker); the stray cat has been removed.
+// Orange cat: same route and layering as the cart, on its own once-a-minute schedule.
+// Only one of them walks at a time (townWalker), so the cat and the cart never appear together.
 let townWalker = null;
-// Lick timing (shared by the pets)
+const CAT_FRAME_MS = 220, CAT_WALK_MS = 24000, CAT_FRAMES = 6; // slower frame rate and slower walk than the cart's
+function scheduleCatWalk(ms) { setTimeout(walkCat, ms); }
+function walkCat() {
+    const el = document.getElementById('town-cat');
+    const town = document.getElementById('view-town');
+    if (!el || !town || town.classList.contains('hidden')) { scheduleCatWalk(3000); return; }
+    if (townWalker) { scheduleCatWalk(2000); return; } // the cart is on screen: wait our turn
+    townWalker = 'cat';
+    el.style.display = 'block';
+    catWalkFrame = 0;
+    catFrameTimer = setInterval(() => {
+        catWalkFrame = (catWalkFrame + 1) % CAT_FRAMES;
+        el.src = `assets/page01/cat/c${catWalkFrame + 1}_q85.webp`;
+    }, CAT_FRAME_MS);
+    // The shadow runs the same walk as the cat, so it stays under its feet
+    const shadow = document.getElementById('town-cat-shadow');
+    catShadowAnim = null;
+    if (shadow) { shadow.style.display = 'block'; catShadowAnim = shadow.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CAT_WALK_MS, easing: 'linear' }); }
+    catWalkAnim = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CAT_WALK_MS, easing: 'linear' });
+    catWalkAnim.onfinish = () => {
+        clearInterval(catFrameTimer);
+        el.style.display = 'none';
+        if (shadow) shadow.style.display = 'none';
+        el.src = 'assets/page01/cat/c1_q85.webp';
+        catWalkAnim = null;
+        townWalker = null;
+        scheduleCatWalk(15000 + Math.random() * 10000); // next walk after 15 to 25 seconds
+    };
+}
+// Click the cat: it stops and sits for a moment, licks, sits again, then goes on walking.
+// The walk is paused (not restarted), so it carries on from the same spot.
 const CAT_LICK_IDLE_MS = 500, CAT_LICK_REST_MS = 1000, CAT_LICK_FRAME_MS = 350;
 const CAT_LICK_SEQ = [2, 3, 4, 3, 4]; // after the sitting idle frame (1)
+const CAT_LICK_W = 134, CAT_LICK_H = 120, CAT_FEET_Y = 915;
+let catWalkAnim = null, catShadowAnim = null, catFrameTimer = null, catWalkFrame = 0, catLicking = false;
+function catClick() {
+    if (catLicking || townWalker !== 'cat' || !catWalkAnim) return;
+    catLicking = true;
+    playSound('sound/cat-meow.mp3');
+    catWalkAnim.pause();
+    if (catShadowAnim) catShadowAnim.pause();
+    clearInterval(catFrameTimer);
+    const walkEl = document.getElementById('town-cat');
+    const lick = document.getElementById('town-cat-lick');
+    if (!lick) { catResume(); return; }
+    // where the cat is now, in design px: its centre starts at -103.5 and moves 2300 px across the walk
+    const cx = -103.5 + 2300 * (catWalkAnim.currentTime / CAT_WALK_MS);
+    lick.style.left = (cx - CAT_LICK_W / 2) + 'px';
+    lick.style.top = (CAT_FEET_Y - CAT_LICK_H) + 'px';
+    walkEl.style.display = 'none';
+    lick.style.display = 'block';
+    const show = n => { lick.src = `assets/page01/cat/lick${n}_q85.webp`; };
+    show(1); // sitting idle
+    setTimeout(() => {
+        let step = 0;
+        show(CAT_LICK_SEQ[step++]);
+        const timer = setInterval(() => {
+            if (step >= CAT_LICK_SEQ.length) {
+                clearInterval(timer);
+                show(1); // sits still for a moment after the lick
+                setTimeout(catResume, CAT_LICK_REST_MS);
+                return;
+            }
+            show(CAT_LICK_SEQ[step++]);
+        }, CAT_LICK_FRAME_MS);
+    }, CAT_LICK_IDLE_MS);
+}
+function catResume() {
+    const walkEl = document.getElementById('town-cat');
+    const lick = document.getElementById('town-cat-lick');
+    if (lick) lick.style.display = 'none';
+    if (walkEl) walkEl.style.display = 'block';
+    catLicking = false;
+    if (catWalkAnim) catWalkAnim.play();
+    if (catShadowAnim) catShadowAnim.play();
+    catFrameTimer = setInterval(() => {
+        catWalkFrame = (catWalkFrame + 1) % CAT_FRAMES;
+        if (walkEl) walkEl.src = `assets/page01/cat/c${catWalkFrame + 1}_q85.webp`;
+    }, CAT_FRAME_MS);
+}
+scheduleCatWalk(5000 + Math.random() * 40000); // first walk at a random time
 
 // ---- Tent pets: the player picks up to 3 owned pets; they walk the tent floor with the same walk and lick as the tent cat ----
 const TENT_PETS_MAX = 3;

@@ -191,6 +191,9 @@
         #town-cartman { position: absolute; left: -260px; top: 725px; width: 260px; height: 200px; pointer-events: none; z-index: 3; display: none; image-rendering: auto; }
         /* Tired emoji over the cart man (one per walk) */
         .cart-emote { position: absolute; z-index: 6; margin-left: -32px; font-size: 56px; line-height: 1; pointer-events: none; }
+        #town-cat { position: absolute; left: -200px; top: 795px; width: 193px; height: 120px; pointer-events: auto; cursor: pointer; z-index: 3; display: none; image-rendering: auto; }
+        #town-cat-lick { position: absolute; left: -67px; top: 795px; width: 134px; height: 120px; pointer-events: auto; cursor: pointer; z-index: 3; display: none; image-rendering: auto; }
+        #town-cat-shadow { position: absolute; left: -179px; top: 885px; width: 150px; height: 60px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
         #town-smith-shadow { position: absolute; left: 274px; top: 768px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; opacity: 0.4; }
         #town-cart-shadow { position: absolute; left: -220px; top: 879px; width: 180px; height: 72px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
         /* Blacksmith at the smithy: frames are 480x320 with the anvil stump centre at (290, 305), shown at 0.71 so he is the player's height (about 193px). Loops the hammer swing (js/ui.js) */
@@ -786,6 +789,9 @@
                     <img class="ts-bg" src="assets/page01/mainbg03_q85.webp" alt="" onerror="townSwap(this,'mainbg03.png')">
                     <img id="town-cart-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
                     <img id="town-cartman" alt="" aria-hidden="true" src="assets/page01/cart/c1_q85.webp">
+                    <img id="town-cat-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
+                    <img id="town-cat" alt="" aria-hidden="true" src="assets/page01/cat/c1_q85.webp" onclick="catClick()">
+                    <img id="town-cat-lick" alt="" aria-hidden="true" src="assets/page01/cat/lick1_q85.webp" onclick="catClick()">
                     <img class="ts-fg" src="assets/page01/mainfg02_q85.webp" alt="" aria-hidden="true">
                     <div id="town-sparkles" aria-hidden="true" style="position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:0; pointer-events:none; overflow:hidden;"></div>
                     <!-- (the foreground sits above the background and below the hero and buttons; it never takes clicks) -->
@@ -1542,7 +1548,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113a"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113u"></script>
+    <script src="js/ui.js?v=20261113v"></script>
     <script src="js/market.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
