@@ -290,13 +290,13 @@
         #view-character #tent-pets-btn { bottom: 103px; }
         #view-character.screen-clear .tent-top-btn, #view-character.screen-clear .tent-ui-toggle { display: block; }
         /* Minimize button (bottom right): hides the UI; faded to 30% while the UI is hidden. Press image while held. */
-        #view-character .tent-minimize { position: absolute; right: 24px; bottom: 20px; z-index: 10; display: none; width: 66px; height: 67px; cursor: pointer; transition: opacity .3s ease; }
-        #view-character .tent-minimize img { display: block; width: 100%; height: 100%; }
-        #view-character .tent-minimize .min-press { display: none; }
-        #view-character .tent-minimize:active .min-press { display: block; }
-        #view-character .tent-minimize:active .min-normal { display: none; }
-        #view-character.screen-clear .tent-minimize { display: block; }
-        #view-character.screen-clear.ui-off .tent-minimize { opacity: .3; }
+        #view-character .tent-icon-btn { position: absolute; right: 24px; bottom: 20px; z-index: 10; display: none; width: 66px; height: 67px; cursor: pointer; transition: opacity .3s ease; }
+        #view-character .tent-icon-btn img { display: block; width: 100%; height: 100%; }
+        #view-character .tent-icon-btn .min-press { display: none; }
+        #view-character .tent-icon-btn:active .min-press { display: block; }
+        #view-character .tent-icon-btn:active .min-normal { display: none; }
+        #view-character.screen-clear .tent-icon-btn { display: block; }
+        #view-character.screen-clear.ui-off .tent-icon-btn { opacity: .3; }
         /* Hide UI: hides the top bar, return and clear buttons, and the bottom-right Pets and Show names buttons */
         #view-character.screen-clear.ui-off .tent-top-btn, #view-character.screen-clear.ui-off #tent-pets-btn, #view-character.screen-clear.ui-off .char-clear-toggle, #view-character.screen-clear.ui-off .char-return { display: none !important; }
         /* Pet name labels above the walking pets */
@@ -1106,8 +1106,8 @@
                     </div>
                     <div class="char-light-zone" id="char-light-left" style="position:absolute; left:530px; top:360px; width:130px; height:190px; z-index:6; cursor:pointer;" onclick="toggleCharLight('left')" title="Lamp"></div>
                     <div class="char-light-zone" id="char-light-right" style="position:absolute; left:1430px; top:530px; width:110px; height:130px; z-index:6; cursor:pointer;" onclick="toggleCharLight('right')" title="Lantern"></div>
-                    <button id="tent-pets-btn" class="tent-ui-toggle" onclick="openPetPanel()">Pets</button>
-                    <div id="tent-ui-toggle" class="tent-minimize" onclick="toggleTentUi()" title="Hide UI"><img class="min-normal" src="assets/cha/button/minimize_q85.webp" alt="Hide UI"><img class="min-press" src="assets/cha/button/minimizepress_q85.webp" alt=""></div>
+                    <div id="tent-pets-btn" class="tent-icon-btn" onclick="openPetPanel()" title="Pets"><img class="min-normal" src="assets/cha/button/peticon_q85.webp" alt="Pets"><img class="min-press" src="assets/cha/button/peticonpress_q85.webp" alt=""></div>
+                    <div id="tent-ui-toggle" class="tent-icon-btn" onclick="toggleTentUi()" title="Hide UI"><img class="min-normal" src="assets/cha/button/minimize_q85.webp" alt="Hide UI"><img class="min-press" src="assets/cha/button/minimizepress_q85.webp" alt=""></div>
                     <div class="ui char-clear-toggle" style="position:absolute; left:2px; top:2px; width:66px; height:67px;" onclick="toggleCharClear()" title="Clear screen">
                         <img class="clr-normal" src="assets/cha/button/clearscreen_q85.webp" alt="">
                         <img class="clr-press" src="assets/cha/button/clearscreenpress_q85.webp" alt="">
@@ -1480,7 +1480,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112bn"></script>
+    <script src="js/ui.js?v=20261112bo"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
