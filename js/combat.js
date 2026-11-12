@@ -979,6 +979,8 @@ function checkLevelUps() {
     }
 }
 
+const COIN_DROP_CHANCE_NORMAL = 0.6;
+
 function awardKill(m) {
     m.rewarded = true;
     player.runes.killCount = (player.runes.killCount || 0) + 1;
@@ -986,7 +988,10 @@ function awardKill(m) {
     const isEvent = currentMode === 'event';
     const isVoidTest = currentMode === 'endless';
     const derived = getDerivedStats();
-    let finalGold = Math.floor(((m.gold / 4) * (1 + (skillBonus('goldPct') + ((m.isBoss || m.isMiniBoss) ? skillBonus('bossGoldPct') : 0)) / 100)) * derived.goldMultiplier);
+    // Coin drop chance: normal monsters 60%, mini bosses and bosses always drop a coin.
+    const coinDrops = (m.isBoss || m.isMiniBoss) ? true : Math.random() < COIN_DROP_CHANCE_NORMAL;
+    // Coin amount per monster: bigger than before (gold/2, was gold/4).
+    let finalGold = coinDrops ? Math.floor(((m.gold / 2) * (1 + (skillBonus('goldPct') + ((m.isBoss || m.isMiniBoss) ? skillBonus('bossGoldPct') : 0)) / 100)) * derived.goldMultiplier) : 0;
     let baseExpGain = Math.max(1, Math.floor(m.baseExp / 3));
     let jobExpGain = Math.max(1, Math.floor(m.jobExp / 3));
     if (isEvent && currentEvent === 'gold') { finalGold *= 2; baseExpGain = 0; jobExpGain = 0; }
