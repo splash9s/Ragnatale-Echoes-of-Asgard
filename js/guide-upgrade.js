@@ -1,13 +1,16 @@
 // ==========================================
 // FIRST-TIME UPGRADE GUIDE
 // Starts after the first map is cleared (player.clearedMaps has an entry) and while there are stat or skill
-// points to spend. Everything on the screen is shaded and unclickable except the target(s) of the current step,
-// which blink, with a tip (same look as the intro guide).
-// Steps:
+// points to spend. Everything on the screen is shaded and unclickable except the one target of the current step,
+// which blinks, with a tip (same look as the intro guide).
+// Workflow (each step waits for the one before it):
 //   1) Character button on the main page
-//   2) Character page, STATS closed: STATS tab or SKILLS button (both clickable)
-//   3) Character page, STATS open: the stat window or SKILLS button (both clickable)
-// Opening the Skills page ends the guide for good (player.guide.upgrade).
+//   2) STATS tab on the character page
+//   3) Close button of the stat panel
+//   4) SKILLS button on the character page
+//   5) Close button of the skills page (back to the town)
+// Progress is kept in player.guide: upStats (stat panel was opened), upSkills (skills page was opened).
+// The guide ends for good (player.guide.upgrade) once the skills page is closed after step 4.
 // ==========================================
 
 const GUIDE_UPGRADE_STEPS = [
@@ -17,23 +20,36 @@ const GUIDE_UPGRADE_STEPS = [
         targets: () => [document.querySelector('#view-town .ui[data-action="character"]')]
     },
     {
-        // STATS closed: the STATS tab and the SKILLS button both stay clickable
-        text: 'Tap STATS to raise your stats, or SKILLS to learn your job skills',
-        visible: () => guideViewVisible('view-character') && document.getElementById('view-character')?.classList.contains('stats-hidden'),
-        targets: () => [document.getElementById('char-stats-tab'), document.querySelector('#view-character .char-skills-btn')]
+        text: 'Tap STATS to raise your stats',
+        visible: () => guideUpCharPage() && guideUpStatsHidden() && !guideFlag('upStats'),
+        targets: () => [document.getElementById('char-stats-tab')]
     },
     {
-        // STATS open: the stat window itself stays clickable (the guide must not cover it), plus SKILLS
-        text: 'Raise your stats here, then tap SKILLS to learn skills',
-        visible: () => guideViewVisible('view-character') && !document.getElementById('view-character')?.classList.contains('stats-hidden'),
-        targets: () => [document.querySelector('#view-character .char-stats-panel'), document.querySelector('#view-character .char-skills-btn')]
+        text: 'Tap Close to leave the stats',
+        visible: () => guideUpCharPage() && !guideUpStatsHidden(),
+        targets: () => [document.querySelector('#view-character .char-stats-close')]
+    },
+    {
+        text: 'Tap SKILLS to learn your job skills',
+        visible: () => guideUpCharPage() && guideUpStatsHidden() && guideFlag('upStats') && !guideFlag('upSkills'),
+        targets: () => [document.querySelector('#view-character .char-skills-btn')]
+    },
+    {
+        text: 'Tap the return button to leave the skills',
+        visible: () => guideViewVisible('view-skills'),
+        targets: () => [document.querySelector('#view-skills .char-return')]
     }
 ];
+
+function guideUpCharPage() { return guideViewVisible('view-character'); }
+function guideUpStatsHidden() { return !!document.getElementById('view-character')?.classList.contains('stats-hidden'); }
 
 function guideUpgradeWanted() {
     if (typeof player === 'undefined' || !player) return false;
     if (player.guide && player.guide.upgrade) return false;
     if (!Object.keys(player.clearedMaps || {}).length) return false;
+    // Points are only needed to start; once the stat step has begun the guide runs to the end
+    if (guideFlag('upStats')) return true;
     return (player.statPoints || 0) > 0 || (player.jobSp || 0) > 0;
 }
 
@@ -50,7 +66,7 @@ function guideUpEnsureNodes() {
     if (document.getElementById('guide-up-shade')) return;
     const shade = document.createElement('div');
     shade.id = 'guide-up-shade';
-    // Covers the whole screen; the clip path cuts holes for the targets, so clicks there reach the game
+    // Covers the whole screen; the clip path cuts a hole for the target, so clicks there reach the game
     shade.style.cssText = 'position:fixed; left:0; top:0; background:rgba(2,6,15,.72); z-index:45; pointer-events:auto; cursor:not-allowed;';
     document.body.appendChild(shade);
     const rings = document.createElement('div');
@@ -70,19 +86,23 @@ function guideUpEnsureNodes() {
 }
 
 function guideUpTick() {
-    if (!guideUpgradeWanted()) {
-        // The Skills page was reached (or the points are spent): the guide is over
-        if (player && !(player.guide && player.guide.upgrade) && guideViewVisible('view-skills')) markGuide('upgrade');
-        guideUpClear();
-        return;
-    }
+    if (!player) return;
+    if (player.guide && player.guide.upgrade) { guideUpClear(); return; }
+
+    // Progress: the stat panel and the skills page were seen open
+    if (guideUpCharPage() && !guideUpStatsHidden() && !guideFlag('upStats')) markGuide('upStats');
+    if (guideViewVisible('view-skills') && !guideFlag('upSkills')) markGuide('upSkills');
+    // Skills page closed after it was opened: the whole guide is done
+    if (guideFlag('upSkills') && !guideViewVisible('view-skills')) { markGuide('upgrade'); guideUpClear(); return; }
+
+    if (!guideUpgradeWanted()) { guideUpClear(); return; }
     if (!document.getElementById('game-modal')?.classList.contains('hidden') || guideViewVisible('view-combat')) { guideUpClear(); return; }
 
     const idx = GUIDE_UPGRADE_STEPS.findIndex(s => s.visible());
     if (idx < 0) { guideUpClear(); return; }
     const step = GUIDE_UPGRADE_STEPS[idx];
 
-    // Only targets that are really on screen count
+    // Only a target that is really on screen counts
     const rects = step.targets().filter(el => {
         if (!el) return false;
         if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') return false;
@@ -101,7 +121,7 @@ function guideUpTick() {
     guideUpEnsureNodes();
     const vw = window.innerWidth, vh = window.innerHeight;
 
-    // One shade with a hole per target (evenodd: outer screen rectangle minus each target rectangle)
+    // One shade with a hole for the target (evenodd: outer screen rectangle minus the target rectangle)
     let d = `M0 0H${vw}V${vh}H0Z`;
     rects.forEach(q => { d += ` M${q.l} ${q.t}H${q.r}V${q.b}H${q.l}Z`; });
     const shade = document.getElementById('guide-up-shade');
@@ -109,13 +129,13 @@ function guideUpTick() {
     shade.style.width = vw + 'px'; shade.style.height = vh + 'px';
     shade.style.clipPath = `path(evenodd, "${d}")`;
 
-    // A blinking ring around each target
+    // A blinking ring around the target
     const rings = document.getElementById('guide-up-rings');
     rings.innerHTML = rects.map(q =>
         `<div style="position:fixed; left:${q.l}px; top:${q.t}px; width:${q.r - q.l}px; height:${q.b - q.t}px; border:3px solid #fbbf24; border-radius:10px; animation: guideUpRingBlink 1s steps(2, end) infinite;"></div>`
     ).join('');
 
-    // Tip above all targets together
+    // Tip above the target
     const L = Math.min(...rects.map(q => q.l)), R = Math.max(...rects.map(q => q.r)), T = Math.min(...rects.map(q => q.t));
     const tip = document.getElementById('guide-up-tip');
     tip.textContent = step.text;
