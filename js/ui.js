@@ -5241,10 +5241,14 @@ const CART_FRAME_MS = 110, CART_WALK_MS = 14000, CART_FRAMES = 6;
 function scheduleCartMan(ms) { setTimeout(walkCartMan, ms); }
 // Clicking the cart man shows a tired emoji. Only once per walk (one loop across the screen).
 let cartEmoteShown = false;
+let cartWalkAnim = null; // the cart's walk animation, so the emote can move with it
+const CART_EMOTE_MS = 1800;
 function cartEmoteClick() {
     const el = document.getElementById('town-cartman');
-    if (!el || cartEmoteShown || townWalker !== 'cart') return;
+    if (!el || cartEmoteShown || townWalker !== 'cart' || !cartWalkAnim) return;
     cartEmoteShown = true;
+    // Same speed as the cart (2300px over the walk), so the emote rides along while it rises and fades
+    const drift = 2300 / CART_WALK_MS * CART_EMOTE_MS;
     const parent = el.parentElement;
     const pr = parent.getBoundingClientRect();
     const er = el.getBoundingClientRect();
@@ -5255,7 +5259,12 @@ function cartEmoteClick() {
     s.style.left = ((er.left + er.width / 2 - pr.left) / scale) + 'px';
     s.style.top = ((er.top - pr.top) / scale) + 'px';
     parent.appendChild(s);
-    setTimeout(() => s.remove(), 1800);
+    s.animate([
+        { transform: 'translate(0px, 0px)', opacity: 0 },
+        { transform: `translate(${drift * 0.15}px, -12px)`, opacity: 1, offset: 0.15 },
+        { transform: `translate(${drift}px, -90px)`, opacity: 0 }
+    ], { duration: CART_EMOTE_MS, easing: 'linear', fill: 'forwards' });
+    setTimeout(() => s.remove(), CART_EMOTE_MS);
 }
 function walkCartMan() {
     const el = document.getElementById('town-cartman');
@@ -5277,7 +5286,9 @@ function walkCartMan() {
     const shadow = document.getElementById('town-cart-shadow');
     if (shadow) { shadow.style.display = 'block'; shadow.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CART_WALK_MS, easing: 'linear' }); }
     const walk = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: CART_WALK_MS, easing: 'linear' });
+    cartWalkAnim = walk;
     walk.onfinish = () => {
+        cartWalkAnim = null;
         clearInterval(timer);
         el.style.display = 'none';
         el.style.pointerEvents = 'none';

@@ -177,7 +177,11 @@ async function friendRpc(fn, args) {
     try {
         const { data, error } = await cloudClient.rpc(fn, args || {});
         if (error) {
-            if (/Could not find the function|does not exist/i.test(error.message || '')) return { error: 'Friends are not set up on the server yet.' };
+            if (/Could not find the function|does not exist/i.test(error.message || '')) {
+                // Name the missing function, so it is clear which SQL file has not been run on the server
+                const missing = (error.message.match(/function (?:public\.)?([a-z_]+)/i) || [])[1] || fn;
+                return { error: `Friends are not set up on the server yet (missing: ${missing}). Run the SQL files in supabase/.` };
+            }
             return { error: error.message || 'Friends are not available right now.' };
         }
         return { data };
