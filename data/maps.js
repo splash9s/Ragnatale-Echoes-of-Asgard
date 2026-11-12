@@ -182,7 +182,7 @@ const GAME_DATA = {
             title: "Map Lv. 1", levelReq: 1, campaignStages: 11, miniStage: 7, stageGrowth: 0.07, dropKey: 'map1',
             enemies: [...LV1_MAP_ENEMIES],
             boss: curveBoss(MONSTERS_DATA.bossGiantMossSlime, 1),
-            miniBoss: makeMiniBoss(BASE_15.mossyBoulder, 1)
+            miniBoss: makeMiniBoss(BASE_15.slime, 1)
         },
         map10: {
             title: "Map Lv. 10", levelReq: 10, campaignStages: 11, miniStage: 7, stageGrowth: 0.08, dropKey: 'map10',

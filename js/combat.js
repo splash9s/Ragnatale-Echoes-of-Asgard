@@ -658,11 +658,11 @@ function spawnStageMonsters() {
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : currentMode === 'endless' ? [MONSTERS_DATA.slime] : (activeMap && activeMap.enemies) || [];
         if (pool.length > 0) {
-            const count = currentMode === 'endless' ? 1 : currentMode === 'voidtest' ? 6 : Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
+            const count = currentMode === 'endless' ? 1 : currentMode === 'voidtest' ? 6 : currentMode === 'daily' ? randomInRange(...dailyCountRange()) : Math.min(activeMap && activeMap.levelReq === 1 ? 3 : 6, Math.floor(Math.random() * 5) + 2);
             const mult = currentMode === 'endless' ? 1 : stageMultiplier(); // Void Tower: one level 1 slime per stage
             for (let i = 0; i < count; i++) {
                 let picked = pool[Math.floor(Math.random() * pool.length)];
-                if (roleOf(picked) === 'tank' && monstersList.filter(x => roleOf(x) === 'tank').length >= MAX_TANKS_PER_STAGE) picked = pickUnitNoTank(pool);
+                if (roleOf(picked) === 'tank' && monstersList.filter(x => roleOf(x) === 'tank').length >= tankCapHere()) picked = pickUnitNoTank(pool);
                 const template = (currentMode === 'daily' || currentMode === 'endless') ? picked : levelScaled(picked, activeMap && activeMap.levelReq); // Void Tower keeps its raw lv 1 slime
                 const base = {
                     ...template,
@@ -728,8 +728,28 @@ function pickUnit(pool, role) {
     }
     return pool[Math.floor(Math.random() * pool.length)];
 }
-// A stage has at most this many tanks. Past that, a tank pick becomes a non-tank unit from the same pool.
-const MAX_TANKS_PER_STAGE = 2;
+// Tanks per stage by map level: level 1 maps have none, level 10 has at most 1, all other levels at most 2.
+// Tanks always stand at the front (see the sort at the end of spawnStageMonsters).
+function maxTanksForLevel(lv) {
+    if (lv <= 1) return 0;
+    if (lv === 10) return 1;
+    return 2;
+}
+// The tank cap for the stage being spawned. Daily Challenge uses the level of the map its stage draws from.
+function tankCapHere() {
+    if (currentMode === 'daily') {
+        const key = ['map1', 'map10', 'map20', 'map30'][Math.min(3, Math.floor((currentStage - 1) / 10))];
+        return maxTanksForLevel(GAME_DATA.maps[key].levelReq);
+    }
+    if (activeMap && activeMap.levelReq) return maxTanksForLevel(activeMap.levelReq);
+    return 2;
+}
+// Daily Challenge monsters per stage: stages 1-10 have 1-4, 12-20 have 3-5, 22-30 have 4-6 (boss stages are only the boss)
+function dailyCountRange() {
+    if (currentStage <= 10) return [1, 4];
+    if (currentStage <= 20) return [3, 5];
+    return [4, 6];
+}
 function pickUnitNoTank(pool) {
     const list = pool.filter(m => roleOf(m) !== 'tank');
     const src = list.length > 0 ? list : pool;
@@ -827,7 +847,7 @@ function spawnWaveFromSet(dailyScale, scaled) {
     let tanksHere = 0;
     set.forEach(role => {
         let picked = pickUnit(pool, role);
-        if (roleOf(picked) === 'tank' && tanksHere >= MAX_TANKS_PER_STAGE) picked = pickUnitNoTank(pool);
+        if (roleOf(picked) === 'tank' && tanksHere >= tankCapHere()) picked = pickUnitNoTank(pool);
         if (roleOf(picked) === 'tank') tanksHere++;
         const unit = makeUnit(levelScaled(picked, activeMap.levelReq), mult);
         monstersList.push(dailyScale === 1 ? unit : scaled(unit));
@@ -851,7 +871,7 @@ function addBossSupport(boss) {
     let tanksHere = 0;
     ((activeMap && activeMap.bossSupport) || []).forEach(s => {
         let picked = pickUnit(activeMap.enemies, s.role);
-        if (roleOf(picked) === 'tank' && tanksHere >= MAX_TANKS_PER_STAGE) picked = pickUnitNoTank(activeMap.enemies);
+        if (roleOf(picked) === 'tank' && tanksHere >= tankCapHere()) picked = pickUnitNoTank(activeMap.enemies);
         if (roleOf(picked) === 'tank') tanksHere++;
         const unit = makeUnit(levelScaled(picked, activeMap.levelReq), mult);
         let want = s.pos - 1;

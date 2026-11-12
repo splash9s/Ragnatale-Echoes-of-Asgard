@@ -598,6 +598,29 @@ function stunFxHTML(m) {
     if (!(m.status && m.status.kind === 'stun' && m.hp > 0)) return '';
     return '<img class="stun-fx" src="assets/combat/stun/stuneffect_q85.webp" alt="" style="position:absolute; left:0; top:0; width:102px; height:78px; max-width:none; pointer-events:none; image-rendering:pixelated;">';
 }
+// The lineup card is rebuilt from HTML on every render, so a dying monster's image must start on the
+// frame it should be showing right now (and with its shift and fade), or it flickers back to idle
+function monsterInitialFrame(m, idleCsv, deadArr) {
+    const idleSrc = idleCsv.split(',')[0];
+    if (!m._deathAt) return { src: idleSrc, css: '' };
+    const e = Date.now() - m._deathAt;
+    const hurtMs = monsterDeathHurtMs(m);
+    const hurt = monsterHurtFrames(m);
+    let src, opacity = '';
+    if (e < hurtMs && hurt.length) {
+        src = hurt[Math.min(hurt.length - 1, Math.floor(e / hurtMs * hurt.length))];
+    } else {
+        src = deadArr[Math.min(deadArr.length - 1, Math.max(0, Math.floor((e - hurtMs) / monsterDeathMs(m))))];
+        if (monsterIsSlowDeath(m)) {
+            const p = Math.min(1, (e - hurtMs) / Math.max(1, monsterDeathTotalMs(m) - hurtMs));
+            opacity = `opacity:${(1 - 0.75 * p * p).toFixed(3)};`;
+        }
+    }
+    const s = MONSTER_SPRITES[m.id];
+    const sh = (s && s.shift && s.shift[src]) || [0, 0];
+    const [dx, dy] = typeof sh === 'number' ? [sh, 0] : sh;
+    return { src, css: `${opacity}left:${dx}px;top:${dy}px;` };
+}
 function setMonsterFrame(img, src) {
     img.src = src;
     const s = MONSTER_SPRITES[img.dataset.sprite];
@@ -4720,7 +4743,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${miniEmbersHTML(m)}${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-hurt-ms="${monsterDeathHurtMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" data-slow-death="${monsterIsSlowDeath(m) ? 1 : 0}" src="${idle.split(',')[0]}" alt="" style="image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;${m._hitAt && Date.now() - m._hitAt < COMBAT_HIT_FLASH_MS ? ' filter:' + COMBAT_HIT_FLASH_FILTER + ';' : ''}">`; })()}${stunFxHTML(m)}</div>
+                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${miniEmbersHTML(m)}${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); const init = monsterInitialFrame(m, idle, dead); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-hurt-ms="${monsterDeathHurtMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" data-slow-death="${monsterIsSlowDeath(m) ? 1 : 0}" src="${init.src}" alt="" style="${init.css}image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;${m._hitAt && Date.now() - m._hitAt < COMBAT_HIT_FLASH_MS ? ' filter:' + COMBAT_HIT_FLASH_FILTER + ';' : ''}">`; })()}${stunFxHTML(m)}</div>
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
