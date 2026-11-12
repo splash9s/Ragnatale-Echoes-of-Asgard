@@ -115,40 +115,25 @@ function manualSaveGame() {
     showModal("Notice", "Your game progress has been successfully saved!");
 }
 
-// Settings: guest players see Bind Email; players who already have an email see it as read-only
+// Settings: guest players see Bind Gmail; players already linked see their Gmail as read-only
 async function refreshBindEmail() {
     const btn = document.getElementById('bind-email-btn');
-    const box = document.getElementById('bind-email-box');
     if (!btn) return;
     const user = await cloudCurrentUser();
-    if (!user) { btn.classList.add('hidden'); box.classList.add('hidden'); return; } // offline-only play: nothing to bind
+    if (!user) { btn.classList.add('hidden'); return; } // offline-only play: nothing to bind
     btn.classList.remove('hidden');
     if (user.is_anonymous) {
         btn.disabled = false;
-        btn.textContent = '✉️ Bind Email';
+        btn.textContent = '✉️ Bind Gmail';
     } else {
         btn.disabled = true;
-        btn.textContent = '✉️ Email: ' + (user.email || 'linked');
-        box.classList.add('hidden');
+        btn.textContent = '✉️ Gmail: ' + (user.email || 'linked');
     }
 }
-function openBindEmail() {
-    const box = document.getElementById('bind-email-box');
-    if (!box) return;
-    box.classList.toggle('hidden');
-    if (!box.classList.contains('hidden')) document.getElementById('bind-email-input')?.focus();
-}
-function closeBindEmail() {
-    document.getElementById('bind-email-box')?.classList.add('hidden');
-}
-async function sendBindEmail() {
-    const input = document.getElementById('bind-email-input');
-    const msg = document.getElementById('bind-email-msg');
-    const email = (input?.value || '').trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { if (msg) msg.textContent = 'Please enter a valid email.'; return; }
-    if (msg) msg.textContent = 'Sending...';
-    const r = await cloudBindEmail(email);
-    if (msg) msg.textContent = r.error ? r.error : 'Check your inbox and tap the link to finish. Your save stays the same.';
+async function bindGmail() {
+    const r = await cloudBindGmail();
+    const msg = document.getElementById('bind-msg');
+    if (r.error && msg) msg.textContent = r.error;
 }
 
 function resetSaveGame() {

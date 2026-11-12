@@ -250,8 +250,7 @@ async function claimServerMail(serverId) {
     }
 }
 
-// Anonymous (guest) players can bind an email later from Settings. The same user and save are kept:
-// Supabase sends a confirmation link, and after it is tapped the account is no longer anonymous.
+// Guest players can bind a Gmail later from Settings. The same user and save are kept.
 async function cloudCurrentUser() {
     if (!cloudInitClient()) return null;
     try {
@@ -259,20 +258,19 @@ async function cloudCurrentUser() {
         return user || null;
     } catch (e) { return null; }
 }
-async function cloudBindEmail(email) {
+// Binds a Gmail to the guest account: Google sign-in is linked to the same user, so the id and save are kept.
+// The page leaves for Google and comes back linked.
+async function cloudBindGmail() {
     const user = await cloudCurrentUser();
     if (!user) return { error: 'Cloud save is not signed in on this browser.' };
-    if (!user.is_anonymous) return { error: 'This account already has an email.' };
+    if (!user.is_anonymous) return { error: 'This account is already linked.' };
     try {
-        const { error } = await cloudClient.auth.updateUser(
-            { email },
-            { emailRedirectTo: location.origin + location.pathname }
-        );
+        const { error } = await cloudClient.auth.linkIdentity({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
         if (error) throw error;
         return { sent: true };
     } catch (e) {
-        console.warn('Bind email failed:', e);
-        return { error: (e && e.message) ? e.message : 'Could not send the link right now.' };
+        console.warn('Bind Gmail failed:', e);
+        return { error: (e && e.message) ? e.message : 'Could not start Gmail linking right now.' };
     }
 }
 

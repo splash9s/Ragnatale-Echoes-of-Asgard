@@ -907,15 +907,8 @@
                 </div>
                 <button onclick="toggleLanguage()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
                 <button onclick="openSendMailForm()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Send Mail</button>
-                <button id="bind-email-btn" onclick="openBindEmail()" class="hidden px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Bind Email</button>
-                <div id="bind-email-box" class="hidden bg-slate-800 rounded-xl p-5 flex flex-col gap-3">
-                    <input id="bind-email-input" type="email" placeholder="you@example.com" autocomplete="email" class="px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 text-xl">
-                    <div class="flex gap-3">
-                        <button onclick="sendBindEmail()" class="flex-1 px-6 py-3 bg-amber-700 hover:bg-amber-600 text-white font-bold rounded-lg text-xl cursor-pointer">Send link</button>
-                        <button onclick="closeBindEmail()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg text-xl cursor-pointer">Cancel</button>
-                    </div>
-                    <p id="bind-email-msg" class="text-slate-300 text-base"></p>
-                </div>
+                <button id="bind-email-btn" onclick="bindGmail()" class="hidden px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Bind Gmail</button>
+                <p id="bind-msg" class="text-red-300 text-base px-2"></p>
                 <button onclick="resetSaveGame()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left !text-red-300 hover:!bg-red-950/40">♻️ Reset Save Data</button>
             </div>
         </div>
@@ -1495,12 +1488,12 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261112b"></script>
     <script src="js/audio.js?v=20261105h"></script>
-    <script src="js/cloud.js?v=20261113a"></script>
+    <script src="js/cloud.js?v=20261113b"></script>
     <script src="js/hero-art.js?v=20261112c"></script>
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113a"></script>
+    <script src="js/ui.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
