@@ -5061,6 +5061,11 @@ function toggleCharClear() {
     updateTentTopLabels();
     syncHeroSprites();
 }
+// The return button on the character page: back to friends while visiting a friend's tent, otherwise to town
+function charReturn() {
+    if (friendTentVisiting()) exitFriendTent();
+    else switchView('town');
+}
 // The main page player opens the tent: the character page with the screen cleared
 function openTentPage() {
     switchView('character');

@@ -384,10 +384,8 @@
         .friend-visitors { font-size: 20px; color: #4a3520; padding: 4px 0; }
         .friend-visitors strong { color: #2a1a0e; }
         .friend-visitors span { color: #7a5a32; }
-        /* Friend's tent (read-only): a Back bar, and the owner's controls hidden */
-        #friend-visit-bar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 500; display: none; align-items: center; gap: 18px; padding: 10px 22px; background: rgba(20,12,4,.85); border: 2px solid #b8945a; border-radius: 12px; color: #fff3d0; font-family: Georgia, "Times New Roman", serif; font-size: 26px; }
-        body.friend-visiting #friend-visit-bar { display: flex; }
-        body.friend-visiting #view-character .tent-top-btn, body.friend-visiting #view-character .char-clear-toggle, body.friend-visiting #view-character .char-return { display: none !important; }
+        /* Friend's tent (read-only): the owner's controls hidden; the return button goes back to friends */
+        body.friend-visiting #view-character .tent-top-btn, body.friend-visiting #view-character .char-clear-toggle { display: none !important; }
         #view-friend .friend-title { position: absolute; left: 0; top: 0; width: 1920px; height: 70px; line-height: 70px; text-align: center; font-size: 32px; font-weight: 700; color: #f5c451; letter-spacing: 3px; z-index: 3; pointer-events: none; font-family: Georgia, "Times New Roman", serif; }
         #view-friend .friend-window { position: absolute; left: 60px; top: 92px; width: 1800px; height: 956px; box-sizing: border-box; padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; background: rgba(231,209,170,.9); border-radius: 18px; z-index: 5; font-family: Georgia, "Times New Roman", serif; color: #2a1a0e; }
         .friend-top { display: flex; flex-direction: column; gap: 12px; flex: none; }
@@ -1100,7 +1098,6 @@
 
                 <!-- VIEW: CHARACTER & EQUIPMENT (layout: 04_psd/pagecharacter) -->
         <div id="view-character" class="hidden art-screen art-dark stats-hidden">
-            <div id="friend-visit-bar"><span>Visiting <strong id="friend-visit-name"></strong>'s tent (view only)</span><button class="friend-btn" onclick="exitFriendTent()">Back to friends</button></div>
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/character/tent/tent_off_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
@@ -1111,7 +1108,7 @@
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">                    <button class="char-skills-btn" onclick="switchView('skills')" style="position:absolute; left:394px; top:152px; transform:translate(-50%, 0); box-sizing:border-box; height:46px; line-height:42px; padding:0 20px; white-space:nowrap; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
-                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
+                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" id="char-return-btn" onclick="charReturn()">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
@@ -1491,7 +1488,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112a"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112jv"></script>
+    <script src="js/ui.js?v=20261112kv"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261112b"></script>
