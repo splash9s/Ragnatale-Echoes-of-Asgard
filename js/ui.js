@@ -896,10 +896,37 @@ function syncPagePetSprites(spec) {
     });
 }
 setInterval(syncPetSprite, 100);
+// Friendship from play: the first play of each day (per pet) adds 1 point and shows a heart. Later plays are animation only.
+function petDayKey(d = new Date()) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function petDailyPlay(item) {
+    if (!item) return false;
+    const day = petDayKey();
+    if (item.lastPlayDay === day) return false;
+    item.lastPlayDay = day;
+    addPetFriendship(item, 1);
+    if (typeof saveGame === 'function') saveGame();
+    return true;
+}
+// A floating heart above the pet's head (x, y in the same coordinates as the parent element)
+function spawnPetHeart(parent, x, y) {
+    if (!parent) return;
+    const h = document.createElement('div');
+    h.className = 'pet-heart';
+    h.textContent = '❤️';
+    h.style.left = x + 'px';
+    h.style.top = y + 'px';
+    parent.appendChild(h);
+    setTimeout(() => h.remove(), 1500);
+}
 // Click the pet: it sits, licks and sits again, same timing and frames as the main page cat
 const PET_LICK_BASE = 'assets/combat/ocat/ocat';
 function petLick(el) {
     if (!el || el.dataset.licking || el.style.display === 'none') return;
+    if (el.id === 'combat-pet-sprite' && petDailyPlay(player.equipped && player.equipped.pet)) {
+        spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
+    }
     el.dataset.licking = '1';
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
     show(1);
@@ -5512,8 +5539,9 @@ function tentPetLick(w) {
     w.state = 'lick';
     w.cat.style.display = 'none';
     w.lick.style.display = 'block';
-    addPetFriendship(tentPetItem(w.token), 1);
-    if (typeof saveGame === 'function') saveGame();
+    if (petDailyPlay(tentPetItem(w.token))) {
+        spawnPetHeart(document.querySelector('#character-stage .ts-inner'), w.x, w.y - TENT_CAT.feetDy - 30);
+    }
     const show = n => { w.lick.src = `assets/page01/cat/lick${n}_q85.webp`; };
     show(1);
     setTimeout(() => {
