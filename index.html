@@ -269,6 +269,9 @@
         @keyframes spriteFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
         /* Clear screen: hides equipment and inventory panels so only the background shows */
         #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn { visibility: hidden !important; pointer-events: none !important; }
+        /* HP and armour card: hide at once in clear screen (no transition or fade) */
+        #view-character.screen-clear #char-hp-card { display: none !important; }
+        #view-character #char-hp-card, #view-character #char-hp-card * { transition: none !important; animation: none !important; }
         /* Tent background is blurred while the panels are open; clear screen shows it sharp */
         #view-character .ts-bg, #view-character .tent-light { transition: filter .4s ease; }
         #view-character:not(.screen-clear) .ts-bg, #view-character:not(.screen-clear) .tent-light { filter: blur(6px); }
