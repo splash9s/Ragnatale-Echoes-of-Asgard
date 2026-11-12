@@ -731,7 +731,6 @@ const COMBAT_PLAYER_WINDUP_PX = -12;  // wind-up draws back this far
 const COMBAT_PLAYER_LUNGE_PX = 40;    // the strike lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
 // The hero dies at the end of a lost battle: a slow-motion fall (PLAYER_FALL_MS), then the dead pose lies on the ground until the result.
-// Without the fall art (still loading) the old fade plays instead.
 const PLAYER_FALL_MS = 2200;
 let combatPlayerDeadAt = 0;
 let combatPlayerFalling = false;
@@ -739,33 +738,29 @@ function playPlayerFallAnim() {
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
     combatPlayerDeadAt = Date.now();
-    const dead = combatDeadFrame();
-    if (dead) {
-        const stand = combatPose().IDLE;
-        if (stand) {
-            // Standing hero tips backwards from its feet
-            applyPlayerFrame(el, stand);
-            const S = COMBAT_PLAYER_SCALE;
-            el.style.transformOrigin = ((stand.fx !== undefined ? stand.fx : stand.w / 2) * S) + 'px ' + ((stand.fy !== undefined ? stand.fy : stand.h) * S) + 'px';
-        }
-        flashPlayerHurt();
-        // Stop a running attack lunge (WAAPI only; the CSS idle/hurt animations stay)
-        el.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); });
-        combatPlayerFalling = true;
-        const fall = el.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-90deg)' }],
-            { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.55, 0, 0.9, 0.5)', fill: 'forwards' });
-        fall.onfinish = () => {
+    flashPlayerHurt();
+    // Stop a running attack lunge (WAAPI only; the CSS idle/hurt animations stay)
+    el.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); });
+    // The standing hero tips backwards from its feet. The fall always plays: the lying frame is swapped in at the end if it has loaded.
+    const stand = combatPose().IDLE;
+    if (stand) {
+        applyPlayerFrame(el, stand);
+        const S = COMBAT_PLAYER_SCALE;
+        el.style.transformOrigin = ((stand.fx !== undefined ? stand.fx : stand.w / 2) * S) + 'px ' + ((stand.fy !== undefined ? stand.fy : stand.h) * S) + 'px';
+    }
+    combatPlayerFalling = true;
+    const fall = el.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-90deg)' }],
+        { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.55, 0, 0.9, 0.5)', fill: 'forwards' });
+    fall.onfinish = () => {
+        const dead = combatDeadFrame();
+        if (dead) {
             fall.cancel();
             el.style.transform = '';
             el.style.transformOrigin = '';
-            combatPlayerFalling = false;
             applyPlayerFrame(el, dead); // lies on the ground
-        };
-        return;
-    }
-    el.classList.remove('player-fall');
-    void el.offsetWidth; // restart the fall
-    el.classList.add('player-fall');
+        } // else the sprite stays tipped over (fill forwards) until the dead frame loads
+        combatPlayerFalling = false;
+    };
 }
 // A frame placed so its torso is where the reference frame's torso is (the feet stay on the ground)
 function alignTorso(f, ref) {
@@ -974,7 +969,10 @@ setInterval(() => {
             if (combatPlayerDeadAt && !img.classList.contains('player-fall')) {
                 // Dead: the fall pose stays until the next battle
                 const dead = combatDeadFrame();
-                if (dead) applyPlayerFrame(img, dead);
+                if (dead) {
+                    img.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); }); // clear a tilt left from a fall that had no lying frame
+                    applyPlayerFrame(img, dead);
+                }
                 return;
             }
             const ae = now - combatPlayerAttack.at;
