@@ -3122,6 +3122,12 @@ function closeInvDetail() {
     const panel = document.getElementById('inv-detail-panel');
     if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
     window.invDetailIndex = null;
+    window.invDetailKey = null;
+}
+// True when the detail window is open for this gear ('inv:<index>' or 'eq:<slot>'); clicking it again closes the window
+function isDetailOpen(key) {
+    const panel = document.getElementById('inv-detail-panel');
+    return !!panel && panel.style.display !== 'none' && window.invDetailKey === key;
 }
 // Rarity tag (R1..R5 in the rarity color) and the base level requirement (green when met, red when not)
 function reqLevelHTML(item, levelReq) {
@@ -3184,10 +3190,13 @@ function itemDetailBodyHTML(item) {
 
     return body;
 }
-function showItemDetail(index) {
+function showItemDetail(index, refresh = false) {
     const item = player.inventory[index];
     if (!item) { closeInvDetail(); return; }
+    const key = 'inv:' + index;
+    if (!refresh && isDetailOpen(key)) { closeInvDetail(); return; } // same gear clicked again: close
     window.invDetailIndex = index;
+    window.invDetailKey = key;
     const isEquip = !!item.slot;
     const isPotion = item.type === 'potion';
     const rarity = RARITY_INFO[item.rarity];
@@ -3229,9 +3238,12 @@ function sellFromDetail(index) { if (sellInventoryItem(index)) closeInvDetail();
 
 function useOrEquipItem(index) { showItemDetail(index); }
 
-function showEquippedDetail(slot) {
+function showEquippedDetail(slot, refresh = false) {
     const item = player.equipped[slot];
     if (!item || !item.name) return;
+    const key = 'eq:' + slot;
+    if (!refresh && isDetailOpen(key)) { closeInvDetail(); return; } // same gear clicked again: close
+    window.invDetailKey = key;
     const isPotion = slot === 'potionSlot';
     const rarity = RARITY_INFO[item.rarity];
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
@@ -4788,7 +4800,7 @@ function toggleFavorite(index) {
     item.favorite = !item.favorite;
     updateUI();
     saveGame();
-    showItemDetail(index);
+    showItemDetail(index, true);
 }
 
 function toggleEquippedFavorite(slot) {
@@ -4797,7 +4809,7 @@ function toggleEquippedFavorite(slot) {
     gear.favorite = !gear.favorite;
     updateUI();
     saveGame();
-    showEquippedDetail(slot);
+    showEquippedDetail(slot, true);
 }
 
 
