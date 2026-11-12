@@ -858,10 +858,8 @@ const PET_SPRITES = {
 const COMBAT_PET_GAP_X = 120;
 // Fine position of the combat pet (px) from the player's feet anchor: 50 left, 60 up
 const COMBAT_PET_OFFSET = { dx: -50, dy: -60 };
-// Page pets: the main page cat was removed, so no page pets are placed (kept empty for future pages)
-const PAGE_PET_IDS = {};
-// Gap from the hero's feet to the pet's feet on each page
-const PAGE_PET_GAP_X = {};
+// Main page pet: its feet stand 200px to the right of the straw man's base centre (dummy at left 997, top 602, 171x207; base at (85.5, 200.6))
+const TOWN_DUMMY_FEET = { left: 997 + 85.5 + 200, top: 602 + 200.6 };
 function petSpriteOf() {
     const pet = player && player.equipped && player.equipped.pet;
     return pet ? (PET_SPRITES[pet.name] || null) : null;
@@ -885,17 +883,10 @@ function syncPetSprite() {
     syncPagePetSprites(spec);
 }
 function syncPagePetSprites(spec) {
-    const f = combatPose().IDLE;
-    Object.keys(PAGE_PET_IDS).forEach(heroId => {
-        const pet = document.getElementById(PAGE_PET_IDS[heroId]);
-        const hero = document.getElementById(heroId);
-        if (!pet) return;
-        if (!spec || !hero || hero.style.left === '') { pet.style.display = 'none'; return; }
-        // The hero's feet are where its frame's feet point sits on the page
-        const feetX = parseFloat(hero.style.left) + f.fx;
-        const feetY = parseFloat(hero.style.top) + f.fy;
-        placePetImg(pet, spec, feetX - PAGE_PET_GAP_X[heroId], feetY);
-    });
+    const pet = document.getElementById('town-pet');
+    if (!pet) return;
+    if (!spec) { pet.style.display = 'none'; return; }
+    placePetImg(pet, spec, TOWN_DUMMY_FEET.left, TOWN_DUMMY_FEET.top);
 }
 setInterval(syncPetSprite, 100);
 // Friendship from play: the first play of each day (per pet) adds 1 point and shows a heart. Later plays are animation only.
@@ -950,7 +941,7 @@ function petLick(el) {
     }, CAT_LICK_IDLE_MS);
 }
 document.addEventListener('DOMContentLoaded', () => {
-    ['combat-pet-sprite'].forEach(id => {
+    ['combat-pet-sprite', 'town-pet'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.style.cursor = 'pointer'; el.style.pointerEvents = 'auto'; el.addEventListener('click', () => petLick(el)); }
     });
