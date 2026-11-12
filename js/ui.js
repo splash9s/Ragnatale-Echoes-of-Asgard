@@ -5552,8 +5552,6 @@ function toggleTentUi() {
 function updateTentTopLabels() {
     const view = document.getElementById('view-character');
     if (!view) return;
-    const n = document.getElementById('tent-names-btn');
-    if (n) n.textContent = view.classList.contains('pet-names-on') ? 'Hide names' : 'Show names';
 }
 
 // ---- Pet management panel (right side of the cleared tent): pet list, then pet detail ----
@@ -5594,8 +5592,10 @@ function renderPetPanel() {
                 + `<span class="pet-row-main">${petEsc(c.name)}<small>Lv ${f.lv + 1} · ${petEsc(f.title)}</small></span>`
                 + (on ? `<span class="pet-tag">Walking</span>` : '') + `</button>`;
         }).join('') : `<p class="pet-empty">You have no pets yet. Buy one in the shop.</p>`;
+        const namesOn = !!document.getElementById('view-character')?.classList.contains('pet-names-on');
         box.innerHTML = `<div class="pet-head"><h3>Pets</h3><button class="pet-x" onclick="closePetPanel()">×</button></div>`
-            + `<div class="pet-list">${rows}</div>`;
+            + `<div class="pet-list">${rows}</div>`
+            + `<button class="pet-walk" onclick="toggleTentPetNames(); renderPetPanel();">${namesOn ? 'Hide names' : 'Show names'}</button>`;
         return;
     }
     const c = choices.find(x => String(x.token) === petPanelView);
