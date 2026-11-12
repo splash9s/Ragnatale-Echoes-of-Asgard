@@ -5009,26 +5009,80 @@ function tentCatKeyframes(withFlip) {
         }),
     })) };
 }
-let tentCatFrame = 0;
+let tentCatFrame = 0, tentCatWalk = null, tentCatShadowWalk = null, tentCatTimer = null, tentCatLicking = false;
 function startTentCat() {
     const cat = document.getElementById('tent-cat');
     const shadow = document.getElementById('tent-cat-shadow');
     if (!cat || cat.dataset.walking) return;
     cat.dataset.walking = '1';
     const walk = tentCatKeyframes(true);
-    cat.animate(walk.frames, { duration: walk.ms, iterations: Infinity, easing: 'linear' });
+    tentCatWalk = cat.animate(walk.frames, { duration: walk.ms, iterations: Infinity, easing: 'linear' });
     if (shadow) {
         shadow.style.width = TENT_CAT.shadowW + 'px';
         shadow.style.height = TENT_CAT.shadowH + 'px';
         const sh = tentCatKeyframes(false);
-        shadow.animate(sh.frames, { duration: sh.ms, iterations: Infinity, easing: 'linear' });
+        tentCatShadowWalk = shadow.animate(sh.frames, { duration: sh.ms, iterations: Infinity, easing: 'linear' });
     }
-    setInterval(() => {
+    tentCatTimer = setInterval(() => {
         tentCatFrame = (tentCatFrame + 1) % TENT_CAT.frames;
         cat.src = `assets/page01/cat/c${tentCatFrame + 1}_q85.webp`;
     }, TENT_CAT.frameMs);
 }
-document.addEventListener('DOMContentLoaded', startTentCat);
+// Click the cat: it stops where it is, sits, licks, sits again, then walks on from the same spot (same as the main page cat).
+function tentCatClick() {
+    if (tentCatLicking || !tentCatWalk) return;
+    const cat = document.getElementById('tent-cat');
+    const lick = document.getElementById('tent-cat-lick');
+    if (!cat || !lick) return;
+    tentCatLicking = true;
+    tentCatWalk.pause();
+    if (tentCatShadowWalk) tentCatShadowWalk.pause();
+    clearInterval(tentCatTimer);
+    // Put the lick pose where the cat stands now (feet on the same spot, design px)
+    const inner = cat.closest('.ts-inner');
+    const ir = inner.getBoundingClientRect(), k = (ir.width / 1920) || 1;
+    const cr = cat.getBoundingClientRect();
+    const feetX = (cr.left + cr.width / 2 - ir.left) / k;
+    const feetY = (cr.bottom - ir.top) / k - 10; // the sprite's lower edge sits 10px below its feet
+    const lickX = feetX - 134 / 2, lickY = feetY - 120;
+    lick.style.transform = `translate(${lickX}px, ${lickY}px)`;
+    cat.style.display = 'none';
+    lick.style.display = 'block';
+    const show = n => { lick.src = `assets/page01/cat/lick${n}_q85.webp`; };
+    show(1);
+    setTimeout(() => {
+        let step = 0;
+        show(CAT_LICK_SEQ[step++]);
+        const timer = setInterval(() => {
+            if (step >= CAT_LICK_SEQ.length) {
+                clearInterval(timer);
+                show(1);
+                setTimeout(tentCatResume, CAT_LICK_REST_MS);
+                return;
+            }
+            show(CAT_LICK_SEQ[step++]);
+        }, CAT_LICK_FRAME_MS);
+    }, CAT_LICK_IDLE_MS);
+}
+function tentCatResume() {
+    const cat = document.getElementById('tent-cat');
+    const lick = document.getElementById('tent-cat-lick');
+    if (lick) lick.style.display = 'none';
+    if (cat) cat.style.display = ''; // back to the CSS rule (shown in clear screen only)
+    tentCatLicking = false;
+    if (tentCatWalk) tentCatWalk.play();
+    if (tentCatShadowWalk) tentCatShadowWalk.play();
+    tentCatTimer = setInterval(() => {
+        tentCatFrame = (tentCatFrame + 1) % TENT_CAT.frames;
+        if (cat) cat.src = `assets/page01/cat/c${tentCatFrame + 1}_q85.webp`;
+    }, TENT_CAT.frameMs);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    startTentCat();
+    attachTentLight(document.getElementById('tent-cat-lick'));
+    const cat = document.getElementById('tent-cat');
+    if (cat) cat.addEventListener('click', tentCatClick);
+});
 
 // Main page sparkles: small golden glints drift up across the town scene now and then.
 // They only spawn while the main page is showing.
