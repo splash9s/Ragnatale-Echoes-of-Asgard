@@ -115,7 +115,15 @@ const GAME_FONTS = {
     roboto:   "'Roboto', sans-serif",
     cinzel:   "'Cinzel', serif",
     medieval: "'MedievalSharp', cursive",
-    pixel:    "'Press Start 2P', monospace"
+    pixel:    "'Press Start 2P', monospace",
+    lora:     "'Lora', serif",
+    playfair: "'Playfair Display', serif",
+    almendra: "'Almendra', serif",
+    pirata:   "'Pirata One', serif",
+    prompt:   "'Prompt', sans-serif",
+    kanit:    "'Kanit', sans-serif",
+    sarabun:  "'Sarabun', sans-serif",
+    notothai: "'Noto Sans Thai', sans-serif"
 };
 function gameFontKey() { return (player && GAME_FONTS[player.uiFont]) ? player.uiFont : 'outfit'; }
 function applyGameFont() {
