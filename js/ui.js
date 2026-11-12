@@ -856,8 +856,8 @@ const PET_SPRITES = {
     'Support Slime Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
 };
 const COMBAT_PET_GAP_X = 120;
-// Fine position of the combat pet (px) from its base spot: 50 left, 240 up
-const COMBAT_PET_OFFSET = { dx: -50, dy: -240 };
+// Fine position of the combat pet (px) from the player's feet anchor: 50 left, 60 up
+const COMBAT_PET_OFFSET = { dx: -50, dy: -60 };
 // Page pets (town and character pages) stand the same way beside the hero's feet
 const PAGE_PET_IDS = { 'town-hero': 'town-pet' }; // main page only; the character page shows no pet
 // Gap from the hero's feet to the pet's feet on each page
