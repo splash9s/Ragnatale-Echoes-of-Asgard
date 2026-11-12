@@ -917,7 +917,7 @@ function spawnPetHeart(parent, x, y) {
 const PET_LICK_BASE = 'assets/combat/ocat/ocat';
 function petLick(el) {
     if (!el || el.dataset.licking || el.style.display === 'none') return;
-    if (el.id === 'combat-pet-sprite' && petDailyPlay(player.equipped && player.equipped.pet)) {
+    if (petDailyPlay(player.equipped && player.equipped.pet)) {
         spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
     }
     el.dataset.licking = '1';
