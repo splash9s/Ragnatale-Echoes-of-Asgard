@@ -731,8 +731,8 @@ const COMBAT_PLAYER_WINDUP_PX = -12;  // wind-up draws back this far
 const COMBAT_PLAYER_LUNGE_PX = 40;    // the strike lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
 // The hero dies at the end of a lost battle: the fall pose drops slowly onto the floor (PLAYER_FALL_MS), then rests there until the result.
-const PLAYER_FALL_MS = 2200;
-const PLAYER_FALL_LIFT_PX = 70; // the fall starts this far above the floor (screen px)
+const PLAYER_FALL_MS = 1500;
+const PLAYER_FALL_LIFT_PX = 90; // the fall starts this far above the floor (screen px)
 let combatPlayerDeadAt = 0;
 let combatPlayerFalling = false;
 function playPlayerFallAnim() {
@@ -747,8 +747,15 @@ function playPlayerFallAnim() {
     const fallen = combatDeadFrame();
     applyPlayerFrame(el, fallen || combatPose().IDLE);
     combatPlayerFalling = true;
-    const drop = el.animate([{ transform: `translateY(-${PLAYER_FALL_LIFT_PX}px)` }, { transform: 'translateY(0px)' }],
-        { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.5, 0, 0.9, 0.6)', fill: 'forwards' }); // slow motion, speeds up as it lands
+    // Drop, impact, then two small bounces (1.5 s in total)
+    const drop = el.animate([
+        { transform: `translateY(-${PLAYER_FALL_LIFT_PX}px)`, offset: 0, easing: 'cubic-bezier(0.55, 0, 0.9, 0.6)' }, // slow start, speeds up
+        { transform: 'translateY(0px)', offset: 0.66, easing: 'ease-out' },                                    // impact on the floor
+        { transform: 'translateY(-16px)', offset: 0.8, easing: 'ease-in' },                                    // bounce up
+        { transform: 'translateY(0px)', offset: 0.9, easing: 'ease-in' },                                      // lands
+        { transform: 'translateY(-5px)', offset: 0.95, easing: 'ease-in' },                                    // small bounce
+        { transform: 'translateY(0px)', offset: 1 }
+    ], { duration: PLAYER_FALL_MS, fill: 'forwards' });
     drop.onfinish = () => {
         drop.cancel();
         combatPlayerFalling = false;
