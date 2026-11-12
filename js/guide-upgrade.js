@@ -5,7 +5,8 @@
 // which blink, with a tip (same look as the intro guide).
 // Steps:
 //   1) Character button on the main page
-//   2) On the character page: STATS tab (raise stats) or SKILLS button (learn skills). Both stay clickable.
+//   2) Character page, STATS closed: STATS tab or SKILLS button (both clickable)
+//   3) Character page, STATS open: the stat window or SKILLS button (both clickable)
 // Opening the Skills page ends the guide for good (player.guide.upgrade).
 // ==========================================
 
@@ -16,9 +17,16 @@ const GUIDE_UPGRADE_STEPS = [
         targets: () => [document.querySelector('#view-town .ui[data-action="character"]')]
     },
     {
+        // STATS closed: the STATS tab and the SKILLS button both stay clickable
         text: 'Tap STATS to raise your stats, or SKILLS to learn your job skills',
-        visible: () => guideViewVisible('view-character'),
+        visible: () => guideViewVisible('view-character') && document.getElementById('view-character')?.classList.contains('stats-hidden'),
         targets: () => [document.getElementById('char-stats-tab'), document.querySelector('#view-character .char-skills-btn')]
+    },
+    {
+        // STATS open: the stat window itself stays clickable (the guide must not cover it), plus SKILLS
+        text: 'Raise your stats here, then tap SKILLS to learn skills',
+        visible: () => guideViewVisible('view-character') && !document.getElementById('view-character')?.classList.contains('stats-hidden'),
+        targets: () => [document.querySelector('#view-character .char-stats-panel'), document.querySelector('#view-character .char-skills-btn')]
     }
 ];
 
