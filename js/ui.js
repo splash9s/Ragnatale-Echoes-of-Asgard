@@ -2640,7 +2640,7 @@ function placeItemInInventory(newItem) {
 }
 
 function addItemToInventory(newItem) {
-    if (stageSummary) stageSummary.items.push({ name: newItem.name, rarity: newItem.rarity });
+    if (stageSummary) stageSummary.items.push(JSON.parse(JSON.stringify(newItem))); // full copy: the result page shows its icon and detail
     if (!placeItemInInventory(newItem)) {
         logMessage(`[Inventory Full] ${newItem.name} was discarded.`, 'combat');
         return false;
@@ -3085,16 +3085,41 @@ function reqLevelHTML(item, levelReq) {
     return `<span class="${rarity ? rarity.text : 'text-slate-300'} font-bold text-[11px]">R${item.rarity}</span>` +
         `<span class="${ok ? 'text-emerald-400' : 'text-red-400'} font-bold text-[11px]">, Requires Base Lv. ${req}</span>`;
 }
-function showItemDetail(index) {
-    const item = player.inventory[index];
-    if (!item) { closeInvDetail(); return; }
-    window.invDetailIndex = index;
+// Combat result: a dropped item's detail, in a window above the result (same body as the inventory detail)
+function showResultItemDetail(index) {
+    const item = stageSummary && stageSummary.items ? stageSummary.items[index] : null;
+    if (!item) return;
+    let ov = document.getElementById('result-item-detail');
+    if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'result-item-detail';
+        ov.style.cssText = 'position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,.6); padding:16px;';
+        ov.onclick = () => closeResultItemDetail();
+        document.body.appendChild(ov);
+    }
+    const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+    ov.innerHTML = `
+        <div onclick="event.stopPropagation()" class="relative char-detail-2x" style="width:756px; max-width:95vw; max-height:90vh; overflow-y:auto; background:rgba(231,209,170,.96); border:2px solid #b8945a; border-radius:14px; padding:18px; text-align:left;">
+            <button onclick="closeResultItemDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
+            <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
+                <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(item)}</span>
+                <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span></div>
+            </div>
+            ${itemDetailBodyHTML(item)}
+        </div>`;
+    ov.style.display = 'flex';
+}
+function closeResultItemDetail() {
+    const ov = document.getElementById('result-item-detail');
+    if (ov) { ov.style.display = 'none'; ov.innerHTML = ''; }
+}
+
+// Shared item detail body (inventory detail and the combat result's item detail use it)
+function itemDetailBodyHTML(item) {
     const isEquip = !!item.slot;
     const isPotion = item.type === 'potion';
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
-    const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-
     let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
     body += `<div class="flex justify-between items-center">
         <span>${rarity ? reqLevelHTML(item, isEquip ? item.levelReq : 0) : ''}</span>
@@ -3111,6 +3136,19 @@ function showItemDetail(index) {
     }
     body += '</div>';
 
+    return body;
+}
+function showItemDetail(index) {
+    const item = player.inventory[index];
+    if (!item) { closeInvDetail(); return; }
+    window.invDetailIndex = index;
+    const isEquip = !!item.slot;
+    const isPotion = item.type === 'potion';
+    const rarity = RARITY_INFO[item.rarity];
+    const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
+    const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+
+    const body = itemDetailBodyHTML(item);
     const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
     let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
     if (item.type === 'chest') actions += `<button onclick="openChestFromDetail(${index})" class="${btn} bg-purple-600 hover:bg-purple-500 text-slate-100">Open</button>`;

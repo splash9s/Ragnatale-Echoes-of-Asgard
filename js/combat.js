@@ -1004,6 +1004,7 @@ function awardKill(m) {
     if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
+    if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:2px;"><img src="assets/shop/diamond/goldmulti.png" alt="" style="width:40px;height:40px;object-fit:contain;"><b style="color:#fde68a; font-size:16px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
     if (m.isFinalBoss) { player.diamonds += 100; logMessage(`[Final Boss] Defeated! Reward: 100 Diamond`, 'drop'); }
     player.baseExp += baseExpGain;
     player.jobExp += jobExpGain;
@@ -1793,7 +1794,10 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', g
     const fmt = n => Number(n).toLocaleString();
     const card = (title, value, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-center min-w-0"><div class="text-[10px] text-slate-500 uppercase">${title}</div><div class="text-sm font-bold font-mono truncate ${cls}">${value}</div></div>`;
     const section = (title, count, body, open = true) => `<details ${open ? 'open' : ''} class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
-    const itemBody = s.items.length ? s.items.map(i => `<div><span class="${(RARITY_INFO[i.rarity] || RARITY_INFO[1]).text}">${escapeHtml(i.name)}</span> <span class="text-slate-500">(Rarity ${i.rarity})</span></div>`).join('') : '<div class="text-slate-500">No item dropped</div>';
+    // Items as icons; a click opens the item's detail (the same detail menu as the inventory)
+    const itemBody = s.items.length
+        ? `<div class="flex flex-wrap gap-2">${s.items.map((i, idx) => `<button onclick="showResultItemDetail(${idx})" title="${escapeHtml(i.name)}" class="cursor-pointer rounded-lg border border-slate-700 bg-slate-950 hover:border-amber-400 p-1" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;">${itemIconHTML(i, 50)}</button>`).join('')}</div>`
+        : '<div class="text-slate-500">No item dropped</div>';
     const runeBody = s.runes.length ? s.runes.map(r => `<div class="${(RARITY_INFO[r.rarity] || RARITY_INFO[1]).text}">${escapeHtml(r.text)}</div>`).join('') : '<div class="text-slate-500">No rune picked</div>';
     const logBody = s.log.length ? `<div class="max-h-48 overflow-y-auto font-mono text-[10px] flex flex-col gap-0.5">${s.log.map(l => `<div class="${logClassFor(l.type)}">${l.msg}</div>`).join('')}</div>` : '<div class="text-slate-500">No log</div>';
     const statCards = (kind === 'win')
