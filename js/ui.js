@@ -3372,6 +3372,7 @@ function syncHeroSprites() {
         el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx * s) + 'px';
         el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy * s) + 'px';
     });
+    if (typeof syncTentLights === "function") syncTentLights();
     document.querySelectorAll('img.hero-thumb').forEach(el => { if (el.getAttribute('src') !== f.src) el.src = f.src; });
     ['town-shadow', 'char-shadow'].forEach(id => {
         const el = document.getElementById(id);
@@ -4888,7 +4889,52 @@ function renderCharLights() {
     set('tent-left', L && !R);
     set('tent-right', R && !L);
     set('tent-both', L && R);
+    syncTentLights();
 }
+
+// Tent light sources in stage pixels (1920x1080 frame).
+// Any sprite on the character page (the hero, the pet, future characters) can be lit: attachTentLight(el) adds a
+// glow layer for each lamp that is masked to the sprite's own pixels, so it follows the sprite's current picture,
+// position and size, whatever animation frame or equipment it shows.
+const TENT_LIGHT_POINTS = { left: { x: 595, y: 470 }, right: { x: 1485, y: 620 } };
+const tentLightSprites = new Map(); // sprite id -> { sprite, glows: { left, right } }
+function attachTentLight(sprite) {
+    if (!sprite || !sprite.id || tentLightSprites.has(sprite.id) || !sprite.parentElement) return;
+    const glows = {};
+    ['left', 'right'].forEach(key => {
+        const g = document.createElement('div');
+        g.className = 'sprite-light sprite-light-' + key;
+        g.dataset.owner = sprite.id;
+        sprite.parentElement.insertBefore(g, sprite.nextSibling);
+        glows[key] = g;
+    });
+    tentLightSprites.set(sprite.id, { sprite, glows });
+    // Re-sync whenever the sprite's picture (src) or placement (style) changes
+    new MutationObserver(syncTentLights).observe(sprite, { attributes: true, attributeFilter: ['src', 'style'] });
+    syncTentLights();
+}
+function syncTentLights() {
+    tentLightSprites.forEach(({ sprite, glows }) => {
+        const left = parseFloat(sprite.style.left) || 0, top = parseFloat(sprite.style.top) || 0;
+        const w = parseFloat(sprite.style.width) || 0, h = parseFloat(sprite.style.height) || 0;
+        const src = sprite.getAttribute('src');
+        const mask = src ? `url("${src}")` : 'none';
+        ['left', 'right'].forEach(key => {
+            const g = glows[key], p = TENT_LIGHT_POINTS[key];
+            g.style.left = left + 'px';
+            g.style.top = top + 'px';
+            g.style.width = w + 'px';
+            g.style.height = h + 'px';
+            g.style.zIndex = sprite.style.zIndex;
+            g.style.setProperty('--lx', (p.x - left) + 'px');
+            g.style.setProperty('--ly', (p.y - top) + 'px');
+            g.style.maskImage = mask;
+            g.style.webkitMaskImage = mask;
+            g.classList.toggle('on', key === 'left' ? charLightState.left : charLightState.right);
+        });
+    });
+}
+document.addEventListener('DOMContentLoaded', () => attachTentLight(document.getElementById('char-hero')));
 function toggleCharLight(side) {
     charLightState[side] = !charLightState[side];
     renderCharLights();
