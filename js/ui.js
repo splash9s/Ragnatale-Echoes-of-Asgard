@@ -118,17 +118,38 @@ function manualSaveGame() {
 // Settings: guest players see Bind Gmail; players already linked see their Gmail as read-only
 async function refreshBindEmail() {
     const btn = document.getElementById('bind-email-btn');
-    if (!btn) return;
+    const status = document.getElementById('account-status');
     const user = await cloudCurrentUser();
-    if (!user) { btn.classList.add('hidden'); return; } // offline-only play: nothing to bind
-    btn.classList.remove('hidden');
-    if (user.is_anonymous) {
-        btn.disabled = false;
-        btn.textContent = '✉️ Bind Gmail';
-    } else {
-        btn.disabled = true;
-        btn.textContent = '✉️ Gmail: ' + (user.email || 'linked');
+    if (status) {
+        status.textContent = '';
+        const addRow = (label, value) => {
+            const row = document.createElement('div');
+            const k = document.createElement('span');
+            k.className = 'text-slate-400';
+            k.textContent = label + ' ';
+            const v = document.createElement('span');
+            v.className = 'break-all font-mono';
+            v.textContent = value;
+            row.append(k, v);
+            status.appendChild(row);
+        };
+        if (!user) {
+            addRow('Account:', 'Not signed in (offline play)');
+        } else if (user.is_anonymous) {
+            addRow('Account:', 'Guest (not linked)');
+            addRow('ID:', user.id);
+        } else {
+            addRow('Account:', 'Linked');
+            addRow('Gmail:', user.email || '-');
+            addRow('ID:', user.id);
+        }
     }
+    if (!btn) return;
+    // Bind Gmail only for guests; hidden for offline play and for linked accounts
+    if (!user || !user.is_anonymous) { btn.classList.add('hidden'); return; }
+    btn.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = '✉️ Bind Gmail';
 }
 async function bindGmail() {
     const r = await cloudBindGmail();
