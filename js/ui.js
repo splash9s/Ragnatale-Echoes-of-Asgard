@@ -5589,7 +5589,8 @@ function petEsc(s) {
     return f(String(s));
 }
 function openPetPanel() {
-    if (!document.getElementById('pet-panel')) {
+    if (document.getElementById('pet-panel')) { closePetPanel(); return; } // pressing Pets again closes it
+    {
         const box = document.createElement('div');
         box.id = 'pet-panel';
         document.body.appendChild(box);
