@@ -2419,11 +2419,11 @@ function renderBlacksmithChrome() {
         const b = document.getElementById('bs-tab-' + m);
         if (!b) return;
         const on = blacksmithMode === m;
-        b.style.background = on ? '#d6be8c' : 'rgba(40,28,14,.7)';
-        b.style.color = on ? '#3b2412' : '#f5e6c4';
-        // Selected: thick border with a light inner edge. Unselected keeps its thin border.
-        b.style.border = on ? '5px solid #3b2412' : '1px solid #b8945a';
-        b.style.boxShadow = on ? 'inset 0 0 0 2px #fbbf24' : 'none';
+        // Same look as the Events page tabs: parchment background; the active tab gets a gold border
+        b.style.backgroundColor = 'rgba(214, 190, 140, .5)';
+        b.style.color = '#2a1a0e';
+        b.style.border = on ? '2px solid #c9a227' : '1px solid #b8945a';
+        b.style.boxShadow = 'none';
     });
 }
 
