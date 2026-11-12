@@ -258,6 +258,18 @@ async function cloudCurrentUser() {
         return user || null;
     } catch (e) { return null; }
 }
+// A failed Gmail link comes back on the page URL (?error_description=... or #error_description=...).
+// Keep the reason so Settings can show it, then clean the URL.
+(function captureBindError() {
+    try {
+        const q = new URLSearchParams(location.search);
+        const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+        const desc = h.get('error_description') || q.get('error_description') || h.get('error') || q.get('error');
+        if (!desc) return;
+        window.bindErrorMsg = 'Gmail link failed: ' + desc.replace(/\+/g, ' ');
+        history.replaceState(null, '', location.pathname);
+    } catch (e) { /* ignore */ }
+})();
 // Binds a Gmail to the guest account: Google sign-in is linked to the same user, so the id and save are kept.
 // The page leaves for Google and comes back linked.
 async function cloudBindGmail() {

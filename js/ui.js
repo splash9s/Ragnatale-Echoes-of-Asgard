@@ -137,13 +137,14 @@ async function refreshBindEmail() {
             addRow('Account:', 'Not signed in (offline play)');
         } else if (user.is_anonymous) {
             addRow('Account:', 'Guest (not linked)');
-            addRow('ID:', user.id);
         } else {
             addRow('Account:', 'Linked');
             addRow('Gmail:', user.email || '-');
-            addRow('ID:', user.id);
         }
     }
+    // Show a Gmail link failure reason (from the OAuth return) once
+    const errEl = document.getElementById('bind-msg');
+    if (errEl && window.bindErrorMsg) { errEl.textContent = window.bindErrorMsg; window.bindErrorMsg = null; }
     if (!btn) return;
     // Bind Gmail only for guests; hidden for offline play and for linked accounts
     if (!user || !user.is_anonymous) { btn.classList.add('hidden'); return; }
@@ -152,9 +153,10 @@ async function refreshBindEmail() {
     btn.textContent = '✉️ Bind Gmail';
 }
 async function bindGmail() {
-    const r = await cloudBindGmail();
     const msg = document.getElementById('bind-msg');
-    if (r.error && msg) msg.textContent = r.error;
+    if (msg) msg.textContent = '';
+    const r = await cloudBindGmail();
+    if (r.error && msg) msg.textContent = 'Gmail link failed: ' + r.error;
 }
 
 function resetSaveGame() {
