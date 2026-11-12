@@ -989,6 +989,7 @@ function petLick(el) {
         spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
     }
     el.dataset.licking = '1';
+    playSound('sound/cat-meow.mp3');
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
     show(1);
     setTimeout(() => {
@@ -5317,11 +5318,17 @@ function setSmithFrame(i) {
     const el = document.getElementById('town-smith');
     if (el) el.src = `assets/page01/smith/k${i}_q85.webp`;
 }
+const SMITH_SWINGS = 2; // the hammer comes down twice per swing cycle
+const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((f, k) => setTimeout(() => setSmithFrame(f), k * SMITH_FRAME_MS));
-    setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, 9 * SMITH_FRAME_MS);
+    playSound('sound/blacksmith-hammering.mp3');
+    const total = SMITH_SWING_FRAMES.length * SMITH_SWINGS;
+    for (let k = 0; k < total; k++) {
+        setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k % SMITH_SWING_FRAMES.length]), k * SMITH_FRAME_MS);
+    }
+    setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, total * SMITH_FRAME_MS);
 }
 function scheduleSmithSwing() {
     setTimeout(() => {
