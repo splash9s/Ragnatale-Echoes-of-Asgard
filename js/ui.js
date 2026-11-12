@@ -5552,9 +5552,8 @@ function toggleTentUi() {
 function updateTentTopLabels() {
     const view = document.getElementById('view-character');
     if (!view) return;
-    const n = document.getElementById('tent-names-btn'), u = document.getElementById('tent-ui-toggle');
+    const n = document.getElementById('tent-names-btn');
     if (n) n.textContent = view.classList.contains('pet-names-on') ? 'Hide names' : 'Show names';
-    if (u) u.textContent = view.classList.contains('ui-off') ? 'Show UI' : 'Hide UI';
 }
 
 // ---- Pet management panel (right side of the cleared tent): pet list, then pet detail ----
