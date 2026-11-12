@@ -730,8 +730,9 @@ const COMBAT_PLAYER_CRIT_MS = 520;    // whole critical: wind-up + critical02 (4
 const COMBAT_PLAYER_WINDUP_PX = -12;  // wind-up draws back this far
 const COMBAT_PLAYER_LUNGE_PX = 40;    // the strike lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
-// The hero dies at the end of a lost battle: a slow-motion fall (PLAYER_FALL_MS), then the dead pose lies on the ground until the result.
+// The hero dies at the end of a lost battle: the fall pose drops slowly onto the floor (PLAYER_FALL_MS), then rests there until the result.
 const PLAYER_FALL_MS = 2200;
+const PLAYER_FALL_LIFT_PX = 70; // the fall starts this far above the floor (screen px)
 let combatPlayerDeadAt = 0;
 let combatPlayerFalling = false;
 function playPlayerFallAnim() {
@@ -741,25 +742,17 @@ function playPlayerFallAnim() {
     el.classList.remove('player-hurt'); // no hit flash on the death: the fall is the only effect
     // Stop a running attack lunge (WAAPI only; the CSS idle/hurt animations stay)
     el.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); });
-    // The standing hero tips backwards from its feet. The fall always plays: the lying frame is swapped in at the end if it has loaded.
-    const stand = combatPose().IDLE;
-    if (stand) {
-        applyPlayerFrame(el, stand);
-        const S = COMBAT_PLAYER_SCALE;
-        el.style.transformOrigin = ((stand.fx !== undefined ? stand.fx : stand.w / 2) * S) + 'px ' + ((stand.fy !== undefined ? stand.fy : stand.h) * S) + 'px';
-    }
+    // The falling figure is the fall pose (tumbling in the air). It starts raised and drops slowly onto the floor.
+    // Without the fall art yet, the standing hero drops in its place.
+    const fallen = combatDeadFrame();
+    applyPlayerFrame(el, fallen || combatPose().IDLE);
     combatPlayerFalling = true;
-    const fall = el.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-90deg)' }],
-        { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'forwards' }); // slow but starts tipping at once
-    fall.onfinish = () => {
-        const dead = combatDeadFrame();
-        if (dead) {
-            fall.cancel();
-            el.style.transform = '';
-            el.style.transformOrigin = '';
-            applyPlayerFrame(el, dead); // lies on the ground
-        } // else the sprite stays tipped over (fill forwards) until the dead frame loads
+    const drop = el.animate([{ transform: `translateY(-${PLAYER_FALL_LIFT_PX}px)` }, { transform: 'translateY(0px)' }],
+        { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.5, 0, 0.9, 0.6)', fill: 'forwards' }); // slow motion, speeds up as it lands
+    drop.onfinish = () => {
+        drop.cancel();
         combatPlayerFalling = false;
+        if (combatDeadFrame()) applyPlayerFrame(el, combatDeadFrame()); // rests on the floor
     };
 }
 // A frame placed so its torso is where the reference frame's torso is (the feet stay on the ground)
