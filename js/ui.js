@@ -5323,19 +5323,20 @@ const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    playSound('sound/blacksmith-hammering.mp3');
+    playSound('sound/blacksmith-hammer-swing.mp3'); // one sound for the whole swing cycle
     const total = SMITH_SWING_FRAMES.length * SMITH_SWINGS;
     for (let k = 0; k < total; k++) {
         setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k % SMITH_SWING_FRAMES.length]), k * SMITH_FRAME_MS);
     }
     setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, total * SMITH_FRAME_MS);
 }
+// Once every minute, at a random moment within that minute, while the main page is showing
 function scheduleSmithSwing() {
     setTimeout(() => {
         const town = document.getElementById('view-town');
         if (town && !town.classList.contains('hidden')) playSmithSwing();
-        scheduleSmithSwing();
-    }, 5000 + Math.random() * 9000);
+    }, Math.random() * 60000);
+    setTimeout(scheduleSmithSwing, 60000);
 }
 scheduleSmithSwing();
 
