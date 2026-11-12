@@ -23,6 +23,7 @@ let player = {
     potions: 3,
     resurrectionPotions: 1, resurrectionOn: true, 
     refiningStones: 5, 
+    elementStones: { fire: 0, wind: 0, earth: 0, water: 0 },
     baseMovementSpeed: 3,
     unlockedMaxMapLevel: 1,
     clearedMaps: {},
@@ -189,7 +190,7 @@ function rollBossDropRarity() {
 // Generates an equipment item with PoE-style rolls:
 // - rarity 1..5 (item rarity), 0..4 buffs (weighted by rarity, at least minBuffs)
 // - each buff rolls its own tier 1..5 and an independent potency roll
-// - weapons have a 40% chance of one element
+// - weapons no longer roll an element from drops (elements are forged at the Blacksmith's Elemental forge)
 
 
 // attackEl / defEl: element key or null. Returns damage multiplier.
@@ -287,10 +288,7 @@ function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
         debuffs.push({ stat: d.key, value: -roll, desc: `-${roll}% ${d.name} Resistance` });
     }
 
-    let element = baseTemplate.element || null;
-    if (!element && baseTemplate.slot === 'weapon' && Math.random() < 0.4) {
-        element = ELEMENT_KEYS[Math.floor(Math.random() * ELEMENT_KEYS.length)];
-    }
+    const element = baseTemplate.element || null;
 
     return { ...baseTemplate, element, rarity, refineLevel: 0, buffs, debuffs, qty: 1 };
 }
@@ -417,6 +415,7 @@ function loadGame() {
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (typeof ensureDailyQuestsToday === 'function') ensureDailyQuestsToday();
             if (!player.materials) player.materials = { ironScraps: 0 };
+            player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0, ...(player.elementStones || {}) };
             if (!player.beginnerQuest) player.beginnerQuest = { index: 0, flags: {} };
             if (!player.guide) player.guide = { lowHp: false, death: false };
             player.runes = { ...defaultRunes(), ...(player.runes || {}) };

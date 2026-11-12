@@ -2225,11 +2225,25 @@ function buyDiamondItem(itemId) {
 // Blacksmith: pick an equipped gear from the list to load it into the gear slot, then refine it
 let blacksmithSelectedSlot = null;
 let blacksmithRuneOn = false;
+let blacksmithMode = 'refine';   // 'refine' or 'elemental' (the menu on the Blacksmith page)
+let blacksmithForgeEl = null;    // the element stone picked for the elemental forge
+// Gold for forging an element onto a weapon: 100 Gold per gear level (minimum 100)
+function elementForgeCost(gear) { return Math.max(100, (Number(gear && gear.levelReq) || 1) * 100); }
+function blacksmithSetMode(mode) {
+    blacksmithMode = mode;
+    blacksmithSelectedSlot = null;
+    renderRefiningUI();
+}
+function blacksmithSelectElement(el) {
+    blacksmithForgeEl = el;
+    renderRefiningUI();
+}
 // Refine success: +0 to +4 always succeed; from +5 the rate drops 15% per level (minimum 10%)
 function refineSuccessRate(lv) {
     return lv >= 5 ? Math.max(10, 100 - ((lv - 4) * 15)) : 100;
 }
 function blacksmithToggleRune() {
+    if (blacksmithMode === 'elemental') return; // the rune slot shows the picked element stone here
     if (!blacksmithRuneOn && (player.blacksmithRuneStones || 0) < 1) {
         showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
         return;
@@ -2246,12 +2260,28 @@ function blacksmithCancel() {
     renderRefiningUI();
 }
 function blacksmithRefineSelected() {
+    if (blacksmithMode === 'elemental') { forgeElementOnWeapon(); return; }
     if (!blacksmithSelectedSlot) return;
     refineEquipment(blacksmithSelectedSlot);
 }
 function renderRuneSlot() {
     const runeEl = document.getElementById('blacksmith-rune-slot');
     const balEl = document.getElementById('bs-rune-balance');
+    if (blacksmithMode === 'elemental') {
+        // Elemental mode: this slot shows the picked element stone and how many are held
+        const stones = player.elementStones || {};
+        if (runeEl) {
+            const e = blacksmithForgeEl && ELEMENTS[blacksmithForgeEl];
+            runeEl.innerHTML = e
+                ? `<span style="font-size:34px; line-height:1;">${e.icon}</span><span style="font-size:12px; font-weight:900; color:#fff; text-shadow:0 1px 3px #000;">x${stones[blacksmithForgeEl] || 0}</span>`
+                : '<span style="opacity:.6; font-size:11px;">Pick stone</span>';
+        }
+        if (balEl) {
+            const e = blacksmithForgeEl && ELEMENTS[blacksmithForgeEl];
+            balEl.textContent = e ? `${e.name} Elemental Stone: ${stones[blacksmithForgeEl] || 0}` : 'No stone picked';
+        }
+        return;
+    }
     const count = player.blacksmithRuneStones || 0;
     if (count < 1) blacksmithRuneOn = false;
     if (runeEl) {
@@ -2263,6 +2293,7 @@ function renderBlacksmithSlot() {
     const slotEl = document.getElementById('blacksmith-gear-slot');
     const refineBtn = document.getElementById('bs-refine');
     renderRuneSlot();
+    if (blacksmithMode === 'elemental') { renderElementalSlot(slotEl, refineBtn); return; }
     if (!slotEl) return;
     const gear = blacksmithSelectedSlot ? player.equipped[blacksmithSelectedSlot] : null;
     if (!gear) {
@@ -2289,6 +2320,8 @@ function renderBlacksmithSlot() {
 function renderRefiningUI() {
     let container = document.getElementById('refining-slots-container');
     if (!container) return;
+    renderBlacksmithChrome();
+    if (blacksmithMode === 'elemental') { renderElementalUI(); return; }
     let scraps = getScrapCount();
     if (blacksmithSelectedSlot && !player.equipped[blacksmithSelectedSlot]) blacksmithSelectedSlot = null;
 
@@ -2328,6 +2361,103 @@ function renderRefiningUI() {
 }
 
 // The very first refine is free (no Gold, no Refining Stone); until then the gear and Refine button blink
+// Menu tabs, left title and right rules for the current Blacksmith mode
+function renderBlacksmithChrome() {
+    const elemental = blacksmithMode === 'elemental';
+    const title = document.getElementById('bs-left-title');
+    if (title) title.textContent = elemental ? 'Elemental Forge' : 'Refinement';
+    const rr = document.getElementById('bs-rules-refine');
+    const re = document.getElementById('bs-rules-elemental');
+    if (rr) rr.style.display = elemental ? 'none' : '';
+    if (re) re.style.display = elemental ? '' : 'none';
+    ['refine', 'elemental'].forEach(m => {
+        const b = document.getElementById('bs-tab-' + m);
+        if (!b) return;
+        const on = blacksmithMode === m;
+        b.style.background = on ? '#d6be8c' : 'rgba(40,28,14,.7)';
+        b.style.color = on ? '#3b2412' : '#f5e6c4';
+    });
+}
+
+// Elemental mode, left window: the equipped weapon to forge and the element stones held
+function renderElementalUI() {
+    const container = document.getElementById('refining-slots-container');
+    if (!container) return;
+    const stones = player.elementStones || {};
+    const weapon = player.equipped.weapon;
+    let html = '<div class="text-[10px] text-slate-400 mb-1">Select the weapon to forge:</div>';
+    if (!weapon) {
+        html += '<div class="text-xs text-slate-400">No weapon equipped.</div>';
+    } else {
+        const selected = blacksmithSelectedSlot === 'weapon';
+        const current = weapon.element && ELEMENTS[weapon.element] ? ELEMENTS[weapon.element].icon + ' ' + ELEMENTS[weapon.element].name : 'No element';
+        html += `
+            <div onclick="blacksmithSelect('weapon')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900 border-slate-700 hover:border-amber-500/50'}">
+                <div>
+                    <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(weapon, 36)} ${weapon.name}</span>
+                    <span class="text-[10px] text-slate-400 block">Current: ${current} | Gear Lv ${weapon.levelReq || 1}</span>
+                </div>
+                <span class="text-[10px] text-slate-300 whitespace-nowrap">${elementForgeCost(weapon)} Gold</span>
+            </div>`;
+    }
+    html += '<div class="text-[10px] text-slate-400 mt-3 mb-1">Select an Elemental Stone:</div>';
+    ELEMENT_KEYS.forEach(k => {
+        const e = ELEMENTS[k];
+        const picked = blacksmithForgeEl === k;
+        html += `
+            <div onclick="blacksmithSelectElement('${k}')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${picked ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900 border-slate-700 hover:border-amber-500/50'}">
+                <span class="font-bold text-xs inline-flex items-center gap-2 ${e.color}"><span style="font-size:20px;">${e.icon}</span> ${e.name} Elemental Stone</span>
+                <span class="text-xs text-slate-200">x${stones[k] || 0}</span>
+            </div>`;
+    });
+    container.innerHTML = html;
+    renderBlacksmithSlot();
+}
+
+// Elemental mode, right window: the weapon slot, the cost, and the Forge button
+function renderElementalSlot(slotEl, forgeBtn) {
+    const weapon = blacksmithSelectedSlot === 'weapon' ? player.equipped.weapon : null;
+    const stones = player.elementStones || {};
+    const rateEl = document.getElementById('bs-success-rate');
+    if (slotEl) {
+        slotEl.innerHTML = weapon ? `${itemIconHTML(weapon, 60)}` : '<span style="opacity:.6">Empty</span>';
+    }
+    const cost = weapon ? elementForgeCost(weapon) : 0;
+    if (rateEl) rateEl.textContent = weapon ? `Cost: ${cost} Gold + 1 Stone` : '';
+    if (!forgeBtn) return;
+    const el = blacksmithForgeEl;
+    let blocked = '';
+    if (!weapon) blocked = 'Select a weapon';
+    else if (!el) blocked = 'Pick a stone';
+    else if ((stones[el] || 0) < 1) blocked = 'No ' + ELEMENTS[el].name + ' stone';
+    else if (weapon.element === el) blocked = 'Already ' + ELEMENTS[el].name;
+    else if (player.gold < cost) blocked = 'Not enough Gold';
+    forgeBtn.disabled = !!blocked;
+    forgeBtn.style.opacity = blocked ? '.5' : '1';
+    forgeBtn.innerHTML = blocked ? blocked : `Forge<br>${cost} Gold`;
+}
+
+// Forge the picked element stone onto the selected weapon: costs 1 stone and Gold, always succeeds
+function forgeElementOnWeapon() {
+    const weapon = player.equipped.weapon;
+    const el = blacksmithForgeEl;
+    if (blacksmithSelectedSlot !== 'weapon' || !weapon) { showFloatNotice('Select a weapon to forge.'); return; }
+    if (!el || !ELEMENTS[el]) { showFloatNotice('Pick an Elemental Stone.'); return; }
+    if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
+    const cost = elementForgeCost(weapon);
+    if ((player.elementStones[el] || 0) < 1) { showFloatNotice(`You have no ${ELEMENTS[el].name} Elemental Stone.`); return; }
+    if (weapon.element === el) { showFloatNotice(`${weapon.name} is already ${ELEMENTS[el].name}.`); return; }
+    if (player.gold < cost) { showFloatNotice(`Forging needs ${cost} Gold.`); return; }
+    player.gold -= cost;
+    player.elementStones[el] -= 1;
+    weapon.element = el;
+    logMessage(`[Forge] ${weapon.name} is now ${ELEMENTS[el].name} (${cost} Gold, 1 ${ELEMENTS[el].name} Elemental Stone).`, 'levelup');
+    showModal("Elemental Forge", `Your ${weapon.name} now carries ${ELEMENTS[el].name}!`);
+    updateUI();
+    renderRefiningUI();
+    saveGame();
+}
+
 function refineIsFree() { return !(player.guide && player.guide.refine); }
 
 function refineEquipment(slot) {
@@ -4601,7 +4731,7 @@ function renderLibraryRules() {
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Element System</h3>
             <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">${elementRows}</ul>
-            <p class="text-[10px] text-slate-500 mt-2">Weapons can roll one element. Campaign monsters take the element of their path (Fire, Water, Earth or Wind). Event and daily monsters keep their own base element.</p>
+            <p class="text-[10px] text-slate-500 mt-2">Weapons no longer roll an element from drops. Forge one at the Blacksmith's Elemental forge with an elemental stone and Gold. Each campaign boss drops the stone of its element (70-80% chance per kill).</p>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Status</h3>

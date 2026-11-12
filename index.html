@@ -1159,9 +1159,14 @@
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
-                    <!-- Left window: list of equipped gear -->
+                    <!-- Menu: Refinement / Elemental -->
+                    <div id="bs-menu" style="position:absolute; z-index:5; left:194px; top:14px; display:flex; gap:10px;">
+                        <button id="bs-tab-refine" onclick="blacksmithSetMode('refine')" class="cursor-pointer" style="padding:6px 18px; font-size:15px; font-weight:800; border:1px solid #b8945a; border-radius:8px; background:#d6be8c; color:#3b2412;">Refinement</button>
+                        <button id="bs-tab-elemental" onclick="blacksmithSetMode('elemental')" class="cursor-pointer" style="padding:6px 18px; font-size:15px; font-weight:800; border:1px solid #b8945a; border-radius:8px; background:rgba(40,28,14,.7); color:#f5e6c4;">Elemental</button>
+                    </div>
+                    <!-- Left window: list of equipped gear (refinement) or weapons and stones (elemental) -->
                     <div id="blacksmith-panel-left" class="art-panel" style="left:194px; top:203px; width:614px; height:766px;">
-                        <h2 class="page-title text-base font-bold text-amber-400 mb-3">Blacksmith: Refinement</h2>
+                        <h2 id="bs-left-title" class="page-title text-base font-bold text-amber-400 mb-3">Refinement</h2>
                         <div id="refining-slots-container" class="flex flex-col gap-3"></div>
                     </div>
                     <!-- Right window: refinery, gear slot, rune slot, buttons, rules -->
@@ -1173,6 +1178,17 @@
                     <button id="bs-cancel" onclick="blacksmithCancel()" class="cursor-pointer" style="z-index:4; position:absolute; left:1161px; top:568px; width:136px; height:44px; font-size:13px; font-weight:700; line-height:1.2; color:#3b2412; background:#e9dcc0; border:2px solid #8b6a3e; border-radius:6px;">Return</button>
                     <button id="bs-refine" onclick="blacksmithRefineSelected()" class="cursor-pointer" style="z-index:4; position:absolute; left:1527px; top:568px; width:136px; height:44px; font-size:12px; font-weight:800; line-height:1.2; color:#1c1209; background:#d4a24c; border:2px solid #7a5520; border-radius:6px;">Refine</button>
                     <div id="blacksmith-panel-right" class="art-panel" style="left:1104px; top:656px; width:595px; height:299px; overflow:auto;">
+                        <div id="bs-rules-elemental" style="display:none;">
+                            <h3 class="text-sm font-bold text-amber-400 mb-2">Elemental Forge Rules</h3>
+                            <ul class="flex flex-col gap-1 text-xs list-disc pl-5">
+                                <li>Pick a weapon and an Elemental Stone, then forge the element onto the weapon.</li>
+                                <li>Each forge costs 1 Elemental Stone of that element and Gold (100 Gold per gear level, minimum 100).</li>
+                                <li>Forging always succeeds. A forged element replaces the weapon's current element.</li>
+                                <li>Each campaign boss drops the Elemental Stone of its element, with a 70-80% chance per kill.</li>
+                                <li>Weapons no longer roll an element when they drop from monsters.</li>
+                            </ul>
+                        </div>
+                        <div id="bs-rules-refine">
                         <h3 class="text-sm font-bold text-amber-400 mb-2">Refine Rules</h3>
                         <ul class="flex flex-col gap-1 text-xs list-disc pl-5">
                             <li>Each refine costs (current level + 1) × 100 Gold and 1 Refining Stone.</li>
@@ -1182,6 +1198,7 @@
                             <li>Maximum refinement is +10.</li>
                             <li>Refining Stones: 100 Iron Scraps smelt into 1 Refining Stone.</li>
                         </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1363,14 +1380,14 @@
     <script src="data/maps.js?v=20261111c"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-    <script src="js/player.js?v=20261111d"></script>
+    <script src="js/player.js?v=20261112a"></script>
     <script src="js/audio.js?v=20261105h"></script>
     <script src="js/cloud.js?v=20261111a"></script>
     <script src="js/hero-art.js?v=20261112c"></script>
     <script src="js/hero-body.js?v=20261112c"></script>
-    <script src="js/combat.js?v=20261112c"></script>
+    <script src="js/combat.js?v=20261112d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112ag"></script>
+    <script src="js/ui.js?v=20261112ah"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
