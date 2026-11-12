@@ -250,6 +250,32 @@ async function claimServerMail(serverId) {
     }
 }
 
+// Anonymous (guest) players can bind an email later from Settings. The same user and save are kept:
+// Supabase sends a confirmation link, and after it is tapped the account is no longer anonymous.
+async function cloudCurrentUser() {
+    if (!cloudInitClient()) return null;
+    try {
+        const { data: { user } } = await cloudClient.auth.getUser();
+        return user || null;
+    } catch (e) { return null; }
+}
+async function cloudBindEmail(email) {
+    const user = await cloudCurrentUser();
+    if (!user) return { error: 'Cloud save is not signed in on this browser.' };
+    if (!user.is_anonymous) return { error: 'This account already has an email.' };
+    try {
+        const { error } = await cloudClient.auth.updateUser(
+            { email },
+            { emailRedirectTo: location.origin + location.pathname }
+        );
+        if (error) throw error;
+        return { sent: true };
+    } catch (e) {
+        console.warn('Bind email failed:', e);
+        return { error: (e && e.message) ? e.message : 'Could not send the link right now.' };
+    }
+}
+
 // Used by reset: removes the cloud save, signs this browser out and stops any pending write.
 // Signing out makes the next start show the sign-in page again.
 async function cloudDeleteSave() {

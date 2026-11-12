@@ -58,7 +58,7 @@
         events:     () => switchView('events'),
         diamond:    () => switchView('diamond'),
         mail:       () => switchView('quests'),
-        setting:    () => switchView('setting'),
+        setting:    () => { switchView('setting'); refreshBindEmail(); },
         character:  () => switchView('character'),
         shop:       () => switchView('shop'),
         blacksmith: () => switchView('blacksmith'),

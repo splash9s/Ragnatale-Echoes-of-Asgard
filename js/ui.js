@@ -115,6 +115,42 @@ function manualSaveGame() {
     showModal("Notice", "Your game progress has been successfully saved!");
 }
 
+// Settings: guest players see Bind Email; players who already have an email see it as read-only
+async function refreshBindEmail() {
+    const btn = document.getElementById('bind-email-btn');
+    const box = document.getElementById('bind-email-box');
+    if (!btn) return;
+    const user = await cloudCurrentUser();
+    if (!user) { btn.classList.add('hidden'); box.classList.add('hidden'); return; } // offline-only play: nothing to bind
+    btn.classList.remove('hidden');
+    if (user.is_anonymous) {
+        btn.disabled = false;
+        btn.textContent = '✉️ Bind Email';
+    } else {
+        btn.disabled = true;
+        btn.textContent = '✉️ Email: ' + (user.email || 'linked');
+        box.classList.add('hidden');
+    }
+}
+function openBindEmail() {
+    const box = document.getElementById('bind-email-box');
+    if (!box) return;
+    box.classList.toggle('hidden');
+    if (!box.classList.contains('hidden')) document.getElementById('bind-email-input')?.focus();
+}
+function closeBindEmail() {
+    document.getElementById('bind-email-box')?.classList.add('hidden');
+}
+async function sendBindEmail() {
+    const input = document.getElementById('bind-email-input');
+    const msg = document.getElementById('bind-email-msg');
+    const email = (input?.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { if (msg) msg.textContent = 'Please enter a valid email.'; return; }
+    if (msg) msg.textContent = 'Sending...';
+    const r = await cloudBindEmail(email);
+    if (msg) msg.textContent = r.error ? r.error : 'Check your inbox and tap the link to finish. Your save stays the same.';
+}
+
 function resetSaveGame() {
     showGameConfirm("Reset Save", "Are you sure you want to reset all save data?", "Reset", () => {
         localStorage.removeItem('ragnatale_save');
