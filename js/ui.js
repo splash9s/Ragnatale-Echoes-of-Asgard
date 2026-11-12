@@ -5556,16 +5556,19 @@ function openPetPanel() {
         box.id = 'pet-panel';
         document.body.appendChild(box);
     }
-    petPanelView = null;
+    petPanelView = null; petEditField = null;
     renderPetPanel();
 }
 function closePetPanel() {
     const box = document.getElementById('pet-panel');
     if (box) box.remove();
-    petPanelView = null;
+    petPanelView = null; petEditField = null;
 }
-function openPetDetail(tok) { petPanelView = String(tok); renderPetPanel(); }
-function petPanelBack() { petPanelView = null; renderPetPanel(); }
+function openPetDetail(tok) { petPanelView = String(tok); petEditField = null; renderPetPanel(); }
+function petPanelBack() { petPanelView = null; petEditField = null; renderPetPanel(); }
+// Name and bio are read-only until Edit is pressed; Submit saves them
+let petEditField = null; // 'name' | 'bio' while that field is being edited
+const PET_NAME_MAX = 16, PET_BIO_MAX = 160;
 function renderPetPanel() {
     const box = document.getElementById('pet-panel');
     if (!box) return;
@@ -5590,21 +5593,45 @@ function renderPetPanel() {
     const progress = f.max ? 'Max level' : `${f.pts - f.cur} / ${f.next - f.cur} to next level`;
     const walking = sel.includes(String(c.token));
     const tok = c.token === 'eq' ? "'eq'" : c.token;
+    const nameVal = petName(c.item), bioVal = petBio(c.item);
+    const nameEdit = petEditField === 'name', bioEdit = petEditField === 'bio';
+    const fieldHead = (key, label, editing) => `<div class="pet-field-head"><label>${label}</label>`
+        + (editing ? '' : `<button class="pet-edit" onclick="petStartEdit('${key}')">Edit</button>`)
+        + (editing ? `<button class="pet-submit" onclick="petSubmit(${tok}, '${key}')">Submit</button>` : '')
+        + `</div>`;
     box.innerHTML = `<div class="pet-head"><button class="pet-back" onclick="petPanelBack()">‹ Pets</button><button class="pet-x" onclick="closePetPanel()">×</button></div>`
         + `<div class="pet-portrait"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""></div>`
-        + `<label for="pet-name-input">Name</label>`
-        + `<input id="pet-name-input" maxlength="16" value="${petEsc(petName(c.item))}" onchange="petSetName(${tok}, this.value)">`
-        + `<label for="pet-bio-input">Bio</label>`
-        + `<textarea id="pet-bio-input" maxlength="160" rows="4" onchange="petSetBio(${tok}, this.value)">${petEsc(petBio(c.item))}</textarea>`
+        + fieldHead('name', 'Name', nameEdit)
+        + `<input id="pet-name-input" maxlength="${PET_NAME_MAX}" value="${petEsc(nameVal)}"${nameEdit ? '' : ' readonly'} oninput="petCount('pet-name-input', 'pet-name-count')">`
+        + `<div class="pet-count"><span id="pet-name-count">${nameVal.length}</span> / ${PET_NAME_MAX}</div>`
+        + fieldHead('bio', 'Bio', bioEdit)
+        + `<textarea id="pet-bio-input" maxlength="${PET_BIO_MAX}" rows="4"${bioEdit ? '' : ' readonly'} oninput="petCount('pet-bio-input', 'pet-bio-count')">${petEsc(bioVal)}</textarea>`
+        + `<div class="pet-count"><span id="pet-bio-count">${bioVal.length}</span> / ${PET_BIO_MAX}</div>`
         + `<label>Friendship</label>`
         + `<div class="pet-friend"><b>Lv ${f.lv + 1} · ${petEsc(f.title)}</b><span>${progress}</span></div>`
         + `<div class="pet-bar"><i style="width:${pct}%"></i></div>`
         + `<button class="pet-walk" onclick="togglePetWalk(${tok})">${walking ? 'Stop walking on floor' : 'Walk on tent floor'}</button>`;
 }
+function petStartEdit(key) {
+    petEditField = key;
+    renderPetPanel();
+    const el = document.getElementById(key === 'name' ? 'pet-name-input' : 'pet-bio-input');
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+}
+function petSubmit(tok, key) {
+    const el = document.getElementById(key === 'name' ? 'pet-name-input' : 'pet-bio-input');
+    const value = el ? el.value : '';
+    petEditField = null;
+    if (key === 'name') petSetName(tok, value); else petSetBio(tok, value);
+}
+function petCount(inputId, countId) {
+    const el = document.getElementById(inputId), out = document.getElementById(countId);
+    if (el && out) out.textContent = el.value.length;
+}
 function petSetName(tok, value) {
     const it = tentPetItem(String(tok));
     if (!it) return;
-    const v = String(value || '').trim().slice(0, 16);
+    const v = String(value || '').trim().slice(0, PET_NAME_MAX);
     if (v && v !== it.name) it.petName = v; else delete it.petName;
     if (typeof saveGame === 'function') saveGame();
     renderPetPanel();
@@ -5613,7 +5640,7 @@ function petSetName(tok, value) {
 function petSetBio(tok, value) {
     const it = tentPetItem(String(tok));
     if (!it) return;
-    const v = String(value || '').trim().slice(0, 160);
+    const v = String(value || '').trim().slice(0, PET_BIO_MAX);
     if (v) it.petBio = v; else delete it.petBio;
     if (typeof saveGame === 'function') saveGame();
     renderPetPanel();
