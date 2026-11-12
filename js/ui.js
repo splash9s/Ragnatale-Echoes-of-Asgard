@@ -4879,6 +4879,13 @@ function toggleCharStats(open) {
     view.classList.toggle('stats-hidden', !open);
 }
 
+// Clear screen: hide equipment and inventory panels to show only the character background. Press again to restore.
+function toggleCharClear() {
+    const view = document.getElementById('view-character');
+    if (!view) return;
+    view.classList.toggle('screen-clear');
+}
+
 // Main page sparkles: small golden glints drift up across the town scene now and then.
 // They only spawn while the main page is showing.
 function spawnTownSparkle() {
