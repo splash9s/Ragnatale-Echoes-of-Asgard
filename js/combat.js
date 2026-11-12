@@ -207,6 +207,7 @@ function checkRuneSelectionPrompt(onCompleteCallback) {
     }
     window.runeCallback = onCompleteCallback;
     showRuneChoices(true);
+    showRuneGuide();
 }
 
 // Shows three random runes. Each map allows 3 refreshes of the offer.
@@ -297,6 +298,7 @@ function refreshRuneChoices() {
 
 function selectRuneChoice(runeId, callback) {
     if (!isRuneOffered(runeId)) return;
+    removeRuneGuide();
     const def = RUNE_DEFS[runeId];
     applyRune(runeId);
     if (!player.currentRunRunes) player.currentRunRunes = [];
@@ -1750,6 +1752,7 @@ function onStageCleared() {
                 }
                 const nextBtn = document.getElementById('next-stage-btn');
                 if (nextBtn) nextBtn.classList.remove('hidden');
+                showNextStageGuide();
             }
         };
         if (wasBossStage && currentStage < maxStages) {
@@ -1767,6 +1770,7 @@ function onStageCleared() {
 }
 
 function proceedToNextStage() {
+    removeNextStageGuide();
     if (window.pendingStageProceed) {
         const cb = window.pendingStageProceed;
         window.pendingStageProceed = null;
@@ -2045,6 +2049,70 @@ function removeGuideSpotlight() {
     }
     guideLowHpActive = false;
 }
+// ---------- FIRST-TIME GUIDES: rune pick and next stage ----------
+// Same look as the potion guide: a glowing target and a tip. Saved once per account in player.guide.
+function guideGlowOn(el) {
+    el.style.zIndex = '51';
+    el.style.boxShadow = '0 0 18px 4px #fbbf24';
+    el.style.animation = 'guideGlow 1s steps(2, end) infinite';
+}
+function guideGlowOff(el) {
+    el.style.zIndex = '';
+    el.style.boxShadow = '';
+    el.style.animation = '';
+}
+function guideTipAbove(text, rect, parent) {
+    const tip = document.createElement('div');
+    tip.className = 'guide-tip-box';
+    tip.textContent = text;
+    tip.style.cssText = 'position:absolute; z-index:52; transform:translate(-50%, -100%); white-space:nowrap; background:#0f172a; border:1px solid #fbbf24; color:#fde68a; padding:6px 10px; border-radius:10px; font-size:14px;';
+    tip.style.left = (rect.left + rect.width / 2) + 'px';
+    tip.style.top = (rect.top - 12) + 'px';
+    parent.appendChild(tip);
+    return tip;
+}
+
+// First time the next-stage button appears: dim the stage, light the button, say what it does
+function showNextStageGuide() {
+    if (guideFlag('nextStage')) return;
+    const inner = document.querySelector('#combat-stage .ts-inner');
+    const btn = document.getElementById('next-stage-btn');
+    if (!inner || !btn || btn.classList.contains('hidden')) return;
+    markGuide('nextStage');
+    removeNextStageGuide();
+    const overlay = document.createElement('div');
+    overlay.className = 'guide-next-overlay';
+    overlay.style.cssText = 'position:absolute; inset:0; z-index:50; background:rgba(2,6,15,.72); cursor:not-allowed;';
+    inner.appendChild(overlay);
+    guideGlowOn(btn);
+    const r = btn.getBoundingClientRect();
+    const sr = inner.getBoundingClientRect();
+    const scale = sr.width / 1920;
+    const rect = { left: (r.left - sr.left) / scale, top: (r.top - sr.top) / scale, width: r.width / scale };
+    guideTipAbove('Stage cleared! Tap Next Stage to continue.', rect, inner);
+}
+function removeNextStageGuide() {
+    document.querySelectorAll('.guide-next-overlay, .guide-tip-box').forEach(el => el.remove());
+    const btn = document.getElementById('next-stage-btn');
+    if (btn) guideGlowOff(btn);
+}
+
+// First time a rune pick window opens: glow the first card and say what to do
+function showRuneGuide() {
+    if (guideFlag('rune')) return;
+    const card = document.querySelector('#rune-pick-root .rune-pick-card');
+    if (!card) return;
+    markGuide('rune');
+    guideGlowOn(card);
+    const tip = guideTipAbove('Pick one rune to power up this run.', card.getBoundingClientRect(), document.body);
+    tip.style.position = 'fixed';
+    tip.dataset.runeGuide = '1';
+}
+function removeRuneGuide() {
+    document.querySelectorAll('[data-rune-guide="1"]').forEach(el => el.remove());
+    document.querySelectorAll('#rune-pick-root .rune-pick-card').forEach(guideGlowOff);
+}
+
 // Drinks one potion through the normal path, then resumes the fight
 function guideDrinkPotion() {
     removeGuideSpotlight();
