@@ -1011,7 +1011,7 @@ function awardKill(m) {
     if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
-    if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:4px;"><img src="assets/icons/goldpile_q85.webp" alt="" style="width:76px;height:58px;object-fit:contain;"><b style="color:#fde68a; font-size:22px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
+    if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:4px;"><img src="assets/icons/goldpile_q85.webp" alt="" style="width:53px;height:41px;object-fit:contain;"><b style="color:#fde68a; font-size:22px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
     if (m.isFinalBoss) { player.diamonds += 100; logMessage(`[Final Boss] Defeated! Reward: 100 Diamond`, 'drop'); }
     player.baseExp += baseExpGain;
     player.jobExp += jobExpGain;
