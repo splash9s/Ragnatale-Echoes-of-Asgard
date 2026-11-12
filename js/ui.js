@@ -4969,7 +4969,7 @@ function isCharClear() {
     return !!document.getElementById('view-character')?.classList.contains('screen-clear');
 }
 // How far the character moves to reach the centre of the tent (design px) while the screen is cleared
-const CHAR_CLEAR_OFFSET = { dx: 681, dy: 50 };
+const CHAR_CLEAR_OFFSET = { dx: 741, dy: 45 };
 function toggleCharClear() {
     const view = document.getElementById('view-character');
     if (!view) return;
