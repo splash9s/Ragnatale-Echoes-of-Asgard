@@ -5001,6 +5001,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tentLightLoop();
 });
 function toggleCharLight(side) {
+    if (!isCharClear()) return; // the tent only responds in clear screen
     charLightState[side] = !charLightState[side];
     renderCharLights();
 }

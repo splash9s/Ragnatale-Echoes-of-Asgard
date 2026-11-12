@@ -259,6 +259,9 @@
         /* Tent lights: left lamp and right lantern toggle, stacked states cross-fade */
         #view-character .tent-light { transition: opacity .6s ease; pointer-events: none; }
         #view-character .char-light-zone { background: transparent; }
+        /* Tent is not clickable outside clear screen (gear / inventory view) */
+        #view-character:not(.screen-clear) .char-light-zone { pointer-events: none !important; cursor: default !important; }
+        #view-character:not(.screen-clear) .ts-bg, #view-character:not(.screen-clear) .tent-light { pointer-events: none; }
         /* Light on sprites: a warm glow masked to the sprite's own pixels, so only the characters and pets are lit */
         #view-character .sprite-light { position: absolute; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity .6s ease; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; animation: spriteFlicker 3.4s ease-in-out infinite; }
         #view-character .sprite-light.on { opacity: 1; }
@@ -1471,7 +1474,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112bi"></script>
+    <script src="js/ui.js?v=20261112bk"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
