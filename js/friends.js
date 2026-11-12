@@ -315,9 +315,8 @@ function enterFriendTent(name, snap) {
     document.body.classList.add('friend-visiting');
     const nameEl = document.getElementById('friend-visit-name');
     if (nameEl) nameEl.textContent = name;
-    if (typeof closePetPanel === 'function') closePetPanel();
+    switchView('character'); // opens the character page reset to the inventory; the tent is turned on after it
     if (!isCharClear()) toggleCharClear();
-    switchView('character');
 }
 
 function exitFriendTent() {

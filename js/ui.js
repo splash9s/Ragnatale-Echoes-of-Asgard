@@ -1659,6 +1659,7 @@ const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the batt
 const SHADOW_BASE = { 'town-shadow': { left: 879, top: 770 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
+    closePetPanel(); // leaving any page closes the pet menu and pet detail
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
     // The Diamond Cash Shop is a tab on the Shop page now
     if (viewName === 'diamond') {
@@ -1687,7 +1688,15 @@ function switchView(viewName) {
         document.getElementById('view-expeditions')?.classList.remove('hidden');
         renderMapGateUI();
     }
-    if (viewName === 'character') document.getElementById('view-character')?.classList.remove('hidden');
+    if (viewName === 'character') {
+        // The character page from the menu always opens on the inventory: stats closed, tent off.
+        // (The tent opens from the hero on the main page, via openTentPage, after this.)
+        const cv = document.getElementById('view-character');
+        cv?.classList.remove('hidden');
+        toggleCharStats(false);
+        if (cv) cv.classList.remove('screen-clear', 'ui-off');
+        updateTentTopLabels();
+    }
     if (viewName === 'friend') {
         document.getElementById('view-friend')?.classList.remove('hidden');
         openFriendPage();
@@ -5052,6 +5061,11 @@ function toggleCharClear() {
     updateTentTopLabels();
     syncHeroSprites();
 }
+// The main page player opens the tent: the character page with the screen cleared
+function openTentPage() {
+    switchView('character');
+    if (!isCharClear()) toggleCharClear();
+}
 
 // Pet walk settings (design px and seconds). The pets wander the green floor area (feet points).
 const TENT_CAT = { frameMs: 220, frames: 6, speed: 90, w: 193, h: 120, feetDy: 110, shadowW: 150, shadowH: 30 };
@@ -5225,6 +5239,24 @@ scheduleSmithSwing();
 // Cart man on the main page: walks in from the left edge, across above the characters and behind the foreground, and off the right edge. Once every minute while the main page is showing.
 const CART_FRAME_MS = 110, CART_WALK_MS = 14000, CART_FRAMES = 6;
 function scheduleCartMan(ms) { setTimeout(walkCartMan, ms); }
+// Clicking the cart man shows a tired emoji. Only once per walk (one loop across the screen).
+let cartEmoteShown = false;
+function cartEmoteClick() {
+    const el = document.getElementById('town-cartman');
+    if (!el || cartEmoteShown || townWalker !== 'cart') return;
+    cartEmoteShown = true;
+    const parent = el.parentElement;
+    const pr = parent.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    const scale = pr.width / (parseFloat(parent.dataset.w) || 1920); // the stage is scaled to the screen
+    const s = document.createElement('div');
+    s.className = 'cart-emote';
+    s.textContent = '😫';
+    s.style.left = ((er.left + er.width / 2 - pr.left) / scale) + 'px';
+    s.style.top = ((er.top - pr.top) / scale) + 'px';
+    parent.appendChild(s);
+    setTimeout(() => s.remove(), 1800);
+}
 function walkCartMan() {
     const el = document.getElementById('town-cartman');
     const town = document.getElementById('view-town');
@@ -5232,6 +5264,10 @@ function walkCartMan() {
     if (townWalker) { scheduleCartMan(2000); return; } // the cat is on screen: wait our turn
     townWalker = 'cart';
     el.style.display = 'block';
+    cartEmoteShown = false; // a new loop: one emote again
+    el.style.pointerEvents = 'auto';
+    el.style.cursor = 'pointer';
+    el.onclick = cartEmoteClick;
     let i = 0;
     const timer = setInterval(() => {
         i = (i + 1) % CART_FRAMES;
@@ -5244,6 +5280,9 @@ function walkCartMan() {
     walk.onfinish = () => {
         clearInterval(timer);
         el.style.display = 'none';
+        el.style.pointerEvents = 'none';
+        el.style.cursor = '';
+        el.onclick = null;
         if (shadow) shadow.style.display = 'none';
         el.src = 'assets/page01/cart/c1_q85.webp';
         townWalker = null;
