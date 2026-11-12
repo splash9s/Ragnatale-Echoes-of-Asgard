@@ -83,7 +83,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 50, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 10, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
-    { id: 'pet_loyal_slime', name: "Support Slime Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 50, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/slimebase.png' },
+    { id: 'pet_loyal_slime', name: "Orange Cat Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 50, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp' },
     { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
@@ -850,8 +850,11 @@ function applyPlayerFrame(img, f, dy = 0) {
 }
 
 // Equipped pet: the pet's idle art stands beside the player's feet, 10px to the left of the player's feet, on the same ground line.
-// Each pet name has its art. Only the Support Slime Pet has art so far (the slime's idle frame).
-const PET_SPRITES = { 'Support Slime Pet': { src: 'assets/combat/slime/slimebase_q85.webp', w: 87, h: 73, fx: 43.5, fy: 73 } };
+// Each pet name has its art. The Orange Cat Pet (idle frame ocat1). The old 'Support Slime Pet' name is kept so saved pets still show the cat.
+const PET_SPRITES = {
+    'Orange Cat Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
+    'Support Slime Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
+};
 const COMBAT_PET_GAP_X = 120;
 // Page pets (town and character pages) stand the same way beside the hero's feet
 const PAGE_PET_IDS = { 'town-hero': 'town-pet' }; // main page only; the character page shows no pet
@@ -862,7 +865,8 @@ function petSpriteOf() {
     return pet ? (PET_SPRITES[pet.name] || null) : null;
 }
 function placePetImg(el, spec, feetX, feetY) {
-    if (el.getAttribute('src') !== spec.src) el.src = spec.src;
+    // While the pet is licking, its frames are not reset to the idle picture
+    if (!el.dataset.licking && el.getAttribute('src') !== spec.src) el.src = spec.src;
     el.style.display = '';
     el.style.width = spec.w + 'px';
     el.style.height = spec.h + 'px';
@@ -892,6 +896,36 @@ function syncPagePetSprites(spec) {
     });
 }
 setInterval(syncPetSprite, 100);
+// Click the pet: it sits, licks and sits again, same timing and frames as the main page cat
+const PET_LICK_BASE = 'assets/combat/ocat/ocat';
+function petLick(el) {
+    if (!el || el.dataset.licking || el.style.display === 'none') return;
+    el.dataset.licking = '1';
+    const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
+    show(1);
+    setTimeout(() => {
+        let step = 0;
+        show(CAT_LICK_SEQ[step++]);
+        const timer = setInterval(() => {
+            if (step >= CAT_LICK_SEQ.length) {
+                clearInterval(timer);
+                show(1);
+                setTimeout(() => {
+                    delete el.dataset.licking;
+                    el.src = `${PET_LICK_BASE}1_q85.webp`;
+                }, CAT_LICK_REST_MS);
+                return;
+            }
+            show(CAT_LICK_SEQ[step++]);
+        }, CAT_LICK_FRAME_MS);
+    }, CAT_LICK_IDLE_MS);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    ['combat-pet-sprite', 'town-pet'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.style.cursor = 'pointer'; el.style.pointerEvents = 'auto'; el.addEventListener('click', () => petLick(el)); }
+    });
+});
 // Monster attack: the card's sprite shows the attack pose and lunges forward at once (same moment as the player's lunge)
 function monsterCardImg(m) {
     const idx = monstersList.indexOf(m);
@@ -2864,7 +2898,7 @@ const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', ga
 const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
 // Inventory icons (PNG, transparent) for consumables and materials; other items keep the emoji
 const ITEM_ICON_RULES = [
-    [/Support Slime Pet/, 'assets/shop/diamond/slimebase.png'],
+    [/Orange Cat Pet|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
