@@ -2376,7 +2376,6 @@ function renderRefiningUI() {
 function renderBlacksmithChrome() {
     const elemental = blacksmithMode === 'elemental';
     const title = document.getElementById('bs-left-title');
-    if (title) title.textContent = elemental ? 'Elemental Forge' : 'Refinement';
     const rr = document.getElementById('bs-rules-refine');
     const re = document.getElementById('bs-rules-elemental');
     if (rr) rr.style.display = elemental ? 'none' : '';
