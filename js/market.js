@@ -35,6 +35,11 @@ function marketListableItems() {
     return out;
 }
 
+// Item icon that starts each list row
+function marketRowIcon(item) {
+    return `<span class="shrink-0 flex items-center justify-center" style="width:64px;height:64px;">${itemIconHTML(item, 60)}</span>`;
+}
+
 // Calls a market function. Resolves to { data } or { error } with the server's message.
 async function marketRpc(name, args) {
     if (!cloudInitClient() || !cloudClient) return { error: 'The market needs the cloud. Check your connection and try again.' };
@@ -126,6 +131,7 @@ async function renderMarketBuy() {
         const btn = r.is_mine ? '<span class="text-xs text-slate-500">Your auction</span>'
             : (r.i_lead || msg ? '' : `<button onclick="marketBidPrompt(${r.id}, ${price}, ${r.bid_count})" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-sm cursor-pointer">Bid</button>`);
         return `<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+            ${marketRowIcon(r.item)}
             <div class="flex-1 min-w-0">
                 <div class="text-sm">${marketItemText(r.item)}</div>
                 <div class="text-xs text-slate-400 mt-1">${marketEsc(r.seller_name)} · ${r.bid_count} bid${r.bid_count === 1 ? '' : 's'} · ${lead} · ends in ${marketTimeLeft(r.ends_at)}</div>
@@ -179,6 +185,7 @@ function renderMarketSell() {
     const field = 'px-3 py-2 bg-slate-950 border border-slate-700 rounded text-slate-100 w-full';
     body.innerHTML = `
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 text-sm">
+            <div id="market-sell-icon" class="flex justify-center"></div>
             <label>Item <select id="market-sell-item" onchange="marketSellPreview()" class="${field}">
                 ${items.map(({ idx, item }) => `<option value="${idx}">${marketEsc(item.name)}${item.levelReq ? ` (Lv. ${item.levelReq})` : ''}</option>`).join('')}
             </select></label>
@@ -193,6 +200,11 @@ function renderMarketSell() {
 }
 
 function marketSellPreview() {
+    const pick = document.getElementById('market-sell-item');
+    const iconEl = document.getElementById('market-sell-icon');
+    if (iconEl && pick && player.inventory && player.inventory[Number(pick.value)]) {
+        iconEl.innerHTML = itemIconHTML(player.inventory[Number(pick.value)], 120);
+    }
     const start = Math.floor(Number(document.getElementById('market-sell-start')?.value) || 0);
     const el = document.getElementById('market-sell-fee');
     if (!el) return;
@@ -245,6 +257,7 @@ async function renderMarketMine() {
     const leadingRows = (res.data && res.data.leading) || [];
     const statusText = { open: 'Open', sold: 'Sold', expired: 'No bids', cancelled: 'Cancelled' };
     const card = (r, extra) => `<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+        ${marketRowIcon(r.item)}
         <div class="flex-1 min-w-0"><div class="text-sm">${marketItemText(r.item)}</div>${extra}</div></div>`;
     const sellHtml = sellingRows.length ? sellingRows.map(r => card(r,
         `<div class="text-xs text-slate-400 mt-1">${statusText[r.status] || r.status} · ${Number(r.current_price).toLocaleString()} G · ${r.bid_count} bid${r.bid_count === 1 ? '' : 's'}${r.status === 'open' ? ` · ends in ${marketTimeLeft(r.ends_at)}` : ''}${r.top_bidder_name ? ` · top: ${marketEsc(r.top_bidder_name)}` : ''}</div>

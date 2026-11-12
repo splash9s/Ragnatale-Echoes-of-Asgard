@@ -965,20 +965,39 @@
         <!-- VIEW: CHARACTER -->
         <!-- VIEW: LIBRARY -->
         <!-- VIEW: MARKET (auction house, gear for gold) -->
-        <div id="view-market" class="hidden flex flex-col gap-4 flex-1">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
-                <div>
-                    <h2 class="page-title text-base font-bold text-amber-300">Market</h2>
-                    <p class="text-xs text-slate-400">Auctions for gear, paid in gold. Level 10 and up, Gmail-linked accounts.</p>
+        <div id="view-market" class="hidden art-screen art-dark">
+            <style>
+                #view-market .mk-panel { position: absolute; box-sizing: border-box; background: rgba(20, 14, 8, .6); border: 2px solid #b8945a; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+                #view-market button { font-size: 24px !important; }
+                #view-market #market-tabs, #view-market #market-cats { flex-direction: column; flex-wrap: nowrap; }
+                #view-market #market-tabs button, #view-market #market-cats button { width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; }
+                #view-market #market-gold { font-size: 26px; color: #fde68a; }
+                #view-market #market-body { font-size: 24px; }
+                #view-market #market-body .text-sm, #view-market #market-body .text-xs, #view-market #market-body .text-\[10px\] { font-size: 22px !important; }
+                #view-market #market-body select, #view-market #market-body input { font-size: 24px; }
+            </style>
+            <div id="market-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/artisan/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
+                    <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
+                    <h2 class="page-title font-bold" style="position:absolute; left:40px; top:14px; margin:0; font-size:34px; color:#fde68a;">Market</h2>
+                    <div style="position:absolute; left:200px; top:20px; font-size:22px; color:#f8fafc; background:rgba(20,14,8,.7); border:1px solid #b8945a; border-radius:10px; padding:4px 12px;">Auctions for gear, paid in gold. Level 10 and up, Gmail-linked accounts.</div>
+                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                    </div>
+                    <div id="market-cats-panel" class="mk-panel" style="left:60px; top:95px; width:240px; height:470px;">
+                        <div id="market-cats"></div>
+                    </div>
+                    <div id="market-tabs-panel" class="mk-panel" style="left:60px; top:585px; width:240px; height:400px;">
+                        <div id="market-tabs"></div>
+                        <div id="market-gold"></div>
+                    </div>
+                    <div id="market-list-panel" class="mk-panel" style="left:330px; top:95px; width:1530px; height:890px;">
+                        <div id="market-body" class="flex flex-col gap-3"></div>
+                    </div>
                 </div>
-                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
             </div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                <div id="market-tabs" class="flex flex-wrap gap-2"></div>
-                <div id="market-gold" class="text-sm text-amber-200"></div>
-                <div id="market-cats" class="flex flex-wrap gap-2"></div>
-            </div>
-            <div id="market-body" class="flex flex-col gap-3"></div>
         </div>
 
         <div id="view-library" class="hidden flex flex-col gap-4 flex-1">
@@ -1524,7 +1543,7 @@
     <script src="js/combat.js?v=20261112d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
     <script src="js/ui.js?v=20261113l"></script>
-    <script src="js/market.js?v=20261113a"></script>
+    <script src="js/market.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
