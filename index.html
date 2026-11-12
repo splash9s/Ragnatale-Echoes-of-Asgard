@@ -1563,6 +1563,11 @@
             }
             updateUI();
             logMessage("[System] Game loaded successfully!", "winlose");
+            // Back from a failed Gmail link: go to Settings and show the reason
+            if (window.bindErrorMsg && typeof switchView === 'function') {
+                switchView('setting');
+                if (typeof refreshBindEmail === 'function') refreshBindEmail();
+            }
         } else {
             firstPlayStart(); // no save: sign-in, then character selection
         }
