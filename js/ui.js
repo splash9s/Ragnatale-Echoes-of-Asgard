@@ -1745,10 +1745,10 @@ function switchView(viewName) {
     // Refresh badges on every screen change, so the character page shows current point alerts
     if (typeof updateTownAlerts === 'function') updateTownAlerts();
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
