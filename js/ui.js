@@ -379,17 +379,17 @@ const MONSTER_SPRITES = {
             'assets/combat/abysslord/abysslorddead_q85.webp': [6.0, 8.0]
         }
     },
-    M020: { // Fallen Angel (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
+    M020: { // Fallen Angel (boss, map lv 40): art at 70% size; shift is [dx, dy] px so the feet stay on the same spot
         idle: ['assets/combat/fallenangel/fallenangel_q85.webp'],
         attack: ['assets/combat/fallenangel/fallenangelattack_q85.webp'],
         hurt: ['assets/combat/fallenangel/fallenangeldamaged_q85.webp'],
         dead: ['assets/combat/fallenangel/fallenangeldead1_q85.webp', 'assets/combat/fallenangel/fallenangeldead2_q85.webp'],
         deathMs: 600,
         shift: {
-            'assets/combat/fallenangel/fallenangelattack_q85.webp': [-178.0, -2.0],
-            'assets/combat/fallenangel/fallenangeldamaged_q85.webp': [-72.5, 0.0],
-            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [-203.0, -2.0],
-            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [385.0, 9.0]
+            'assets/combat/fallenangel/fallenangelattack_q85.webp': [-124.6, -1.4],
+            'assets/combat/fallenangel/fallenangeldamaged_q85.webp': [-50.8, 0.0],
+            'assets/combat/fallenangel/fallenangeldead1_q85.webp': [-442.1, -1.4], // 70% size; dead moved 300 px left
+            'assets/combat/fallenangel/fallenangeldead2_q85.webp': [-30.5, 6.3] // 70% size; dead moved 300 px left
         }
     },
     M024: { // Dusk World-Eater (boss): natural size; shift is [dx, dy] px so the feet stay on the same spot
