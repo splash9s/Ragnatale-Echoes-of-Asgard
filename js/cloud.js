@@ -123,12 +123,12 @@ async function cloudSignInGmail() {
 
 // Called after every local save: only marks the save as changed
 function cloudSaveSoon() {
-    if (!cloudDisabled) cloudDirty = true;
+    if (!cloudDisabled && !friendTentVisiting()) cloudDirty = true;
 }
 
-// Uploads the save if it changed since the last upload
+// Uploads the save if it changed since the last upload (never while a friend's tent is open: `player` is their copy then)
 function cloudFlush() {
-    if (!cloudDirty || !cloudClient || !cloudUserId || cloudDisabled) return;
+    if (!cloudDirty || !cloudClient || !cloudUserId || cloudDisabled || friendTentVisiting()) return;
     const json = JSON.stringify(player);
     cloudDirty = false;
     if (json === cloudLastPushed) return;
@@ -143,7 +143,7 @@ function cloudFlush() {
 // The public card other players see: name, base level and avatar (the friend ID is made by the server)
 let cloudProfileKey = null; // the last profile row the server accepted; unchanged profiles are not sent again
 function cloudPushProfile() {
-    if (!cloudClient || !cloudUserId || cloudDisabled || typeof player === 'undefined') return;
+    if (!cloudClient || !cloudUserId || cloudDisabled || typeof player === 'undefined' || friendTentVisiting()) return;
     const av = player.avatar || '';
     const avatar = av.startsWith('assets/') || (av.startsWith('data:image') && av.length < 20000) ? av : '';
     const row = { user_id: cloudUserId, name: String(player.name || 'Hero').slice(0, 20), base_lv: player.baseLv || 1, avatar };
@@ -197,11 +197,13 @@ const friendApi = {
     remove: (userId) => friendRpc('remove_friend', { p_friend: userId }),
     sendGift: (userId) => friendRpc('send_friend_gift', { p_friend: userId }),
     restoreStreak: (userId) => friendRpc('restore_friend_streak', { p_friend: userId }),
+    visitTent: (userId) => friendRpc('visit_friend_tent', { p_friend: userId }),
+    visitors: () => friendRpc('my_tent_visitors'),
 };
 
 // Copies unclaimed server mail (friend gifts) into the mailbox once. Negative ids keep them apart from local mail.
 async function syncServerMail() {
-    if (!cloudInitClient() || !cloudUserId || cloudDisabled) return false;
+    if (!cloudInitClient() || !cloudUserId || cloudDisabled || friendTentVisiting()) return false;
     try {
         const { data, error } = await cloudClient.from('mail')
             .select('id, title, sender, message, rewards, sent_at')

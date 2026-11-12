@@ -87,6 +87,7 @@ async function refreshFriends() {
         friendState.outgoing = reqs.data.outgoing || [];
     }
     renderFriendPage();
+    loadTentVisitors();
 }
 
 // Switches between the Friends and Requests tabs
@@ -176,6 +177,7 @@ function friendRowHTML(f, today, idx) {
         </div>
         <div class="friend-actions">
             <button class="friend-btn gift" ${st.sentToday ? 'disabled' : ''} onclick="sendFriendGift(${idx})">${giftLabel}</button>
+            <button class="friend-btn visit" onclick="visitFriendTent(${idx})">Visit Tent</button>
             ${restoreBtn}
             <button class="friend-btn del" onclick="deleteFriendAsk(${idx})">Delete</button>
         </div>
@@ -286,4 +288,58 @@ function deleteFriendAsk(idx) {
         setFriendStatus(`${f.name} was removed from your friends.`);
         refreshFriends();
     });
+}
+
+// ---- Visiting a friend's tent (read-only) ----
+// While a friend's tent is open, `player` holds their copy (from the server, loaded on entry). Nothing is saved then:
+// the save, cloud and profile writes all check friendTentVisiting(). The owner's copy is put back on exit.
+async function visitFriendTent(idx) {
+    if (friendTentVisiting()) return;
+    const f = friendState.friends[idx];
+    if (!f) return;
+    setFriendStatus('Opening ' + (f.name || 'Hero') + "'s tent...", false);
+    const res = await friendApi.visitTent(f.user_id);
+    if (res.error) { setFriendStatus(res.error, true); return; }
+    setFriendStatus('', false);
+    enterFriendTent(f.name || 'Hero', res.data);
+}
+
+function enterFriendTent(name, snap) {
+    if (friendTentVisiting()) return;
+    const backup = JSON.parse(JSON.stringify(player));
+    const copy = JSON.parse(JSON.stringify(snap));
+    if (typeof removeTentPetWalker === 'function' && typeof tentPetWalkers !== 'undefined') [...tentPetWalkers.keys()].forEach(removeTentPetWalker);
+    Object.keys(player).forEach(k => { delete player[k]; });
+    Object.assign(player, copy);
+    window.friendVisit = { name, backup };
+    document.body.classList.add('friend-visiting');
+    const nameEl = document.getElementById('friend-visit-name');
+    if (nameEl) nameEl.textContent = name;
+    if (typeof closePetPanel === 'function') closePetPanel();
+    if (!isCharClear()) toggleCharClear();
+    switchView('character');
+}
+
+function exitFriendTent() {
+    if (!friendTentVisiting()) return;
+    const backup = window.friendVisit.backup;
+    if (typeof removeTentPetWalker === 'function' && typeof tentPetWalkers !== 'undefined') [...tentPetWalkers.keys()].forEach(removeTentPetWalker);
+    Object.keys(player).forEach(k => { delete player[k]; });
+    Object.assign(player, backup);
+    window.friendVisit = null;
+    document.body.classList.remove('friend-visiting');
+    if (isCharClear()) toggleCharClear();
+    switchView('friend');
+}
+
+// The owner's list of who visited their tent in the last 3 days
+async function loadTentVisitors() {
+    const box = document.getElementById('friend-visitors');
+    if (!box) return;
+    const res = await friendApi.visitors();
+    if (res.error) { box.textContent = res.error; return; }
+    const rows = res.data || [];
+    box.innerHTML = rows.length
+        ? 'Tent visitors (last 3 days): ' + rows.map(r => `<strong>${escapeHtml(r.name || 'Hero')}</strong> <span>${escapeHtml(new Date(r.visited_at).toLocaleString())}</span>`).join(' · ')
+        : 'No tent visitors in the last 3 days.';
 }

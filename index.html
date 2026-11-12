@@ -379,6 +379,13 @@
         #blacksmith-panel-left { border: none; }
         #blacksmith-panel-right { border-color: transparent; }
         /* Friends page: parchment window (the inventory colour), friend rows in the character info style (navy, gold name) */
+        .friend-visitors { font-size: 20px; color: #4a3520; padding: 4px 0; }
+        .friend-visitors strong { color: #2a1a0e; }
+        .friend-visitors span { color: #7a5a32; }
+        /* Friend's tent (read-only): a Back bar, and the owner's controls hidden */
+        #friend-visit-bar { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 500; display: none; align-items: center; gap: 18px; padding: 10px 22px; background: rgba(20,12,4,.85); border: 2px solid #b8945a; border-radius: 12px; color: #fff3d0; font-family: Georgia, "Times New Roman", serif; font-size: 26px; }
+        body.friend-visiting #friend-visit-bar { display: flex; }
+        body.friend-visiting #view-character .tent-top-btn, body.friend-visiting #view-character .char-clear-toggle, body.friend-visiting #view-character .char-return { display: none !important; }
         #view-friend .friend-title { position: absolute; left: 0; top: 0; width: 1920px; height: 70px; line-height: 70px; text-align: center; font-size: 32px; font-weight: 700; color: #f5c451; letter-spacing: 3px; z-index: 3; pointer-events: none; font-family: Georgia, "Times New Roman", serif; }
         #view-friend .friend-window { position: absolute; left: 60px; top: 92px; width: 1800px; height: 956px; box-sizing: border-box; padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; background: rgba(231,209,170,.9); border-radius: 18px; z-index: 5; font-family: Georgia, "Times New Roman", serif; color: #2a1a0e; }
         .friend-top { display: flex; flex-direction: column; gap: 12px; flex: none; }
@@ -867,6 +874,7 @@
                             <button id="friend-tab-friends" class="friend-tab active" onclick="setFriendTab('friends')">Friends (0)</button>
                             <button id="friend-tab-requests" class="friend-tab" onclick="setFriendTab('requests')">Requests</button>
                         </div>
+                        <div id="friend-visitors" class="friend-visitors"></div>
                         <div id="friend-list" class="friend-list"></div>
                     </div>
                 </div>
@@ -1090,6 +1098,7 @@
 
                 <!-- VIEW: CHARACTER & EQUIPMENT (layout: 04_psd/pagecharacter) -->
         <div id="view-character" class="hidden art-screen art-dark stats-hidden">
+            <div id="friend-visit-bar"><span>Visiting <strong id="friend-visit-name"></strong>'s tent (view only)</span><button class="friend-btn" onclick="exitFriendTent()">Back to friends</button></div>
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/character/tent/tent_off_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
@@ -1473,17 +1482,17 @@
     <script src="data/maps.js?v=20261111c"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-    <script src="js/player.js?v=20261112a"></script>
+    <script src="js/player.js?v=20261112b"></script>
     <script src="js/audio.js?v=20261105h"></script>
-    <script src="js/cloud.js?v=20261111a"></script>
+    <script src="js/cloud.js?v=20261112a"></script>
     <script src="js/hero-art.js?v=20261112c"></script>
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112gv"></script>
+    <script src="js/ui.js?v=20261112hv"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
-    <script src="js/friends.js?v=20261109k"></script>
+    <script src="js/friends.js?v=20261112a"></script>
     <script src="js/town.js?v=20261110e"></script>
     <script src="js/loader.js?v=20261112e"></script>
 

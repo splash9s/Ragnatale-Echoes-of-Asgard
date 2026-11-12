@@ -386,7 +386,10 @@ function getDerivedStats() {
     return { maxHp, maxArmor: finalMaxArmor, atk, def, hit, flee, crit, aspd, movementSpeed, goldMultiplier, elemRes };
 }
 
+// True while a friend's tent is open (js/friends.js sets window.friendVisit). Defined here because player.js loads first.
+function friendTentVisiting() { return !!window.friendVisit; }
 function saveGame() {
+    if (friendTentVisiting()) return; // a friend's tent is open: `player` is their copy, so never write it to this save
     try {
         localStorage.setItem('ragnatale_save', JSON.stringify(player));
         localStorage.setItem('ragnatale_save_at', String(Date.now()));

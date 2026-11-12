@@ -894,7 +894,7 @@ function petDayKey(d = new Date()) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 function petDailyPlay(item) {
-    if (!item) return false;
+    if (!item || friendTentVisiting()) return false; // visiting a friend's tent: animation only, no friendship
     const day = petDayKey();
     if (item.lastPlayDay === day) return false;
     item.lastPlayDay = day;
@@ -5569,6 +5569,7 @@ function renderPetPanel() {
         + `<button class="pet-walk" onclick="togglePetWalk(${tok})">${walking ? 'Stop walking on floor' : 'Walk on tent floor'}</button>`;
 }
 function petStartEdit(key) {
+    if (friendTentVisiting()) return; // read-only on a friend's tent
     petEditField = key;
     renderPetPanel();
     const el = document.getElementById(key === 'name' ? 'pet-name-input' : 'pet-bio-input');
@@ -5585,6 +5586,7 @@ function petCount(inputId, countId) {
     if (el && out) out.textContent = el.value.length;
 }
 function petSetName(tok, value) {
+    if (friendTentVisiting()) return;
     const it = tentPetItem(String(tok));
     if (!it) return;
     const v = String(value || '').trim().slice(0, PET_NAME_MAX);
@@ -5594,6 +5596,7 @@ function petSetName(tok, value) {
     syncTentPets();
 }
 function petSetBio(tok, value) {
+    if (friendTentVisiting()) return;
     const it = tentPetItem(String(tok));
     if (!it) return;
     const v = String(value || '').trim().slice(0, PET_BIO_MAX);
@@ -5602,6 +5605,7 @@ function petSetBio(tok, value) {
     renderPetPanel();
 }
 function togglePetWalk(tok) {
+    if (friendTentVisiting()) return; // the friend's tent layout is theirs to change
     toggleTentPet(tok === 'eq' ? 'eq' : Number(tok));
     renderPetPanel();
 }
