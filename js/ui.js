@@ -918,7 +918,7 @@ function spawnPetHeart(parent, x, y) {
     h.style.left = x + 'px';
     h.style.top = y + 'px';
     parent.appendChild(h);
-    setTimeout(() => h.remove(), 1500);
+    setTimeout(() => h.remove(), 2500);
 }
 // Click the pet: it sits, licks and sits again, same timing and frames as the main page cat
 const PET_LICK_BASE = 'assets/combat/ocat/ocat';
