@@ -4924,8 +4924,14 @@ function attachTentLight(sprite) {
 }
 function syncTentLights() {
     tentLightSprites.forEach(({ sprite, glows }) => {
-        const left = parseFloat(sprite.style.left) || 0, top = parseFloat(sprite.style.top) || 0;
-        const w = parseFloat(sprite.style.width) || 0, h = parseFloat(sprite.style.height) || 0;
+        // Use the sprite's real on-screen box (in design px), so moving sprites (animated by transform) are lit where they are
+        const inner = sprite.closest('.ts-inner');
+        if (!inner) return;
+        const ir = inner.getBoundingClientRect();
+        const k = (ir.width / 1920) || 1;
+        const sr = sprite.getBoundingClientRect();
+        const left = (sr.left - ir.left) / k, top = (sr.top - ir.top) / k;
+        const w = sr.width / k, h = sr.height / k;
         const src = sprite.getAttribute('src');
         const mask = src ? `url("${src}")` : 'none';
         ['left', 'right'].forEach(key => {
@@ -4943,7 +4949,16 @@ function syncTentLights() {
         });
     });
 }
-document.addEventListener('DOMContentLoaded', () => attachTentLight(document.getElementById('char-hero')));
+// Keep every lit sprite's glow on the sprite each frame (the cat and any other moving sprite).
+function tentLightLoop() {
+    if (tentLightSprites.size) syncTentLights();
+    requestAnimationFrame(tentLightLoop);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    attachTentLight(document.getElementById('char-hero'));
+    attachTentLight(document.getElementById('tent-cat'));
+    tentLightLoop();
+});
 function toggleCharLight(side) {
     charLightState[side] = !charLightState[side];
     renderCharLights();

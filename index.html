@@ -262,8 +262,8 @@
         /* Light on sprites: a warm glow masked to the sprite's own pixels, so only the characters and pets are lit */
         #view-character .sprite-light { position: absolute; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity .6s ease; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; animation: spriteFlicker 3.4s ease-in-out infinite; }
         #view-character .sprite-light.on { opacity: 1; }
-        #view-character .sprite-light-left { background: radial-gradient(circle 360px at var(--lx, 0px) var(--ly, 0px), rgba(255,180,90,.85), rgba(255,150,60,.35) 50%, rgba(255,140,40,0) 100%); }
-        #view-character .sprite-light-right { background: radial-gradient(circle 200px at var(--lx, 0px) var(--ly, 0px), rgba(255,200,120,.7), rgba(255,170,80,.25) 45%, rgba(255,160,60,0) 100%); }
+        #view-character .sprite-light-left { background: radial-gradient(circle 620px at var(--lx, 0px) var(--ly, 0px), rgba(255,180,90,.85), rgba(255,150,60,.35) 50%, rgba(255,140,40,0) 100%); }
+        #view-character .sprite-light-right { background: radial-gradient(circle 520px at var(--lx, 0px) var(--ly, 0px), rgba(255,200,120,.8), rgba(255,170,80,.3) 50%, rgba(255,160,60,0) 100%); }
         @keyframes spriteFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
         /* Clear screen: hides equipment and inventory panels so only the background shows */
         #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn { visibility: hidden !important; pointer-events: none !important; }
@@ -1424,7 +1424,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112av"></script>
+    <script src="js/ui.js?v=20261112aw"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>
