@@ -5429,6 +5429,7 @@ function createTentPetWalker(k, stage) {
     attachTentLight(cat);
     attachTentLight(lick);
     ensureTentPetFrameTimer();
+    ensureTentPetDepth();
 }
 function removeTentPetWalker(k) {
     const w = tentPetWalkers.get(k);
@@ -5444,6 +5445,27 @@ function ensureTentPetFrameTimer() {
         tentPetFrame = (tentPetFrame + 1) % TENT_CAT.frames;
         tentPetWalkers.forEach(w => { if (!w.licking) w.cat.src = `assets/page01/cat/c${tentPetFrame + 1}_q85.webp`; });
     }, TENT_CAT.frameMs);
+}
+// Layer order between walking pets: the pet whose feet are lower on the floor (closer to the viewer) is drawn in front.
+// Each pet's cat and lick sprite share a rank; shadows stay under all pets (z 3).
+let tentPetDepthOn = false;
+function tentPetDepthLoop() {
+    if (!tentPetWalkers.size) { tentPetDepthOn = false; return; }
+    const list = [...tentPetWalkers.values()].map(w => {
+        const el = w.licking ? w.lick : w.cat;
+        return { w, y: el.getBoundingClientRect().bottom };
+    });
+    list.sort((a, b) => a.y - b.y); // smaller y = higher on screen = further back
+    list.forEach((item, rank) => {
+        item.w.cat.style.zIndex = String(7 + rank * 2);
+        item.w.lick.style.zIndex = String(8 + rank * 2);
+    });
+    requestAnimationFrame(tentPetDepthLoop);
+}
+function ensureTentPetDepth() {
+    if (tentPetDepthOn) return;
+    tentPetDepthOn = true;
+    requestAnimationFrame(tentPetDepthLoop);
 }
 // Click a walking pet: it stops, sits, licks, sits again, then walks on from the same spot
 function tentPetLick(w) {
