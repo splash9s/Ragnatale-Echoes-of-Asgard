@@ -109,6 +109,30 @@ function toggleLanguage() {
     currentLanguage = (currentLanguage === 'en') ? 'th' : 'en';
 }
 
+// Game font: the player picks one in Settings. Saved with the player's save (player.uiFont).
+const GAME_FONTS = {
+    outfit:   "'Outfit', sans-serif",
+    roboto:   "'Roboto', sans-serif",
+    cinzel:   "'Cinzel', serif",
+    medieval: "'MedievalSharp', cursive",
+    pixel:    "'Press Start 2P', monospace"
+};
+function gameFontKey() { return (player && GAME_FONTS[player.uiFont]) ? player.uiFont : 'outfit'; }
+function applyGameFont() {
+    document.documentElement.style.setProperty('--game-font', GAME_FONTS[gameFontKey()]);
+    refreshFontUI();
+}
+function setGameFont(key) {
+    if (!GAME_FONTS[key]) return;
+    player.uiFont = key;
+    applyGameFont();
+    saveGame();
+}
+function refreshFontUI() {
+    const sel = document.getElementById('font-select');
+    if (sel) sel.value = gameFontKey();
+}
+
 function manualSaveGame() {
     saveGame();
     if (typeof cloudFlush === 'function') cloudFlush();
