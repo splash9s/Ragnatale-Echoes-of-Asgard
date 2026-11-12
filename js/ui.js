@@ -5385,6 +5385,9 @@ function toggleTentPet(token) {
     else if (sel.length >= TENT_PETS_MAX) { showFloatNotice(`You can choose up to ${TENT_PETS_MAX} pets.`); return; }
     else sel.push(token);
     player.tentPets = sel;
+    // Upload right away, so friends who visit see the walk change (cloudFlush skips while visiting a friend's tent)
+    saveGame();
+    if (typeof cloudFlush === 'function') cloudFlush();
     renderTentPetPicker();
     syncTentPets();
 }
