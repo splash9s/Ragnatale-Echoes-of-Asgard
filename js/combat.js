@@ -1000,11 +1000,13 @@ function awardKill(m) {
     if (isVoidTest) { const em = voidExpMult(currentStage); baseExpGain *= em; jobExpGain *= em; finalGold *= voidGoldMult(currentStage); }
     if (player.baseLv >= MAX_BASE_LV) baseExpGain = 0;
     if (player.jobLv >= MAX_CLASS_LV) jobExpGain = 0;
+    // Bosses and mini bosses always drop at least one coin (100%), even when the event rules zero the gold.
+    if (bossKill && finalGold < 1) finalGold = 1;
 
     if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
-    if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:2px;"><img src="assets/icons/goldpile_q85.webp" alt="" style="width:52px;height:40px;object-fit:contain;"><b style="color:#fde68a; font-size:16px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
+    if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:4px;"><img src="assets/icons/goldpile_q85.webp" alt="" style="width:76px;height:58px;object-fit:contain;"><b style="color:#fde68a; font-size:22px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
     if (m.isFinalBoss) { player.diamonds += 100; logMessage(`[Final Boss] Defeated! Reward: 100 Diamond`, 'drop'); }
     player.baseExp += baseExpGain;
     player.jobExp += jobExpGain;
