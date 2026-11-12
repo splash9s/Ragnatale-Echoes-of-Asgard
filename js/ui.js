@@ -284,7 +284,9 @@ const COMBAT_HIT_FLASH_FILTER = 'brightness(1.8) sepia(1) hue-rotate(-50deg) sat
 // Death: slime_dead_0001 to 0006 play once (150ms each), then the monster disappears
 const COMBAT_SLIME_DEATH_FRAMES = ['assets/combat/slime/slimedead_q85.webp'];
 const COMBAT_DEATH_FRAME_MS = 600;
-const COMBAT_SLIME_ATTACK_FRAME = 'assets/combat/slime/slimeattack_q85.webp';
+// Slime attack: wind-up, then the strike (the attack pose splits its time across the list)
+const COMBAT_SLIME_ATTACK_FRAMES = ['assets/combat/slime/slimeattack0_q85.webp', 'assets/combat/slime/slimeattack1_q85.webp'];
+const COMBAT_SLIME_ATTACK_FRAME = COMBAT_SLIME_ATTACK_FRAMES[0];
 const COMBAT_MONSTER_ATTACK_MS = 300; // attack pose shown when a monster attacks
 const COMBAT_MONSTER_LUNGE_PX = -40;  // monsters stand to the right of the player, so forward is left
 const COMBAT_DEATH_TOTAL_MS = COMBAT_SLIME_DEATH_FRAMES.length * COMBAT_DEATH_FRAME_MS;
@@ -602,7 +604,7 @@ function monsterDeathMs(m) {
 function monsterDeathTotalMs(m) { return monsterDeathHurtMs(m) + monsterDeathFrames(m).length * monsterDeathMs(m); }
 function monsterAttackFrame(m) { const s = monsterSpriteOf(m); return s && s.attack ? s.attack[0] : COMBAT_SLIME_ATTACK_FRAME; }
 // All attack frames in play order (the attack pose splits its time across them)
-function monsterAttackFrames(m) { const s = monsterSpriteOf(m); return s && s.attack && s.attack.length ? s.attack : [COMBAT_SLIME_ATTACK_FRAME]; }
+function monsterAttackFrames(m) { const s = monsterSpriteOf(m); return s && s.attack && s.attack.length ? s.attack : COMBAT_SLIME_ATTACK_FRAMES; }
 function monsterHurtFrames(m) { const s = monsterSpriteOf(m); return s ? (s.hurt || []) : COMBAT_SLIME_DAMAGE_FRAMES; }
 // Show a monster frame on its card image, applying that frame's feet shift (px)
 // Stun effect above the monster's head; the sprite loop shakes it
