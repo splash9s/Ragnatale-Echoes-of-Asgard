@@ -1736,6 +1736,8 @@ function onStageCleared() {
         };
 
         const continueRun = () => {
+            // Last stage: go straight to the result screen (no "next chapter" step before it)
+            if (currentStage >= maxStages) { proceedNext(); return; }
             if (isRuneDueAfter(currentStage) && currentStage < maxStages) {
                 checkRuneSelectionPrompt(proceedNext);
             } else {
@@ -1748,10 +1750,14 @@ function onStageCleared() {
                 if (nextBtn) nextBtn.classList.remove('hidden');
             }
         };
-        if (wasBossStage) {
-            // Boss stage completed: show the combat result right away; closing it moves on
-            showModal("Boss Defeated!", '', buildMapSummaryHTML('win', currentStage < maxStages ? `Continue to Stage ${currentStage + 1}` : 'Continue', false, 'Boss Defeated'), () => continueRun());
+        if (wasBossStage && currentStage < maxStages) {
+            // Boss stage completed (not the last stage): show the result right away; closing it moves on
+            showModal("Boss Defeated!", '', buildMapSummaryHTML('win', `Continue to Stage ${currentStage + 1}`, false, 'Boss Defeated'), () => continueRun());
             playSound('sound/mvp.mp3');
+        } else if (wasBossStage) {
+            // Final boss: its result is the map result shown by proceedNext, so only the sound plays here
+            playSound('sound/mvp.mp3');
+            continueRun();
         } else {
             continueRun();
         }
