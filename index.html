@@ -14,9 +14,9 @@
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700&family=Roboto:wght@400;700&family=Cinzel:wght@400;700&family=MedievalSharp&family=Noto+Sans+Thai:wght@400;700&family=Prompt:wght@400;700&family=Kanit:wght@400;700&family=Sarabun:wght@400;700&family=Lora:wght@400;700&family=Playfair+Display:wght@400;700&family=Almendra:wght@400;700&family=Pirata+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700&family=Roboto:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: var(--game-font, 'Outfit', sans-serif); background-color: #030712; color: #f8fafc; }
+        body { font-family: 'Roboto', 'Noto Sans Thai', sans-serif; background-color: #030712; color: #f8fafc; }
         /* No text highlighting by drag on any page; typing fields keep normal selection */
         html, body, body * { -webkit-user-select: none; user-select: none; }
         input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; }
@@ -918,24 +918,6 @@
                     <span id="sfx-volume-text" class="w-12 text-right font-mono text-xl">20</span>
                 </div>
                 <button onclick="toggleLanguage()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
-                <label class="px-6 py-4 bg-slate-800 rounded-xl text-slate-200 font-bold text-xl flex items-center gap-4">
-                    <span>🔤 Font</span>
-                    <select id="font-select" onchange="setGameFont(this.value)" class="flex-1 bg-slate-700 text-slate-100 rounded-lg px-3 py-2 cursor-pointer text-xl">
-                        <option value="outfit">Outfit (default)</option>
-                        <option value="roboto">Roboto</option>
-                        <option value="cinzel">Cinzel (fantasy)</option>
-                        <option value="medieval">MedievalSharp</option>
-                        <option value="pixel">Pixel (Press Start 2P)</option>
-                        <option value="lora">Lora (serif)</option>
-                        <option value="playfair">Playfair Display (serif)</option>
-                        <option value="almendra">Almendra (fantasy)</option>
-                        <option value="pirata">Pirata One (pirate)</option>
-                        <option value="prompt">Prompt (Thai + Latin)</option>
-                        <option value="kanit">Kanit (Thai + Latin)</option>
-                        <option value="sarabun">Sarabun (Thai + Latin)</option>
-                        <option value="notothai">Noto Sans Thai (Thai + Latin)</option>
-                    </select>
-                </label>
                 <button onclick="openSendMailForm()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Send Mail</button>
                 <div id="account-status" class="px-5 py-4 bg-slate-800 rounded-xl text-slate-200 text-lg leading-relaxed"></div>
                 <button id="bind-email-btn" onclick="bindGmail()" class="hidden px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Bind Gmail</button>
@@ -1560,7 +1542,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113q"></script>
+    <script src="js/ui.js?v=20261113r"></script>
     <script src="js/market.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
@@ -1589,7 +1571,6 @@
         } else {
             firstPlayStart(); // no save: sign-in, then character selection
         }
-        if (typeof applyGameFont === 'function') applyGameFont();
         setMusicTrack('town');
         if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();
         if (typeof cloudStart === 'function') cloudStart();

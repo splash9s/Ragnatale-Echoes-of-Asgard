@@ -50,7 +50,7 @@
         events:     () => switchView('events'),
         diamond:    () => switchView('diamond'),
         mail:       () => switchView('quests'),
-        setting:    () => { switchView('setting'); refreshBindEmail(); refreshFontUI(); },
+        setting:    () => { switchView('setting'); refreshBindEmail(); },
         character:  () => switchView('character'),
         shop:       () => switchView('shop'),
         market:     () => switchView('market'),
