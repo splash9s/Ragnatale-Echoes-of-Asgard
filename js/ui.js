@@ -5323,7 +5323,7 @@ const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    playSound('sound/blacksmith-hammer-swing.mp3'); // one sound for the whole swing cycle
+    setTimeout(() => playSound('sound/blacksmith-hammer-swing.mp3'), 3000); // one sound per swing cycle, 3 s after the animation starts
     const total = SMITH_SWING_FRAMES.length * SMITH_SWINGS;
     for (let k = 0; k < total; k++) {
         setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k % SMITH_SWING_FRAMES.length]), k * SMITH_FRAME_MS);
@@ -5401,7 +5401,7 @@ function walkCartMan() {
         if (shadow) shadow.style.display = 'none';
         el.src = 'assets/page01/cart/c1_q85.webp';
         townWalker = null;
-        scheduleCartMan(60000); // one walk every minute
+        scheduleCartMan(15000 + Math.random() * 10000); // next walk after 15 to 25 seconds (was every 60)
     };
 }
 scheduleCartMan(5000 + Math.random() * 40000); // first walk at a random time
