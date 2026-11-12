@@ -119,6 +119,7 @@ const LOADING_IMAGES = [
     "assets/combat/valkyriehealer/valkyriehealerdamaged_q85.webp",
     "assets/combat/valkyriehealer/valkyriehealerdead_q85.webp",
     "assets/combat/cavebeast/cavebeast_q85.webp",
+    "assets/combat/cavebeast/cavebeastattack0_q85.webp",
     "assets/combat/cavebeast/cavebeastattack_q85.webp",
     "assets/combat/cavebeast/cavebeastdamaged_q85.webp",
     "assets/combat/cavebeast/cavebeastdead1_q85.webp",

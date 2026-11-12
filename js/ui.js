@@ -344,7 +344,7 @@ const MONSTER_SPRITES = {
     },
     M008: { // Cave Beast (boss, map lv 10): natural size; shift is [dx, dy] px so the feet stay on the same spot
         idle: ['assets/combat/cavebeast/cavebeast_q85.webp'],
-        attack: ['assets/combat/cavebeast/cavebeastattack_q85.webp'],
+        attack: ['assets/combat/cavebeast/cavebeastattack0_q85.webp', 'assets/combat/cavebeast/cavebeastattack_q85.webp'], // wind-up, then the strike
         hurt: ['assets/combat/cavebeast/cavebeastdamaged_q85.webp'],
         dead: ['assets/combat/cavebeast/cavebeastdead1_q85.webp', 'assets/combat/cavebeast/cavebeastdead2_q85.webp'],
         deathMs: 600,
@@ -601,6 +601,8 @@ function monsterDeathMs(m) {
 }
 function monsterDeathTotalMs(m) { return monsterDeathHurtMs(m) + monsterDeathFrames(m).length * monsterDeathMs(m); }
 function monsterAttackFrame(m) { const s = monsterSpriteOf(m); return s && s.attack ? s.attack[0] : COMBAT_SLIME_ATTACK_FRAME; }
+// All attack frames in play order (the attack pose splits its time across them)
+function monsterAttackFrames(m) { const s = monsterSpriteOf(m); return s && s.attack && s.attack.length ? s.attack : [COMBAT_SLIME_ATTACK_FRAME]; }
 function monsterHurtFrames(m) { const s = monsterSpriteOf(m); return s ? (s.hurt || []) : COMBAT_SLIME_DAMAGE_FRAMES; }
 // Show a monster frame on its card image, applying that frame's feet shift (px)
 // Stun effect above the monster's head; the sprite loop shakes it
@@ -1178,7 +1180,8 @@ setInterval(() => {
         if (attackOn) {
             // Attack pose has priority and plays to the end; the red flash still shows on a hit
             img.style.filter = redFlashOn ? COMBAT_HIT_FLASH_FILTER : '';
-            setMonsterFrame(img, img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME);
+            const aFrames = img.dataset.attackFrames ? img.dataset.attackFrames.split(',') : [img.dataset.attackFrame || COMBAT_SLIME_ATTACK_FRAME];
+            setMonsterFrame(img, aFrames[Math.min(aFrames.length - 1, Math.floor(ae / (COMBAT_MONSTER_ATTACK_MS / aFrames.length)))]);
             return;
         }
         if (hurtOn) {
@@ -4764,7 +4767,7 @@ function updateUI() {
             if (p) cardStyle += `${cardStyle ? '; ' : ''}left:${p[0]}px; top:${p[1]}px`;
             lineupContainer.innerHTML += `
                 <div class="flex flex-col items-center gap-1" data-pos="${posIdx}" data-slot="${hasSlot ? 'y' : ''}"${cardStyle ? ` style="${cardStyle}"` : ''}>
-                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${miniEmbersHTML(m)}${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); const init = monsterInitialFrame(m, idle, dead); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-hurt-ms="${monsterDeathHurtMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" data-slow-death="${monsterIsSlowDeath(m) ? 1 : 0}" src="${init.src}" alt="" style="${init.css}image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;${m._hitAt && Date.now() - m._hitAt < COMBAT_HIT_FLASH_MS ? ' filter:' + COMBAT_HIT_FLASH_FILTER + ';' : ''}">`; })()}${stunFxHTML(m)}</div>
+                    <div style="height:100px; display:flex; align-items:flex-end; justify-content:center; position:relative;">${miniEmbersHTML(m)}${(() => { const sp = monsterSpriteOf(m); const idle = sp ? sp.idle.join(',') : COMBAT_SLIME_FRAMES; const dead = monsterDeathFrames(m); const init = monsterInitialFrame(m, idle, dead); return `<img class="idle-anim monster-idle ${monsterTintClass(m)}" data-stunned="${m.status && m.status.kind === 'stun' ? '1' : ''}" data-sprite="${m.id}" data-frames="${idle}" data-hit-at="${m._hitAt || 0}" data-flash-at="${m._flashAt || 0}" data-death-at="${m._deathAt || 0}" data-attack-at="${m._attackAt || 0}" data-lunge-at="${m._animAt || 0}" data-attack-frame="${monsterAttackFrame(m)}" data-attack-frames="${monsterAttackFrames(m).join(',')}" data-hurt-frames="${monsterHurtFrames(m).join(',')}" data-death-frames="${dead.join(',')}" data-death-ms="${monsterDeathMs(m)}" data-death-hurt-ms="${monsterDeathHurtMs(m)}" data-death-total="${monsterDeathTotalMs(m)}" data-slow-death="${monsterIsSlowDeath(m) ? 1 : 0}" src="${init.src}" alt="" style="${init.css}image-rendering:pixelated; pointer-events:none; position:relative; max-width:none; height:auto; flex-shrink:0; animation-delay:-${((idx * 0.37) % 1.8).toFixed(2)}s;${m._hitAt && Date.now() - m._hitAt < COMBAT_HIT_FLASH_MS ? ' filter:' + COMBAT_HIT_FLASH_FILTER + ';' : ''}">`; })()}${stunFxHTML(m)}</div>
                     <div class="w-[200px] p-2.5 rounded-lg border ${borderColor} flex flex-col gap-1.5 transition-all">
                         <div class="flex justify-between items-center gap-2 text-xs">
                             <span class="font-bold text-red-400 truncate">${m.name}</span>
