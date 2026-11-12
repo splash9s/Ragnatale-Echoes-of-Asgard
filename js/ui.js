@@ -2227,25 +2227,18 @@ let blacksmithSelectedSlot = null;
 let blacksmithRuneOn = false;
 let blacksmithMode = 'refine';   // 'refine' or 'elemental' (the menu on the Blacksmith page)
 let blacksmithForgeEl = null;    // the element stone picked for the elemental forge
-// Elemental forge tiers. A weapon's tier is its forge rank: R1 for a weapon not yet forged, up to R4.
-// Each successful forge raises the rank by one (R4 is the top tier).
-const FORGE_TIERS = [
-    { rank: 1, cost: 500,  rate: 60 },
-    { rank: 2, cost: 1000, rate: 50 },
-    { rank: 3, cost: 2000, rate: 40 },
-    { rank: 4, cost: 5000, rate: 30 }
-];
+// Elemental forge costs, from the weapon's item level (levelReq):
+// Gold = level x 100; Elemental Stones = level / 10 (rounded up, at least 1). Success is a flat 20%.
+const FORGE_SUCCESS_RATE = 20;
 const FORGE_ELEMENT_COLOR = { fire: '#ef4444', water: '#38bdf8', earth: '#d97706', wind: '#5eead4' };
-function forgeTierOf(gear) {
-    const i = Math.min(FORGE_TIERS.length - 1, Math.max(0, Math.floor(Number(gear && gear.forgeRank) || 0)));
-    return FORGE_TIERS[i];
-}
-function elementForgeCost(gear) { return forgeTierOf(gear).cost; }
-// The forged weapon's name: "<player name> <Element> <base weapon name>", the element in its colour
+function forgeItemLevel(gear) { return Math.max(1, Math.floor(Number(gear && gear.levelReq) || 1)); }
+function elementForgeCost(gear) { return forgeItemLevel(gear) * 100; }
+function elementStoneCost(gear) { return Math.max(1, Math.ceil(forgeItemLevel(gear) / 10)); }
+// The forged weapon's name: "<player name in blue> <Element> <base weapon name>"
 function forgedWeaponName(gear, el) {
     const esc = (t) => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const color = FORGE_ELEMENT_COLOR[el] || '#ffffff';
-    return `${esc((player.name || 'Hero').slice(0, MAX_NAME_LENGTH))} <span style="color:${color}; font-weight:900;">${ELEMENTS[el].name}</span> ${esc(gear.baseName || gear.name)}`;
+    return `<span style="color:#2563eb; font-weight:900;">${esc((player.name || 'Hero').slice(0, MAX_NAME_LENGTH))}</span> <span style="color:${color}; font-weight:900;">${ELEMENTS[el].name}</span> ${esc(gear.baseName || gear.name)}`;
 }
 function blacksmithSetMode(mode) {
     blacksmithMode = mode;
@@ -2413,9 +2406,9 @@ function renderElementalUI() {
             <div onclick="blacksmithSelect('weapon')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900 border-slate-700 hover:border-amber-500/50'}">
                 <div>
                     <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(weapon, 36)} ${weapon.name}</span>
-                    <span class="text-[10px] text-slate-400 block">Current: ${current} | Gear Lv ${weapon.levelReq || 1}</span>
+                    <span class="text-[10px] text-slate-400 block">Current: ${current} | Item Lv ${forgeItemLevel(weapon)}</span>
                 </div>
-                <span class="text-[10px] text-slate-300 whitespace-nowrap">${forgeTierOf(weapon).rank ? 'R' + forgeTierOf(weapon).rank : ''} | ${forgeTierOf(weapon).rate}% | ${elementForgeCost(weapon)} Gold</span>
+                <span class="text-[10px] text-slate-300 whitespace-nowrap">${elementForgeCost(weapon)} Gold + ${elementStoneCost(weapon)} Stone</span>
             </div>`;
     }
     html += '<div class="text-[10px] text-slate-400 mt-3 mb-1">Select an Elemental Stone:</div>';
@@ -2441,13 +2434,14 @@ function renderElementalSlot(slotEl, forgeBtn) {
         slotEl.innerHTML = weapon ? `${itemIconHTML(weapon, 60)}` : '<span style="opacity:.6">Empty</span>';
     }
     const cost = weapon ? elementForgeCost(weapon) : 0;
-    if (rateEl) rateEl.textContent = weapon ? `R${forgeTierOf(weapon).rank} | Success: ${forgeTierOf(weapon).rate}% | ${cost} Gold + 1 Stone` : '';
+    const need = weapon ? elementStoneCost(weapon) : 0;
+    if (rateEl) rateEl.textContent = weapon ? `Success: ${FORGE_SUCCESS_RATE}% | ${cost} Gold + ${need} Stone` : '';
     if (!forgeBtn) return;
     const el = blacksmithForgeEl;
     let blocked = '';
     if (!weapon) blocked = 'Select a weapon';
     else if (!el) blocked = 'Pick a stone';
-    else if ((stones[el] || 0) < 1) blocked = 'No ' + ELEMENTS[el].name + ' stone';
+    else if ((stones[el] || 0) < need) blocked = `Need ${need} ${ELEMENTS[el].name} stone`;
     else if (weapon.element === el) blocked = 'Already ' + ELEMENTS[el].name;
     else if (player.gold < cost) blocked = 'Not enough Gold';
     forgeBtn.disabled = !!blocked;
@@ -2455,30 +2449,30 @@ function renderElementalSlot(slotEl, forgeBtn) {
     forgeBtn.innerHTML = blocked ? blocked : `Forge<br>${cost} Gold`;
 }
 
-// Forge the picked element stone onto the selected weapon. The tier sets the Gold cost and success rate.
-// A failed forge never loses the weapon: it only uses up the stone and the Gold.
+// Forge the picked element stone onto the selected weapon: flat 20% success.
+// The Gold and stones are used up either way; a failed forge never loses the weapon.
 function forgeElementOnWeapon() {
     const weapon = player.equipped.weapon;
     const el = blacksmithForgeEl;
     if (blacksmithSelectedSlot !== 'weapon' || !weapon) { showFloatNotice('Select a weapon to forge.'); return; }
     if (!el || !ELEMENTS[el]) { showFloatNotice('Pick an Elemental Stone.'); return; }
     if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
-    const tier = forgeTierOf(weapon);
-    if ((player.elementStones[el] || 0) < 1) { showFloatNotice(`You have no ${ELEMENTS[el].name} Elemental Stone.`); return; }
-    if (weapon.element === el) { showFloatNotice(`${weapon.baseName || weapon.name} is already ${ELEMENTS[el].name}.`); return; }
-    if (player.gold < tier.cost) { showFloatNotice(`Forging needs ${tier.cost} Gold.`); return; }
-    // The cost is paid either way
-    player.gold -= tier.cost;
-    player.elementStones[el] -= 1;
-    if (Math.random() * 100 >= tier.rate) {
-        logMessage(`[Forge Failed] R${tier.rank} forge of ${weapon.baseName || weapon.name} failed. The ${ELEMENTS[el].name} Elemental Stone and ${tier.cost} Gold are lost; the weapon is safe.`, 'combat');
-        showModal("Forging Failed", `The forge failed. Your ${weapon.baseName || weapon.name} is safe, but the stone and ${tier.cost} Gold were used up.`);
+    const cost = elementForgeCost(weapon);
+    const need = elementStoneCost(weapon);
+    const baseName = weapon.baseName || weapon.name;
+    if ((player.elementStones[el] || 0) < need) { showFloatNotice(`Forging needs ${need} ${ELEMENTS[el].name} Elemental Stone.`); return; }
+    if (weapon.element === el) { showFloatNotice(`${baseName} is already ${ELEMENTS[el].name}.`); return; }
+    if (player.gold < cost) { showFloatNotice(`Forging needs ${cost} Gold.`); return; }
+    player.gold -= cost;
+    player.elementStones[el] -= need;
+    if (Math.random() * 100 >= FORGE_SUCCESS_RATE) {
+        logMessage(`[Forge Failed] Forging ${baseName} failed. ${need} ${ELEMENTS[el].name} Elemental Stone(s) and ${cost} Gold are lost; the weapon is safe.`, 'combat');
+        showModal("Forging Failed", `The forge failed. Your ${baseName} is safe, but ${need} stone(s) and ${cost} Gold were used up.`);
     } else {
         if (!weapon.baseName) weapon.baseName = weapon.name;
         weapon.element = el;
         weapon.name = forgedWeaponName(weapon, el);
-        weapon.forgeRank = Math.min(FORGE_TIERS.length, (Number(weapon.forgeRank) || 0) + 1);
-        logMessage(`[Forge] ${weapon.baseName} is now ${ELEMENTS[el].name} (R${tier.rank}, ${tier.cost} Gold, 1 ${ELEMENTS[el].name} Elemental Stone).`, 'levelup');
+        logMessage(`[Forge] ${baseName} is now ${ELEMENTS[el].name} (${cost} Gold, ${need} ${ELEMENTS[el].name} Elemental Stone).`, 'levelup');
         showModal("Elemental Forge", `Forged! Your weapon is now ${ELEMENTS[el].name}.`);
     }
     updateUI();
@@ -4759,7 +4753,7 @@ function renderLibraryRules() {
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Element System</h3>
             <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">${elementRows}</ul>
-            <p class="text-[10px] text-slate-500 mt-2">Weapons no longer roll an element from drops. Forge one at the Blacksmith's Elemental forge with an elemental stone and Gold (R1 to R4, 30-60% success). Each campaign boss drops the stone of its element (70-80% chance per kill).</p>
+            <p class="text-[10px] text-slate-500 mt-2">Weapons no longer roll an element from drops. Forge one at the Blacksmith's Elemental forge with an elemental stone and Gold (20% success; Gold = item level x 100, stones = item level / 10). Each campaign boss drops the stone of its element (5% chance per kill).</p>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Status</h3>

@@ -1036,11 +1036,11 @@ function awardKill(m) {
         logMessage(`[Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(rollSetForDrop(droppedItem));
     }
-    // Elemental Stone: each campaign boss drops the stone of its element, 70-80% chance per kill
+    // Elemental Stone: each campaign boss drops the stone of its element, flat 5% chance per kill
     if (m.isBoss && currentMode === 'campaign') {
         const pathEl = (CAMPAIGN_PATHS[currentPath] || {}).element;
         const stoneEl = m.baseElement || m.element || pathEl;
-        if (stoneEl && ELEMENTS[stoneEl] && Math.random() < 0.70 + Math.random() * 0.10) {
+        if (stoneEl && ELEMENTS[stoneEl] && Math.random() < 0.05) {
             if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
             player.elementStones[stoneEl] = (player.elementStones[stoneEl] || 0) + 1;
             logMessage(`[Elemental Drop] ${m.name} dropped a ${ELEMENTS[stoneEl].name} Elemental Stone!`, 'drop');
