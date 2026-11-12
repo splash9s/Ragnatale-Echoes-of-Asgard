@@ -1022,19 +1022,19 @@ function awardKill(m) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template);
         logMessage(`[Monster Drop] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(rollSetForDrop(droppedItem));
+        addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }
     if (m.isMiniBoss && pool.length > 0 && Math.random() < (isVoidTest ? 1 : 0.5)) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template, rollMiniBossDropRarity(), 1);
         logMessage(`[Mini Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(rollSetForDrop(droppedItem));
+        addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }
     for (let bd = 0; bd < (m.isFinalBoss ? 2 : 1); bd++) if (m.isBoss && pool.length > 0) {
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
         logMessage(`[Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(rollSetForDrop(droppedItem));
+        addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }
     // Elemental Stone: each campaign boss drops the stone of its element, flat 5% chance per kill
     if (m.isBoss && currentMode === 'campaign') {
@@ -1044,6 +1044,7 @@ function awardKill(m) {
             if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
             player.elementStones[stoneEl] = (player.elementStones[stoneEl] || 0) + 1;
             logMessage(`[Elemental Drop] ${m.name} dropped a ${ELEMENTS[stoneEl].name} Elemental Stone!`, 'drop');
+            showMonsterGroundDrop(m, `<img src="assets/items/elemental/stone_${stoneEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;">`);
         }
     }
     // Helmet: only from campaign bosses, chance by the map level (see bossHelmetChance)
@@ -1053,7 +1054,7 @@ function awardKill(m) {
         const template = list[Math.floor(Math.random() * list.length)];
         const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
         logMessage(`[Helmet Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
-        addItemToInventory(rollSetForDrop(droppedItem));
+        addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }
 }
 

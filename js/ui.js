@@ -683,6 +683,41 @@ function showCombatText(selector, text, variant, delayMs = 0) {
     else spawn();
 }
 
+// Item dropped on the ground where a monster fell: it lands with a small bounce, stays 1.5 s, then fades
+const GROUND_DROP_STAY_MS = 1500;
+const GROUND_DROP_FADE_MS = 400;
+function showGroundDrop(monsterIndex, iconHTML) {
+    const view = document.getElementById('view-combat');
+    if (!view || view.classList.contains('hidden') || monsterIndex < 0) return;
+    const anchor = document.querySelector(`#monsters-lineup-container > div:nth-child(${monsterIndex + 1}) img`);
+    const stage = document.querySelector('#combat-stage .ts-inner');
+    if (!anchor || !stage) return;
+    const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
+    const b = anchor.getBoundingClientRect(), ib = stage.getBoundingClientRect();
+    const d = document.createElement('div');
+    d.className = 'ground-drop';
+    d.innerHTML = iconHTML;
+    const spread = (Math.random() * 2 - 1) * 26; // several drops land a little apart
+    d.style.left = ((b.left + b.width / 2 - ib.left) / sc + spread) + 'px';
+    d.style.top = ((b.bottom - ib.top) / sc - 6) + 'px';
+    stage.appendChild(d);
+    const land = 350, fadeStart = land + GROUND_DROP_STAY_MS, total = fadeStart + GROUND_DROP_FADE_MS;
+    const at = (t) => t / total;
+    const anim = d.animate([
+        { transform: 'translate(-50%, -150px) scale(.6)', opacity: 0, offset: 0 },
+        { transform: 'translate(-50%, 0) scale(1)', opacity: 1, offset: at(land), easing: 'ease-out' },   // lands
+        { transform: 'translate(-50%, -12px)', opacity: 1, offset: at(land + 120) },                      // small bounce
+        { transform: 'translate(-50%, 0)', opacity: 1, offset: at(land + 240) },
+        { transform: 'translate(-50%, 0)', opacity: 1, offset: at(fadeStart) },                           // stays on the ground
+        { transform: 'translate(-50%, 0)', opacity: 0, offset: 1 }                                         // fades
+    ], { duration: total, fill: 'forwards' });
+    anim.onfinish = () => d.remove();
+}
+// Drop shown for a monster: a gear item (by its icon HTML) or an elemental stone (by its element key)
+function showMonsterGroundDrop(m, iconHTML) {
+    showGroundDrop(monstersList.indexOf(m), iconHTML);
+}
+
 // Green number floating over a healed combat sprite (monster or player)
 const HEAL_NUMBER_DELAY_MS = 450; // heal numbers appear after the hit numbers
 function showHealNumber(selector, amount) {
@@ -2284,7 +2319,7 @@ function renderRuneSlot() {
         if (runeEl) {
             const e = blacksmithForgeEl && ELEMENTS[blacksmithForgeEl];
             runeEl.innerHTML = e
-                ? `<span style="font-size:34px; line-height:1;">${e.icon}</span><span style="font-size:12px; font-weight:900; color:#fff; text-shadow:0 1px 3px #000;">x${stones[blacksmithForgeEl] || 0}</span>`
+                ? `<img src="assets/items/elemental/stone_${blacksmithForgeEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;"><span style="font-size:12px; font-weight:900; color:#fff; text-shadow:0 1px 3px #000;">x${stones[blacksmithForgeEl] || 0}</span>`
                 : '<span style="opacity:.6; font-size:11px;">Pick stone</span>';
         }
         if (balEl) {
@@ -2386,6 +2421,9 @@ function renderBlacksmithChrome() {
         const on = blacksmithMode === m;
         b.style.background = on ? '#d6be8c' : 'rgba(40,28,14,.7)';
         b.style.color = on ? '#3b2412' : '#f5e6c4';
+        // Selected: thick border with a light inner edge. Unselected keeps its thin border.
+        b.style.border = on ? '5px solid #3b2412' : '1px solid #b8945a';
+        b.style.boxShadow = on ? 'inset 0 0 0 2px #fbbf24' : 'none';
     });
 }
 
@@ -2416,7 +2454,7 @@ function renderElementalUI() {
         const picked = blacksmithForgeEl === k;
         html += `
             <div onclick="blacksmithSelectElement('${k}')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${picked ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900 border-slate-700 hover:border-amber-500/50'}">
-                <span class="font-bold text-xs inline-flex items-center gap-2 ${e.color}"><span style="font-size:20px;">${e.icon}</span> ${e.name} Elemental Stone</span>
+                <span class="font-bold text-xs inline-flex items-center gap-2 ${e.color}"><img src="assets/items/elemental/stone_${k}.webp" alt="" style="width:30px;height:30px;object-fit:contain;"> ${e.name} Elemental Stone</span>
                 <span class="text-xs text-slate-200">x${stones[k] || 0}</span>
             </div>`;
     });
