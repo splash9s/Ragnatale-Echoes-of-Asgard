@@ -4969,7 +4969,7 @@ function isCharClear() {
     return !!document.getElementById('view-character')?.classList.contains('screen-clear');
 }
 // How far the character moves to reach the centre of the tent (design px) while the screen is cleared
-const CHAR_CLEAR_OFFSET = { dx: 581, dy: 60 };
+const CHAR_CLEAR_OFFSET = { dx: 681, dy: 50 };
 function toggleCharClear() {
     const view = document.getElementById('view-character');
     if (!view) return;
@@ -4979,7 +4979,8 @@ function toggleCharClear() {
 
 // Orange cat walks a loop across the tent floor, in front of the character. Feet points in design px.
 const TENT_CAT = { frameMs: 220, frames: 6, speed: 90, w: 193, h: 120, feetDy: 110, shadowW: 150, shadowH: 30 };
-const TENT_CAT_PATH = [{ x: 330, y: 860 }, { x: 1560, y: 860 }, { x: 1560, y: 905 }, { x: 330, y: 905 }];
+// Walk loop kept inside the green floor area (feet points, design px)
+const TENT_CAT_PATH = [{ x: 560, y: 812 }, { x: 1360, y: 812 }, { x: 1360, y: 866 }, { x: 560, y: 866 }];
 function tentCatKeyframes(withFlip) {
     const frames = [];
     let t = 0;
