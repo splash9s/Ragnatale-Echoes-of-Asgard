@@ -697,9 +697,21 @@ function showGroundDrop(monsterIndex, iconHTML) {
     const d = document.createElement('div');
     d.className = 'ground-drop';
     d.innerHTML = iconHTML;
-    const spread = (Math.random() * 2 - 1) * 26; // several drops land a little apart
-    d.style.left = ((b.left + b.width / 2 - ib.left) / sc + spread) + 'px';
-    d.style.top = ((b.bottom - ib.top) / sc - 6) + 'px';
+    // Scatter: try a few random spots around the monster and take the one farthest from the drops already on the ground
+    const baseX = (b.left + b.width / 2 - ib.left) / sc, baseY = (b.bottom - ib.top) / sc - 6;
+    const others = [...stage.querySelectorAll('.ground-drop')].map(e => ({ x: parseFloat(e.style.left), y: parseFloat(e.style.top) }));
+    let spot = null, bestGap = -1;
+    for (let k = 0; k < 14; k++) {
+        const x = baseX + (Math.random() * 2 - 1) * 130;
+        const y = baseY + (Math.random() * 2 - 1) * 16;
+        let gap = Infinity;
+        for (const o of others) gap = Math.min(gap, Math.hypot(o.x - x, o.y - y));
+        if (gap > bestGap) { bestGap = gap; spot = { x, y }; }
+    }
+    if (!spot) spot = { x: baseX, y: baseY };
+    d.style.left = spot.x + 'px';
+    d.style.top = spot.y + 'px';
+    d.style.zIndex = String(3 + Math.max(0, Math.round(spot.y / 10))); // lower on screen draws in front
     stage.appendChild(d);
     const land = 350, fadeStart = land + GROUND_DROP_STAY_MS, total = fadeStart + GROUND_DROP_FADE_MS;
     const at = (t) => t / total;
