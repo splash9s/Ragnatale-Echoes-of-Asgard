@@ -738,7 +738,7 @@ function playPlayerFallAnim() {
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
     combatPlayerDeadAt = Date.now();
-    flashPlayerHurt();
+    el.classList.remove('player-hurt'); // no hit flash on the death: the fall is the only effect
     // Stop a running attack lunge (WAAPI only; the CSS idle/hurt animations stay)
     el.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); });
     // The standing hero tips backwards from its feet. The fall always plays: the lying frame is swapped in at the end if it has loaded.
@@ -750,7 +750,7 @@ function playPlayerFallAnim() {
     }
     combatPlayerFalling = true;
     const fall = el.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-90deg)' }],
-        { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.55, 0, 0.9, 0.5)', fill: 'forwards' });
+        { duration: PLAYER_FALL_MS, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'forwards' }); // slow but starts tipping at once
     fall.onfinish = () => {
         const dead = combatDeadFrame();
         if (dead) {
