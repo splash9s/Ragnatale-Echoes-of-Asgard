@@ -262,12 +262,18 @@
         /* Light on sprites: a warm glow masked to the sprite's own pixels, so only the characters and pets are lit */
         #view-character .sprite-light { position: absolute; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity .6s ease; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; animation: spriteFlicker 3.4s ease-in-out infinite; }
         #view-character .sprite-light.on { opacity: 1; }
-        #view-character.screen-clear .sprite-light { visibility: hidden !important; }
         #view-character .sprite-light-left { background: radial-gradient(circle 360px at var(--lx, 0px) var(--ly, 0px), rgba(255,180,90,.85), rgba(255,150,60,.35) 50%, rgba(255,140,40,0) 100%); }
         #view-character .sprite-light-right { background: radial-gradient(circle 200px at var(--lx, 0px) var(--ly, 0px), rgba(255,200,120,.7), rgba(255,170,80,.25) 45%, rgba(255,160,60,0) 100%); }
         @keyframes spriteFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
         /* Clear screen: hides equipment and inventory panels so only the background shows */
-        #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn, #view-character.screen-clear #char-hero, #view-character.screen-clear #char-shadow { visibility: hidden !important; pointer-events: none !important; }
+        #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn { visibility: hidden !important; pointer-events: none !important; }
+        /* Tent background is blurred while the panels are open; clear screen shows it sharp */
+        #view-character .ts-bg, #view-character .tent-light { transition: filter .4s ease; }
+        #view-character:not(.screen-clear) .ts-bg, #view-character:not(.screen-clear) .tent-light { filter: blur(6px); }
+        /* Orange cat walks the tent floor in front of the character; shown in clear screen only */
+        #view-character #tent-cat, #view-character #tent-cat-shadow { position: absolute; left: 0; top: 0; display: none; }
+        #view-character #tent-cat { z-index: 7; width: 193px; height: 120px; pointer-events: none; }
+        #view-character.screen-clear #tent-cat, #view-character.screen-clear #tent-cat-shadow { display: block; }
         .art-screen .char-clear-toggle { cursor: pointer; z-index: 10; }
         .art-screen .char-clear-toggle img { display: block; width: 100%; height: 100%; }
         .art-screen .char-clear-toggle .clr-press { display: none; }
@@ -1036,6 +1042,8 @@
                     <img id="tent-both" class="tent-light" src="assets/pages/character/tent/tent_both_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
                     
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
+                    <img id="tent-cat-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp" style="z-index:3;">
+                    <img id="tent-cat" alt="" aria-hidden="true" src="assets/page01/cat/c1_q85.webp" style="z-index:7;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">                    <button class="char-skills-btn" onclick="switchView('skills')" style="position:absolute; left:394px; top:152px; transform:translate(-50%, 0); box-sizing:border-box; height:46px; line-height:42px; padding:0 20px; white-space:nowrap; z-index:4; background-color:#dbc5a0; border:2px solid #c09e6a; color:#2a1a0e; border-radius:8px;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
@@ -1416,7 +1424,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112au"></script>
+    <script src="js/ui.js?v=20261112av"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>

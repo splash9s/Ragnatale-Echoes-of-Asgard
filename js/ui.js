@@ -3368,10 +3368,19 @@ function syncHeroSprites() {
         // The Tailwind base style caps every img at its parent's size: lift the cap so the size stays true
         el.style.maxWidth = 'none';
         el.style.maxHeight = 'none';
-        const o = HERO_PAGE_ORIGIN[id];
+        // On the character page the hero moves to the centre of the tent while the screen is cleared
+        const base = HERO_PAGE_ORIGIN[id];
+        const o = (id === 'char-hero' && isCharClear()) ? { left: base.left + CHAR_CLEAR_OFFSET.dx, top: base.top + CHAR_CLEAR_OFFSET.dy } : base;
         el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx * s) + 'px';
         el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy * s) + 'px';
     });
+    // The character's shadow moves with the character
+    const sh = document.getElementById('char-shadow');
+    if (sh) {
+        const off = isCharClear() ? CHAR_CLEAR_OFFSET : { dx: 0, dy: 0 };
+        sh.style.left = (339 + off.dx) + 'px';
+        sh.style.top = (684 + off.dy) + 'px';
+    }
     if (typeof syncTentLights === "function") syncTentLights();
     document.querySelectorAll('img.hero-thumb').forEach(el => { if (el.getAttribute('src') !== f.src) el.src = f.src; });
     ['town-shadow', 'char-shadow'].forEach(id => {
@@ -4941,11 +4950,69 @@ function toggleCharLight(side) {
 }
 
 // Clear screen: hide equipment and inventory panels to show only the character background. Press again to restore.
+function isCharClear() {
+    return !!document.getElementById('view-character')?.classList.contains('screen-clear');
+}
+// How far the character moves to reach the centre of the tent (design px) while the screen is cleared
+const CHAR_CLEAR_OFFSET = { dx: 581, dy: 60 };
 function toggleCharClear() {
     const view = document.getElementById('view-character');
     if (!view) return;
     view.classList.toggle('screen-clear');
+    syncHeroSprites();
 }
+
+// Orange cat walks a loop across the tent floor, in front of the character. Feet points in design px.
+const TENT_CAT = { frameMs: 220, frames: 6, speed: 90, w: 193, h: 120, feetDy: 110, shadowW: 150, shadowH: 30 };
+const TENT_CAT_PATH = [{ x: 330, y: 860 }, { x: 1560, y: 860 }, { x: 1560, y: 905 }, { x: 330, y: 905 }];
+function tentCatKeyframes(withFlip) {
+    const frames = [];
+    let t = 0;
+    const total = [];
+    for (let i = 0; i < TENT_CAT_PATH.length; i++) {
+        const a = TENT_CAT_PATH[i], b = TENT_CAT_PATH[(i + 1) % TENT_CAT_PATH.length];
+        total.push(Math.hypot(b.x - a.x, b.y - a.y));
+    }
+    const sum = total.reduce((s, v) => s + v, 0);
+    const ms = sum / TENT_CAT.speed * 1000;
+    let acc = 0;
+    for (let i = 0; i < TENT_CAT_PATH.length; i++) {
+        const a = TENT_CAT_PATH[i], b = TENT_CAT_PATH[(i + 1) % TENT_CAT_PATH.length];
+        const flip = b.x < a.x ? -1 : 1; // face the way it walks; keep the flip for the whole leg
+        const start = acc / sum, end = (acc + total[i]) / sum;
+        frames.push({ offset: start, x: a.x, y: a.y, flip });
+        frames.push({ offset: end, x: b.x, y: b.y, flip });
+        acc += total[i];
+    }
+    return { ms, frames: frames.map(f => ({
+        offset: f.offset,
+        ...(withFlip ? {
+            transform: `translate(${f.x - TENT_CAT.w / 2}px, ${f.y - TENT_CAT.feetDy}px) scaleX(${f.flip})`
+        } : {
+            transform: `translate(${f.x - TENT_CAT.shadowW / 2}px, ${f.y - TENT_CAT.shadowH / 2}px)`
+        }),
+    })) };
+}
+let tentCatFrame = 0;
+function startTentCat() {
+    const cat = document.getElementById('tent-cat');
+    const shadow = document.getElementById('tent-cat-shadow');
+    if (!cat || cat.dataset.walking) return;
+    cat.dataset.walking = '1';
+    const walk = tentCatKeyframes(true);
+    cat.animate(walk.frames, { duration: walk.ms, iterations: Infinity, easing: 'linear' });
+    if (shadow) {
+        shadow.style.width = TENT_CAT.shadowW + 'px';
+        shadow.style.height = TENT_CAT.shadowH + 'px';
+        const sh = tentCatKeyframes(false);
+        shadow.animate(sh.frames, { duration: sh.ms, iterations: Infinity, easing: 'linear' });
+    }
+    setInterval(() => {
+        tentCatFrame = (tentCatFrame + 1) % TENT_CAT.frames;
+        cat.src = `assets/page01/cat/c${tentCatFrame + 1}_q85.webp`;
+    }, TENT_CAT.frameMs);
+}
+document.addEventListener('DOMContentLoaded', startTentCat);
 
 // Main page sparkles: small golden glints drift up across the town scene now and then.
 // They only spawn while the main page is showing.
