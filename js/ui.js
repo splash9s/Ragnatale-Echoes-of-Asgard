@@ -858,10 +858,10 @@ const PET_SPRITES = {
 const COMBAT_PET_GAP_X = 120;
 // Fine position of the combat pet (px) from the player's feet anchor: 50 left, 60 up
 const COMBAT_PET_OFFSET = { dx: -50, dy: -60 };
-// Page pets (town and character pages) stand the same way beside the hero's feet
-const PAGE_PET_IDS = { 'town-hero': 'town-pet' }; // main page only; the character page shows no pet
+// Page pets: the main page cat was removed, so no page pets are placed (kept empty for future pages)
+const PAGE_PET_IDS = {};
 // Gap from the hero's feet to the pet's feet on each page
-const PAGE_PET_GAP_X = { 'town-hero': 100 };
+const PAGE_PET_GAP_X = {};
 function petSpriteOf() {
     const pet = player && player.equipped && player.equipped.pet;
     return pet ? (PET_SPRITES[pet.name] || null) : null;
@@ -950,7 +950,7 @@ function petLick(el) {
     }, CAT_LICK_IDLE_MS);
 }
 document.addEventListener('DOMContentLoaded', () => {
-    ['combat-pet-sprite', 'town-pet'].forEach(id => {
+    ['combat-pet-sprite'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.style.cursor = 'pointer'; el.style.pointerEvents = 'auto'; el.addEventListener('click', () => petLick(el)); }
     });
