@@ -1712,6 +1712,7 @@ function switchView(viewName) {
         renderLibraryView();
     }
     if (viewName === 'events') {
+        populateBossGauntletPick();
         document.getElementById('view-events')?.classList.remove('hidden');
         renderEventsView();
         switchEventsTab(currentEventsTab);
@@ -5061,6 +5062,17 @@ function toggleCharClear() {
     updateTentTopLabels();
     syncHeroSprites();
 }
+// Boss Gauntlet picker on the Events page: 'all' cycles through every map's boss; a map key fights that boss on every stage
+let bossGauntletPick = 'all';
+function populateBossGauntletPick() {
+    const sel = document.getElementById('boss-gauntlet-pick');
+    if (!sel || typeof GAME_DATA === 'undefined' || !GAME_DATA.maps) return;
+    const bosses = Object.entries(GAME_DATA.maps).filter(([, m]) => m && m.boss);
+    sel.innerHTML = '<option value="all">All bosses (cycle)</option>' + bosses.map(([k, m]) =>
+        `<option value="${k}">${petEsc(m.boss.name || k)}${m.levelReq ? ` (Lv ${m.levelReq}+)` : ''}</option>`).join('');
+    sel.value = bosses.some(([k]) => k === bossGauntletPick) ? bossGauntletPick : 'all';
+}
+function setBossGauntletPick(value) { bossGauntletPick = value; }
 // The return button on the character page: back to friends while visiting a friend's tent, otherwise to town
 function charReturn() {
     if (friendTentVisiting()) exitFriendTent();

@@ -554,6 +554,8 @@ function isBossStage() {
 
 function getBossTemplate() {
     if (currentMode === 'bossmap') {
+        // A boss picked on the Events page fights every stage; 'all' cycles through every map's boss
+        if (bossGauntletPick !== 'all' && GAME_DATA.maps[bossGauntletPick]?.boss) return curveBoss(GAME_DATA.maps[bossGauntletPick].boss, currentStage);
         // Boss Gauntlet: stage N uses a boss scaled to level N, cycling through the map bosses
         const pool = Object.values(GAME_DATA.maps).map(m => m.boss).filter(Boolean);
         return curveBoss(pool[(currentStage - 1) % pool.length], currentStage);
