@@ -256,6 +256,9 @@
         .art-screen .char-return .ret-press { display: none; }
         .art-screen .char-return:active .ret-press { display: block; }
         .art-screen .char-return:active .ret-normal { display: none; }
+        /* Tent lights: left lamp and right lantern toggle, stacked states cross-fade */
+        #view-character .tent-light { transition: opacity .6s ease; pointer-events: none; }
+        #view-character .char-light-zone { background: transparent; }
         /* Clear screen: hides equipment and inventory panels so only the background shows */
         #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn, #view-character.screen-clear #char-hero, #view-character.screen-clear #char-shadow { visibility: hidden !important; pointer-events: none !important; }
         .art-screen .char-clear-toggle { cursor: pointer; z-index: 10; }
@@ -1020,7 +1023,10 @@
         <div id="view-character" class="hidden art-screen art-dark stats-hidden">
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/character/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
+                    <img class="ts-bg" src="assets/pages/character/tent/tent_off_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
+                    <img id="tent-left" class="tent-light" src="assets/pages/character/bg_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:1;">
+                    <img id="tent-right" class="tent-light" src="assets/pages/character/tent/tent_right_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
+                    <img id="tent-both" class="tent-light" src="assets/pages/character/tent/tent_both_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
                     
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">
@@ -1030,6 +1036,8 @@
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
+                    <div class="char-light-zone" id="char-light-left" style="position:absolute; left:530px; top:360px; width:130px; height:190px; z-index:6; cursor:pointer;" onclick="toggleCharLight('left')" title="Lamp"></div>
+                    <div class="char-light-zone" id="char-light-right" style="position:absolute; left:1430px; top:530px; width:110px; height:130px; z-index:6; cursor:pointer;" onclick="toggleCharLight('right')" title="Lantern"></div>
                     <div class="ui char-clear-toggle" style="position:absolute; left:2px; top:2px; width:66px; height:67px;" onclick="toggleCharClear()" title="Clear screen">
                         <img class="clr-normal" src="assets/cha/button/clearscreen_q85.webp" alt="">
                         <img class="clr-press" src="assets/cha/button/clearscreenpress_q85.webp" alt="">
@@ -1402,7 +1410,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112l"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261112aq"></script>
+    <script src="js/ui.js?v=20261112ar"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261109k"></script>

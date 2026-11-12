@@ -4879,6 +4879,21 @@ function toggleCharStats(open) {
     view.classList.toggle('stats-hidden', !open);
 }
 
+// Tent lights on the character page: the left lamp and right lantern toggle on and off.
+// Four pictures: off (base), left only, right only, both. Only the matching one is visible; they cross-fade.
+const charLightState = { left: true, right: false };
+function renderCharLights() {
+    const L = charLightState.left, R = charLightState.right;
+    const set = (id, on) => { const el = document.getElementById(id); if (el) el.style.opacity = on ? '1' : '0'; };
+    set('tent-left', L && !R);
+    set('tent-right', R && !L);
+    set('tent-both', L && R);
+}
+function toggleCharLight(side) {
+    charLightState[side] = !charLightState[side];
+    renderCharLights();
+}
+
 // Clear screen: hide equipment and inventory panels to show only the character background. Press again to restore.
 function toggleCharClear() {
     const view = document.getElementById('view-character');
