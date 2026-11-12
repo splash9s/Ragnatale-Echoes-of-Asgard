@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ragnatale - Idle RPG</title>
+    <script>
+        // Defined early: inline onerror handlers on town images can fire before town.js loads.
+        window.townSwap = function (img, name) {
+            const box = document.createElement('div');
+            box.className = 'missing';
+            box.textContent = name;
+            img.replaceWith(box);
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -827,6 +836,9 @@
                 <img src="assets/page01/characterbutton_q85.webp" alt="" onerror="townSwap(this,'characterbutton.png')">
                 <img id="alert-char" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
             </div>
+            <div class="ui" data-action="market" style="left:691px; top:858px; width:206px; height:209px;">
+                <img src="assets/page01/market_q85.webp" alt="" onerror="townSwap(this,'market')">
+            </div>
             <div class="ui" data-action="shop" style="left:239px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/shoppagebutton_q85.webp" alt="" onerror="townSwap(this,'shoppagebutton.png')">
                 <img id="alert-shop" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
@@ -951,6 +963,23 @@
 
         <!-- VIEW: CHARACTER -->
         <!-- VIEW: LIBRARY -->
+        <!-- VIEW: MARKET (auction house, gear for gold) -->
+        <div id="view-market" class="hidden flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <div>
+                    <h2 class="page-title text-base font-bold text-amber-300">Market</h2>
+                    <p class="text-xs text-slate-400">Auctions for gear, paid in gold. Level 10 and up, Gmail-linked accounts.</p>
+                </div>
+                <button onclick="switchView('town')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer">Back to Town</button>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+                <div id="market-tabs" class="flex flex-wrap gap-2"></div>
+                <div id="market-gold" class="text-sm text-amber-200"></div>
+                <div id="market-cats" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div id="market-body" class="flex flex-col gap-3"></div>
+        </div>
+
         <div id="view-library" class="hidden flex flex-col gap-4 flex-1">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
                 <div>
@@ -1493,12 +1522,13 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261112d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113j"></script>
+    <script src="js/ui.js?v=20261113k"></script>
+    <script src="js/market.js?v=20261113a"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
     <script src="js/friends.js?v=20261112b"></script>
-    <script src="js/town.js?v=20261113a"></script>
+    <script src="js/town.js?v=20261113b"></script>
     <script src="js/loader.js?v=20261113c"></script>
 
 <script>

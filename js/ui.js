@@ -1712,7 +1712,7 @@ function switchView(viewName) {
         currentShopTab = 'diamond';
         viewName = 'shop';
     }
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market'];
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -1753,6 +1753,10 @@ function switchView(viewName) {
         skillFocusHub();
     }
     if (viewName === 'setting') { document.getElementById('view-setting')?.classList.remove('hidden'); refreshAudioUI(); }
+    if (viewName === 'market') {
+        document.getElementById('view-market')?.classList.remove('hidden');
+        marketOpen();
+    }
     if (viewName === 'library') {
         document.getElementById('view-library')?.classList.remove('hidden');
         renderLibraryView();
@@ -4056,7 +4060,11 @@ async function claimMail(mailId) {
         showModal('Mail Error', 'This boss helm reward cannot be created. The mail is kept.');
         return;
     }
-    if ((gear || bossHelm) && Array.isArray(player.inventory) && !player.inventory.some(s => s === null)) {
+    // Auction items (market mail) are full gear objects; each one needs a free bag slot
+    const marketItems = Array.isArray(mail.rewards.items) ? mail.rewards.items.filter(it => it && it.name) : [];
+    const freeSlots = Array.isArray(player.inventory) ? player.inventory.filter(s => s === null).length : 0;
+    const slotsNeeded = (gear ? 1 : 0) + (bossHelm ? 1 : 0) + marketItems.length;
+    if (slotsNeeded > 0 && freeSlots < slotsNeeded) {
         showModal('Inventory Full', 'Make room in your bag to claim this mail.');
         return;
     }
@@ -4082,6 +4090,7 @@ async function claimMail(mailId) {
     }
     if (gear) addItemToInventory(gear);
     if (bossHelm) addItemToInventory(bossHelm);
+    marketItems.forEach(it => addItemToInventory(JSON.parse(JSON.stringify(it))));
     if (mail.rewards.chest) openChest(mail.rewards.chest);
     // Potions (friend gifts, rewards): they stack in the bag like shop potions
     for (const [id, q] of Object.entries(mail.rewards.potions || {})) {
@@ -4124,6 +4133,7 @@ function mailRewardText(r) {
     if (r.classLv) parts.push(`${r.classLv} Class LV`);
     if (r.baseExp) parts.push(`${r.baseExp} Base EXP`); // mails sent before the LV rewards
     if (r.classExp) parts.push(`${r.classExp} Class EXP`);
+    for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) parts.push(it.name); // auction items
     if (r.chest) parts.push(`${r.chest[0].toUpperCase() + r.chest.slice(1)} Chest`);
     if (r.gear) parts.push(`${(MAIL_GEAR_SLOTS.find(s => s[0] === r.gear.slot) || [0, r.gear.slot])[1]} Lv ${r.gear.lv} (R5)`);
     if (r.bossHelm) parts.push(`${(HELMET_DROP_POOL[r.bossHelm] || [{ name: 'Boss Helm' }])[0].name} (R5)`);

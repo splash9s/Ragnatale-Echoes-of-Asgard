@@ -44,14 +44,6 @@
     window.addEventListener('resize', fitTown);
     fitTown();
 
-    // Replace a missing image with a labeled placeholder box
-    window.townSwap = function (img, name) {
-        const box = document.createElement('div');
-        box.className = 'missing';
-        box.textContent = name;
-        img.replaceWith(box);
-    };
-
     // Button actions. Mail opens the Quests & Mail screen. Setting opens the Setting page.
     const TOWN_ACTIONS = {
         friend:     () => switchView('friend'),
@@ -61,6 +53,7 @@
         setting:    () => { switchView('setting'); refreshBindEmail(); },
         character:  () => switchView('character'),
         shop:       () => switchView('shop'),
+        market:     () => switchView('market'),
         blacksmith: () => switchView('blacksmith'),
         expedition: () => switchView('expeditions'),
     };
