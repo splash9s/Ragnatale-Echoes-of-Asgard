@@ -420,6 +420,12 @@ function startExpedition(mode, opts = {}) {
     switchView('combat');
     document.getElementById('combat-player-sprite')?.classList.remove('player-fall'); // back up for a new battle
     if (typeof combatPlayerDeadAt !== 'undefined') combatPlayerDeadAt = 0; // alive again
+    if (typeof combatPlayerFalling !== 'undefined' && combatPlayerFalling) { // a fall cut short by leaving the battle
+        combatPlayerFalling = false;
+        const sp = document.getElementById('combat-player-sprite');
+        sp?.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); });
+        if (sp) { sp.style.transform = ''; sp.style.transformOrigin = ''; }
+    }
     player.inCombat = true;
     stageSummary = newStageSummary(currentStage);
     runeRefreshLeft = RUNE_REFRESH_MAX;
