@@ -13,8 +13,7 @@
 // MONSTER_CURVE: [level, unit HP, unit ATK]. Unit = a melee monster at that level. Levels between
 // anchors are interpolated geometrically; below 1 or above 99 the nearest anchor is used.
 const MONSTER_CURVE = [
-    [1, 106, 8], [10, 145, 4.3], [20, 272, 8], [30, 448, 13.5], [40, 693, 35], [50, 1028, 52],
-    [60, 1430, 111], [70, 1806, 205], [80, 2206, 414], [90, 2436, 434], [99, 2441, 1405]
+    [1, 106, 8], [10, 116, 6.45], [20, 218, 12], [30, 358, 20.25], [40, 554, 52.5], [50, 822, 78], [60, 1144, 166.5], [70, 1445, 307.5], [80, 1765, 414], [90, 1949, 434], [99, 1953, 1405]
 ];
 // Role profile: multipliers on the unit. heal = HP restored per turn as a share of the unit HP.
 const ROLE_CURVE = {
