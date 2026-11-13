@@ -5234,7 +5234,32 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleCharLight(side) {
     if (!isCharClear()) return; // the tent only responds in clear screen
     charLightState[side] = !charLightState[side];
+    if (charLightState[side]) tentSparks(side); // sparks fly out when the lamp turns on
     renderCharLights();
+}
+// A small burst of sparks around a tent light (stage pixels), fading out
+function tentSparks(side) {
+    const inner = document.querySelector('#character-stage .ts-inner');
+    const p = TENT_LIGHT_POINTS[side];
+    if (!inner || !p) return;
+    for (let i = 0; i < 16; i++) {
+        const d = document.createElement('div');
+        d.className = 'tent-spark';
+        const size = 3 + Math.random() * 4;
+        d.style.width = size + 'px';
+        d.style.height = size + 'px';
+        d.style.left = p.x + 'px';
+        d.style.top = p.y + 'px';
+        inner.appendChild(d);
+        const ang = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 90;
+        const dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist - 30;
+        const anim = d.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 1, offset: 0.25 },
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.3)`, opacity: 0 }
+        ], { duration: 600 + Math.random() * 600, delay: Math.random() * 200, fill: 'backwards', easing: 'ease-out' });
+        anim.onfinish = () => d.remove();
+    }
 }
 
 // Clear screen: hide equipment and inventory panels to show only the character background. Press again to restore.
