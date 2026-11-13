@@ -286,6 +286,12 @@
         #inventory-grid > .inv-selected, #equipment-slots-container > .inv-selected { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }
         /* Shop: gold border on the selected gear row */
         #shop-items-container > .shop-selected { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }
+        /* Shop gear: inventory-style grid cells, a line between level groups */
+        #shop-items-container { display: grid; grid-template-columns: repeat(5, 104px); grid-auto-rows: auto; gap: 6px; justify-content: center; }
+        #shop-items-container > .shop-cell { width: 104px; height: 96px; background-image: url('assets/pages/character/inventoryslot2.png'); background-size: 100% 100%; background-color: transparent !important; border: 0 !important; }
+        #shop-items-container > .shop-cell:hover { filter: brightness(1.1); }
+        #shop-items-container > .shop-lv-line { grid-column: 1 / -1; height: 26px; display: flex; align-items: center; gap: 8px; background: transparent !important; border: 0 !important; font-size: 14px; font-weight: 700; color: #6b3f12; }
+        #shop-items-container > .shop-lv-line::before, #shop-items-container > .shop-lv-line::after { content: ''; flex: 1; height: 2px; background: #b8945a; }
         #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn { visibility: hidden !important; pointer-events: none !important; }
         /* HP and armour card: hide at once in clear screen (no transition or fade) */
         #view-character.screen-clear #char-hp-card { display: none !important; }
@@ -1300,7 +1306,7 @@
                     <div id="shop-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
                         <div id="shop-armory-section" class="flex flex-col gap-3">
                             <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
-                            <div id="shop-items-container" class="flex flex-col gap-2"></div>
+                            <div id="shop-items-container" class="grid"></div>
                         </div>
                     </div>
                 </div>
@@ -1548,7 +1554,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113a"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113ab"></script>
+    <script src="js/ui.js?v=20261113ac"></script>
     <script src="js/market.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

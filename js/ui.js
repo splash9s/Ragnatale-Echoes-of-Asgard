@@ -2186,22 +2186,20 @@ function renderShop() {
         });
 
         armoryContainer.innerHTML = rows.length ? '' : '<p class="text-xs" style="color:#3b2716">No items match these filters.</p>';
+        // Gear is shown as grid cells like the inventory; a line separates each level group (not used when sorted by price)
+        const byLevel = armoryFilter.sort !== 'price-asc' && armoryFilter.sort !== 'price-desc';
+        let prevLv = null;
+        let html = '';
         // idx is the item's index in SHOP_ARMORY_ITEMS, which buyArmoryItem() expects
         rows.forEach(({ item, idx }) => {
-            const price = priceOf(item);
-            armoryContainer.innerHTML += `
-                <div data-shop-idx="${idx}" onclick="showArmoryItemDetail(${idx})" class="cursor-pointer p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center${window.shopDetailIdx === idx ? ' shop-selected' : ''}">
-                    <div class="flex-1 flex items-center gap-3">
-                        ${itemIconHTML(item, 48)}
-                        <div>
-                        <span class="font-bold text-amber-300 block text-xs">${shopGearLabel(item).base}</span>
-                        <span class="text-[10px] text-slate-400">[${shopGearLabel(item).tag}] LV${lvOf(item)}: ${price} Gold</span>
-                        </div>
-                    </div>
-                    <button onclick="event.stopPropagation(); buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
-                </div>
-            `;
+            const lv = lvOf(item);
+            if (byLevel && lv !== prevLv) {
+                html += `<div class="shop-lv-line"><span>LV ${lv}</span></div>`;
+                prevLv = lv;
+            }
+            html += `<div data-shop-idx="${idx}" onclick="showArmoryItemDetail(${idx})" class="shop-cell cursor-pointer flex items-center justify-center${window.shopDetailIdx === idx ? ' shop-selected' : ''}" title="${shopGearLabel(item).base} · LV${lv} · ${priceOf(item)} Gold">${itemIconHTML(item, 64)}</div>`;
         });
+        armoryContainer.innerHTML += html;
     }
 }
 
