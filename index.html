@@ -1373,22 +1373,42 @@
 
         <!-- VIEW: QUESTS & MAIL -->
         <div id="view-quests" class="hidden art-screen">
-            <div id="mail-stage" class="town-stage" data-w="2752" data-h="1536">
-                <div class="ts-inner" style="width:2752px; height:1536px;">
-                    <img class="ts-bg" src="assets/pages/mail/bg_q85.webp" alt="" style="width:2752px; height:1536px;" onerror="townSwap(this,'mail bg')">
-                    <div class="char-header-bar" style="left:0px; top:0px; width:2752px; height:100px;"></div>
-                    <div class="ui char-return" style="left:2620px; top:3px; width:94px; height:95px;" onclick="switchView('town')">
+            <style>
+                #mail-stage .ml-menu { position: absolute; left: 160px; top: 150px; width: 635px; height: 870px; overflow-y: auto; box-sizing: border-box; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+                #mail-stage .ml-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 2px solid #6b4a2b; border-radius: 8px; background: rgba(40, 24, 14, .65); cursor: pointer; }
+                #mail-stage .ml-row.on { border-color: #e6b422; box-shadow: 0 0 8px #f5c542; }
+                #mail-stage .ml-dot { flex: none; width: 16px; height: 16px; border-radius: 50%; background: #6b5b4b; }
+                #mail-stage .ml-dot.read { background: #3fdc52; box-shadow: 0 0 8px #3fdc52; }
+                #mail-stage .ml-text { flex: 1; min-width: 0; }
+                #mail-stage .ml-subj { font-size: 28px; font-weight: 700; color: #f5d98a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                #mail-stage .ml-meta { font-size: 21px; color: #d9c7a4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                #mail-stage .ml-empty { color: #f5d98a; font-size: 26px; text-align: center; margin-top: 30px; }
+                #mail-stage .ml-detail { position: absolute; left: 915px; top: 195px; width: 815px; height: 810px; box-sizing: border-box; padding: 22px 28px; display: flex; flex-direction: column; color: #2a1a0e; font-size: 26px; }
+                #mail-stage .ml-d-title { font-size: 40px; font-weight: 700; color: #3b2410; }
+                #mail-stage .ml-d-meta { font-size: 22px; color: #6b3f12; margin-top: 6px; }
+                #mail-stage .ml-d-body { flex: 1; min-height: 0; margin-top: 16px; overflow-y: auto; white-space: pre-line; line-height: 1.4; }
+                #mail-stage .ml-att-label { font-size: 24px; font-weight: 700; color: #3b2410; margin-top: 10px; }
+                #mail-stage .ml-att-text { font-size: 22px; color: #5a3a1a; margin-top: 4px; }
+                #mail-stage .ml-att { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; min-height: 96px; }
+                #mail-stage .ml-slot { position: relative; width: 96px; height: 92px; display: flex; align-items: center; justify-content: center; background-size: 100% 100%; }
+                #mail-stage .ml-qty { position: absolute; right: 4px; bottom: 2px; font-size: 18px; font-weight: 700; color: #fff; text-shadow: 1px 1px 0 #000; }
+                #mail-stage .ml-foot { display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-top: 12px; }
+                #mail-stage .ml-claim, #mail-stage .ml-del { padding: 10px 26px; border: 0; border-radius: 10px; font-size: 26px; font-weight: 700; cursor: pointer; }
+                #mail-stage .ml-claim { background: #b7791f; color: #1e1409; }
+                #mail-stage .ml-del { background: #7f1d1d; color: #fff; }
+                #mail-stage .ml-claimed { font-size: 24px; font-weight: 700; color: #1f7a33; }
+            </style>
+            <div id="mail-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/mail/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'mail bg')">
+                    <img src="assets/pages/mail/window_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
+                    <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:100px;"></div>
+                    <div class="ui char-return" style="left:1820px; top:3px; width:94px; height:95px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
-                    <div class="art-panel" style="left:513px; top:326px; width:1727px; height:658px;">
-            <div class="grid grid-cols-1 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mailbox</h3>
-                    <div id="mailbox-container" class="flex flex-col gap-2"></div>
-                </div>
-            </div>
-        </div>
+                    <div id="mail-menu" class="ml-menu"></div>
+                    <div id="mail-detail" class="ml-detail"></div>
                 </div>
             </div>
         </div>
@@ -1554,7 +1574,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113ae"></script>
+    <script src="js/ui.js?v=20261113f"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

@@ -4303,36 +4303,61 @@ function deleteMail(mailId) {
         remove();
     }
 }
+// Mail page: the list on the left (subject, sender, date, read light), the selected mail on the right with its attachments
+let mailSelectedId = null;
+function mailAttachmentCells(r) {
+    const cells = [];
+    for (const [id, q] of Object.entries(r.potions || {})) {
+        if (!(q > 0)) continue;
+        cells.push({ item: GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id }, qty: q });
+    }
+    for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) cells.push({ item: it, qty: 1 });
+    return cells;
+}
+function selectMail(id) {
+    mailSelectedId = id;
+    renderMailBox();
+}
 function renderMailBox() {
-    let container = document.getElementById('mailbox-container');
-    if (!container) return;
-    container.innerHTML = '';
-
+    const menu = document.getElementById('mail-menu');
+    const detail = document.getElementById('mail-detail');
+    if (!menu || !detail) return;
     if (!Array.isArray(player.mailBox)) player.mailBox = createWelcomeMail();
-    if (player.mailBox.length === 0) {
-        container.innerHTML = '<p class="text-xs text-center" style="color:#3b2716">No mail.</p>';
+    const box = player.mailBox;
+    if (box.length === 0) {
+        menu.innerHTML = '<p class="ml-empty">No mail.</p>';
+        detail.innerHTML = '';
+        mailSelectedId = null;
         return;
     }
+    if (!box.some(m => m.id === mailSelectedId)) mailSelectedId = box[0].id;
+    const sel = box.find(m => m.id === mailSelectedId);
+    sel.read = true; // opening a mail marks it read (the light turns green)
 
-    player.mailBox.forEach(m => {
-        container.innerHTML += `
-            <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-                <div>
-                    <span class="font-bold text-amber-400 block">${m.title}</span>
-                    <span class="text-[10px] text-slate-400 block">${m.message}</span>
-                    ${mailRewardText(m.rewards || {}) ? `<span class="text-[10px] text-emerald-300 block">Rewards: ${mailRewardText(m.rewards || {})}</span>` : ''}
-                    <span class="text-[9px] text-purple-300 block mt-1">From: ${m.sender}</span>
-                    ${mailTimeText(m) ? `<span class="text-[9px] text-slate-400 block">${mailTimeText(m)}</span>` : ''}
-                </div>
-                <div class="flex flex-col gap-1 items-end">
-                ${!m.claimed ? `
-                    <button onclick="claimMail(${m.id})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer transition">Claim</button>
-                ` : `<span class="text-[10px] text-emerald-400 font-bold">Claimed</span>`}
-                <button onclick="deleteMail(${m.id})" class="px-3 py-1 bg-slate-800 hover:bg-red-700 text-slate-200 font-bold rounded-lg cursor-pointer transition text-[10px]">Delete</button>
-                </div>
+    const meta = m => `${escapeHtml(m.sender || '')}${mailTimeText(m) ? ' · ' + mailTimeText(m) : ''}`;
+    menu.innerHTML = box.map(m => `
+        <div class="ml-row${m.id === mailSelectedId ? ' on' : ''}" onclick="selectMail(${m.id})">
+            <span class="ml-dot${m.read ? ' read' : ''}"></span>
+            <div class="ml-text">
+                <div class="ml-subj">${escapeHtml(m.title || '')}</div>
+                <div class="ml-meta">${meta(m)}</div>
             </div>
-        `;
-    });
+        </div>`).join('');
+
+    const r = sel.rewards || {};
+    const cells = mailAttachmentCells(r);
+    const text = mailRewardText({ ...r, potions: {}, items: [] });
+    detail.innerHTML = `
+        <div class="ml-d-title">${escapeHtml(sel.title || '')}</div>
+        <div class="ml-d-meta">${meta(sel)}</div>
+        <div class="ml-d-body">${escapeHtml(sel.message || '')}</div>
+        ${cells.length || text ? '<div class="ml-att-label">Attached</div>' : ''}
+        ${text ? `<div class="ml-att-text">${escapeHtml(text)}</div>` : ''}
+        <div class="ml-att">${cells.map(c => `<div title="${escapeHtml(c.item.name)}" class="ml-slot" style="${REWARD_SLOT_BG}">${itemIconHTML(c.item, 64)}${c.qty > 1 ? `<span class="ml-qty">${c.qty}</span>` : ''}</div>`).join('')}</div>
+        <div class="ml-foot">
+            <button class="ml-del" onclick="deleteMail(${sel.id})">Delete</button>
+            ${sel.claimed ? '<span class="ml-claimed">Claimed</span>' : `<button class="ml-claim" onclick="claimMail(${sel.id})">Claim</button>`}
+        </div>`;
 }
 
 function claimQuestMilestone(count) {
