@@ -1763,7 +1763,7 @@ function tentHandPlay() {
 function syncTentHand() {
     const view = document.getElementById('view-character');
     const on = !!view && !view.classList.contains('hidden') && isCharClear();
-    if (on && !tentHandTimer) tentHandTimer = setInterval(tentHandPlay, 6000);
+    // Hand animation removed: the tent player stays on the base idle picture.
     if (!on) {
         if (tentHandTimer) { clearInterval(tentHandTimer); tentHandTimer = null; }
         if (tentHandFrameTimer) { clearInterval(tentHandFrameTimer); tentHandFrameTimer = null; }
