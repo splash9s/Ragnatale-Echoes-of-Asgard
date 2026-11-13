@@ -118,6 +118,8 @@
         .pix-btn-green { background-image: url(assets/pages/button/greenbutton_q85.webp) !important; }
         .pix-btn-green:active { background-image: url(assets/pages/button/greenbuttonpress_q85.webp) !important; }
         .pix-btn:disabled { filter: grayscale(1) brightness(.7); opacity: .6; }
+        /* Art panels on dark screens force dark text; pixel buttons keep white text */
+        .art-dark .art-panel .pix-btn, .art-panel .pix-btn, .art-panel .pix-btn.pix-btn-red, .art-panel .pix-btn.pix-btn-yellow, .art-panel .pix-btn.pix-btn-green { color: #fff !important; }
         #quests-container button[onclick^="claimQuestMilestone"]:not(:disabled) { background-image: url(assets/pages/button/greenbutton_q85.webp) !important; background-size: 100% 100% !important; background-color: transparent !important; border: 0 !important; color: #f3ffe8; }
         #quests-container button[onclick^="claimQuestMilestone"]:not(:disabled):active { background-image: url(assets/pages/button/greenbuttonpress_q85.webp) !important; }
         /* Quest and mail item text: dark brown on the shop background */
