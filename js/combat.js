@@ -1911,14 +1911,14 @@ const EVENT_CONFIG = {
 };
 const EVENT_MAPS = {
     gold: [
-        { mapKey: 'map10', label: 'Map 1', sub: 'Campaign Lv. 10' },
-        { mapKey: 'map30', label: 'Map 2', sub: 'Campaign Lv. 30' },
-        { mapKey: 'map50', label: 'Map 3', sub: 'Campaign Lv. 50' }
+        { mapKey: 'map10', label: 'Copper Mines', sub: 'Campaign Lv. 10' },
+        { mapKey: 'map30', label: 'Silver Vault', sub: 'Campaign Lv. 30' },
+        { mapKey: 'map50', label: "Dragon's Hoard", sub: 'Campaign Lv. 50' }
     ],
     xp: [
-        { mapKey: 'map10', label: 'Map 1', sub: 'Campaign Lv. 10' },
-        { mapKey: 'map30', label: 'Map 2', sub: 'Campaign Lv. 30' },
-        { mapKey: 'map50', label: 'Map 3', sub: 'Campaign Lv. 50' }
+        { mapKey: 'map10', label: 'Moonlit Grove', sub: 'Campaign Lv. 10' },
+        { mapKey: 'map30', label: 'Sage Library', sub: 'Campaign Lv. 30' },
+        { mapKey: 'map50', label: 'Starfall Peak', sub: 'Campaign Lv. 50' }
     ]
 };
 
