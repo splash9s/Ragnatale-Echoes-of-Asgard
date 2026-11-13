@@ -176,7 +176,7 @@ function friendRowHTML(f, today, idx) {
             ${st.sentToday ? '<div class="friend-hint">Today\'s gift is sent.</div>' : ''}
         </div>
         <div class="friend-actions">
-            <button class="friend-btn gift" ${st.sentToday ? 'disabled' : ''} onclick="sendFriendGift(${idx})">${giftLabel}</button>
+            <button class="friend-btn send" ${st.sentToday ? 'disabled' : ''} onclick="sendFriendGift(${idx})">${giftLabel}</button>
             <button class="friend-btn visit" onclick="visitFriendTent(${idx})">Visit Tent</button>
             ${restoreBtn}
             <button class="friend-btn del" onclick="deleteFriendAsk(${idx})">Delete</button>
