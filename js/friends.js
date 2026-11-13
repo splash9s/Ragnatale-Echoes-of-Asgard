@@ -109,7 +109,7 @@ function requestRowHTML(r, kind, idx) {
         <div class="friend-avatar">${friendAvatarHTML(r.avatar)}</div>
         <div class="friend-info">
             <div class="friend-name">${escapeHtml(r.name || 'Hero')}</div>
-            <div class="friend-lv">Base Lv. <strong>${r.base_lv || 1}</strong> · ID <strong>${escapeHtml(r.friend_code || '')}</strong></div>
+            <div class="friend-lv">Lv. <strong>${r.base_lv || 1}</strong></div>
             <div class="friend-hint">${hint}</div>
         </div>
         <div class="friend-actions">${actions}</div>
@@ -169,7 +169,7 @@ function friendRowHTML(f, today, idx) {
         <div class="friend-avatar">${friendAvatarHTML(f.avatar)}</div>
         <div class="friend-info">
             <div class="friend-name">${escapeHtml(f.name || 'Hero')}</div>
-            <div class="friend-lv">Base Lv. <strong>${f.base_lv || 1}</strong> · ID <strong>${escapeHtml(f.friend_code || '')}</strong></div>
+            <div class="friend-lv">Lv. <strong>${f.base_lv || 1}</strong></div>
             <div class="friend-bond">Friendship Lv. <strong>${lv}</strong> · ${streakText}</div>
             <div class="friend-bar"><div class="fill" style="width:${progress.pct}%"></div></div>
             <div class="friend-hint">${progress.text}</div>
