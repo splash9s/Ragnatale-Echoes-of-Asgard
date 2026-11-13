@@ -283,7 +283,9 @@
         @keyframes spriteFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
         /* Clear screen: hides equipment and inventory panels so only the background shows */
         /* Inventory: gold border on the selected bag cell */
-        #inventory-grid > .inv-selected { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }
+        #inventory-grid > .inv-selected, #equipment-slots-container > .inv-selected { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }
+        /* Shop: gold border on the selected gear row */
+        #shop-items-container > .shop-selected { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }
         #view-character.screen-clear #char-panel-mid, #view-character.screen-clear #char-panel-right, #view-character.screen-clear #inv-detail-panel, #view-character.screen-clear #char-stats-tab, #view-character.screen-clear .char-skills-btn { visibility: hidden !important; pointer-events: none !important; }
         /* HP and armour card: hide at once in clear screen (no transition or fade) */
         #view-character.screen-clear #char-hp-card { display: none !important; }
@@ -1546,7 +1548,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113a"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113z"></script>
+    <script src="js/ui.js?v=20261113aa"></script>
     <script src="js/market.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

@@ -2190,7 +2190,7 @@ function renderShop() {
         rows.forEach(({ item, idx }) => {
             const price = priceOf(item);
             armoryContainer.innerHTML += `
-                <div class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center">
+                <div data-shop-idx="${idx}" class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center${window.shopDetailIdx === idx ? ' shop-selected' : ''}">
                     <div onclick="showArmoryItemDetail(${idx})" class="cursor-pointer flex-1 flex items-center gap-3">
                         ${itemIconHTML(item, 48)}
                         <div>
@@ -2235,6 +2235,8 @@ function shopGearLabel(item) {
 }
 
 function showArmoryItemDetail(itemIndex) {
+    window.shopDetailIdx = itemIndex;
+    markShopSelected();
     const template = SHOP_ARMORY_ITEMS[itemIndex];
     if (!template) return;
     const price = template.price || 300;
@@ -2271,6 +2273,14 @@ function showArmoryItemDetail(itemIndex) {
 function closeShopDetail() {
     const panel = document.getElementById('shop-detail-panel');
     if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
+    window.shopDetailIdx = null;
+    markShopSelected();
+}
+// Gold border on the shop gear row whose detail panel is open
+function markShopSelected() {
+    document.querySelectorAll('#shop-items-container [data-shop-idx]').forEach(el => {
+        el.classList.toggle('shop-selected', Number(el.dataset.shopIdx) === window.shopDetailIdx);
+    });
 }
 // Buy from the shop detail panel: close it first, then buy
 function buyArmoryFromDetail(itemIndex) {
@@ -3224,6 +3234,9 @@ function markInvSelected() {
     document.querySelectorAll('#inventory-grid > [data-idx]').forEach(el => {
         el.classList.toggle('inv-selected', Number(el.dataset.idx) === window.invDetailIndex);
     });
+    document.querySelectorAll('#equipment-slots-container [data-eq]').forEach(el => {
+        el.classList.toggle('inv-selected', window.invDetailKey === 'eq:' + el.dataset.eq);
+    });
 }
 // True when the detail window is open for this gear ('inv:<index>' or 'eq:<slot>'); clicking it again closes the window
 function isDetailOpen(key) {
@@ -3346,6 +3359,7 @@ function showEquippedDetail(slot, refresh = false) {
     const key = 'eq:' + slot;
     if (!refresh && isDetailOpen(key)) { closeInvDetail(); return; } // same gear clicked again: close
     window.invDetailKey = key;
+    markInvSelected();
     const isPotion = slot === 'potionSlot';
     const rarity = RARITY_INFO[item.rarity];
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
@@ -4598,7 +4612,7 @@ function updateUI() {
             const iconLayer = has && !useVisual
                 ? `<div style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; transform:scale(.8); pointer-events:none;">${itemIconHTML(gear)}</div>`
                 : '';
-            return `<div ${slot === 'potionSlot' ? 'id="potion-slot-box"' : ''} ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}" style="left:${x}px; top:${y}px;">
+            return `<div data-eq="${slot}" ${slot === 'potionSlot' ? 'id="potion-slot-box"' : ''} ondragover="eqDragOver(event)" ondrop="eqDrop(event, '${slot}')" ${has ? `onclick="showEquippedDetail('${slot}')"` : ''} class="absolute w-[77px] h-[77px] ${has ? 'cursor-pointer hover:brightness-110' : 'opacity-50'}${window.invDetailKey === 'eq:' + slot ? ' inv-selected' : ''}" style="left:${x}px; top:${y}px;">
                 <img src="${src}" alt="" class="w-full h-full" style="object-fit:${has && !useVisual ? 'fill' : 'contain'};" onerror="this.onerror=null;this.src='${base}'">
                 ${iconLayer}
                 ${slot === 'potionSlot' && has && gear.qty > 1 ? `<span class="absolute bottom-0 right-0.5 text-[10px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${gear.qty}</span>` : ''}
