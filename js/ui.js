@@ -2190,15 +2190,15 @@ function renderShop() {
         rows.forEach(({ item, idx }) => {
             const price = priceOf(item);
             armoryContainer.innerHTML += `
-                <div data-shop-idx="${idx}" class="p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center${window.shopDetailIdx === idx ? ' shop-selected' : ''}">
-                    <div onclick="showArmoryItemDetail(${idx})" class="cursor-pointer flex-1 flex items-center gap-3">
+                <div data-shop-idx="${idx}" onclick="showArmoryItemDetail(${idx})" class="cursor-pointer p-3 bg-slate-950/60 rounded border border-slate-800 flex justify-between items-center${window.shopDetailIdx === idx ? ' shop-selected' : ''}">
+                    <div class="flex-1 flex items-center gap-3">
                         ${itemIconHTML(item, 48)}
                         <div>
                         <span class="font-bold text-amber-300 block text-xs">${shopGearLabel(item).base}</span>
                         <span class="text-[10px] text-slate-400">[${shopGearLabel(item).tag}] LV${lvOf(item)}: ${price} Gold</span>
                         </div>
                     </div>
-                    <button onclick="buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
+                    <button onclick="event.stopPropagation(); buyArmoryItem(${idx})" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition">Buy</button>
                 </div>
             `;
         });
@@ -2235,6 +2235,8 @@ function shopGearLabel(item) {
 }
 
 function showArmoryItemDetail(itemIndex) {
+    const shopPanel = document.getElementById('shop-detail-panel');
+    if (window.shopDetailIdx === itemIndex && shopPanel && shopPanel.style.display !== 'none') { closeShopDetail(); return; }
     window.shopDetailIdx = itemIndex;
     markShopSelected();
     const template = SHOP_ARMORY_ITEMS[itemIndex];
@@ -2269,6 +2271,7 @@ function showArmoryItemDetail(itemIndex) {
         </div>
         ${body}${actions}`;
     panel.style.display = 'block';
+    placeShopDetail();
 }
 function closeShopDetail() {
     const panel = document.getElementById('shop-detail-panel');
@@ -2276,6 +2279,31 @@ function closeShopDetail() {
     window.shopDetailIdx = null;
     markShopSelected();
 }
+// Fit the shop detail window to its content, and put it above or below the selected gear row so it never covers it
+function placeShopDetail() {
+    const panel = document.getElementById('shop-detail-panel');
+    const row = document.querySelector(`#shop-items-container [data-shop-idx="${window.shopDetailIdx}"]`);
+    if (!panel || !row || panel.style.display === 'none') return;
+    const stage = panel.closest('.ts-inner');
+    if (!stage) return;
+    const sRect = stage.getBoundingClientRect();
+    const k = (sRect.width / stage.offsetWidth) || 1; // stage scale (the stage is scaled to fit the window)
+    panel.style.height = 'auto';
+    panel.style.maxHeight = '1000px';
+    const h = panel.offsetHeight;
+    const r = row.getBoundingClientRect();
+    const rowTop = (r.top - sRect.top) / k;
+    const rowBottom = (r.bottom - sRect.top) / k;
+    const below = rowBottom + 14;
+    const above = rowTop - 14 - h;
+    let y;
+    if (below + h <= 1070) y = below;
+    else if (above >= 80) y = above;
+    else y = Math.max(80, 1070 - h);
+    panel.style.top = Math.round(y) + 'px';
+}
+window.addEventListener('resize', () => { if (window.shopDetailIdx != null) placeShopDetail(); });
+
 // Gold border on the shop gear row whose detail panel is open
 function markShopSelected() {
     document.querySelectorAll('#shop-items-container [data-shop-idx]').forEach(el => {
