@@ -168,7 +168,7 @@ function friendRowHTML(f, today, idx) {
     <div class="friend-row">
         <div class="friend-avatar">${friendAvatarHTML(f.avatar)}</div>
         <div class="friend-info">
-            <div class="friend-name">${escapeHtml(f.name || 'Hero')}</div>
+            <div class="friend-name-row"><div class="friend-name">${escapeHtml(f.name || 'Hero')}</div>${(friendState.visitors || {})[f.name || 'Hero'] ? `<div class="friend-visit">Visited tent: ${escapeHtml((friendState.visitors || {})[f.name || 'Hero'])}</div>` : ''}</div>
             <div class="friend-lv">Lv. <strong>${f.base_lv || 1}</strong></div>
             <div class="friend-bond">Friendship Lv. <strong>${lv}</strong> · ${streakText}</div>
             <div class="friend-bar"><div class="fill" style="width:${progress.pct}%"></div></div>
@@ -336,9 +336,16 @@ async function loadTentVisitors() {
     const box = document.getElementById('friend-visitors');
     if (!box) return;
     const res = await friendApi.visitors();
-    if (res.error) { box.textContent = res.error; return; }
-    const rows = res.data || [];
-    box.innerHTML = rows.length
-        ? 'Tent visitors (last 3 days): ' + rows.map(r => `<strong>${escapeHtml(r.name || 'Hero')}</strong> <span>${escapeHtml(new Date(r.visited_at).toLocaleString())}</span>`).join(' · ')
-        : 'No tent visitors in the last 3 days.';
+    // Latest visit per visitor name; each friend row shows its visit beside the name
+    const visits = {};
+    if (!res.error) {
+        for (const r of res.data || []) {
+            const name = r.name || 'Hero';
+            if (!visits[name]) visits[name] = new Date(r.visited_at).toLocaleString();
+        }
+    }
+    friendState.visitors = visits;
+    box.style.display = 'none';
+    if (res.error) { box.style.display = ''; box.textContent = res.error; return; }
+    renderFriendPage();
 }
