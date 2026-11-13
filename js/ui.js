@@ -2578,7 +2578,7 @@ function renderBlacksmithSlot() {
     if (refineBtn) {
         refineBtn.disabled = isMax;
         refineBtn.style.opacity = isMax ? '.5' : '1';
-        refineBtn.innerHTML = isMax ? 'MAX LEVEL' : (refineIsFree() ? 'Refine<br>FREE' : `Refine<br>${cost} Gold`);
+        refineBtn.innerHTML = isMax ? 'MAX LEVEL' : (refineIsFree() ? 'Refine FREE' : `Refine ${cost} Gold`);
         refineBtn.classList.toggle('guide-flash-link', !isMax && refineIsFree());
     }
 }
