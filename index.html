@@ -1076,56 +1076,52 @@
             </div>
         </div>
 
-        <!-- VIEW: EVENTS -->
+        <!-- VIEW: EVENTS (layout: left event menu, right banner + details, map choice, start) -->
         <div id="view-events" class="hidden art-screen art-dark">
+            <style>
+                #events-stage .ev-left, #events-stage .ev-right { position: absolute; }
+                #events-stage .ev-left > img, #events-stage .ev-right > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+                #events-menu { position: absolute; left: 112px; top: 128px; width: 360px; display: flex; flex-direction: column; gap: 6px; }
+                .ev-menu-item { position: relative; width: 360px; height: 90px; padding: 0; border: 0; background: none; cursor: pointer; }
+                .ev-menu-item img { width: 100%; height: 100%; display: block; }
+                .ev-menu-item span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: #2a1a0e; }
+                .ev-menu-on img { filter: drop-shadow(0 0 6px #e0b547) brightness(1.12); }
+                .ev-menu-on span { color: #3b2410; }
+                #events-banner { position: absolute; left: 50px; top: 60px; width: 860px; height: 164px; }
+                #events-banner img { width: 100%; height: 100%; display: block; }
+                .ev-banner-text { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 56px; font-weight: 700; color: #f5d98a; text-shadow: 2px 2px 0 #1e1409; }
+                #events-detail { position: absolute; left: 54px; top: 370px; width: 854px; height: 411px; color: #2a1a0e; font-size: 24px; }
+                #events-detail .ev-body { position: absolute; left: 22px; top: 14px; right: 22px; height: 236px; overflow-y: auto; line-height: 1.35; }
+                #events-detail .ev-body-full { height: 380px; }
+                #events-detail .ev-body p { margin: 0 0 10px; }
+                #events-detail .ev-status { font-weight: 700; color: #6b3f12; }
+                #events-detail .ev-foot { position: absolute; left: 20px; right: 20px; bottom: 12px; height: 130px; display: flex; align-items: center; gap: 16px; }
+                .ev-maps { flex: 1; display: flex; gap: 10px; height: 120px; }
+                .ev-map { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 6px 10px; border: 2px solid #b8945a; border-radius: 10px; background: rgba(255, 250, 235, .55); color: #2a1a0e; text-align: left; cursor: pointer; }
+                .ev-map b { font-size: 22px; }
+                .ev-map span { font-size: 16px; color: #5a3a1a; }
+                .ev-map-on { border-color: #c9a227; background: rgba(230, 190, 70, .5); box-shadow: inset 0 0 0 2px #c9a227; }
+                .ev-pick { flex: 1; font-size: 22px; font-weight: 700; }
+                .ev-select { display: block; width: 100%; margin-top: 6px; padding: 8px; border: 2px solid #b8945a; border-radius: 8px; background: #f5e8c8; color: #2a1a0e; font-size: 22px; }
+                .ev-start { flex: none; width: 230px; height: 128px; padding: 0; border: 0; background: none; cursor: pointer; }
+                .ev-start img { width: 100%; height: 100%; display: block; }
+                .ev-start:disabled { filter: grayscale(1); opacity: .45; cursor: not-allowed; }
+            </style>
             <div id="events-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/events/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
-                    <img class="art-frame" src="assets/pages/frame/c_q85.webp" alt="" style="left:614px; top:78px; width:803px; height:953px;">
                     <div class="ui" style="left:1762px; top:1px; width:163px; height:93px;" onclick="switchView('town')">
                         <img src="assets/compaign/returnbutton_q85.webp" alt="">
                     </div>
-                    <div class="art-panel" style="left:734px; top:197px; width:564px; height:716px;">
-            <div class="flex gap-2 mb-4">
-                <button id="events-tab-btn-events" onclick="switchEventsTab('events')" class="px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Events</button>
-                <button id="events-tab-btn-quests" onclick="switchEventsTab('quests')" class="relative px-3 py-1.5 rounded text-xs font-bold cursor-pointer" style="background-color: rgba(214, 190, 140, .5); border: 1px solid #b8945a; color: #2a1a0e;">Daily Quests<img id="alert-tab-quests" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;"></button>
-            </div>
-            <div id="events-tab-quests" class="hidden flex flex-col gap-3">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daily Quests</h3>
-                    <div id="quests-container" class="flex flex-col gap-2"></div>
-                </div>
-            </div>
-            <div id="events-tab-events" class="grid grid-cols-1 gap-3">
-                    <div id="event-daily" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                <div id="event-gold" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                <div id="event-xp" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4"></div>
-                    <div id="void-tower-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-                        <div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded border border-purple-500/40 uppercase">Endless · Test</span>
-                            <h3 class="text-sm font-bold text-slate-200 mt-2">Void Tower <span class="text-[10px] text-amber-300">(100x rewards, test only)</span></h3>
-                        </div>
-                        <button onclick="startExpedition('endless')" class="py-3 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Tower</button>
+                    <div class="ev-left" style="left:60px; top:110px; width:583px; height:839px;">
+                        <img src="assets/events/left_q85.webp" alt="">
+                        <div id="events-menu"></div>
                     </div>
-                    <div id="void-test-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-                        <div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/40 uppercase">Test · Free</span>
-                            <h3 class="text-sm font-bold text-slate-200 mt-2">Void Test Map <span class="text-[10px] text-slate-400">(1 stage, 6 monsters)</span></h3>
-                        </div>
-                        <button onclick="startExpedition('voidtest')" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Void Test Map</button>
+                    <div class="ev-right" style="left:680px; top:110px; width:960px; height:837px;">
+                        <img src="assets/events/right_q85.webp" alt="">
+                        <div id="events-banner"></div>
+                        <div id="events-detail"></div>
                     </div>
-                    <div id="boss-gauntlet-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
-                        <div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 bg-red-500/20 text-red-300 rounded border border-red-500/40 uppercase">Boss · 99 Stages</span>
-                            <h3 class="text-sm font-bold text-slate-200 mt-2">Boss Gauntlet <span class="text-[10px] text-slate-400">(a boss on every level 1–99)</span></h3>
-                            <label class="text-[10px] text-slate-400 block mt-2">Boss to fight
-                                <select id="boss-gauntlet-pick" onchange="setBossGauntletPick(this.value)" class="block w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200"></select>
-                            </label>
-                        </div>
-                        <button onclick="startExpedition('bossmap')" class="py-3 bg-red-600 hover:bg-red-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow mt-auto">Enter Boss Gauntlet</button>
-                    </div>
-            </div>
-        </div>
                 </div>
             </div>
         </div>
@@ -1548,7 +1544,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113a"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261113x"></script>
+    <script src="js/ui.js?v=20261113y"></script>
     <script src="js/market.js?v=20261113b"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

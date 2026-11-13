@@ -2125,22 +2125,12 @@ function refreshShopAndAlerts() {
 }
 
 // ---------- EVENTS PAGE TABS ----------
-let currentEventsTab = 'quests'; // Events page opens on Daily Quests
+let currentEventsTab = 'daily'; // Events page opens on Daily Challenge
 
 function switchEventsTab(tabName) {
-    if (tabName !== 'events' && tabName !== 'quests') tabName = 'events';
+    if (!EVENT_MENU.some(m => m.key === tabName)) tabName = 'daily';
     currentEventsTab = tabName;
-    const eventsPane = document.getElementById('events-tab-events');
-    const questsPane = document.getElementById('events-tab-quests');
-    const btnEvents = document.getElementById('events-tab-btn-events');
-    const btnQuests = document.getElementById('events-tab-btn-quests');
-    if (eventsPane) eventsPane.classList.toggle('hidden', tabName !== 'events');
-    if (questsPane) questsPane.classList.toggle('hidden', tabName !== 'quests');
-    // Active tab gets an amber border; inactive tab keeps the parchment background
-    const active = 'border: 2px solid #c9a227';
-    const inactive = 'border: 1px solid #b8945a';
-    if (btnEvents) btnEvents.setAttribute('style', `background-color: rgba(214, 190, 140, .5); color: #2a1a0e; ${tabName === 'events' ? active : inactive}`);
-    if (tabName === 'quests') renderQuestsView();
+    renderEventsView();
     updateQuestTabButton();
 }
 
@@ -4845,45 +4835,79 @@ function logMessage(msg, type = 'combat') {
 }
 
 // ---------- EVENTS VIEW ----------
-function renderEventsView() {
-    const st = getEventState();
+// Left: event menu (eventleftmenuwindow). Right: banner, details, map choice and the start button.
+const EVENT_MENU = [
+    { key: 'daily',    label: 'Daily Challenge', banner: 'assets/events/banner_daily_q85.webp' },
+    { key: 'gold',     label: 'Gold Frenzy',     banner: 'assets/events/banner_gold_q85.webp' },
+    { key: 'xp',       label: 'Wisdom Trail',    banner: 'assets/events/banner_xp_q85.webp' },
+    { key: 'quests',   label: 'Daily Quests',    banner: 'assets/events/banner_quest_q85.webp' },
+    { key: 'endless',  label: 'Void Tower',      banner: null },
+    { key: 'voidtest', label: 'Void Test Map',   banner: null },
+    { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
+];
+const eventMapPick = { gold: null, xp: null };
 
-    const dEl = document.getElementById('event-daily');
-    if (dEl) {
-        const can = eventCanPlay('daily');
-        const left = Math.max(0, EVENT_LIMIT - st.plays.daily);
-        const status = st.dailyCleared ? 'Cleared today: locked until tomorrow' : `${left} / ${EVENT_LIMIT} plays left today`;
-        dEl.innerHTML = `
-            <div>
-                <span class="text-[10px] font-bold px-2 py-0.5 bg-cyan-500/20 text-cyan-300 rounded border border-cyan-500/40 uppercase">Daily</span>
-                <h3 class="text-sm font-bold text-slate-200 mt-2">Daily Challenge</h3>
-                <p class="text-[10px] text-slate-400 mt-1">31 stages with bosses on 11, 21 and 31. Level, skills and gear have no effect. Health potions are disabled and only one resurrection can be used per run.</p>
-                <span class="text-[10px] font-mono text-cyan-300 mt-2 block">${status}</span>
-            </div>
-            <button ${can ? '' : 'disabled'} onclick="startEvent('daily')" class="py-3 font-bold rounded-xl text-xs transition mt-4 ${can ? 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 cursor-pointer shadow' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">${can ? 'Start Daily Challenge' : 'Locked'}</button>`;
+function selectEventMap(kind, mapKey) {
+    eventMapPick[kind] = mapKey;
+    renderEventsView();
+}
+
+function renderEventsView() {
+    const menuEl = document.getElementById('events-menu');
+    const bannerEl = document.getElementById('events-banner');
+    const detailEl = document.getElementById('events-detail');
+    if (!menuEl || !bannerEl || !detailEl) return;
+    const st = getEventState();
+    if (!EVENT_MENU.some(m => m.key === currentEventsTab)) currentEventsTab = 'daily';
+    const cur = currentEventsTab;
+    const item = EVENT_MENU.find(m => m.key === cur);
+
+    menuEl.innerHTML = EVENT_MENU.map(m => `
+        <button class="ev-menu-item${m.key === cur ? ' ev-menu-on' : ''}" onclick="switchEventsTab('${m.key}')">
+            <img src="assets/events/leftmenu_q85.webp" alt="">
+            <span>${m.label}</span>
+        </button>`).join('');
+
+    bannerEl.innerHTML = item.banner
+        ? `<img src="${item.banner}" alt="${item.label}">`
+        : `<div class="ev-banner-text">${item.label}</div>`;
+
+    if (cur === 'quests') {
+        detailEl.innerHTML = `<div class="ev-body ev-body-full"><div id="quests-container" class="flex flex-col gap-2"></div></div>`;
+        renderQuestsView();
+        return;
     }
 
-    ['gold', 'xp'].forEach(kind => {
-        const el = document.getElementById(`event-${kind}`);
-        if (!el) return;
-        const cfg = EVENT_CONFIG[kind];
-        const can = eventCanPlay(kind);
-        const left = Math.max(0, EVENT_LIMIT - st.plays[kind]);
-        const tone = kind === 'gold' ? 'amber' : 'emerald';
-        const buttons = EVENT_MAPS[kind].map(m => `
-            <button ${can ? '' : 'disabled'} onclick="startEvent('${kind}','${m.mapKey}')" class="p-3 rounded-xl border text-left text-xs transition ${can ? `bg-slate-950 border-slate-700 hover:border-${tone}-400 text-slate-200 cursor-pointer` : 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed'}">
-                <span class="block font-bold">${m.label}</span>
-                <span class="block text-[10px] mt-0.5">${m.sub} · HP & damage x1.5 · ${kind === 'gold' ? 'Gold' : 'EXP'} x2 · No item drops</span>
-            </button>`).join('');
-        el.innerHTML = `
-            <div>
-                <span class="text-[10px] font-bold px-2 py-0.5 bg-${tone}-500/20 text-${tone}-300 rounded border border-${tone}-500/40 uppercase">Event</span>
-                <h3 class="text-sm font-bold text-slate-200 mt-2">${cfg.name}</h3>
-                <p class="text-[10px] text-slate-400 mt-1">${cfg.desc}</p>
-                <span class="text-[10px] font-mono text-${tone}-300 mt-2 block">${left} / ${EVENT_LIMIT} plays left today</span>
-            </div>
-            <div class="flex flex-col gap-2">${buttons}</div>`;
-    });
+    let body = '', foot = '', start = null;
+    if (cur === 'daily') {
+        const left = Math.max(0, EVENT_LIMIT - st.plays.daily);
+        const status = st.dailyCleared ? 'Cleared today: locked until tomorrow' : `${left} / ${EVENT_LIMIT} plays left today`;
+        body = `<p>31 stages with bosses on 11, 21 and 31. Level, skills and gear have no effect. Health potions are disabled and only one resurrection can be used per run.</p><p class="ev-status">${status}</p>`;
+        start = { can: eventCanPlay('daily'), js: `startEvent('daily')` };
+    } else if (cur === 'gold' || cur === 'xp') {
+        const cfg = EVENT_CONFIG[cur];
+        const maps = EVENT_MAPS[cur];
+        if (!maps.some(m => m.mapKey === eventMapPick[cur])) eventMapPick[cur] = maps[0].mapKey;
+        const pick = eventMapPick[cur];
+        const left = Math.max(0, EVENT_LIMIT - st.plays[cur]);
+        body = `<p>${cfg.desc}</p><p class="ev-status">${left} / ${EVENT_LIMIT} plays left today</p>`;
+        foot = `<div class="ev-maps">${maps.map(m => `<button class="ev-map${m.mapKey === pick ? ' ev-map-on' : ''}" onclick="selectEventMap('${cur}','${m.mapKey}')"><b>${m.label}</b><span>${m.sub}</span></button>`).join('')}</div>`;
+        start = { can: eventCanPlay(cur), js: `startEvent('${cur}','${pick}')` };
+    } else if (cur === 'endless') {
+        body = `<p>Endless test map. 100x rewards, test only.</p>`;
+        start = { can: true, js: `startExpedition('endless')` };
+    } else if (cur === 'voidtest') {
+        body = `<p>Free test map: 1 stage, 6 monsters.</p>`;
+        start = { can: true, js: `startExpedition('voidtest')` };
+    } else if (cur === 'bossmap') {
+        body = `<p>A boss on every level 1–99. Choose the boss to fight.</p>`;
+        foot = `<label class="ev-pick">Boss to fight<select id="boss-gauntlet-pick" onchange="setBossGauntletPick(this.value)" class="ev-select"></select></label>`;
+        start = { can: true, js: `startExpedition('bossmap')` };
+    }
+    detailEl.innerHTML = `
+        <div class="ev-body">${body}</div>
+        <div class="ev-foot">${foot}${start ? `<button class="ev-start" ${start.can ? '' : 'disabled'} onclick="${start.js}"><img src="assets/events/start_q85.webp" alt="Start"></button>` : ''}</div>`;
+    if (cur === 'bossmap' && typeof populateBossGauntletPick === 'function') populateBossGauntletPick();
 }
 
 
