@@ -3217,6 +3217,7 @@ function closeInvDetail() {
     if (panel) { panel.style.display = 'none'; panel.innerHTML = ''; }
     window.invDetailIndex = null;
     window.invDetailKey = null;
+    markInvSelected();
 }
 // Gold border on the clicked bag cell (the one whose detail panel is open)
 function markInvSelected() {
