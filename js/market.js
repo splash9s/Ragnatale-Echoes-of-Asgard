@@ -125,12 +125,15 @@ async function renderMarketBuy() {
     const rows = res.data || [];
     const note = msg ? `<div class="text-xs text-amber-200">${marketEsc(msg)} You can look but not bid.</div>` : '';
     if (!rows.length) { body.innerHTML = note + '<div class="text-sm text-slate-400">No auctions in this category right now.</div>'; return; }
+    marketBuyRows = {};
+    marketBuyBlock = msg;
+    rows.forEach(r => { marketBuyRows[r.id] = r; });
     body.innerHTML = note + rows.map(r => {
         const price = Number(r.current_price);
         const lead = r.i_lead ? '<span class="text-emerald-300">You lead</span>' : (r.top_bidder_name ? `Top bid: ${marketEsc(r.top_bidder_name)}` : 'No bids yet');
         const btn = r.is_mine ? '<span class="text-xs text-slate-500">Your auction</span>'
-            : (r.i_lead || msg ? '' : `<button onclick="marketBidPrompt(${r.id}, ${price}, ${r.bid_count})" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-sm cursor-pointer">Bid</button>`);
-        return `<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+            : (r.i_lead || msg ? '' : `<button onclick="event.stopPropagation(); marketBidPrompt(${r.id}, ${price}, ${r.bid_count})" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-sm cursor-pointer">Bid</button>`);
+        return `<div onclick="marketRowClick(${r.id})" class="cursor-pointer hover:brightness-110 bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
             ${marketRowIcon(r.item)}
             <div class="flex-1 min-w-0">
                 <div class="text-sm">${marketItemText(r.item)}</div>
@@ -142,6 +145,18 @@ async function renderMarketBuy() {
             </div>
         </div>`;
     }).join('');
+}
+
+// Clicking an auction row opens its bid window, or says why it can't be bid on
+let marketBuyRows = {};
+let marketBuyBlock = null;
+function marketRowClick(id) {
+    const r = marketBuyRows[id];
+    if (!r) return;
+    if (marketBuyBlock) { showModal('Market', marketBuyBlock); return; }
+    if (r.is_mine) { showModal('Market', 'This is your own auction.'); return; }
+    if (r.i_lead) { showModal('Market', 'You already lead this auction.'); return; }
+    marketBidPrompt(id, Number(r.current_price), r.bid_count);
 }
 
 // Minimum next bid: the start price for the first bid, then 5% over the current price (at least 1)
@@ -181,7 +196,11 @@ function renderMarketSell() {
     const body = document.getElementById('market-body');
     if (!body) return;
     const items = marketListableItems();
-    if (!items.length) { body.innerHTML = '<div class="text-sm text-slate-400">No gear in your bag to sell. Take off or move gear out of equipped slots first.</div>'; return; }
+    if (!items.length) {
+        body.innerHTML = '<div class="text-sm text-slate-400">No gear in your bag to sell. Take off or move gear out of equipped slots first.</div><div id="market-sell-mine" class="flex flex-col gap-2 mt-3"></div>';
+        marketSellShowMine();
+        return;
+    }
     const field = 'px-3 py-2 bg-slate-950 border border-slate-700 rounded text-slate-100 w-full';
     body.innerHTML = `
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 text-sm">
@@ -195,8 +214,26 @@ function renderMarketSell() {
             </select></label>
             <div id="market-sell-fee" class="text-xs text-slate-300"></div>
             <button onclick="marketConfirmList()" class="py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">List for auction</button>
-        </div>`;
+        </div>
+        <div id="market-sell-mine" class="flex flex-col gap-2 mt-3"></div>`;
     marketSellPreview();
+    marketSellShowMine();
+}
+
+// Your open auctions (what you are selling right now), shown on the Sell tab
+async function marketSellShowMine() {
+    const box = document.getElementById('market-sell-mine');
+    if (!box) return;
+    const res = await marketRpc('auction_mine');
+    if (!document.getElementById('market-sell-mine')) return;
+    if (res.error) { box.innerHTML = `<div class="text-xs text-amber-200">${marketEsc(res.error)}</div>`; return; }
+    const open = ((res.data && res.data.selling) || []).filter(r => r.status === 'open');
+    box.innerHTML = '<h3 class="text-sm font-bold text-sky-300">Your selling items</h3>' + (open.length
+        ? open.map(r => `<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+            ${marketRowIcon(r.item)}
+            <div class="flex-1 min-w-0"><div class="text-sm">${marketItemText(r.item)}</div>
+            <div class="text-xs text-slate-400 mt-1">${Number(r.current_price).toLocaleString()} G · ${r.bid_count} bid${r.bid_count === 1 ? '' : 's'} · ends in ${marketTimeLeft(r.ends_at)}</div></div></div>`).join('')
+        : '<div class="text-sm text-slate-400">You are not selling anything right now.</div>');
 }
 
 function marketSellPreview() {
