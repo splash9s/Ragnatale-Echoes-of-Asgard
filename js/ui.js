@@ -1739,7 +1739,7 @@ const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left
 const HERO_PAGE_FEET = { x: 71.5, y: 189 };
 const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the battle size
 // Tent (clear screen) player: the standing base (idle breathing in index.html), with a hand-stretch animation now and then
-const TENT_HERO = { w: 190, h: 386, fx: 95, fy: 386 };
+const TENT_HERO = { w: 294, h: 454, fx: 147, fy: 454 }; // 500 x 772 frames: figure stands at the same size as before
 const TENT_HERO_BASE = 'assets/pages/character/tent/hero_standing_q85.webp';
 const TENT_HAND_FRAMES = Array.from({ length: 10 }, (_, i) => `assets/pages/character/tent/hand_${String(i + 1).padStart(2, '0')}_q85.webp`);
 let tentHeroSrc = TENT_HERO_BASE;
