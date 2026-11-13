@@ -1,7 +1,7 @@
 // Background music and sound effects, with on/off toggles and volume (0-100).
 // Settings are stored in player.audio so they save with the game.
 const MUSIC_TRACKS = { town: 'sound/bgm_town.mp3', tent: 'sound/bgm_tent.mp3', battle: 'sound/bgm_battle.mp3', boss: 'sound/bgm_boss.mp3' };
-const AUDIO_DEFAULTS = { musicOn: true, musicVol: 20, sfxOn: true, sfxVol: 20 };
+const AUDIO_DEFAULTS = { musicOn: true, musicVol: 15, sfxOn: true, sfxVol: 15 };
 // Per-track level: the battle track is mixed louder, so it plays at 60% of the chosen volume
 const MUSIC_GAIN = { town: 1, tent: 1, battle: 0.6, boss: 1 };
 let musicEl = null;
