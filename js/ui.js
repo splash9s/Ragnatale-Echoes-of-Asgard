@@ -1738,6 +1738,8 @@ async function changeEarthLayers() {
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
 const HERO_PAGE_FEET = { x: 71.5, y: 189 };
 const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the battle size
+// Tent (clear screen) hero: the standing base picture with its own gear, idle animation in index.html
+const TENT_HERO = { src: 'assets/pages/character/tent/hero_standing_q85.webp', w: 190, h: 386, fx: 95, fy: 386 };
 const SHADOW_BASE = { 'town-shadow': { left: 879, top: 770 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
@@ -3560,19 +3562,21 @@ function syncHeroSprites() {
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        if (el.getAttribute('src') !== f.src) el.src = f.src;
+        // The tent (clear screen) shows the standing base picture; the gear page keeps the gear-composed hero
+        const spec = (id === 'char-hero' && isCharClear()) ? TENT_HERO : f;
+        if (el.getAttribute('src') !== spec.src) el.src = spec.src;
         // The main page hero is 10% smaller than the character page hero
         const s = id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE;
-        el.style.width = f.w * s + 'px';
-        el.style.height = f.h * s + 'px';
+        el.style.width = spec.w * s + 'px';
+        el.style.height = spec.h * s + 'px';
         // The Tailwind base style caps every img at its parent's size: lift the cap so the size stays true
         el.style.maxWidth = 'none';
         el.style.maxHeight = 'none';
         // On the character page the hero moves to the centre of the tent while the screen is cleared
         const base = HERO_PAGE_ORIGIN[id];
         const o = (id === 'char-hero' && isCharClear()) ? { left: base.left + CHAR_CLEAR_OFFSET.dx, top: base.top + CHAR_CLEAR_OFFSET.dy } : base;
-        el.style.left = (o.left + HERO_PAGE_FEET.x - f.fx * s) + 'px';
-        el.style.top = (o.top + HERO_PAGE_FEET.y - f.fy * s) + 'px';
+        el.style.left = (o.left + HERO_PAGE_FEET.x - spec.fx * s) + 'px';
+        el.style.top = (o.top + HERO_PAGE_FEET.y - spec.fy * s) + 'px';
     });
     // The character's shadow moves with the character
     const sh = document.getElementById('char-shadow');
