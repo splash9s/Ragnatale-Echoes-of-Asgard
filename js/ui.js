@@ -3574,7 +3574,9 @@ function syncHeroSprites() {
         const base = HERO_PAGE_ORIGIN[id];
         const o = (id === 'char-hero' && isCharClear()) ? { left: base.left + CHAR_CLEAR_OFFSET.dx, top: base.top + CHAR_CLEAR_OFFSET.dy } : base;
         el.style.left = (o.left + HERO_PAGE_FEET.x - spec.fx * s) + 'px';
-        el.style.top = (o.top + HERO_PAGE_FEET.y - spec.fy * s) + 'px';
+        // On the tent (clear screen) the player stands 20 px higher
+        const lift = (id === 'char-hero' && isCharClear()) ? 20 : 0;
+        el.style.top = (o.top + HERO_PAGE_FEET.y - spec.fy * s - lift) + 'px';
     });
     // The character's shadow moves with the character
     const sh = document.getElementById('char-shadow');
