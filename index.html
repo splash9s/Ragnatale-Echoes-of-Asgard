@@ -110,12 +110,12 @@
         #quests-container button[onclick="claimQuestMilestone(2)"] { background-color: rgba(192, 192, 192, .55) !important; border-color: #9a9a9a !important; }
         #quests-container button[onclick="claimQuestMilestone(3)"] { background-color: rgba(230, 190, 70, .55) !important; border-color: #c9a227 !important; }
         /* Pixel buttons (graphic/cha/page/button): red, yellow and green, with a pressed image while held */
-        .pix-btn { background-color: transparent !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; border: 0 !important; box-shadow: none !important; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,.7); }
-        .pix-btn-red { background-image: url(assets/pages/button/redbutton_q85.webp) !important; color: #fff3e0 !important; }
+        .pix-btn { background-color: transparent !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-position: center !important; border: 0 !important; box-shadow: none !important; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; font-weight: 700; color: #fff !important; text-shadow: 0 0 3px #000, 0 1px 3px rgba(0,0,0,.9); }
+        .pix-btn-red { background-image: url(assets/pages/button/redbutton_q85.webp) !important; }
         .pix-btn-red:active { background-image: url(assets/pages/button/redbuttonpress_q85.webp) !important; }
-        .pix-btn-yellow { background-image: url(assets/pages/button/yellowbutton_q85.webp) !important; color: #2a1a06 !important; text-shadow: 0 1px 0 rgba(255,255,255,.45); }
+        .pix-btn-yellow { background-image: url(assets/pages/button/yellowbutton_q85.webp) !important; }
         .pix-btn-yellow:active { background-image: url(assets/pages/button/yellowbuttonpress_q85.webp) !important; }
-        .pix-btn-green { background-image: url(assets/pages/button/greenbutton_q85.webp) !important; color: #f3ffe8 !important; }
+        .pix-btn-green { background-image: url(assets/pages/button/greenbutton_q85.webp) !important; }
         .pix-btn-green:active { background-image: url(assets/pages/button/greenbuttonpress_q85.webp) !important; }
         .pix-btn:disabled { filter: grayscale(1) brightness(.7); opacity: .6; }
         #quests-container button[onclick^="claimQuestMilestone"]:not(:disabled) { background-image: url(assets/pages/button/greenbutton_q85.webp) !important; background-size: 100% 100% !important; background-color: transparent !important; border: 0 !important; color: #f3ffe8; }
@@ -175,7 +175,8 @@
         .bq-task { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
         .bq-status { flex: 0 0 auto; font-size: 18px; color: #fbbf24; }
         .bq-status.bq-done { color: #4ade80; }
-        .bq-claim { padding: 10px 10px; font-size: 24px; font-weight: 800; color: #fff; background: #15803d; border: 2px solid #0f5a2b; border-radius: 10px; cursor: pointer; }
+        .bq-claim { min-width: 200px; padding: 12px 10px; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; font-size: 24px; font-weight: 700; color: #fff; text-shadow: 0 0 3px #000, 0 1px 3px rgba(0,0,0,.9); background: url(assets/pages/button/greenbutton_q85.webp) center / 100% 100% no-repeat; border: 0; border-radius: 0; cursor: pointer; }
+        .bq-claim:active { background-image: url(assets/pages/button/greenbuttonpress_q85.webp); }
         .bq-claim.bq-disabled { background: #475569; border-color: #334155; cursor: default; }
         .bq-reward { font-size: 17px; color: #bfae85; }
         .bq-clickable { cursor: pointer; }
