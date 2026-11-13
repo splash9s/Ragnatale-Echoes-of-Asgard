@@ -752,7 +752,7 @@ function showCombatText(selector, text, variant, delayMs = 0) {
 }
 
 // Item dropped on the ground where a monster fell: it lands with a small bounce, stays 1.5 s, then fades
-const GROUND_DROP_STAY_MS = 1500;
+const GROUND_DROP_STAY_MS = 2500;
 const GROUND_DROP_FADE_MS = 400;
 function showGroundDrop(monsterIndex, iconHTML) {
     const view = document.getElementById('view-combat');
@@ -783,6 +783,10 @@ function showGroundDrop(monsterIndex, iconHTML) {
     stage.appendChild(d);
     const land = 350, fadeStart = land + GROUND_DROP_STAY_MS, total = fadeStart + GROUND_DROP_FADE_MS;
     const at = (t) => t / total;
+    // Click the item on the ground: it fades away right away
+    d.style.pointerEvents = 'auto';
+    d.style.cursor = 'pointer';
+    let clicked = false;
     const anim = d.animate([
         { transform: 'translate(-50%, -150px) scale(.6)', opacity: 0, offset: 0 },
         { transform: 'translate(-50%, 0) scale(1)', opacity: 1, offset: at(land), easing: 'ease-out' },   // lands
@@ -792,6 +796,14 @@ function showGroundDrop(monsterIndex, iconHTML) {
         { transform: 'translate(-50%, 0)', opacity: 0, offset: 1 }                                         // fades
     ], { duration: total, fill: 'forwards' });
     anim.onfinish = () => d.remove();
+    d.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (clicked) return;
+        clicked = true;
+        anim.cancel();
+        const fade = d.animate([{ transform: 'translate(-50%, 0)', opacity: 1 }, { transform: 'translate(-50%, 0)', opacity: 0 }], { duration: GROUND_DROP_FADE_MS, fill: 'forwards' });
+        fade.onfinish = () => d.remove();
+    });
 }
 // Drop shown for a monster: a gear item (by its icon HTML) or an elemental stone (by its element key)
 function showMonsterGroundDrop(m, iconHTML) {
