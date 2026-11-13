@@ -5302,11 +5302,13 @@ function tentSparkEmit(side) {
 }
 // Start a spark emitter while a lamp is on; stop it when the lamp goes off
 function syncTentSparkEmitters() {
+    // Sparks play only on the tent (clear screen) while the lamp is on
     ['left', 'right'].forEach(side => {
-        const on = charLightState[side];
+        const on = charLightState[side] && isCharClear();
         if (on && !tentSparkTimers[side]) tentSparkTimers[side] = setInterval(() => tentSparkEmit(side), 320);
         if (!on && tentSparkTimers[side]) { clearInterval(tentSparkTimers[side]); delete tentSparkTimers[side]; }
     });
+    if (!isCharClear()) document.querySelectorAll('#character-stage .tent-spark').forEach(n => n.remove());
 }
 
 // Clear screen: hide equipment and inventory panels to show only the character background. Press again to restore.
@@ -5322,6 +5324,7 @@ function toggleCharClear() {
     if (!view.classList.contains('screen-clear')) { view.classList.remove('ui-off'); closePetPanel(); }
     updateTentTopLabels();
     syncHeroSprites();
+    syncTentSparkEmitters();
 }
 // Boss Gauntlet picker on the Events page: 'all' cycles through every map's boss; a map key fights that boss on every stage
 let bossGauntletPick = 'all';
