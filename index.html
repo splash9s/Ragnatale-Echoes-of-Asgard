@@ -444,6 +444,26 @@
         .friend-actions .friend-btn { width: 100%; }
         .friend-actions .friend-hint { font-size: 17px; line-height: 1.25; }
         .friend-empty { padding: 60px 20px; text-align: center; font-size: 28px; color: #3b2716; }
+        /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
+        #view-friend .friend-window { left: 105px; top: 244px; width: 1728px; height: 765px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
+        #view-friend .friend-myid { color: #f1e4c3; }
+        #view-friend .friend-myid strong { color: #f5c451; }
+        #view-friend .friend-add input { background: #2a1d12; color: #f5e6c0; border-color: #b8945a; }
+        #view-friend .friend-add input::placeholder { color: #a88a5a; }
+        #view-friend .friend-status { color: #f1e4c3; }
+        #view-friend .friend-status.err { color: #ff8a7a; }
+        #view-friend .friend-tab { background: #2a1d12; color: #f1e4c3; border-color: #b8945a; }
+        #view-friend .friend-tab.active { background: #7a5a2c; color: #fff; }
+        #view-friend .friend-visitors { color: #e8d9b5; }
+        #view-friend .friend-visitors strong { color: #f5e6c0; }
+        #view-friend .friend-visitors span { color: #bfae85; }
+        #view-friend .friend-empty { color: #e8d9b5; }
+        #view-friend .friend-btn.add, #view-friend .friend-btn.del, #view-friend .friend-btn.send, #view-friend .friend-btn.visit { height: 64px; border: 0; background-color: transparent; background-size: 100% 100%; background-repeat: no-repeat; background-position: center; color: #fff; text-shadow: 0 2px 3px rgba(0,0,0,.7); }
+        #view-friend .friend-btn.add { background-image: url(assets/pages/friend/btn_green_q85.webp); min-width: 240px; }
+        #view-friend .friend-btn.del { background-image: url(assets/pages/friend/btn_red_q85.webp); }
+        #view-friend .friend-btn.send, #view-friend .friend-btn.visit { background-image: url(assets/pages/friend/btn_blue_q85.webp); }
+        #view-friend .friend-btn.send:disabled { background-image: url(assets/pages/friend/btn_blue_q85.webp); filter: grayscale(1) brightness(.6); color: #d9c9a6; }
+        #view-friend .friend-btn.add:active, #view-friend .friend-btn.del:active, #view-friend .friend-btn.send:active, #view-friend .friend-btn.visit:active { filter: brightness(.85); }
         /* Dark font on the art pages (not Mail/Setting, which are .art-dark-off); cards and selects get a light parchment background so the text stays readable */
         .art-dark .art-panel, .art-dark .art-panel * { color: #2a1a0e !important; }
         /* Campaign Dungeons panel: parchment background (c.png), dark text; buttons and dropdown keep dark text */
@@ -881,7 +901,8 @@
         <div id="view-friend" class="hidden art-screen art-dark">
             <div id="friend-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/friend/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'friendpage.png')">
+                    <img class="ts-bg" src="assets/pages/friend/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'friendpage.png')">
+                    <img src="assets/pages/friend/window_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
@@ -1579,7 +1600,7 @@
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261107l"></script>
-    <script src="js/friends.js?v=20261113e"></script>
+    <script src="js/friends.js?v=20261113f"></script>
     <script src="js/town.js?v=20261113b"></script>
     <script src="js/loader.js?v=20261113c"></script>
 
