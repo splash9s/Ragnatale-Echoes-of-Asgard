@@ -1738,8 +1738,6 @@ async function changeEarthLayers() {
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
 const HERO_PAGE_FEET = { x: 71.5, y: 189 };
 const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the battle size
-// Tent (clear screen) hero: the standing base picture with its own gear, idle animation in index.html
-const TENT_HERO = { src: 'assets/pages/character/tent/hero_standing_q85.webp', w: 190, h: 386, fx: 95, fy: 386 };
 const SHADOW_BASE = { 'town-shadow': { left: 879, top: 770 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
@@ -3562,8 +3560,8 @@ function syncHeroSprites() {
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        // The tent (clear screen) shows the standing base picture; the gear page keeps the gear-composed hero
-        const spec = (id === 'char-hero' && isCharClear()) ? TENT_HERO : f;
+        // The hero is drawn with the player's gear in the game's own colours, on every page
+        const spec = f;
         if (el.getAttribute('src') !== spec.src) el.src = spec.src;
         // The main page hero is 10% smaller than the character page hero
         const s = id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE;
