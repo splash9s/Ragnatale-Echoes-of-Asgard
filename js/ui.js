@@ -1738,6 +1738,38 @@ async function changeEarthLayers() {
 const HERO_PAGE_ORIGIN = { 'town-hero': { left: 0, top: 0 }, 'char-hero': { left: 350, top: 527 } };
 const HERO_PAGE_FEET = { x: 71.5, y: 189 };
 const HERO_PAGE_SCALE = 0.5; // main and character page heroes are half the battle size
+// Tent (clear screen) player: the standing base (idle breathing in index.html), with a hand-stretch animation now and then
+const TENT_HERO = { w: 190, h: 386, fx: 95, fy: 386 };
+const TENT_HERO_BASE = 'assets/pages/character/tent/hero_standing_q85.webp';
+const TENT_HAND_FRAMES = Array.from({ length: 10 }, (_, i) => `assets/pages/character/tent/hand_${String(i + 1).padStart(2, '0')}_q85.webp`);
+let tentHeroSrc = TENT_HERO_BASE;
+let tentHandTimer = null, tentHandFrameTimer = null;
+function tentHeroSet(src) {
+    tentHeroSrc = src;
+    const el = document.getElementById('char-hero');
+    if (el && el.getAttribute('src') !== src) el.src = src;
+}
+// One run of the hand-stretch sheet, then back to the base
+function tentHandPlay() {
+    if (tentHandFrameTimer) return;
+    let i = 0;
+    tentHandFrameTimer = setInterval(() => {
+        if (i < TENT_HAND_FRAMES.length) { tentHeroSet(TENT_HAND_FRAMES[i++]); return; }
+        clearInterval(tentHandFrameTimer); tentHandFrameTimer = null;
+        tentHeroSet(TENT_HERO_BASE);
+    }, 140);
+}
+// Runs the hand animation every few seconds, only while the tent (clear screen) is on screen
+function syncTentHand() {
+    const view = document.getElementById('view-character');
+    const on = !!view && !view.classList.contains('hidden') && isCharClear();
+    if (on && !tentHandTimer) tentHandTimer = setInterval(tentHandPlay, 6000);
+    if (!on) {
+        if (tentHandTimer) { clearInterval(tentHandTimer); tentHandTimer = null; }
+        if (tentHandFrameTimer) { clearInterval(tentHandFrameTimer); tentHandFrameTimer = null; }
+        tentHeroSrc = TENT_HERO_BASE;
+    }
+}
 const SHADOW_BASE = { 'town-shadow': { left: 879, top: 770 }, 'char-shadow': { left: 339, top: 684 } };
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
@@ -3557,12 +3589,15 @@ function isTwoHanded(item) {
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     if (!f) return; // still loading
+    syncTentHand(); // hand animation runs only while the tent is on screen
     ['town-hero', 'char-hero'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        // The hero is drawn with the player's gear in the game's own colours, on every page
-        const spec = f;
-        if (el.getAttribute('src') !== spec.src) el.src = spec.src;
+        // The tent (clear screen) shows the standing base with its hand animation; the gear page keeps the gear-composed hero
+        const tentNow = id === 'char-hero' && isCharClear();
+        const spec = tentNow ? TENT_HERO : f;
+        const src = tentNow ? tentHeroSrc : f.src;
+        if (el.getAttribute('src') !== src) el.src = src;
         // The main page hero is 10% smaller than the character page hero
         const s = id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE;
         el.style.width = spec.w * s + 'px';
