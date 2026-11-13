@@ -126,7 +126,7 @@ const RUNE_DEFS = {
     glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 10, once: true, desc: "Max armor 0, +10% crit chance", text: v => `Max armor 0, +${v}% crit chance` },
     runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% Max HP per rune picked (from Max HP at stage start)", text: () => "+5% Max HP per rune picked (from Max HP at stage start)" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each rune you own", text: () => "+20% damage for each rune you own" },
-    powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "+50% of the damage you had when picked, added to every hit", text: v => `+${v}% of the damage you had when picked, added to every hit`, onApply: () => { player.runes.powerSurgeBase = getDerivedStats().atk; } },
+    powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, desc: "+50% of your ATK at the moment you pick it, added to every hit", text: v => `+${v}% of your ATK at the moment you pick it, added to every hit`, onApply: () => { player.runes.powerSurgeBase = getDerivedStats().atk; } },
     giantSlayer: { name: "Giant Slayer Rune", rarity: 3, add: 25, once: true, desc: "+25% damage vs bosses and mini-bosses", text: v => `+${v}% damage vs bosses and mini-bosses` },
     monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 50, once: true, desc: "+50% damage vs normal monsters", text: v => `+${v}% damage vs normal monsters` },
     ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0: 3x damage", text: () => "While armor is above 0: 3x damage" },
