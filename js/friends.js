@@ -173,7 +173,7 @@ function friendRowHTML(f, today, idx) {
             <div class="friend-bond">Friendship Lv. <strong>${lv}</strong> · ${streakText}</div>
             <div class="friend-bar"><div class="fill" style="width:${progress.pct}%"></div></div>
             <div class="friend-hint">${progress.text}</div>
-            <div class="friend-hint">${st.sentToday ? 'Today\'s gift is sent.' : `Today's gift: ${friendGiftText(lv)}`}</div>
+            ${st.sentToday ? '<div class="friend-hint">Today\'s gift is sent.</div>' : ''}
         </div>
         <div class="friend-actions">
             <button class="friend-btn gift" ${st.sentToday ? 'disabled' : ''} onclick="sendFriendGift(${idx})">${giftLabel}</button>
