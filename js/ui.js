@@ -3218,6 +3218,12 @@ function closeInvDetail() {
     window.invDetailIndex = null;
     window.invDetailKey = null;
 }
+// Gold border on the clicked bag cell (the one whose detail panel is open)
+function markInvSelected() {
+    document.querySelectorAll('#inventory-grid > [data-idx]').forEach(el => {
+        el.classList.toggle('inv-selected', Number(el.dataset.idx) === window.invDetailIndex);
+    });
+}
 // True when the detail window is open for this gear ('inv:<index>' or 'eq:<slot>'); clicking it again closes the window
 function isDetailOpen(key) {
     const panel = document.getElementById('inv-detail-panel');
@@ -3291,6 +3297,7 @@ function showItemDetail(index, refresh = false) {
     if (!refresh && isDetailOpen(key)) { closeInvDetail(); return; } // same gear clicked again: close
     window.invDetailIndex = index;
     window.invDetailKey = key;
+    markInvSelected();
     const isEquip = !!item.slot;
     const isPotion = item.type === 'potion';
     const rarity = RARITY_INFO[item.rarity];
@@ -4613,7 +4620,7 @@ function updateUI() {
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             invGrid.innerHTML += `
-                <div onclick="event.stopPropagation(); showItemDetail(${index})" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
+                <div data-idx="${index}" onclick="event.stopPropagation(); showItemDetail(${index})" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}${window.invDetailIndex === index ? ' inv-selected' : ''}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
                     <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Favorite" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-yellow-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[9px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
