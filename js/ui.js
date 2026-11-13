@@ -5164,6 +5164,7 @@ function renderCharLights() {
     set('tent-right', R && !L);
     set('tent-both', L && R);
     syncTentLights();
+    syncTentSparkEmitters();
 }
 
 // Tent light sources in stage pixels (1920x1080 frame).
@@ -5230,36 +5231,43 @@ function tentLightLoop() {
 document.addEventListener('DOMContentLoaded', () => {
     attachTentLight(document.getElementById('char-hero'));
     tentLightLoop();
+    syncTentSparkEmitters();
 });
 function toggleCharLight(side) {
     if (!isCharClear()) return; // the tent only responds in clear screen
     charLightState[side] = !charLightState[side];
-    if (charLightState[side]) tentSparks(side); // sparks fly out when the lamp turns on
     renderCharLights();
 }
-// A small burst of sparks around a tent light (stage pixels), fading out
-function tentSparks(side) {
+// Sparks keep flying up from a lit tent light (like fire), for as long as the light is on
+const tentSparkTimers = {};
+function tentSparkEmit(side) {
     const inner = document.querySelector('#character-stage .ts-inner');
     const p = TENT_LIGHT_POINTS[side];
     if (!inner || !p) return;
-    for (let i = 0; i < 16; i++) {
-        const d = document.createElement('div');
-        d.className = 'tent-spark';
-        const size = 3 + Math.random() * 4;
-        d.style.width = size + 'px';
-        d.style.height = size + 'px';
-        d.style.left = p.x + 'px';
-        d.style.top = p.y + 'px';
-        inner.appendChild(d);
-        const ang = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 90;
-        const dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist - 30;
-        const anim = d.animate([
-            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 1, offset: 0.25 },
-            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.3)`, opacity: 0 }
-        ], { duration: 600 + Math.random() * 600, delay: Math.random() * 200, fill: 'backwards', easing: 'ease-out' });
-        anim.onfinish = () => d.remove();
-    }
+    const d = document.createElement('div');
+    d.className = 'tent-spark';
+    const size = 2 + Math.random() * 3;
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+    d.style.left = (p.x + (Math.random() * 2 - 1) * 22) + 'px';
+    d.style.top = (p.y + (Math.random() * 2 - 1) * 12) + 'px';
+    inner.appendChild(d);
+    const rise = 70 + Math.random() * 60, sway = (Math.random() * 2 - 1) * 30;
+    const anim = d.animate([
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 1, offset: 0.2 },
+        { transform: `translate(calc(-50% + ${sway * 0.5}px), calc(-50% - ${rise * 0.5}px)) scale(.8)`, opacity: 0.8, offset: 0.6 },
+        { transform: `translate(calc(-50% + ${sway}px), calc(-50% - ${rise}px)) scale(.2)`, opacity: 0 }
+    ], { duration: 700 + Math.random() * 400, easing: 'ease-out' });
+    anim.onfinish = () => d.remove();
+}
+// Start a spark emitter while a lamp is on; stop it when the lamp goes off
+function syncTentSparkEmitters() {
+    ['left', 'right'].forEach(side => {
+        const on = charLightState[side];
+        if (on && !tentSparkTimers[side]) tentSparkTimers[side] = setInterval(() => tentSparkEmit(side), 140);
+        if (!on && tentSparkTimers[side]) { clearInterval(tentSparkTimers[side]); delete tentSparkTimers[side]; }
+    });
 }
 
 // Clear screen: hide equipment and inventory panels to show only the character background. Press again to restore.
