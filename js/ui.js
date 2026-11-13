@@ -5258,14 +5258,14 @@ function tentSparkEmit(side) {
         { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 1, offset: 0.2 },
         { transform: `translate(calc(-50% + ${sway * 0.5}px), calc(-50% - ${rise * 0.5}px)) scale(.8)`, opacity: 0.8, offset: 0.6 },
         { transform: `translate(calc(-50% + ${sway}px), calc(-50% - ${rise}px)) scale(.2)`, opacity: 0 }
-    ], { duration: 1500 + Math.random() * 800, easing: 'ease-out' });
+    ], { duration: 2400 + Math.random() * 900, easing: 'ease-out' });
     anim.onfinish = () => d.remove();
 }
 // Start a spark emitter while a lamp is on; stop it when the lamp goes off
 function syncTentSparkEmitters() {
     ['left', 'right'].forEach(side => {
         const on = charLightState[side];
-        if (on && !tentSparkTimers[side]) tentSparkTimers[side] = setInterval(() => tentSparkEmit(side), 140);
+        if (on && !tentSparkTimers[side]) tentSparkTimers[side] = setInterval(() => tentSparkEmit(side), 320);
         if (!on && tentSparkTimers[side]) { clearInterval(tentSparkTimers[side]); delete tentSparkTimers[side]; }
     });
 }
@@ -5830,6 +5830,7 @@ function ensureTentPetLoop() {
 function tentPetLick(w) {
     if (w.state === 'lick') return;
     w.state = 'lick';
+    playSound('sound/cat-meow.mp3'); // same sound as the main page pet
     w.cat.style.display = 'none';
     w.lick.style.display = 'block';
     if (petDailyPlay(tentPetItem(w.token))) {
