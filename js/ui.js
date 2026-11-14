@@ -3893,7 +3893,7 @@ function manualDrinkPotion() {
     saveGame();
 }
 
-const STAT_FULL_NAMES = { str: 'STR', agi: 'AGI', vit: 'VIT', int: 'INT', dex: 'DEX', luk: 'LUK' };
+const STAT_FULL_NAMES = { str: 'STR', agi: 'AGI', vit: 'VIT', int: 'WIS', dex: 'DEX', luk: 'LUK' };
 
 // Points are queued with +, then spent together after one confirmation.
 let pendingAlloc = { stats: {}, skills: {} };
