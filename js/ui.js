@@ -5630,7 +5630,7 @@ function toggleCharLight(side) {
 let tentPose = 'stand', tentPoseTarget = 'stand', tentPoseSwapTimer = null;
 const TENT_POSES = {
     sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 470, top: 694, w: 194, h: 185, anim: 'none' }, // on the left side of the red carpet box,
-    sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 550, top: 650, w: 195, h: 108, anim: 'none' } // in the green box (bed)
+    sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 536, top: 642, w: 224, h: 124, anim: 'none' } // in the green box (bed)
 };
 function tentPoseLayout(el) {
     const P = TENT_POSES[tentPose];
