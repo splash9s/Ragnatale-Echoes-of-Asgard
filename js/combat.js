@@ -46,9 +46,12 @@ function playSound(path) {
     try {
         const vol = sfxVolumeNow();
         if (vol <= 0) return; // Effects off
+        if (!pageIsActive) return; // no sound while the game is not on screen
         const audio = new Audio(path);
         audio.volume = vol;
-        audio.play().catch(e => console.log("Audio play prevented:", e));
+        sfxPlaying.add(audio);
+        audio.addEventListener('ended', () => sfxPlaying.delete(audio));
+        audio.play().catch(e => { sfxPlaying.delete(audio); console.log("Audio play prevented:", e); });
     } catch (err) {
         console.log("Audio error:", err);
     }

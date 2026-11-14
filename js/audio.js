@@ -7,6 +7,24 @@ const MUSIC_GAIN = { town: 1, tent: 1, battle: 0.6, boss: 1 };
 let musicEl = null;
 let musicTrack = null; // key of the track currently loaded
 
+// The game is active only while its tab is visible and its window has focus.
+// When it is not, the music and every sound effect stop, and they resume when the player comes back.
+let pageIsActive = (typeof document === 'undefined') || (document.visibilityState === 'visible' && document.hasFocus());
+let sfxPlaying = new Set();
+function setPageActive(active) {
+    pageIsActive = !!active;
+    if (!pageIsActive) {
+        if (musicEl && !musicEl.paused) musicEl.pause();
+        sfxPlaying.forEach(a => { try { a.pause(); } catch (e) {} });
+        sfxPlaying.clear();
+    } else if (audioSettings().musicOn && musicTrack && musicEl && musicEl.paused) {
+        musicEl.play().catch(() => {});
+    }
+}
+document.addEventListener('visibilitychange', () => setPageActive(document.visibilityState === 'visible' && document.hasFocus()));
+window.addEventListener('blur', () => setPageActive(false));
+window.addEventListener('focus', () => setPageActive(document.visibilityState === 'visible'));
+
 function audioSettings() {
     if (!player.audio) player.audio = {};
     Object.keys(AUDIO_DEFAULTS).forEach(k => { if (player.audio[k] === undefined) player.audio[k] = AUDIO_DEFAULTS[k]; });
@@ -30,13 +48,13 @@ function setMusicTrack(key) {
         el.src = MUSIC_TRACKS[key];
     }
     el.volume = trackVolumeNow();
-    if (audioSettings().musicOn) el.play().catch(() => {}); // blocked until the first click or key press (see initAudio)
+    if (audioSettings().musicOn && pageIsActive) el.play().catch(() => {}); // blocked until the first click or key press (see initAudio)
 }
 
 // Browsers block autoplay until the player interacts with the page, so music resumes on the first click or key press
 function initAudio() {
     const resume = () => {
-        if (!audioSettings().musicOn || !musicTrack) return;
+        if (!audioSettings().musicOn || !musicTrack || !pageIsActive) return;
         const el = getMusicEl();
         if (el.paused) el.play().catch(() => {});
     };
