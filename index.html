@@ -960,7 +960,7 @@
             <!-- Login status bar across the top, same as the main page top bar -->
             <div class="absolute left-0 right-0 top-0 flex items-center gap-3 px-4 py-2 bg-slate-950/80 border-b border-slate-800/80 text-xs text-slate-300" style="z-index:3; min-height:44px;">
                 <span class="account-text min-w-0 flex-1"></span>
-                <button type="button" onclick="bindGmail()" class="account-link-btn hidden shrink-0 px-3 py-1 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold cursor-pointer">Link Gmail</button>
+                <button type="button" onclick="bindGmail()" class="account-link-btn hidden shrink-0 p-0 bg-transparent border-0 cursor-pointer" aria-label="Link Gmail"><img src="assets/cha/page/link_gmail_q85.webp" alt="Link Gmail" style="width:250px; max-width:100%; height:auto; display:block;"></button>
             </div>
             <!-- Game name at the top centre of the page -->
             <img src="assets/cha/page/rune_thread_logo_v3_q85.webp" alt="Rune Thread" class="absolute left-1/2 -translate-x-1/2 block" style="top:68px; z-index:2; width:240px; max-width:60vw; height:auto;">
@@ -1157,7 +1157,7 @@
                 <button onclick="toggleLanguage()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
                 <button onclick="openSendMailForm()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Send Mail</button>
                 <div id="account-status" class="px-5 py-4 bg-slate-800 rounded-xl text-slate-200 text-lg leading-relaxed"></div>
-                <button id="bind-email-btn" onclick="bindGmail()" class="hidden px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Bind Gmail</button>
+                <button id="bind-email-btn" onclick="bindGmail()" class="hidden p-0 bg-transparent border-0 cursor-pointer self-start" aria-label="Bind Gmail"><img src="assets/cha/page/link_gmail_q85.webp" alt="Bind Gmail" style="width:280px; max-width:100%; height:auto; display:block;"></button>
                 <p id="bind-msg" class="text-red-300 text-base px-2"></p>
                 <button onclick="resetSaveGame()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left !text-red-300 hover:!bg-red-950/40">♻️ Reset Save Data</button>
             </div>
@@ -1797,7 +1797,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114av"></script>
+    <script src="js/ui.js?v=20261114aw"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

@@ -150,7 +150,6 @@ async function refreshBindEmail() {
     if (!user || !user.is_anonymous) { btn.classList.add('hidden'); return; }
     btn.classList.remove('hidden');
     btn.disabled = false;
-    btn.textContent = '✉️ Bind Gmail';
 }
 async function bindGmail() {
     const msg = document.getElementById('bind-msg');
