@@ -88,7 +88,6 @@ function setSfxVolume(v) {
 }
 function saveAudioSettings() { saveGame(); }
 // Plays one effect at the chosen volume, so the player can hear the level they set
-function previewSfx() { if (sfxVolumeNow() > 0 && typeof playSound === 'function') playSound('sound/hit.mp3'); }
 
 // Keeps the Settings page controls in step with the saved values
 function refreshAudioUI() {
