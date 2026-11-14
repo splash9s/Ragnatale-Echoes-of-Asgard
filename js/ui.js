@@ -4178,8 +4178,8 @@ function renderCreateStats() {
     if (now) {
         const next = previewDerivedStats();
         const cells = [
-            ['ATK', now.atk, next.atk], ['DEF', now.def, next.def], ['HIT', now.hit, next.hit],
-            ['FLEE', now.flee, next.flee], ['CRIT', `${Math.round(now.crit * 10) / 10}%`, `${Math.round(next.crit * 10) / 10}%`], ['ASPD', now.aspd, next.aspd]
+            ['HP', now.maxHp, next.maxHp], ['ATK', now.atk, next.atk], ['MATK', now.matk, next.matk], ['DEF', now.def, next.def],
+            ['HIT', now.hit, next.hit], ['FLEE', now.flee, next.flee], ['CRIT', `${Math.round(now.crit * 10) / 10}%`, `${Math.round(next.crit * 10) / 10}%`], ['ASPD', now.aspd, next.aspd]
         ];
         rows.innerHTML += `<div class="mt-2 pt-2 border-t border-slate-700 grid grid-cols-1 gap-y-1">`
             + cells.map(([k, a, b]) => {
