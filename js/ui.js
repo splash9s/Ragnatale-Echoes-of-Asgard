@@ -355,6 +355,16 @@ async function signInWithGmail() {
     if (!started) showCharacterPage();
 }
 
+// Reserved names: staff-like words are not allowed for players (checked ignoring case, spaces and symbols)
+const RESERVED_NAME_WORDS = ['admin', 'administrator', 'gamemaster', 'gamemod', 'moderator', 'gamesupport', 'support', 'staff', 'official', 'system', 'developer', 'owner', 'superuser', 'root'];
+const RESERVED_NAME_EXACT = ['gm', 'mod', 'dev', 'sys', 'op'];
+function isReservedPlayerName(name) {
+    const n = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!n) return false;
+    if (RESERVED_NAME_EXACT.includes(n)) return true;
+    return RESERVED_NAME_WORDS.some(w => n.includes(w));
+}
+
 let startNameBusy = false;
 async function startGameWithName() {
     if (startNameBusy) return;
@@ -362,6 +372,12 @@ async function startGameWithName() {
     try {
         let nameInputEl = document.getElementById('input-player-name');
         let nameInput = nameInputEl ? nameInputEl.value.trim().slice(0, MAX_NAME_LENGTH) : "VanguardHero";
+
+        // Names that sound like staff are reserved for the game team
+        if (nameInput && isReservedPlayerName(nameInput)) {
+            showModal('Name not allowed', `"${nameInput}" is reserved. Choose a different name.`);
+            return;
+        }
 
         // Player names are unique: a name another player uses is refused and the name window stays open
         if (nameInput && await cloudNameTaken(nameInput)) {
