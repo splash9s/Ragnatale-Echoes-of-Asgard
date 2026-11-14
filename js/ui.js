@@ -330,6 +330,8 @@ function showCharacterPage() {
     document.getElementById('view-signin')?.classList.add('hidden');
     const modal = document.getElementById('view-name-select');
     if (modal) { modal.classList.remove('hidden'); modal.style.display = ''; }
+    renderCreateStats();
+    refreshAccountBar();
 }
 async function signInAnonymous() {
     await cloudSignInAnonymous(); // offline or failed: the game still continues on this browser
@@ -3724,7 +3726,6 @@ function syncHeroSprites() {
         sh.style.top = (684 + off.dy) + 'px';
     }
     if (typeof syncTentLights === "function") syncTentLights();
-    document.querySelectorAll('img.hero-thumb').forEach(el => { if (el.getAttribute('src') !== f.src) el.src = f.src; });
     ['town-shadow', 'char-shadow'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -4142,6 +4143,42 @@ function confirmPendingStats() {
 }
 
 function resetPendingStats() { pendingAlloc.stats = {}; updateUI(); }
+
+// Character select: the stat window on the left (same add / confirm rules as the stat page)
+function renderCreateStats() {
+    const rows = document.getElementById('create-stat-rows');
+    if (!rows || !player.stats) return;
+    const left = (player.statPoints || 0) - pendingStatTotal();
+    const pts = document.getElementById('create-stat-points');
+    if (pts) pts.textContent = left;
+    rows.innerHTML = Object.keys(STAT_FULL_NAMES).map(k => {
+        const add = pendingAlloc.stats[k] || 0;
+        const val = (player.stats[k] || 0) + add;
+        const full = left <= 0 || val >= STAT_MAX;
+        return `<div class="flex items-center justify-between gap-2 text-sm">`
+            + `<span class="font-bold text-slate-200">${STAT_FULL_NAMES[k]}</span>`
+            + `<span class="flex items-center gap-2"><span class="font-bold text-slate-100">${val}${add ? ` <span class="text-amber-300">+${add}</span>` : ''}</span>`
+            + `<button type="button" onclick="addStat('${k}')"${full ? ' disabled' : ''} class="w-7 h-7 rounded-lg bg-amber-600 text-slate-950 font-black cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">+</button></span></div>`;
+    }).join('');
+}
+
+// Top bar: who is logged in, and the Link Gmail button for guests
+async function refreshAccountBar() {
+    const text = document.getElementById('account-text');
+    const btn = document.getElementById('account-link-btn');
+    if (!text) return;
+    const user = typeof cloudCurrentUser === 'function' ? await cloudCurrentUser() : null;
+    if (!user) {
+        text.textContent = 'Offline play. Your save is on this device only.';
+        btn?.classList.add('hidden');
+    } else if (user.is_anonymous) {
+        text.textContent = 'You are logged in as anonymous. Your save is on this device only.';
+        btn?.classList.remove('hidden');
+    } else {
+        text.textContent = `Logged in with Gmail: ${user.email || ''}`;
+        btn?.classList.add('hidden');
+    }
+}
 
 function upgradeSkill(skillKey) {
     const s = player.skills[skillKey];
@@ -4735,6 +4772,7 @@ function renderElementStats() {
 }
 
 function updateUI() {
+    if (typeof renderCreateStats === 'function') renderCreateStats(); // character select stat window
     syncHeroSprites();
     if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
     if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();

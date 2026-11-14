@@ -888,6 +888,10 @@
 
     <!-- TOP HEADER / HUD -->
     <header id="app-header" class="hidden bg-slate-950/80 border-b border-slate-800/80 backdrop-blur sticky top-0 z-40 px-4 py-2 flex justify-end items-center gap-3">
+        <div id="account-bar" class="mr-auto flex items-center gap-3 min-w-0 text-xs text-slate-300">
+            <span id="account-text" class="min-w-0"></span>
+            <button id="account-link-btn" type="button" onclick="bindGmail()" class="hidden shrink-0 px-3 py-1 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold cursor-pointer">Link Gmail</button>
+        </div>
         <div class="flex items-center gap-3">
             <div class="px-3 py-1 bg-slate-900/90 rounded-xl border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold text-amber-300 shadow-inner">
                 <span>💰</span> <span id="header-gold">1000 Gold</span>
@@ -934,14 +938,14 @@
                     <span>I have read and accept the <button type="button" onclick="showTermsModal()" class="underline font-bold text-amber-300 hover:text-amber-200 cursor-pointer">Terms and Conditions</button>.</span>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <button id="signin-gmail-btn" onclick="signInWithGmail()" disabled class="w-full py-3 bg-slate-100 hover:bg-white text-slate-900 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-                        Sign in with Gmail
+                    <button id="signin-gmail-btn" onclick="signInWithGmail()" disabled class="w-full bg-transparent border-0 p-0 cursor-pointer hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+                        <img src="assets/cha/page/gmail_signin_q85.webp" alt="Sign in with Gmail" class="block w-full h-auto">
                     </button>
                     <span class="text-[11px] text-amber-400 font-bold">* Recommended</span>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <button id="signin-anon-btn" onclick="signInAnonymous()" disabled class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-                        Play as anonymous
+                    <button id="signin-anon-btn" onclick="signInAnonymous()" disabled class="w-full bg-transparent border-0 p-0 cursor-pointer hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+                        <img src="assets/cha/page/anonymous_signin_q85.webp" alt="Sign in anonymously" class="block w-full h-auto">
                     </button>
                     <span class="text-[11px] text-slate-400">You can bind an email later in the Settings menu.</span>
                 </div>
@@ -953,18 +957,31 @@
         <div id="view-name-select" class="hidden fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
             <!-- Same background as the sign-in page and the map select page, blurred -->
             <div aria-hidden="true" class="absolute inset-0" style="background:url(assets/compaign/mapselect02_q85.webp) center/cover no-repeat; filter:blur(8px); transform:scale(1.06);"></div>
-            <div class="relative bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
+            <div class="relative flex flex-col md:flex-row gap-4 items-stretch justify-center w-full max-w-3xl">
+            <!-- Stat window: upgrade the starting stats here -->
+            <aside id="create-stats" class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-5 w-full md:w-60 flex flex-col gap-3 shadow-2xl">
+                <div class="text-center">
+                    <h3 class="text-sm font-bold text-amber-400">Stats</h3>
+                    <p class="text-xs text-slate-400">Points left: <span id="create-stat-points">0</span></p>
+                </div>
+                <div id="create-stat-rows" class="flex flex-col gap-2"></div>
+                <div class="flex gap-2">
+                    <button onclick="resetPendingStats()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs cursor-pointer">Reset</button>
+                    <button onclick="confirmPendingStats()" class="flex-1 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-xl text-xs cursor-pointer">Confirm</button>
+                </div>
+            </aside>
+            <div class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
                 <div class="text-center">
                     <h2 class="text-lg font-bold text-amber-400 pixel-font mb-1">RAGNATALE</h2>
                     <p class="text-xs text-slate-400">Choose your character.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-amber-400 bg-amber-500/10">
-                        <img alt="" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
+                        <img alt="" src="assets/pages/character/tent/hero_standing_q85.webp" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
                         <span class="text-xs font-bold text-amber-300">Vanguard</span>
                     </div>
                     <div aria-disabled="true" class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-slate-700 bg-slate-900 opacity-40 grayscale cursor-not-allowed select-none">
-                        <img alt="" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
+                        <img alt="" src="assets/cha/page/skuggi_create_q85.webp" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
                         <span class="text-xs font-bold text-slate-400">Skuggi</span>
                         <span class="text-[10px] text-slate-500">Unavailable</span>
                     </div>
@@ -976,6 +993,7 @@
                 <button onclick="startGameWithName()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
                     Begin Journey
                 </button>
+            </div>
             </div>
         </div>
 
@@ -1764,7 +1782,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114ad"></script>
+    <script src="js/ui.js?v=20261114af"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
@@ -1795,6 +1813,7 @@
         }
         setMusicTrack('town');
         if (typeof refreshShopAndAlerts === 'function') refreshShopAndAlerts();
+        if (typeof refreshAccountBar === 'function') refreshAccountBar();
         if (typeof cloudStart === 'function') cloudStart();
     }
 </script>
