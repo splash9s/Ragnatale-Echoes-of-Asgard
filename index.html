@@ -900,6 +900,28 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
 
+        <!-- TERMS (opened from the sign-in page; Accept unlocks only after reading to the end) -->
+        <div id="terms-modal" class="hidden fixed inset-0 flex items-center justify-center p-4" style="z-index:60; background:rgba(7,13,26,.85);">
+            <div class="w-full flex flex-col" style="max-width:560px; max-height:88vh; background:#111a2c; border:2px solid #26344f; border-radius:16px; overflow:hidden; color:#e9edf5; font-family:'Roboto','Noto Sans Thai',sans-serif;">
+                <div class="flex items-center gap-3" style="padding:16px 18px; border-bottom:2px solid #26344f;">
+                    <div aria-hidden="true" style="width:44px; height:44px; flex:0 0 44px; border-radius:12px; border:2px solid #f5a00b; background:#0b1322; display:flex; align-items:center; justify-content:center;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#f5a00b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+                    </div>
+                    <div class="flex-1" style="min-width:0;">
+                        <h3 style="margin:0; color:#f5a00b; font-size:18px; font-weight:800;">Terms of Service and Privacy</h3>
+                        <p style="margin:2px 0 0; color:#9aa6bd; font-size:13px;">Please read to the end before you accept.</p>
+                    </div>
+                    <button type="button" onclick="closeTermsModal()" aria-label="Close" style="width:36px; height:36px; flex:0 0 36px; border-radius:10px; border:2px solid #26344f; background:#1b2740; color:#e9edf5; font-size:20px; font-weight:800; cursor:pointer;">×</button>
+                </div>
+                <div id="terms-body" onscroll="termsScrolled()" style="flex:1; min-height:0; overflow-y:auto; padding:6px 18px 14px;"></div>
+                <div class="flex items-center gap-2" style="padding:12px 18px; border-top:2px solid #26344f;">
+                    <span id="terms-status" style="flex:1; min-width:0; font-size:13px; color:#9aa6bd;">Scroll to the end to accept</span>
+                    <button type="button" onclick="closeTermsModal()" style="padding:10px 18px; border-radius:12px; border:2px solid #26344f; background:#1b2740; color:#e9edf5; font-size:14px; font-weight:800; cursor:pointer;">Cancel</button>
+                    <button type="button" id="terms-accept" onclick="acceptTerms()" disabled style="padding:10px 18px; border-radius:12px; border:2px solid #26344f; background:#1b2740; color:#9aa6bd; font-size:14px; font-weight:800; cursor:not-allowed; opacity:.5;">Accept</button>
+                </div>
+            </div>
+        </div>
+
         <!-- SIGN-IN (first play only) -->
         <div id="view-signin" class="hidden fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
             <!-- Same background as the map select page, blurred -->
@@ -1742,7 +1764,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114ac"></script>
+    <script src="js/ui.js?v=20261114ad"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
