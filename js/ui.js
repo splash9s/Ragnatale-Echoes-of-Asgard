@@ -4158,6 +4158,14 @@ function addStat(statKey) {
     updateUI();
 }
 
+// Takes back one pending point on a stat (only points added on this window can be taken back)
+function removeStat(statKey) {
+    if (!pendingAlloc.stats[statKey]) return;
+    pendingAlloc.stats[statKey] -= 1;
+    if (pendingAlloc.stats[statKey] <= 0) delete pendingAlloc.stats[statKey];
+    updateUI();
+}
+
 function confirmPendingStats() {
     const total = pendingStatTotal();
     if (total <= 0) return;
@@ -4200,6 +4208,7 @@ function renderCreateStats() {
         return `<div class="flex items-center justify-between gap-2 text-sm">`
             + `<span class="font-bold text-slate-200">${STAT_FULL_NAMES[k]}</span>`
             + `<span class="flex items-center gap-2"><span class="font-bold text-slate-100">${val}${add ? ` <span class="text-amber-300">+${add}</span>` : ''}</span>`
+            + `<button type="button" onclick="removeStat('${k}')"${add ? '' : ' disabled'} aria-label="Take back one ${STAT_FULL_NAMES[k]} point" class="w-7 h-7 rounded-lg bg-slate-700 text-slate-100 font-black cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">&minus;</button>`
             + `<button type="button" onclick="addStat('${k}')"${full ? ' disabled' : ''} class="w-7 h-7 rounded-lg bg-amber-600 text-slate-950 font-black cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">+</button></span></div>`;
     }).join('');
     // Derived combat numbers: the current value, and the preview with the pending stat points added
