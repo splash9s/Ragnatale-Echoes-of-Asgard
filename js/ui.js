@@ -290,6 +290,9 @@ function renderTermsBody() {
 function setTermsAcceptReady(ready) {
     const btn = document.getElementById('terms-accept');
     const status = document.getElementById('terms-status');
+    // The sign-in checkbox stays locked until the player has read the terms to the end
+    const signinBox = document.getElementById('signin-terms');
+    if (signinBox && ready) signinBox.disabled = false;
     if (btn) {
         btn.disabled = !ready;
         btn.style.background = ready ? '#e8720c' : '#1b2740';
