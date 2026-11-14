@@ -4243,6 +4243,16 @@ function commitCreateStats() {
 }
 
 // Character select: the stat window on the left (same add / confirm rules as the stat page)
+// Create page: the Vanguard model turns 45 degrees per click, in this order (frames are the 8 animations)
+const SPIN_ORDER = [180, 135, 90, 45, 0, 315, 270, 225];
+let spinIdx = 0;
+SPIN_ORDER.forEach(a => { const pre = new Image(); pre.src = `assets/cha/page/spin/spin_${a}_q85.webp`; });
+function spinCreateHero() {
+    spinIdx = (spinIdx + 1) % SPIN_ORDER.length;
+    const img = document.getElementById('create-hero-img');
+    if (img) img.src = `assets/cha/page/spin/spin_${SPIN_ORDER[spinIdx]}_q85.webp`;
+}
+
 function renderCreateStats() {
     const rows = document.getElementById('create-stat-rows');
     if (!rows || !player.stats) return;
