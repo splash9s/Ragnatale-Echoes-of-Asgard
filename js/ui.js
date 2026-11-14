@@ -1109,7 +1109,7 @@ function petLick(el) {
         spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
     }
     el.dataset.licking = '1';
-    playSound('sound/cat-meow.mp3');
+    playSound('sound/cat-meow.mp3', 2.5);
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
     show(1);
     setTimeout(() => {
@@ -4047,6 +4047,26 @@ function skillEnsureView() {
     };
     vp.addEventListener('pointerup', endDrag);
     vp.addEventListener('pointercancel', endDrag);
+
+    // Pinch zoom (touch): two fingers zoom at the point between them and stop panning
+    const touches = new Map();
+    let pinchPrev = 0;
+    vp.addEventListener('pointerdown', (e) => {
+        touches.set(e.pointerId, local(e));
+        if (touches.size === 2) { skillView.drag = null; pinchPrev = 0; }
+    });
+    const endTouch = (e) => { touches.delete(e.pointerId); if (touches.size < 2) pinchPrev = 0; };
+    vp.addEventListener('pointerup', endTouch);
+    vp.addEventListener('pointercancel', endTouch);
+    vp.addEventListener('pointermove', (e) => {
+        if (!touches.has(e.pointerId)) return;
+        touches.set(e.pointerId, local(e));
+        if (touches.size !== 2) return;
+        const [a, b] = [...touches.values()];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (pinchPrev > 0 && dist > 0) skillZoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, dist / pinchPrev);
+        pinchPrev = dist;
+    });
 }
 
 // Default camera: fill the view, centered on the middle (hub) node
@@ -5903,7 +5923,7 @@ let catWalkAnim = null, catShadowAnim = null, catFrameTimer = null, catWalkFrame
 function catClick() {
     if (catLicking || townWalker !== 'cat' || !catWalkAnim) return;
     catLicking = true;
-    playSound('sound/cat-meow.mp3');
+    playSound('sound/cat-meow.mp3', 2.5);
     catWalkAnim.pause();
     if (catShadowAnim) catShadowAnim.pause();
     clearInterval(catFrameTimer);
@@ -5945,7 +5965,7 @@ function catResume() {
         if (walkEl) walkEl.src = `assets/page01/cat/c${catWalkFrame + 1}_q85.webp`;
     }, CAT_FRAME_MS);
 }
-scheduleCatWalk(5000 + Math.random() * 40000); // first walk at a random time
+scheduleCatWalk(1500); // first walk right after the main page shows (the cat waits until then)
 
 // ---- Tent pets: the player picks up to 3 owned pets; they walk the tent floor with the same walk and lick as the tent cat ----
 const TENT_PETS_MAX = 3;
@@ -6144,7 +6164,7 @@ function ensureTentPetLoop() {
 function tentPetLick(w) {
     if (w.state === 'lick') return;
     w.state = 'lick';
-    playSound('sound/cat-meow.mp3'); // same sound as the main page pet
+    playSound('sound/cat-meow.mp3', 2.5); // same sound as the main page pet
     w.cat.style.display = 'none';
     w.lick.style.display = 'block';
     if (petDailyPlay(tentPetItem(w.token))) {

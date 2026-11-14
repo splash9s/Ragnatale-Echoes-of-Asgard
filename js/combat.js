@@ -9,8 +9,9 @@ let maxStages = 11;
 let combatInterval = null;
 let combatSessionId = 0; // changes whenever the player leaves combat; stale timers check it and stop
 let combatPaused = false;
-let runeRefreshLeft = 0;
-const RUNE_REFRESH_MAX = 3;
+// Refreshes used on this map: the first is free, then 1, 2, 4... diamonds (doubling each time)
+let runeRefreshUsed = 0;
+function runeRefreshCost() { return runeRefreshUsed === 0 ? 0 : 2 ** (runeRefreshUsed - 1); }
 let stageSummary = null;
 let lastHitBy = null;
 let monstersList = [];
@@ -42,13 +43,13 @@ const BOSS_HP_MULT = 1.75; // was 2.5; cut 30% (ends up 0.7x)
 const BOSS_ATK_MULT = 2.4; // 2x the old 1.2
 
 // Helper to play audio effects safely
-function playSound(path) {
+function playSound(path, gain = 1) {
     try {
         const vol = sfxVolumeNow();
         if (vol <= 0) return; // Effects off
         if (!pageIsActive) return; // no sound while the game is not on screen
         const audio = new Audio(path);
-        audio.volume = vol;
+        audio.volume = Math.min(1, vol * gain);
         sfxPlaying.add(audio);
         audio.addEventListener('ended', () => sfxPlaying.delete(audio));
         audio.play().catch(e => { sfxPlaying.delete(audio); console.log("Audio play prevented:", e); });
@@ -97,7 +98,8 @@ const RUNE_DEFS = {
     focus: { name: "Inner Calm Rune", rarity: 1, add: 10, desc: "Missing restores 10% HP", text: v => `Missing restores ${v}% HP` },
     maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% of your current HP added to Max HP when picked", text: () => "+50% of your current HP added to Max HP when picked", onApply: () => { player.runes.vitalityFlat = (player.runes.vitalityFlat || 0) + Math.floor(player.hp * 0.5); } },
     firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "First hit on each enemy: +50% damage", text: v => `First hit on each enemy: +${v}% damage` },
-    randomHitCount: { name: "Chaos Rune", rarity: 2, add: 1, once: true, desc: "50% of attacks hit a random enemy", text: () => "50% of attacks hit a random enemy" },
+    randomHitCount: { name: "Chaos Rune", rarity: 4, add: 1, once: true, desc: "50% of attacks hit a random enemy and deal 50% ATK to the enemy behind", text: () => "50% of attacks hit a random enemy and deal 50% ATK to the enemy behind" },
+    backstab: { name: "Backstab Rune", rarity: 2, add: 20, once: true, desc: "Each hit also deals 20% ATK damage to the enemy behind", text: v => `Each hit also deals ${v}% ATK damage to the enemy behind` },
     thorn: { name: "Briar Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage", text: v => `Reflect ${v}% of melee damage` },
     critHeal: { name: "Critical Heal Rune", rarity: 2, add: 5, desc: "Crit restores 5% HP", text: v => `Crit restores ${v}% HP` },
     lifeline: { name: "Lifeline Rune", rarity: 4, add: 20, once: true, desc: "First hit each battle restores 20% Max HP", text: v => `First hit each battle restores ${v}% Max HP` },
@@ -269,8 +271,10 @@ function showRuneChoices(isNew) {
             </button>`;
     });
     html += `</div>`;
-    const canRefresh = runeRefreshLeft > 0;
-    html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">↻ Refresh ${runeRefreshLeft}/${RUNE_REFRESH_MAX}</button>`;
+    const refreshCost = runeRefreshCost();
+    const canRefresh = (player.diamonds || 0) >= refreshCost;
+    const refreshLabel = refreshCost === 0 ? '↻ Refresh (free)' : `↻ Refresh · <img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:14px;height:14px;display:inline-block;vertical-align:-2px"> ${refreshCost}`;
+    html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">${refreshLabel}</button>`;
     // Edge tab on the right side of the window: opens the list of runes acquired
     html += `<button id="rune-acq-tab" onclick="toggleRuneAcquired(true)">Runes (${acquired.length})</button>`;
     // Slide-out list of acquired runes, overlaying the pick window
@@ -294,8 +298,12 @@ function toggleRuneAcquired(open) {
 }
 
 function refreshRuneChoices() {
-    if (runeRefreshLeft <= 0) return;
-    runeRefreshLeft--;
+    const cost = runeRefreshCost();
+    if ((player.diamonds || 0) < cost) return;
+    player.diamonds -= cost;
+    runeRefreshUsed++;
+    updateUI();
+    saveGame();
     showRuneChoices(false);
 }
 
@@ -433,7 +441,7 @@ function startExpedition(mode, opts = {}) {
     }
     player.inCombat = true;
     stageSummary = newStageSummary(currentStage);
-    runeRefreshLeft = RUNE_REFRESH_MAX;
+    runeRefreshUsed = 0;
     combatPaused = false;
     updatePauseButton();
     monsterOpenerRound = true;
@@ -1620,6 +1628,17 @@ function runCombatTick() {
         }
         if (runeN('vampire') > 0) healPlayer(Math.floor(pDmg * runeN('vampire') / 100), 'Vampire');
         if (runeN('babyVampire') > 0) healPlayer(Math.floor(pDmg * runeN('babyVampire') / 100), 'Baby Vampire');
+        // Enemy behind the one hit (next in the lineup): Chaos Rune 50% ATK, Backstab Rune 20% ATK
+        const lineup = getAliveMonsters();
+        const behindEnemy = lineup[lineup.indexOf(targetEnemy) + 1];
+        if (behindEnemy && behindEnemy.hp > 0) {
+            [[runeN('randomHitCount') > 0 ? 50 : 0, 'Chaos'], [runeN('backstab'), 'Backstab']].forEach(([pct, label]) => {
+                if (!pct || behindEnemy.hp <= 0) return;
+                const dmg = Math.max(1, Math.floor(derived.atk * pct / 100));
+                behindEnemy.hp -= dmg;
+                logMessage(`[${label}] ${behindEnemy.name} takes ${dmg} damage behind the target`, 'drop');
+            });
+        }
     } else {
         critStreak = 0;
         if (!attackBlocked) playPlayerAttackAnim(false); // the swing plays on a miss too
