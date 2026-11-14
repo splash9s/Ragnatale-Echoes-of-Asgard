@@ -116,6 +116,13 @@
         .el-ico { width: 1.2em; height: 1.2em; object-fit: contain; display: inline-block; vertical-align: -0.25em; }
         /* Inventory bag: Salvage All and Sell All at the top right, grey text */
         #char-panel-right .inv-top-btns .pix-btn { color: #9ca3af !important; }
+        /* Inventory bag: Salvage All and Sell All are round picture buttons; press picture while held */
+        .inv-icon-btn { position: relative; display: inline-block; width: 64px; height: 64px; padding: 0; border: 0; background: none; cursor: pointer; }
+        .inv-icon-btn img { width: 100%; height: 100%; display: block; }
+        .inv-icon-btn .cb-press { display: none; position: absolute; inset: 0; }
+        .inv-icon-btn:active .cb-normal { display: none; }
+        .inv-icon-btn:active .cb-press { display: block; }
+        .inv-icon-btn:hover .cb-normal { filter: brightness(1.12); }
         .pix-btn-red:active { background-image: url(assets/pages/button/redbuttonpress_q85.webp) !important; }
         .pix-btn-yellow { background-image: url(assets/pages/button/yellowbutton_q85.webp) !important; }
         .pix-btn-yellow:active { background-image: url(assets/pages/button/yellowbuttonpress_q85.webp) !important; }
@@ -1495,8 +1502,8 @@
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inventory Bag</h3>
                         <span id="inventory-count" class="text-xs font-mono text-slate-400 ml-6">0 / 63 slots</span>
                         <div class="inv-top-btns ml-auto flex items-center gap-2">
-                            <button onclick="salvageAllEquipment()" class="pix-btn pix-btn-red px-3 py-1 text-[9px] cursor-pointer">Salvage All</button>
-                            <button onclick="sellAllEquipment()" class="pix-btn pix-btn-yellow px-3 py-1 text-[9px] cursor-pointer">Sell All</button>
+                            <button onclick="salvageAllEquipment()" class="inv-icon-btn" title="Salvage All" aria-label="Salvage All"><img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt=""></button>
+                            <button onclick="sellAllEquipment()" class="inv-icon-btn" title="Sell All" aria-label="Sell All"><img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt=""></button>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
