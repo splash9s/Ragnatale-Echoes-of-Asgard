@@ -2007,6 +2007,9 @@ function renderMapGateUI() {
     const current = (mk && isMapUnlocked(`${pk}:${mk}`)) ? mk : unlockedKeys[unlockedKeys.length - 1];
     selectEl.value = `${pk}:${current}`;
 
+    const pathIconEl = document.getElementById('campaign-path-icon');
+    if (pathIconEl) pathIconEl.innerHTML = `<img class="el-ico" style="width:72px;height:72px;vertical-align:baseline;" src="assets/icons/element_${pk}_q85.webp" alt="">`;
+
     if (!listEl) return;
     listEl.innerHTML = order.map(m => {
         const key = `${pk}:${m}`;
@@ -2016,7 +2019,7 @@ function renderMapGateUI() {
         let cls, sub, diamond = false;
         if (!unlocked) {
             cls = 'bg-slate-900/50 border-slate-800 text-slate-600 opacity-60 cursor-not-allowed';
-            sub = `🔒 Clear ${getMapPrereqTitle(m)}`;
+            sub = '';
             diamond = true;
         } else if (selected) {
             cls = 'bg-amber-500/20 border-amber-400 text-amber-300 cursor-pointer';
@@ -2027,9 +2030,9 @@ function renderMapGateUI() {
         }
         const bg = '';
         return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="relative overflow-hidden p-3 pl-12 rounded-xl border text-left text-xs transition ${cls}">
-            <img class="el-ico absolute left-2 top-2 pointer-events-none" style="width:32px;height:32px;vertical-align:baseline;" src="assets/icons/element_${pk}_q85.webp" alt="">
+            ${unlocked ? '' : '<span class="absolute left-2 top-2 text-base leading-none pointer-events-none">🔒</span>'}
             ${bg}<span class="relative block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
-            <span class="relative block text-[10px] mt-0.5">${sub}</span>
+            ${sub ? `<span class="relative block text-[10px] mt-0.5">${sub}</span>` : ''}
         </button>`;
     }).join('');
 }
