@@ -911,7 +911,7 @@
                 <img src="assets/page01/setting_q85.webp" alt="" onerror="townSwap(this,'setting.png')">
             </div>
             <div id="beginner-quest" class="bq-panel" style="left:1515px; top:236px; width:390px; height:auto;"></div>
-            <div id="beginner-detail" class="bq-panel bq-detail" style="left:1085px; top:236px; width:390px; height:auto; display:none;"></div>
+            <div id="beginner-detail" data-drag-panel class="bq-panel bq-detail" style="left:1085px; top:236px; width:390px; height:auto; display:none;"></div>
             <div class="ui" data-action="character" style="left:13px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/characterbutton_q85.webp" alt="" onerror="townSwap(this,'characterbutton.png')">
                 <img id="alert-char" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-5px; top:-5px; width:38px; height:38px; z-index:10; pointer-events:none;">
@@ -1197,7 +1197,7 @@
                     <div class="ev-right" style="left:771px; top:100px; width:960px; height:837px; transform:scale(1.1); transform-origin:0 0;">
                         <img src="assets/events/right_q85.webp" alt="">
                         <div id="events-banner"></div>
-                        <div id="events-detail"></div>
+                        <div id="events-detail" data-drag-panel></div>
                     </div>
                 </div>
             </div>
@@ -1221,7 +1221,7 @@
                     <div id="skill-pending-bar" class="art-panel" style="left:810px; top:68px; width:300px; height:47px; padding:0; border:0; z-index:4;"></div>
                     <div id="skill-viewport">
                         <div id="skill-world"><div id="skill-map-slot"></div><div id="skill-nodes"></div></div>
-                        <div id="skill-detail" class="skill-detail"></div>
+                        <div id="skill-detail" data-drag-panel class="skill-detail"></div>
                         <div id="skill-zoom"><button onclick="skillZoomStep(1.2)" title="Zoom in">+</button><button onclick="skillZoomStep(1/1.2)" title="Zoom out">&minus;</button></div>
                     </div>
                 </div>
@@ -1315,7 +1315,7 @@
                         <div id="equipment-slots-container" class="absolute" style="left:0; top:0; width:400px; height:700px;"></div>
                         <div id="set-bonus-panel" class="hidden"></div>
                     </div>
-                    <div id="inv-detail-panel" class="art-panel" style="left:0px; top:69px; width:756px; height:auto; max-height:1007px; overflow-y:auto; display:none; z-index:7; background-color:rgba(231,209,170,.9) !important; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
+                    <div id="inv-detail-panel" data-drag-panel class="art-panel" style="left:0px; top:69px; width:756px; height:auto; max-height:1007px; overflow-y:auto; display:none; z-index:7; background-color:rgba(231,209,170,.9) !important; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
                     <div id="char-panel-right" class="art-panel" style="left:762px; top:80px; width:1131px; height:980px; overflow:hidden;">
                         <div class="flex flex-col" style="position:absolute; left:20px; top:14px; width:1091px; gap:22px;">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1369,7 +1369,7 @@
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
                         </div>
                     </div>
-                    <div id="shop-detail-panel" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px; overflow-y:auto; display:none; z-index:6; background-color:#ead8b4 !important; opacity:1; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
+                    <div id="shop-detail-panel" data-drag-panel class="art-panel" style="left:1127px; top:214px; width:564px; height:716px; overflow-y:auto; display:none; z-index:6; background-color:#ead8b4 !important; opacity:1; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
                     <div id="shop-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
                         <div id="shop-armory-section" class="flex flex-col gap-3">
                             <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
@@ -1475,7 +1475,7 @@
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div id="mail-menu" class="ml-menu"></div>
-                    <div id="mail-detail" class="ml-detail"></div>
+                    <div id="mail-detail" data-drag-panel class="ml-detail"></div>
                 </div>
             </div>
         </div>
@@ -1641,7 +1641,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114q"></script>
+    <script src="js/ui.js?v=20261114r"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
