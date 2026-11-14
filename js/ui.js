@@ -2286,32 +2286,17 @@ function showArmoryItemDetail(itemIndex) {
     const price = template.price || 300;
     const title = shopGearLabel(template).base;
 
-    // Same layout as the character page gear detail, shown in the equipment window; rarity and buffs are rolled when bought
-    let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
-    body += `<div class="flex justify-between items-center">
-        <span class="${(player.baseLv || 1) >= (template.levelReq || 1) ? 'text-emerald-400' : 'text-red-400'} font-bold text-[11px]">Requires Base Lv. ${template.levelReq || 1}</span>
-        <span class="text-[10px] text-slate-400 capitalize">Shop · ${template.slot || 'Gear'}</span></div>`;
-    if (template.stats && Object.keys(template.stats).length) {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-            Object.entries(template.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') +
-            `</div>`;
-    }
-    body += `<span class="text-[11px] text-amber-200">Price: ${price} Gold</span>`;
-    body += '</div>';
-
-    const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    const actions = `<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">`
-        + `<button onclick="buyArmoryFromDetail(${itemIndex})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Buy ${price} Gold</button>`
-        + `</div></div>`;
     const panel = document.getElementById('shop-detail-panel');
     if (!panel) return;
-    panel.innerHTML = `
-        <button id="inv-detail-close" onclick="closeShopDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
-        <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
-            <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(template, 86)}</span>
-            <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span></div>
-        </div>
-        ${body}${actions}`;
+    ddFill(panel, {
+        close: 'closeShopDetail()',
+        icon: itemIconHTML(template, 80),
+        name: title,
+        meta: `Shop · ${template.slot || 'Gear'} · Requires Lv ${template.levelReq || 1}`,
+        stats: ddStatRows(template.stats),
+        price: `Price <b>${price} Gold</b>`,
+        primary: `<button onclick="buyArmoryFromDetail(${itemIndex})" class="dd-btn primary">Buy ${price} Gold</button>`
+    });
     panel.style.display = 'block';
     placeShopDetail();
 }
@@ -3374,6 +3359,34 @@ function itemDetailBodyHTML(item) {
 
     return body;
 }
+// Item detail layout shared by inventory, equipped gear and shop (the "Item Details" draft style)
+function ddFill(panel, o) {
+    const row = o.secondary && o.secondary.length
+        ? `<div class="dd-row" style="grid-template-columns:repeat(${o.secondary.length},minmax(0,1fr))">${o.secondary.join('')}</div>` : '';
+    panel.scrollTop = 0;
+    panel.innerHTML = `
+        <button id="inv-detail-close" onclick="${o.close}" class="dd-close" aria-label="Close">✕</button>
+        <div class="dd-head">
+            <span class="dd-icon">${o.icon}</span>
+            <div class="dd-name-wrap">
+                <span class="dd-name">${o.name}</span>
+                <span class="dd-meta">${o.meta}</span>
+            </div>
+        </div>
+        <div class="dd-body">
+            ${o.stats ? `<div class="dd-stats">${o.stats}</div>` : ''}
+            ${o.extra || ''}
+            ${o.compare || ''}
+            ${o.lore ? `<p class="dd-lore">${o.lore}</p>` : ''}
+            ${o.price ? `<div class="dd-price">${o.price}</div>` : ''}
+            ${o.primary || ''}
+            ${row}
+        </div>`;
+}
+function ddStatRows(stats) {
+    if (!stats || !Object.keys(stats).length) return '';
+    return Object.entries(stats).map(([k, v]) => `<span>${formatStatLine(k, v)}</span>`).join('');
+}
 function showItemDetail(index, refresh = false) {
     const item = player.inventory[index];
     if (!item) { closeInvDetail(); return; }
@@ -3387,30 +3400,29 @@ function showItemDetail(index, refresh = false) {
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-
-    const body = itemDetailBodyHTML(item);
-    const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
-    if (item.type === 'chest') actions += `<button onclick="openChestFromDetail(${index})" class="${btn} bg-purple-600 hover:bg-purple-500 text-slate-100">Open</button>`;
-    if (isEquip) actions += `<button onclick="equipFromDetail(${index})" class="${btn} bg-amber-600 hover:bg-amber-500 text-slate-950">Equip</button>`;
-    if (isPotion) actions += `<button onclick="usePotionFromDetail(${index})" class="${btn} bg-emerald-600 hover:bg-emerald-500 text-slate-950">Equip</button>`;
-    if (isEquip && item.slot !== 'pet' && !item.favorite) actions += `<button onclick="salvageFromDetail(${index})" class="${btn} bg-red-600 hover:bg-red-500 text-slate-100">Salvage</button>`;
-    if (item.slot !== 'pet' && !item.favorite) actions += `<button onclick="sellFromDetail(${index})" class="${btn} bg-amber-700 hover:bg-amber-600 text-amber-100">Sell ${getSellPrice(item)} Gold</button>`;
-    actions += '</div>';
-    actions += '</div>';
-
-    const favBtn = isGearItem(item) && item.slot !== 'pet'
-        ? `<button onclick="toggleFavorite(${index})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-yellow-300 font-bold text-xs">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`
-        : '';
+    const canSell = item.slot !== 'pet';
+    const canSalvage = isEquip && item.slot !== 'pet' && !item.favorite;
+    const primary = item.type === 'chest'
+        ? `<button onclick="openChestFromDetail(${index})" class="dd-btn primary">Open</button>`
+        : isEquip ? `<button onclick="equipFromDetail(${index})" class="dd-btn primary">Equip</button>`
+        : isPotion ? `<button onclick="usePotionFromDetail(${index})" class="dd-btn primary">Equip</button>` : '';
+    const secondary = [];
+    if (canSalvage) secondary.push(`<button onclick="salvageFromDetail(${index})" class="dd-btn ghost">Salvage</button>`);
+    if (canSell && !item.favorite) secondary.push(`<button onclick="sellFromDetail(${index})" class="dd-btn ghost">Sell</button>`);
+    if (isGearItem(item) && canSell) secondary.push(`<button onclick="toggleFavorite(${index})" class="dd-btn ghost">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`);
     const panel = document.getElementById('inv-detail-panel');
     if (!panel) return;
-    panel.innerHTML = `
-        <button id="inv-detail-close" onclick="closeInvDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
-        <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
-            <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(item)}</span>
-            <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span>${favBtn}</div>
-        </div>
-        ${body}${actions}`;
+    ddFill(panel, {
+        close: 'closeInvDetail()',
+        icon: itemIconHTML(item, 80),
+        name: title,
+        meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
+        compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        lore: !isEquip && !isPotion && item.desc ? item.desc : '',
+        price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
+        primary, secondary
+    });
     panel.style.left = '0px'; // inventory items keep their original place and width
     panel.style.width = '756px';
     panel.style.display = 'block';
@@ -3431,37 +3443,34 @@ function showEquippedDetail(slot, refresh = false) {
     window.invDetailKey = key;
     markInvSelected();
     const isPotion = slot === 'potionSlot';
-    const rarity = RARITY_INFO[item.rarity];
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-
-    let body = '<div class="char-detail-2x flex flex-col gap-2 text-left text-xs">';
-    body += `<div class="flex justify-between items-center">
-        <span>${rarity ? reqLevelHTML(item, item.levelReq) : ''}</span>
-        <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '<span class="text-yellow-300 font-bold">★ Locked</span> · ' : ''}Equipped · ${slot}</span></div>`;
-    if (item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
-    if (item.stats && Object.keys(item.stats).length) {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
-            Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') +
-            `</div>`;
-    }
-    if (!isPotion && slot !== 'pet') {
-        body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-purple-500/30 flex flex-col gap-1">
-            <span class="text-[10px] font-bold text-purple-300 uppercase">Buffs</span>${buffsDetailHTML(item.buffs, item.debuffs)}</div>`;
-    }
-    if (item.setName) body += setInfoHTML(item.setName);
-    if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>`;
-    body += '</div>';
-
-    const btn = 'flex-1 py-2 font-bold rounded-xl text-xs transition cursor-pointer';
-    let actions = '<div class="flex flex-col gap-2 mt-2"><div class="flex gap-2">';
-    if (!isPotion) actions += `<button onclick="unequipFromDetail('${slot}')" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
-    else actions += `<button onclick="unequipPotionFromDetail()" class="${btn} bg-red-600/60 hover:bg-red-600 text-red-100">Unequip</button>`;
-    actions += '</div>';
-
-    const favBtn = !isPotion && slot !== 'pet'
-        ? `<button onclick="toggleEquippedFavorite('${slot}')" class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-yellow-300 font-bold text-xs">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`
-        : '';
-    showEquippedPanel(item, title, favBtn, body, actions);
+    const extra = [];
+    if (item.element) extra.push(`<span class="dd-note">${elementDetailHTML(item.element)}</span>`);
+    if (!isPotion && slot !== 'pet') extra.push(`<div class="dd-stats">${buffsDetailHTML(item.buffs, item.debuffs)}</div>`);
+    if (item.setName) extra.push(setInfoHTML(item.setName));
+    const unequip = isPotion ? 'unequipPotionFromDetail()' : `unequipFromDetail('${slot}')`;
+    const secondary = [];
+    if (!isPotion && slot !== 'pet') secondary.push(`<button onclick="toggleEquippedFavorite('${slot}')" class="dd-btn ghost">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`);
+    const rarity = RARITY_INFO[item.rarity];
+    showEquippedPanelDD(item, {
+        close: 'closeInvDetail()',
+        icon: itemIconHTML(item, 80),
+        name: title,
+        meta: `Equipped · ${slot}${rarity ? ` · ${rarity.name}` : ''}${item.levelReq ? ` · Requires Lv ${item.levelReq}` : ''}`,
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(item.stats),
+        extra: extra.join(''),
+        primary: `<button onclick="${unequip}" class="dd-btn primary">Unequip</button>`,
+        secondary
+    });
+}
+function showEquippedPanelDD(item, o) {
+    const panel = document.getElementById('inv-detail-panel');
+    if (!panel) return;
+    window.invDetailIndex = null;
+    ddFill(panel, o);
+    panel.style.left = '700px'; // near side of the inventory bag (green box)
+    panel.style.width = '668px';
+    panel.style.display = 'block';
 }
 
 // Equipped gear, pet and potion open in the same detail panel as inventory items, on the right side of the window
