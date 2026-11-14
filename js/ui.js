@@ -2027,7 +2027,7 @@ function renderMapGateUI() {
         }
         const bg = '';
         return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="relative overflow-hidden p-3 pl-12 rounded-xl border text-left text-xs transition ${cls}">
-            <img class="absolute left-2 top-2 w-8 h-8 object-contain pointer-events-none" src="assets/icons/element_${pk}_q85.webp" alt="">
+            <img class="el-ico absolute left-2 top-2 pointer-events-none" style="width:32px;height:32px;vertical-align:baseline;" src="assets/icons/element_${pk}_q85.webp" alt="">
             ${bg}<span class="relative block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
             <span class="relative block text-[10px] mt-0.5">${sub}</span>
         </button>`;
