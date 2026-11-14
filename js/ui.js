@@ -5564,6 +5564,37 @@ document.addEventListener('DOMContentLoaded', () => {
     tentLightLoop();
     syncTentSparkEmitters();
 });
+// Map on the tent wall: asks before going to the campaign map select
+function tentMapClick() {
+    if (!isCharClear()) return; // the tent only responds in clear screen
+    confirmAction('Expedition Map', 'Go to the campaign map select?', () => switchView('expeditions'));
+}
+
+// Desk: Rune Thread Lore rolls up from the bottom of the screen; tap to close
+const RUNE_LORE = [
+    'Long before the first campfire, the lands of Asgard were held together by a single thread of runes, spun by the Weavers beneath the roots of the world.',
+    'Each rune carries a part of that thread: fire for courage, ice for patience, earth for endurance and wind for speed. Where the threads met, the first camps were raised.',
+    'The Weavers vanished when the World-Eater woke. Its hunger unravelled the thread, and the runes scattered across the land like sparks from a broken forge.',
+    'Those who gather the scattered runes are called Thread-bearers. Every rune you carry adds a knot to the thread, and every knot holds back the dark a little longer.',
+    'The expedition gates open onto the old roads the Weavers once walked. Each path is guarded by creatures that feed on lost runes, and each map runs deeper than the last.',
+    'Return to camp between expeditions. Rest, tend your pets and sharpen your steel, for the thread is only as strong as the hands that hold it.',
+    'The World-Eater is still asleep. Keep the thread strong, Thread-bearer.'
+];
+function openRuneLore() {
+    if (!isCharClear() || document.getElementById('rune-lore')) return;
+    const el = document.createElement('div');
+    el.id = 'rune-lore';
+    el.innerHTML = `<div class="rl-track"><h2>Rune Thread Lore</h2>${RUNE_LORE.map(p => `<p>${p}</p>`).join('')}</div><div class="rl-hint">Tap to close</div>`;
+    document.body.appendChild(el);
+    const track = el.querySelector('.rl-track');
+    const anim = track.animate(
+        [{ transform: 'translate(-50%, 100vh)' }, { transform: 'translate(-50%, -' + track.offsetHeight + 'px)' }],
+        { duration: 45000, easing: 'linear', fill: 'forwards' }
+    );
+    anim.onfinish = () => el.remove();
+    el.addEventListener('click', () => el.remove());
+}
+
 function toggleCharLight(side) {
     if (!isCharClear()) return; // the tent only responds in clear screen
     charLightState[side] = !charLightState[side];
