@@ -5847,6 +5847,37 @@ function playSmithSwing() {
     }
     setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, total * SMITH_FRAME_MS);
 }
+// Shopkeeper at the shop on the main page: idle sway; once a minute she plays her book-and-quill sequence
+const SHOP_SEQ = [1, 2, 3, 4, 6, 5, 7, 8, 9, 10, 9, 10, 9, 8, 9, 10, 9, 8, 5, 6, 4, 3, 2, 1];
+let shopPlaying = false;
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach(k => { const pre = new Image(); pre.src = `assets/cha/page/shopkeeper/shop_f${k}_q85.webp`; });
+function shopFrame(k) {
+    const el = document.getElementById('shop-keeper-img');
+    if (el) el.src = k === 'base' ? 'assets/cha/page/shopkeeper/shop_base_q85.webp' : `assets/cha/page/shopkeeper/shop_f${k}_q85.webp`;
+}
+function playShopKeeper() {
+    if (shopPlaying) return;
+    shopPlaying = true;
+    let i = 0;
+    const step = () => {
+        if (i >= SHOP_SEQ.length) { shopFrame('base'); shopPlaying = false; return; }
+        const f = SHOP_SEQ[i++];
+        shopFrame(f);
+        // frames 1-6: 200-300 ms, frames 7-10: 600-700 ms
+        setTimeout(step, f <= 6 ? 200 + Math.random() * 100 : 600 + Math.random() * 100);
+    };
+    step();
+}
+function scheduleShopKeeper() {
+    setTimeout(() => {
+        const town = document.getElementById('view-town');
+        const covered = ['view-name-select', 'view-signin'].some(id => { const v = document.getElementById(id); return v && !v.classList.contains('hidden'); });
+        if (town && !town.classList.contains('hidden') && !covered) playShopKeeper();
+    }, Math.random() * 60000);
+    setTimeout(scheduleShopKeeper, 60000);
+}
+scheduleShopKeeper();
+
 // Once every minute, at a random moment within that minute, while the main page is showing
 function scheduleSmithSwing() {
     setTimeout(() => {
