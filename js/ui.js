@@ -1113,7 +1113,7 @@ function petLick(el) {
         spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
     }
     el.dataset.licking = '1';
-    playSfx(SFX.meow, 2.5);
+    playSfx(SFX.meow);
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
     show(1);
     setTimeout(() => {
@@ -6074,7 +6074,7 @@ let catWalkAnim = null, catShadowAnim = null, catFrameTimer = null, catWalkFrame
 function catClick() {
     if (catLicking || townWalker !== 'cat' || !catWalkAnim) return;
     catLicking = true;
-    playSfx(SFX.meow, 2.5);
+    playSfx(SFX.meow);
     catWalkAnim.pause();
     if (catShadowAnim) catShadowAnim.pause();
     clearInterval(catFrameTimer);
@@ -6321,7 +6321,7 @@ function ensureTentPetLoop() {
 function tentPetLick(w) {
     if (w.state === 'lick') return;
     w.state = 'lick';
-    playSfx(SFX.meow, 2.5);
+    playSfx(SFX.meow);
     w.cat.style.display = 'none';
     w.lick.style.display = 'block';
     if (petDailyPlay(tentPetItem(w.token))) {
