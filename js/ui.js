@@ -262,7 +262,6 @@ function showSignInPage() {
     document.getElementById('view-name-select')?.classList.add('hidden');
     document.getElementById('view-signin')?.classList.remove('hidden');
     signinTermsChanged();
-    playSound('sound/blacksmith-hammer-swing.mp3'); // blacksmith hammer sfx when the sign-in page opens
 }
 // Terms and Conditions shown from the sign-in page. Sections are numbered; Accept unlocks only after reading to the end.
 const TERMS_SECTIONS = [
@@ -1426,7 +1425,9 @@ function showAvatarLockInfo(av, tileEl) {
     panel.innerHTML = `<div class="font-bold text-amber-300">Locked</div><div class="mt-1">${avatarLockTitle(av) || 'This avatar is locked.'}</div>`;
     const hostRect = host.getBoundingClientRect();
     const tileRect = tileEl.getBoundingClientRect();
-    panel.style.left = (tileRect.right - hostRect.left + 12) + 'px';
+    // Right-column tiles open the panel on their left, so it stays inside the picker
+    const onRight = (tileRect.left - hostRect.left) > host.clientWidth / 2;
+    panel.style.left = onRight ? (tileRect.left - hostRect.left - 300 - 12) + 'px' : (tileRect.right - hostRect.left + 12) + 'px';
     panel.style.top = (tileRect.top - hostRect.top) + 'px';
     host.appendChild(panel);
     requestAnimationFrame(() => panel.classList.add('open'));
@@ -2285,10 +2286,10 @@ function refreshShopAndAlerts() {
 }
 
 // ---------- EVENTS PAGE TABS ----------
-let currentEventsTab = 'daily'; // Events page opens on Daily Challenge
+let currentEventsTab = 'quests'; // Events page opens on Daily Quests
 
 function switchEventsTab(tabName) {
-    if (!EVENT_MENU.some(m => m.key === tabName)) tabName = 'daily';
+    if (!EVENT_MENU.some(m => m.key === tabName)) tabName = 'quests';
     currentEventsTab = tabName;
     renderEventsView();
     updateQuestTabButton();
@@ -4610,13 +4611,21 @@ function deleteMail(mailId) {
 }
 // Mail page: the list on the left (subject, sender, date, read light), the selected mail on the right with its attachments
 let mailSelectedId = null;
+// Every attachment is an icon cell: { name, icon (html), qty }
 function mailAttachmentCells(r) {
     const cells = [];
+    const pic = src => `<img src="${src}" alt="" style="width:64px;height:64px;object-fit:contain;">`;
+    if (r.gold) cells.push({ name: `${r.gold} Gold`, icon: pic('assets/icons/goldiconsmall_q85.webp'), qty: r.gold });
+    if (r.diamonds) cells.push({ name: `${r.diamonds} Diamonds`, icon: pic('assets/icons/diamondiconsmall_q85.webp'), qty: r.diamonds });
+    if (r.refiningStones) cells.push({ name: 'Refining Stone', icon: pic('assets/shop/diamond/refiningstone.png'), qty: r.refiningStones });
+    if (r.resurrection) cells.push({ name: 'Resurrection Potion', icon: pic('assets/shop/diamond/resurrectionpotion.png'), qty: r.resurrection });
+    if (r.chest) cells.push({ name: `${r.chest[0].toUpperCase() + r.chest.slice(1)} Chest`, icon: chestIconHTML(r.chest, 64), qty: 1 });
     for (const [id, q] of Object.entries(r.potions || {})) {
         if (!(q > 0)) continue;
-        cells.push({ item: GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id }, qty: q });
+        const item = GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id };
+        cells.push({ name: item.name, icon: itemIconHTML(item, 64), qty: q });
     }
-    for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) cells.push({ item: it, qty: 1 });
+    for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) cells.push({ name: it.name, icon: itemIconHTML(it, 64), qty: 1 });
     return cells;
 }
 function selectMail(id) {
@@ -4651,14 +4660,15 @@ function renderMailBox() {
 
     const r = sel.rewards || {};
     const cells = mailAttachmentCells(r);
-    const text = mailRewardText({ ...r, potions: {}, items: [] });
+    // Only the level and EXP rewards stay as text; everything else is an icon cell
+    const text = mailRewardText({ ...r, gold: 0, diamonds: 0, refiningStones: 0, resurrection: 0, chest: null, potions: {}, items: [] });
     detail.innerHTML = `
         <div class="ml-d-title">${escapeHtml(sel.title || '')}</div>
         <div class="ml-d-meta">${meta(sel)}</div>
         <div class="ml-d-body">${escapeHtml(sel.message || '')}</div>
         ${cells.length || text ? '<div class="ml-att-label">Attached</div>' : ''}
         ${text ? `<div class="ml-att-text">${escapeHtml(text)}</div>` : ''}
-        <div class="ml-att">${cells.map(c => `<div title="${escapeHtml(c.item.name)}" class="ml-slot" style="${REWARD_SLOT_BG}">${itemIconHTML(c.item, 64)}${c.qty > 1 ? `<span class="ml-qty">${c.qty}</span>` : ''}</div>`).join('')}</div>
+        <div class="ml-att">${cells.map(c => `<div title="${escapeHtml(c.name)}" class="ml-slot" style="${REWARD_SLOT_BG}">${c.icon}${c.qty > 1 ? `<span class="ml-qty">${c.qty}</span>` : ''}</div>`).join('')}</div>
         <div class="ml-foot">
             <button class="ml-del" onclick="deleteMail(${sel.id})">Delete</button>
             ${sel.claimed ? '<span class="ml-claimed">Claimed</span>' : `<button class="ml-claim" onclick="claimMail(${sel.id})">Claim</button>`}
@@ -4922,6 +4932,8 @@ function updateUI() {
     if (el) el.innerText = player.diamonds;
     el = document.getElementById('town-gold');
     if (el) el.innerText = `${player.gold} Gold`;
+    el = document.getElementById('shop-gold-value');
+    if (el) el.innerText = player.gold;
     el = document.getElementById('town-diamonds');
     if (el) el.innerText = player.diamonds;
 
@@ -5237,7 +5249,7 @@ function renderEventsView() {
     const detailEl = document.getElementById('events-detail');
     if (!menuEl || !bannerEl || !detailEl) return;
     const st = getEventState();
-    if (!EVENT_MENU.some(m => m.key === currentEventsTab)) currentEventsTab = 'daily';
+    if (!EVENT_MENU.some(m => m.key === currentEventsTab)) currentEventsTab = 'quests';
     const cur = currentEventsTab;
     const item = EVENT_MENU.find(m => m.key === cur);
 
