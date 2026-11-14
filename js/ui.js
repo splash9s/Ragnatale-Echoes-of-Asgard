@@ -235,6 +235,19 @@ function handleCustomAvatarUpload(event) {
 }
 
 const MAX_NAME_LENGTH = 13;
+// Random name for the character select: two parts from these lists, kept within the name length limit
+const RANDOM_NAME_FIRST = ['Ash', 'Brine', 'Cinder', 'Dusk', 'Ember', 'Frost', 'Gale', 'Halo', 'Iron', 'Jade', 'Kestrel', 'Lumen', 'Moss', 'Nova', 'Onyx', 'Pike', 'Quill', 'Rune', 'Sable', 'Thorn', 'Umber', 'Vale', 'Wren', 'Xan', 'Yarrow', 'Zephyr'];
+const RANDOM_NAME_LAST = ['wood', 'blade', 'fall', 'crest', 'ward', 'mere', 'brand', 'hart', 'stone', 'wing', 'moor', 'shade', 'song', 'mark', 'guard', 'peak'];
+function randomPlayerName() {
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    let name = '';
+    for (let i = 0; i < 20 && !name; i++) {
+        const cand = (pick(RANDOM_NAME_FIRST) + pick(RANDOM_NAME_LAST)).slice(0, MAX_NAME_LENGTH);
+        if (cand.length >= 4) name = cand;
+    }
+    const input = document.getElementById('input-player-name');
+    if (input && name) input.value = name;
+}
 const START_AVATAR = 'assets/avatars/man1_q85.webp'; // every new Vanguard starts with this avatar
 
 // First play: sign-in page first (unless already signed in), then character selection
