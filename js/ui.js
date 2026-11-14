@@ -251,29 +251,72 @@ function showSignInPage() {
     document.getElementById('view-signin')?.classList.remove('hidden');
     signinTermsChanged();
 }
-// Draft player-facing terms. Shown from the Terms and Conditions link on the sign-in page.
-const TERMS_TEXT = `1. Your account
-You can play as a guest, or sign in with Gmail. A guest's progress stays on this device until an email is bound in the Settings menu. Keep your sign-in safe: you are responsible for what happens on your account.
-
-2. Your game data
-Your progress, characters and friend list are saved to our cloud service so they can be restored. We keep only what the game needs to run.
-
-3. Fair play
-Do not use bots, scripts, exploits or modified game files. We may reset progress or suspend accounts that break these rules.
-
-4. Virtual items
-Gold, Diamonds, items and other in-game goods have no real-world value and cannot be exchanged for money. Purchases of virtual items are final, unless the law says otherwise.
-
-5. Names and content
-Player names must not be offensive or impersonate other people. We may rename or remove content that breaks these rules.
-
-6. Changes
-We may update the game and these terms. Playing after an update means you accept the updated terms.
-
-7. Availability
-The game is provided as it is. We do not guarantee uninterrupted service.`;
+// Terms and Conditions shown from the sign-in page. Sections are numbered; Accept unlocks only after reading to the end.
+const TERMS_SECTIONS = [
+    { title: 'Your account', body: 'You can play as a guest or sign in with Gmail. A guest account is tied to this browser until you bind an email in the Settings menu, so bind one if you want to keep your progress on another device.\nYou are responsible for what happens on your account. Keep your sign-in private, and do not let others play on it.' },
+    { title: 'What we store', body: 'We store your player name, your characters, inventory, gold, Diamonds, skills, friends, mail and settings, so your progress can be restored.\nWe store your account ID and, if you sign in with Gmail or bind an email, that email address. We never see your Google password.\nCloudflare Turnstile checks that you are a real person when you sign in. It is a Cloudflare service and receives the data it needs for that check.' },
+    { title: 'Fair play', body: 'No bots, scripts, auto-play tools, modified game files, exploits or other ways to gain an unfair advantage. If you find a bug, report it to the team instead of using it.' },
+    { title: 'Conduct', body: 'No harassment, hate, threats, scams or impersonating the team. Player names and bios must not be offensive, must not pretend to be staff, and must not contain personal details such as phone numbers or addresses.' },
+    { title: 'Virtual items and purchases', body: 'Gold, Diamonds, items, pets and other in-game goods are game data with no real-world value. They cannot be sold, traded or exchanged for money outside the game.\nPurchases made with real money are final, unless the law where you live requires a refund.' },
+    { title: 'Friends and other players', body: 'Your player name, level and friend list can be seen by other players. Your friends can visit your tent and see your pets.' },
+    { title: 'Enforcement', body: 'Breaking these terms can lead to a warning, a reset of affected progress, a temporary suspension or a permanent ban. The team may take back items or currency that came from a bug or from cheating.' },
+    { title: 'Your choices and deletion', body: 'You can ask the team to delete your account and its data. Some records, such as a ban record, may be kept for as long as the law or fraud prevention requires.' },
+    { title: 'Age', body: 'You must be at least 13 years old to create an account. If you are under 18, you should play with a parent or guardian who has agreed to these terms.' },
+    { title: 'Ownership of the game', body: 'The game, its art, characters, maps, music, text and software belong to the game team. Do not copy, extract, modify or redistribute the game or its files. Screenshots and videos of your own play may be shared, with credit to the game.' },
+    { title: 'Changes and availability', body: 'We may update the game and these terms. Important changes are announced in the game, and playing after an update means you accept the updated terms.\nThe game is provided as it is. We do not guarantee that it will always be available.' }
+];
+function renderTermsBody() {
+    const body = document.getElementById('terms-body');
+    if (!body) return;
+    body.innerHTML = TERMS_SECTIONS.map((sec, i) => {
+        const paras = sec.body.split('\n').map(p => `<p style="margin:4px 0 0; color:#c3cbda; font-size:14px; line-height:1.55;">${p}</p>`).join('');
+        return `<div style="display:flex; gap:12px; padding:14px 0; border-bottom:1px solid #1d2a42;">`
+            + `<div style="width:28px; height:28px; flex:0 0 28px; border-radius:50%; border:2px solid #e8720c; color:#f5a00b; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center;">${i + 1}</div>`
+            + `<div style="min-width:0;"><h4 style="margin:0; color:#e9edf5; font-size:15px; font-weight:800;">${sec.title}</h4>${paras}</div></div>`;
+    }).join('') + `<p style="text-align:center; color:#9aa6bd; font-size:13px; margin:14px 0 4px;">End of the terms</p>`;
+}
+function setTermsAcceptReady(ready) {
+    const btn = document.getElementById('terms-accept');
+    const status = document.getElementById('terms-status');
+    if (btn) {
+        btn.disabled = !ready;
+        btn.style.background = ready ? '#e8720c' : '#1b2740';
+        btn.style.borderColor = ready ? '#e8720c' : '#26344f';
+        btn.style.color = ready ? '#ffffff' : '#9aa6bd';
+        btn.style.opacity = ready ? '1' : '.5';
+        btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+    }
+    if (status) {
+        status.textContent = ready ? 'You have read the terms: you can accept' : 'Scroll to the end to accept';
+        status.style.color = ready ? '#7dff9e' : '#9aa6bd';
+    }
+}
+// Accept unlocks when the body is scrolled to its end (or when it fits without scrolling)
+function termsScrolled() {
+    const body = document.getElementById('terms-body');
+    if (!body) return;
+    setTermsAcceptReady(body.scrollTop + body.clientHeight >= body.scrollHeight - 8);
+}
 function showTermsModal() {
-    showModal('Terms and Conditions', TERMS_TEXT);
+    const modal = document.getElementById('terms-modal');
+    if (!modal) return;
+    renderTermsBody();
+    modal.classList.remove('hidden');
+    const body = document.getElementById('terms-body');
+    if (body) body.scrollTop = 0;
+    setTermsAcceptReady(false);
+    requestAnimationFrame(termsScrolled); // short text fits without scrolling: unlock at once
+}
+function closeTermsModal() {
+    document.getElementById('terms-modal')?.classList.add('hidden');
+}
+function acceptTerms() {
+    const btn = document.getElementById('terms-accept');
+    if (!btn || btn.disabled) return;
+    const box = document.getElementById('signin-terms');
+    if (box) box.checked = true;
+    signinTermsChanged();
+    closeTermsModal();
 }
 // Sign-in buttons stay locked until the Terms and Conditions are accepted
 function signinTermsChanged() {
