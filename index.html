@@ -897,13 +897,15 @@
         /* Item detail text: a little bigger for the other text in the window */
         #inv-detail-panel.dd-skin .text-xs { font-size: 20px !important; }
         #inv-detail-panel.dd-skin .text-sm { font-size: 22px !important; }
-        /* Stat window (STATS): same navy card layout and colours as the Item Details window */
-        #char-panel-left.char-stats-panel { background: #0b1322 !important; border-color: #26344f !important; }
-        #char-panel-left .rounded-2xl.border, #char-element-stats { background-color: #111a2c !important; border: 2px solid #26344f !important; }
-        #char-panel-left h3, #char-element-stats h4 { color: #f5a00b !important; }
-        #char-panel-left .text-slate-400, #char-element-stats .text-slate-400 { color: #9aa6bd !important; }
-        #char-panel-left .text-slate-100, #char-panel-left .text-slate-200, #char-element-stats .text-slate-100 { color: #e9edf5 !important; }
-        #char-panel-left .bg-slate-950\/80 { background-color: #0b1322 !important; border-color: #26344f !important; }
+        /* Stat window (STATS): same navy card layout and colours as the Item Details window (ids raise the rule priority) */
+        #view-character #char-panel-left.char-stats-panel { background: #0b1322 !important; border: 2px solid #26344f !important; }
+        #view-character #char-panel-left .rounded-2xl.border, #view-character #char-panel-left #char-element-stats { background-color: #111a2c !important; border: 2px solid #26344f !important; }
+        #view-character #char-panel-left h3, #view-character #char-panel-left #char-element-stats h4 { color: #f5a00b !important; }
+        #view-character #char-panel-left .rounded-2xl.border *, #view-character #char-panel-left #char-element-stats * { color: #e9edf5 !important; }
+        #view-character #char-panel-left .rounded-2xl.border .text-slate-400, #view-character #char-panel-left #char-element-stats .text-slate-400 { color: #9aa6bd !important; }
+        #view-character #char-panel-left .rounded-2xl.border h3, #view-character #char-panel-left #char-element-stats h4 { color: #f5a00b !important; }
+        #view-character #char-panel-left .bg-slate-950\/80 { background-color: #0b1322 !important; border: 1px solid #26344f !important; }
+        #view-character #char-panel-left .char-stats-close.dd-x { width: 48px; height: 48px; padding: 0 !important; display: flex; align-items: center; justify-content: center; font-size: 26px !important; line-height: 1; border-radius: 10px; border: 2px solid #26344f; background: #1b2740 !important; color: #e9edf5 !important; top: 14px; right: 14px; }
     </style>
 </head>
 
@@ -1445,7 +1447,7 @@
                     </div>
                     <button id="char-stats-tab" class="char-stats-tab" onclick="toggleCharStats(true)">STATS<img id="alert-char-stats" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div id="char-panel-left" class="art-panel char-stats-panel" style="overflow-y:auto;">
-                        <button class="char-stats-close" onclick="toggleCharStats(false)">&#9664; Close</button>
+                        <button class="char-stats-close dd-x" onclick="toggleCharStats(false)" aria-label="Close" title="Close">&#10005;</button>
                         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Attributes</h3>
