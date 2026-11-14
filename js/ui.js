@@ -5878,6 +5878,28 @@ function scheduleShopKeeper() {
 }
 scheduleShopKeeper();
 
+// Black cat beside the shopkeeper: click plays 6, 4, 6 slowly with an angry sound; 10 second cooldown
+let blackCatCooldownUntil = 0, blackCatPlaying = false;
+[1, 3, 4, 6].forEach(k => { const pre = new Image(); pre.src = `assets/cha/page/blackcat/cat_${k}_q85.webp`; });
+function setBlackCat(k) {
+    const el = document.getElementById('shop-cat');
+    if (el) el.src = `assets/cha/page/blackcat/cat_${k}_q85.webp`;
+}
+function blackCatClick() {
+    if (blackCatPlaying || Date.now() < blackCatCooldownUntil) return;
+    blackCatPlaying = true;
+    blackCatCooldownUntil = Date.now() + 10000;
+    playSound('sound/angrycat.mp3');
+    const seq = [6, 4, 6];
+    let i = 0;
+    const step = () => {
+        if (i >= seq.length) { setBlackCat(3); blackCatPlaying = false; return; }
+        setBlackCat(seq[i++]);
+        setTimeout(step, 600); // slow: 600 ms per frame
+    };
+    step();
+}
+
 // Once every minute, at a random moment within that minute, while the main page is showing
 function scheduleSmithSwing() {
     setTimeout(() => {
