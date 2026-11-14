@@ -777,11 +777,11 @@
         @media (prefers-reduced-motion: reduce) { .mini-aura, .mini-ember { animation: none; } .mini-ember { opacity: .6; } }
         /* Idle breathing: player sways up and down with a slight stretch; monsters squish gently */
         /* Stepped loop: each pose holds (steps) for about 0.3s, four poses per 1.2s cycle */
-        @keyframes playerIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
+        @keyframes playerIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(0); animation-timing-function: steps(1, end); } 50% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 75% { transform: translateY(0); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
         @keyframes monsterIdle { 0% { transform: translateY(0); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px); animation-timing-function: steps(1, end); } 100% { transform: translateY(0); } }
         .player-idle { animation: playerIdle 2.4s infinite; transform-origin: 50% 100%; }
         /* Hat layer: same bob as the body, keeping its tilt (--hat-tilt is set by the script) */
-        @keyframes playerIdleHat { 0% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 25% { transform: translateY(-1px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 50% { transform: translateY(-3px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 75% { transform: translateY(-1px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 100% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); } }
+        @keyframes playerIdleHat { 0% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 25% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 50% { transform: translateY(-1px) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 75% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); animation-timing-function: steps(1, end); } 100% { transform: translateY(0) rotate(var(--hat-tilt, 0deg)); } }
         .hat-idle { animation: playerIdleHat 2.4s infinite; }
         @media (prefers-reduced-motion: reduce) { .hat-idle { animation: none; } }
         .monster-idle { animation: monsterIdle 2.4s infinite; transform-origin: 50% 100%; }
@@ -1139,7 +1139,7 @@
                     <img id="town-smith-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
                     <img id="town-smith" alt="" src="assets/page01/smith/k1_q85.webp" title="Refine" onclick="switchView('blacksmith')">
                     <img id="shop-keeper-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp" style="position:absolute; left:1436px; top:790px; width:102px; height:41px; object-fit:contain; pointer-events:none; z-index:0; opacity:0.4;">
-                    <div id="shop-keeper" style="position:absolute; left:1422px; top:609px; width:130px; height:205px; z-index:1; pointer-events:none;"><img id="shop-keeper-img" alt="" src="assets/cha/page/shopkeeper/shop_base_q85.webp" style="width:100%; height:100%; display:block; image-rendering:auto; animation:heroIdle 3.2s ease-in-out infinite;"></div>
+                    <div id="shop-keeper" style="position:absolute; left:1422px; top:609px; width:130px; height:205px; z-index:1; pointer-events:none;"><img id="shop-keeper-img" alt="" src="assets/cha/page/shopkeeper/shop_base_q85.webp" style="width:100%; height:100%; display:block; image-rendering:auto;"></div>
                     <div id="town-hero-wrap" onclick="openTentPage()" title="Tent">
                         <img id="town-hero" class="player-idle" alt="" src="">
                     </div>
