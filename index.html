@@ -907,29 +907,31 @@
             <div class="relative bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl text-center">
                 <h2 class="text-lg font-bold text-amber-400 pixel-font">Welcome to Ragnatale</h2>
                 <p class="text-xs text-slate-400">Sign in to keep your progress in the cloud.</p>
-                <label class="flex items-start gap-2 text-xs text-slate-300 text-left cursor-pointer">
+                <div class="flex items-start gap-2 text-xs text-slate-300 text-left">
                     <input type="checkbox" id="signin-terms" onchange="signinTermsChanged()" class="mt-0.5 w-4 h-4 accent-amber-500 cursor-pointer">
-                    <span>I have read and accept the Terms and Conditions.</span>
-                </label>
+                    <span>I have read and accept the <button type="button" onclick="showTermsModal()" class="underline font-bold text-amber-300 hover:text-amber-200 cursor-pointer">Terms and Conditions</button>.</span>
+                </div>
                 <div class="flex flex-col gap-1">
                     <button id="signin-gmail-btn" onclick="signInWithGmail()" disabled class="w-full py-3 bg-slate-100 hover:bg-white text-slate-900 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
                         Sign in with Gmail
                     </button>
                     <span class="text-[11px] text-amber-400 font-bold">* Recommended</span>
                 </div>
-                <div id="turnstile-box" class="flex justify-center" style="min-height:65px"></div>
                 <div class="flex flex-col gap-1">
                     <button id="signin-anon-btn" onclick="signInAnonymous()" disabled class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
                         Play as anonymous
                     </button>
                     <span class="text-[11px] text-slate-400">You can bind an email later in the Settings menu.</span>
                 </div>
+                <div id="turnstile-box" class="flex justify-center" style="min-height:65px"></div>
             </div>
         </div>
 
         <!-- CHARACTER SELECTION (first play, after sign-in) -->
-        <div id="view-name-select" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
-            <div class="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
+        <div id="view-name-select" class="hidden fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+            <!-- Same background as the sign-in page and the map select page, blurred -->
+            <div aria-hidden="true" class="absolute inset-0" style="background:url(assets/compaign/mapselect02_q85.webp) center/cover no-repeat; filter:blur(8px); transform:scale(1.06);"></div>
+            <div class="relative bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
                 <div class="text-center">
                     <h2 class="text-lg font-bold text-amber-400 pixel-font mb-1">RAGNATALE</h2>
                     <p class="text-xs text-slate-400">Choose your character.</p>
@@ -1740,7 +1742,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114ab"></script>
+    <script src="js/ui.js?v=20261114ac"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
