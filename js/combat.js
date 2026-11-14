@@ -58,6 +58,31 @@ function playSound(path, gain = 1) {
     }
 }
 
+// Sound effects (files in sound/sfx/). A list means a random pick from its numbered files.
+const SFX = {
+    swordHit: ['sound/sfx/sword_hit1.mp3', 'sound/sfx/sword_hit2.mp3'],
+    swordCrit: 'sound/sfx/sword_crit.mp3',
+    punchHit: 'sound/sfx/punch_hit.mp3',
+    punchCrit: 'sound/sfx/punch_crit.mp3',
+    monsterDeath: 'sound/sfx/monster_death.mp3',
+    meow: ['sound/sfx/meow1.mp3', 'sound/sfx/meow2.mp3', 'sound/sfx/meow3.mp3'],
+    angryCat: ['sound/sfx/angrycat1.mp3', 'sound/sfx/angrycat2.mp3'],
+    blacksmith: 'sound/sfx/blacksmith.mp3',
+    levelup: 'sound/sfx/levelup.mp3',
+    coin: 'sound/sfx/coin.mp3',
+    mapWin: 'sound/sfx/map_win.mp3'
+};
+function playSfx(v, gain = 1) {
+    playSound(Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v, gain);
+}
+// Sword equipped: sword sounds. No weapon or knuckles: punch sounds.
+function attackSfx(crit) {
+    const w = player.equipped && player.equipped.weapon;
+    const punch = !w || /knuckle/i.test(w.name || '');
+    if (punch) return crit ? SFX.punchCrit : SFX.punchHit;
+    return crit ? SFX.swordCrit : SFX.swordHit;
+}
+
 function runeN(key) {
     return (player.runes && player.runes[key]) || 0;
 }
@@ -1002,6 +1027,7 @@ function checkLevelUps() {
         player.baseMaxExp = baseExpNeed(player.baseLv);
         player.statPoints += 3;
         logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points`, 'levelup');
+        playSfx(SFX.levelup);
     }
 
     if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
@@ -1045,6 +1071,7 @@ function awardKill(m) {
     if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
+    if (finalGold > 0) playSfx(SFX.coin);
     if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:4px;"><img src="assets/icons/goldpile_q85.webp" alt="" style="width:53px;height:41px;object-fit:contain;"><b style="color:#fde68a; font-size:22px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
     if (m.isFinalBoss) { player.diamonds += 100; logMessage(`[Final Boss] Defeated! Reward: 100 Diamond`, 'drop'); }
     player.baseExp += baseExpGain;
@@ -1556,6 +1583,7 @@ function runCombatTick() {
             const critIdx = monstersList.indexOf(targetEnemy);
             if (critIdx >= 0 && typeof playCritFx === 'function') setTimeout(() => playCritFx(`#monsters-lineup-container > div:nth-child(${critIdx + 1}) img`), 0);
             updateQuestProgress('crit', 1);
+            playSfx(attackSfx(true));
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
             critStreak++;
             if (runeN('critSplash') > 0) {
@@ -1577,6 +1605,7 @@ function runCombatTick() {
             }
         } else {
             critStreak = 0;
+            playSfx(attackSfx(false));
             const atkIdx = monstersList.indexOf(targetEnemy);
             if (atkIdx >= 0 && typeof playAtkFx === 'function') setTimeout(() => playAtkFx(`#monsters-lineup-container > div:nth-child(${atkIdx + 1}) img`), 0);
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
@@ -1718,6 +1747,7 @@ function onStageCleared() {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
                 showModal("Event Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
+                playSfx(SFX.mapWin);
                 updateUI();
                 saveGame();
                 return;
@@ -1726,6 +1756,7 @@ function onStageCleared() {
             if ((currentMode === 'voidtest' || currentMode === 'bossmap') && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 showModal(currentMode === 'bossmap' ? "Boss Gauntlet Cleared!" : "Void Test Map Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
+                playSfx(SFX.mapWin);
                 updateUI();
                 saveGame();
                 return;
@@ -1748,6 +1779,7 @@ function onStageCleared() {
                 addItemToInventory(rollSetForDrop(reward));
 
                 showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
+                playSfx(SFX.mapWin);
                 return;
             }
 
@@ -1756,6 +1788,7 @@ function onStageCleared() {
                 getEventState().dailyCleared = true;
                 updateUI();
                 saveGame();
+                playSfx(SFX.mapWin);
                 openChest('gold');
                 switchView('town');
                 return;
@@ -1795,8 +1828,10 @@ function onStageCleared() {
         if (wasBossStage && currentStage < maxStages) {
             // Boss stage completed (not the last stage): show the result right away; closing it moves on
             showModal("Boss Defeated!", '', buildMapSummaryHTML('win', `Continue to Stage ${currentStage + 1}`, false, 'Boss Defeated'), () => continueRun());
+            playSfx(SFX.mapWin);
         } else if (wasBossStage) {
             // Final boss: its result is the map result shown by proceedNext, so only the sound plays here
+            playSfx(SFX.mapWin);
             continueRun();
         } else {
             continueRun();
