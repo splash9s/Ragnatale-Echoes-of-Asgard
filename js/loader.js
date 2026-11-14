@@ -274,7 +274,7 @@ const LOADING_IMAGES = [
     "assets/page01/eventsbutton_q85.webp",
     "assets/page01/eventsbuttonpress_q85.webp",
     "assets/page01/expedition_v2_q85.webp",
-    "assets/page01/expeditionpress_v2_q85.webp",
+    "assets/page01/expedition_v2press_q85.webp",
     "assets/page01/mailbutton_q85.webp",
     "assets/page01/mailbuttonpress_q85.webp",
     "assets/page01/friendbutton_q85.webp",

@@ -195,10 +195,12 @@
         .ts-inner .ts-bg { animation: bgFadeIn .2s ease both; }
         .ts-inner .ui, .ts-inner .art-frame, .ts-inner .art-panel { animation: itemFadeIn .2s ease .2s both; }
         .ts-inner .ui.round { border-radius: 50%; }
-/* Expedition plaque: the pressed picture shows while the button is held */
-.exp-press { display: none !important; }
-.ui[data-action="expedition"]:active .exp-normal { display: none !important; }
-.ui[data-action="expedition"]:active .exp-press { display: block !important; }
+/* Expedition plaque: gold glow (the press picture is swapped in by js/town.js) */
+.ui[data-action="expedition"] img.exp-glow { animation: expGlow 2.4s ease-in-out infinite; }
+@keyframes expGlow {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(251,191,36,.55)) drop-shadow(0 0 14px rgba(245,158,11,.35)); }
+    50%      { filter: drop-shadow(0 0 14px rgba(255,214,90,.95)) drop-shadow(0 0 30px rgba(245,158,11,.7)); }
+}
         .ts-inner .missing { width: 100%; height: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 3px dashed #c9a227; color: #e8d9b5; background: rgba(42,29,23,.7); font: 600 22px/1.2 Georgia, serif; text-align: center; padding: 8px; }
         #town-shadow { position: absolute; left: 879px; top: 770px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; opacity: 0.7; }
         /* Main page sparkles: small golden glints that drift up and fade (spawned by js/ui.js) */
@@ -1086,9 +1088,8 @@
             <div class="ui" data-action="blacksmith" style="left:465px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/articanbutton_q85.webp" alt="" onerror="townSwap(this,'articanbutton.png')">
             </div>
-            <div class="ui" data-action="expedition" style="left:1615px; top:934px; width:300px; height:133px;">
-                <img class="exp-normal" src="assets/page01/expedition_v2_q85.webp" alt="Expedition">
-                <img class="exp-press" src="assets/page01/expeditionpress_v2_q85.webp" alt="">
+            <div class="ui" data-action="expedition" style="left:1565px; top:934px; width:300px; height:133px;">
+                <img class="exp-glow" src="assets/page01/expedition_v2_q85.webp" alt="Expedition">
             </div>
                     <img id="town-shadow" alt="" src="assets/cha/shadowclean_q85.webp">
                     <img id="town-dummy" alt="" src="assets/page01/straw/s1_q85.webp" title="Attack" onclick="strawAttack()">
@@ -1802,7 +1803,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114ay"></script>
+    <script src="js/ui.js?v=20261114az"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
