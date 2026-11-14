@@ -937,8 +937,8 @@
             <div class="relative bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl text-center">
                 <img src="assets/cha/page/rune_thread_logo_v3_q85.webp" alt="Rune Thread" class="mx-auto block" style="width:240px; max-width:100%; height:auto;">
                 <p class="text-xs text-slate-400">Sign in to keep your progress in the cloud.</p>
-                <div class="flex items-start gap-2 text-xs text-slate-300 text-left">
-                    <input type="checkbox" id="signin-terms" onchange="signinTermsChanged()" class="mt-0.5 w-4 h-4 accent-amber-500 cursor-pointer">
+                <div class="flex items-center justify-center gap-2 text-xs text-slate-300">
+                    <input type="checkbox" id="signin-terms" disabled onchange="signinTermsChanged()" class="w-4 h-4 accent-amber-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40" title="Read the Terms and Conditions to the end first">
                     <span>I have read and accept the <button type="button" onclick="showTermsModal()" class="underline font-bold text-amber-300 hover:text-amber-200 cursor-pointer">Terms and Conditions</button>.</span>
                 </div>
                 <div class="flex flex-col gap-1">
@@ -1802,7 +1802,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114ax"></script>
+    <script src="js/ui.js?v=20261114ay"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
