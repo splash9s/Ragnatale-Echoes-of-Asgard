@@ -307,17 +307,37 @@
         .dd-skin button.bg-red-600:hover, .dd-skin button.bg-amber-700:hover { background-color: #101a2e !important; }
         .dd-skin #inv-detail-close { background: #1b2740; color: #e9edf5; border: 2px solid #26344f; border-radius: 10px; }
         .dd-skin div, .dd-skin span, .dd-skin p { color: #e9edf5; }
-        .art-dark .art-panel.dd-skin *:not([class*="text-"]):not(button) { color: #e9edf5 !important; }
+        .art-dark .art-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not(button) { color: #e9edf5 !important; }
         .art-dark .art-panel.dd-skin .text-slate-400, .art-dark .art-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
         .art-dark .art-panel.dd-skin .text-slate-200 { color: #e9edf5 !important; }
         .art-dark .art-panel.dd-skin button { color: #e9edf5 !important; }
         .art-dark .art-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
         .art-dark .art-panel.dd-skin .font-black { color: #f5a00b !important; }
-        #inv-detail-panel.dd-skin *:not([class*="text-"]):not(button), #shop-detail-panel.dd-skin *:not([class*="text-"]):not(button) { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not(button), #shop-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not(button) { color: #e9edf5 !important; }
         #inv-detail-panel.dd-skin .text-slate-400, #inv-detail-panel.dd-skin .text-slate-300, #shop-detail-panel.dd-skin .text-slate-400, #shop-detail-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
         #inv-detail-panel.dd-skin button, #shop-detail-panel.dd-skin button { color: #e9edf5 !important; }
         #inv-detail-panel.dd-skin [class*="text-slate-9"], #shop-detail-panel.dd-skin [class*="text-slate-9"], #inv-detail-panel.dd-skin [class*="text-slate-2"], #shop-detail-panel.dd-skin [class*="text-slate-2"], #inv-detail-panel.dd-skin [class*="text-black"], #shop-detail-panel.dd-skin [class*="text-black"] { color: #e9edf5 !important; }
         #inv-detail-panel.dd-skin [class*="text-slate-5"], #shop-detail-panel.dd-skin [class*="text-slate-5"] { color: #9aa6bd !important; }
+        /* Item Details layout (ddFill in js/ui.js) */
+        #inv-detail-panel.dd-skin .dd-close, #shop-detail-panel.dd-skin .dd-close { position: absolute; top: 14px; right: 14px; width: 48px; height: 48px; border-radius: 10px; border: 2px solid #26344f; background: #1b2740 !important; color: #e9edf5 !important; font-size: 22px; font-weight: 800; cursor: pointer; }
+        #inv-detail-panel.dd-skin .dd-head, #shop-detail-panel.dd-skin .dd-head { display: flex; align-items: center; gap: 18px; padding: 0 64px 14px 0; border-bottom: 2px solid #26344f; margin-bottom: 14px; }
+        #inv-detail-panel.dd-skin .dd-icon, #shop-detail-panel.dd-skin .dd-icon { width: 96px; height: 96px; flex: none; display: flex; align-items: center; justify-content: center; border: 2px solid #f5a00b; border-radius: 12px; background: #0b1322; }
+        #inv-detail-panel.dd-skin .dd-name-wrap, #shop-detail-panel.dd-skin .dd-name-wrap { display: grid; gap: 4px; min-width: 0; }
+        #inv-detail-panel.dd-skin .dd-name, #shop-detail-panel.dd-skin .dd-name { font-size: 30px; font-weight: 800; line-height: 1.15; color: #f5a00b !important; text-wrap: balance; }
+        #inv-detail-panel.dd-skin .dd-meta, #shop-detail-panel.dd-skin .dd-meta { font-size: 20px; color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin .dd-body, #shop-detail-panel.dd-skin .dd-body { display: flex; flex-direction: column; gap: 14px; }
+        #inv-detail-panel.dd-skin .dd-stats, #shop-detail-panel.dd-skin .dd-stats { border: 2px solid #26344f; border-radius: 12px; background: #0b1322; padding: 4px 16px; display: flex; flex-direction: column; font-size: 22px; }
+        #inv-detail-panel.dd-skin .dd-stats > *, #shop-detail-panel.dd-skin .dd-stats > * { display: block; padding: 10px 0; border-bottom: 2px solid #26344f; color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin .dd-stats > *:last-child, #shop-detail-panel.dd-skin .dd-stats > *:last-child { border-bottom: 0; }
+        #inv-detail-panel.dd-skin .dd-lore, #shop-detail-panel.dd-skin .dd-lore { margin: 0; text-align: center; font-style: italic; font-size: 20px; color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin .dd-price, #shop-detail-panel.dd-skin .dd-price { text-align: center; font-size: 20px; color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin .dd-price b, #shop-detail-panel.dd-skin .dd-price b { color: #f5a00b !important; }
+        #inv-detail-panel.dd-skin .dd-row, #shop-detail-panel.dd-skin .dd-row { display: grid; gap: 12px; }
+        #inv-detail-panel.dd-skin .dd-btn, #shop-detail-panel.dd-skin .dd-btn { width: 100%; font-size: 20px; font-weight: 800; border-radius: 12px; padding: 16px 10px; border: 2px solid #26344f; cursor: pointer; color: #e9edf5 !important; background: #1b2740; min-width: 0; }
+        #inv-detail-panel.dd-skin .dd-btn.primary, #shop-detail-panel.dd-skin .dd-btn.primary { background: #e8720c; border-color: #e8720c; color: #fff !important; }
+        #inv-detail-panel.dd-skin .dd-btn.primary:hover, #shop-detail-panel.dd-skin .dd-btn.primary:hover { background: #c45f08; }
+        #inv-detail-panel.dd-skin .dd-btn.ghost:hover, #shop-detail-panel.dd-skin .dd-btn.ghost:hover { background: #101a2e; }
+        #inv-detail-panel.dd-skin .dd-note, #shop-detail-panel.dd-skin .dd-note { font-size: 18px; color: #9aa6bd !important; }
         #inv-detail-panel.dd-skin button.bg-amber-600, #shop-detail-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
         #inv-detail-panel.dd-skin .font-black, #shop-detail-panel.dd-skin .font-black { color: #f5a00b !important; }
         .dd-skin .font-black { color: #f5a00b !important; }
@@ -1671,7 +1691,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114r"></script>
+    <script src="js/ui.js?v=20261114s"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
