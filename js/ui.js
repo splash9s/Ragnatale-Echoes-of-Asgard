@@ -4160,6 +4160,14 @@ function renderCreateStats() {
             + `<span class="flex items-center gap-2"><span class="font-bold text-slate-100">${val}${add ? ` <span class="text-amber-300">+${add}</span>` : ''}</span>`
             + `<button type="button" onclick="addStat('${k}')"${full ? ' disabled' : ''} class="w-7 h-7 rounded-lg bg-amber-600 text-slate-950 font-black cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">+</button></span></div>`;
     }).join('');
+    // Derived combat numbers from the current gear and stats
+    const d = typeof getDerivedStats === 'function' ? getDerivedStats() : null;
+    if (d) {
+        const cells = [['ATK', d.atk], ['DEF', d.def], ['HIT', d.hit], ['FLEE', d.flee]];
+        rows.innerHTML += `<div class="mt-2 pt-2 border-t border-slate-700 grid grid-cols-2 gap-x-3 gap-y-1">`
+            + cells.map(([k, v]) => `<div class="flex items-center justify-between text-xs"><span class="text-slate-400 font-bold">${k}</span><span class="font-bold text-slate-100">${v}</span></div>`).join('')
+            + `</div>`;
+    }
 }
 
 // Top bar: who is logged in, and the Link Gmail button for guests
