@@ -3842,11 +3842,36 @@ function showGameConfirm(title, message, confirmLabel, onConfirm) {
     if (yes) yes.onclick = () => { closeModal(); onConfirm(); };
 }
 
+// Salvage All / Sell All confirm: a plain pop-up box (no dim background, no blur), item icons, bold text
+function showBulkConfirm(title, gainText, targets, verb, onConfirm) {
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : (x => x);
+    let box = document.getElementById('bulk-confirm');
+    if (!box) { box = document.createElement('div'); box.id = 'bulk-confirm'; document.body.appendChild(box); }
+    const rows = targets.slice(0, 8).map(({ it }) =>
+        `<div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0;">${itemIconHTML(it, 28)}<span>${esc(it.name)}</span></div>`).join('')
+        + (targets.length > 8 ? `<div style="font-size:12px; color:#94a3b8;">…and ${targets.length - 8} more</div>` : '');
+    box.style.cssText = 'position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:310; width:max-content; max-width:min(520px,92vw); background:#0f172a; border:1px solid #334155; border-radius:16px; padding:16px 18px; box-shadow:0 10px 30px rgba(0,0,0,.5); display:flex; flex-direction:column; gap:10px;';
+    box.innerHTML = `
+        <div style="font-size:15px; font-weight:800; color:#fbbf24; text-align:center;">${esc(title)}</div>
+        <div style="font-size:12px; color:#e2e8f0;">${verb} ${targets.length} equipment item(s)?</div>
+        <div style="font-size:13px; font-weight:800; color:#4ade80;">You get: ${esc(gainText)}</div>
+        <div style="display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto;">${rows}</div>
+        <div style="font-size:12px; color:#94a3b8;">Locked items are kept.</div>
+        <div style="font-size:12px; font-weight:800; color:#ef4444;">This cannot be undone.</div>
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px;">
+            <button type="button" id="bulk-cancel" style="padding:8px 14px; border-radius:12px; background:#334155; color:#f1f5f9; font-weight:700; font-size:12px; cursor:pointer; border:0;">Cancel</button>
+            <button type="button" id="bulk-yes" style="padding:8px 14px; border-radius:12px; background:#dc2626; color:#fff; font-weight:700; font-size:12px; cursor:pointer; border:0;">${esc(title)}</button>
+        </div>`;
+    const close = () => { box.style.display = 'none'; };
+    box.querySelector('#bulk-cancel').onclick = close;
+    box.querySelector('#bulk-yes').onclick = () => { close(); onConfirm(); };
+}
+
 function salvageAllEquipment() {
     const targets = bulkEquipTargets();
     if (targets.length === 0) { showFloatNotice("No equipment to salvage."); return; }
     const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
-    showGameConfirm("Salvage All", `Salvage ${targets.length} equipment item(s)?\n\nYou get: ${gain} Iron Scrap\n\n${confirmItemList(targets)}\n\nLocked items are kept. This cannot be undone.`, "Salvage All", () => doSalvageAll(targets, gain));
+    showBulkConfirm("Salvage All", `${gain} Iron Scrap`, targets, "Salvage", () => doSalvageAll(targets, gain));
 }
 function doSalvageAll(targets, gain) {
     targets.forEach(({ i }) => { player.inventory[i] = null; });
@@ -3861,10 +3886,10 @@ function doSalvageAll(targets, gain) {
 }
 
 function sellAllEquipment() {
-    const targets = bulkEquipTargets().filter(({ it }) => (it.levelReq || 1) < 99);
+    const targets = bulkEquipTargets(); // Lv 99 gear is sold too (only locked items are kept)
     if (targets.length === 0) { showFloatNotice("No equipment to sell."); return; }
     const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
-    showGameConfirm("Sell All", `Sell ${targets.length} equipment item(s)?\n\nYou get: ${total} Gold\n\n${confirmItemList(targets)}\n\nLocked and Lv 99 gear are kept. This cannot be undone.`, "Sell All", () => {
+    showBulkConfirm("Sell All", `${total} Gold`, targets, "Sell", () => {
         targets.forEach(({ i }) => { player.inventory[i] = null; });
         player.gold += total;
         logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
