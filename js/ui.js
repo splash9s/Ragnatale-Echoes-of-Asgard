@@ -372,6 +372,7 @@ async function startGameWithName() {
 
         if (nameInput) player.name = nameInput;
         player.avatar = START_AVATAR;
+        commitCreateStats(); // the stat points chosen on the character select page are spent when the journey begins
         if (typeof waitForTownArt === 'function') await waitForTownArt(); // first visit: the town art may still be loading
         saveGame();
         if (typeof cloudPushProfile === 'function') cloudPushProfile(); // the friend list shows this name at once
@@ -4156,6 +4157,16 @@ function confirmPendingStats() {
 }
 
 function resetPendingStats() { pendingAlloc.stats = {}; updateUI(); }
+
+// Spends the pending stat points without a confirm step (used by Begin Journey on the character select page)
+function commitCreateStats() {
+    const t = pendingStatTotal();
+    if (t <= 0 || t > player.statPoints) { pendingAlloc.stats = {}; return; }
+    for (const k in pendingAlloc.stats) player.stats[k] += pendingAlloc.stats[k];
+    player.statPoints -= t;
+    markBeginnerFlag('stat');
+    pendingAlloc.stats = {};
+}
 
 // Character select: the stat window on the left (same add / confirm rules as the stat page)
 function renderCreateStats() {
