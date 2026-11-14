@@ -293,7 +293,11 @@ async function cloudDeleteSave() {
     cloudDirty = false;
     if (!cloudClient) return;
     try {
-        if (cloudUserId) await cloudClient.from('saves').delete().eq('user_id', cloudUserId);
+        if (cloudUserId) {
+            await cloudClient.from('saves').delete().eq('user_id', cloudUserId);
+            // Also free the player name (profiles holds the unique name)
+            await cloudClient.from('profiles').delete().eq('user_id', cloudUserId);
+        }
         await cloudClient.auth.signOut({ scope: 'local' });
     } catch (e) {
         console.warn('Cloud reset failed:', e);
