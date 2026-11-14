@@ -5950,12 +5950,32 @@ function openPetPanel() {
         document.body.appendChild(box);
     }
     petPanelView = null; petEditField = null;
+    fitPetPanel();
     renderPetPanel();
 }
 function closePetPanel() {
     const box = document.getElementById('pet-panel');
     if (box) box.remove();
     petPanelView = null; petEditField = null;
+}
+// The panel is laid out at the 1920x1080 design size and scaled with the window, like the rest of the game
+function fitPetPanel() {
+    const box = document.getElementById('pet-panel');
+    if (!box) return;
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1;
+    box.style.setProperty('--ps', s);
+}
+window.addEventListener('resize', fitPetPanel);
+// Pressing outside the panel closes it (the Pets button and the pets on the floor keep their own clicks)
+document.addEventListener('pointerdown', (e) => {
+    const box = document.getElementById('pet-panel');
+    if (!box || !e.target || !e.target.closest) return;
+    if (e.target.closest('#pet-panel, #tent-pets-btn, #tent-pet-picker')) return;
+    closePetPanel();
+}, true);
+// Friendship hearts: one heart per friendship level
+function petHearts(f) {
+    return '\u2764\uFE0F'.repeat(Math.max(1, f.lv + 1));
 }
 function openPetDetail(tok) { petPanelView = String(tok); petEditField = null; renderPetPanel(); }
 function petPanelBack() { petPanelView = null; petEditField = null; renderPetPanel(); }
@@ -5972,7 +5992,7 @@ function renderPetPanel() {
             const f = petFriendText(c.item), on = sel.includes(String(c.token));
             return `<button class="pet-row" onclick="openPetDetail('${c.token}')">`
                 + `<img src="assets/shop/diamond/ocatpet_q85.webp" alt="">`
-                + `<span class="pet-row-main">${petEsc(c.name)}<small>Lv ${f.lv + 1} · ${petEsc(f.title)}</small></span>`
+                + `<span class="pet-row-main"><span class="pet-row-name">${petEsc(c.name)}<span class="pet-hearts">${petHearts(f)}</span></span><small>Lv ${f.lv + 1} · ${petEsc(f.title)}</small></span>`
                 + (on ? `<span class="pet-tag">Walking</span>` : '') + `</button>`;
         }).join('') : `<p class="pet-empty">You have no pets yet. Buy one in the shop.</p>`;
         const namesOn = !!document.getElementById('view-character')?.classList.contains('pet-names-on');
@@ -6002,7 +6022,7 @@ function renderPetPanel() {
         + fieldHead('bio', 'Bio', bioEdit)
         + `<textarea id="pet-bio-input" maxlength="${PET_BIO_MAX}" rows="4"${bioEdit ? '' : ' readonly'} oninput="petCount('pet-bio-input', 'pet-bio-count')">${petEsc(bioVal)}</textarea>`
         + `<div class="pet-count"><span id="pet-bio-count">${bioVal.length}</span> / ${PET_BIO_MAX}</div>`
-        + `<label>Friendship</label>`
+        + `<div class="pet-field-head"><label>Friendship</label><span class="pet-hearts">${petHearts(f)}</span></div>`
         + `<div class="pet-friend"><b>Lv ${f.lv + 1} · ${petEsc(f.title)}</b><span>${progress}</span></div>`
         + `<div class="pet-bar"><i style="width:${pct}%"></i></div>`
         + `<button class="pet-walk" onclick="togglePetWalk(${tok})">${walking ? 'Stop walking on floor' : 'Walk on tent floor'}</button>`;
