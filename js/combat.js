@@ -53,9 +53,11 @@ function playSound(path, gain = 1) {
         sfxPlaying.add(audio);
         audio.addEventListener('ended', () => sfxPlaying.delete(audio));
         audio.play().catch(e => { sfxPlaying.delete(audio); console.log("Audio play prevented:", e); });
+        return audio;
     } catch (err) {
         console.log("Audio error:", err);
     }
+    return null;
 }
 
 // Sound effects (files in sound/sfx/). A list means a random pick from its numbered files.
@@ -108,7 +110,16 @@ const SFX_LEVEL = {
 };
 function playSfx(v, gain = 1) {
     const path = Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v;
-    playSound(path, gain * (SFX_LEVEL[path] || 1));
+    return playSound(path, gain * (SFX_LEVEL[path] || 1));
+}
+// A hit on a slime: the weapon swing starts first, then the slime's voice 0.2 s later, which cuts the swing off
+const SLIME_VOICE_DELAY_MS = 200;
+function playSlimeHitSfx(attackV) {
+    const swing = playSfx(attackV);
+    setTimeout(() => {
+        if (swing) { try { swing.pause(); sfxPlaying.delete(swing); } catch (e) {} }
+        playSfx(SFX.slimeHit);
+    }, SLIME_VOICE_DELAY_MS);
 }
 // Slimes (any monster named Slime, including the boss) have their own hit and death sounds
 function isSlime(m) { return !!m && /slime/i.test(m.name || ''); }
@@ -1653,7 +1664,8 @@ function runCombatTick() {
             }
         } else {
             critStreak = 0;
-            playSfx(isSlime(targetEnemy) ? SFX.slimeHit : attackSfx(false));
+            if (isSlime(targetEnemy)) playSlimeHitSfx(attackSfx(false));
+            else playSfx(attackSfx(false));
             const atkIdx = monstersList.indexOf(targetEnemy);
             if (atkIdx >= 0 && typeof playAtkFx === 'function') setTimeout(() => playAtkFx(`#monsters-lineup-container > div:nth-child(${atkIdx + 1}) img`), 0);
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
