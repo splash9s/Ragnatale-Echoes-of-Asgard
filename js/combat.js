@@ -66,6 +66,7 @@ const SFX = {
     punchCrit: 'sound/sfx/punch_crit.mp3',
     monsterDeath: 'sound/sfx/monster_death.mp3',
     slimeHit: 'sound/sfx/slime_damaged.wav',
+    dodge: 'sound/sfx/dodge.mp3',
     slimeDead: 'sound/sfx/slime_dead.wav',
     meow: ['sound/sfx/meow1.mp3', 'sound/sfx/meow2.mp3', 'sound/sfx/meow3.mp3'],
     angryCat: ['sound/sfx/angrycat1.mp3', 'sound/sfx/angrycat2.mp3'],
@@ -88,6 +89,7 @@ const SFX_LEVEL = {
     'sound/sfx/monster_death.mp3': 1.08,
     'sound/sfx/slime_damaged.wav': 0.89,
     'sound/sfx/slime_dead.wav': 1.25,
+    'sound/sfx/dodge.mp3': 1,
     'sound/sfx/punch_crit.mp3': 3.05,
     'sound/sfx/punch_hit.mp3': 2.07,
     'sound/sfx/sword_crit.mp3': 1.91,
@@ -1221,6 +1223,7 @@ function onPlayerDodged(m, source) {
     setTimeout(() => showCombatText('#combat-player-sprite', 'DODGE', 'miss'), 0);
     playPlayerReactAnim('dodge');
     playPlayerDodgeLunge();
+    playSfx(SFX.dodge);
     logMessage(`[Dodge] You evaded ${m.name}'s attack! (${source})`, 'combat');
     monsterHitStreak = 0;
     dodgeStreak++;
@@ -1695,6 +1698,7 @@ function runCombatTick() {
         if (!attackBlocked) {
             const di = monstersList.indexOf(targetEnemy);
             if (di >= 0) setTimeout(() => showCombatText(`#monsters-lineup-container > div:nth-child(${di + 1}) img`, 'DODGE', 'miss'), 0);
+            playSfx(SFX.dodge);
         }
         logMessage(`[Miss] Attack on ${targetEnemy.name} missed!`, 'combat');
         if (runeN('focus') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('focus') / 100), 'Focus');
