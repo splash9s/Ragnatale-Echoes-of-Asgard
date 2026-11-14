@@ -65,6 +65,8 @@ const SFX = {
     punchHit: 'sound/sfx/punch_hit.mp3',
     punchCrit: 'sound/sfx/punch_crit.mp3',
     monsterDeath: 'sound/sfx/monster_death.mp3',
+    slimeHit: 'sound/sfx/slime_damaged.wav',
+    slimeDead: 'sound/sfx/slime_dead.wav',
     meow: ['sound/sfx/meow1.mp3', 'sound/sfx/meow2.mp3', 'sound/sfx/meow3.mp3'],
     angryCat: ['sound/sfx/angrycat1.mp3', 'sound/sfx/angrycat2.mp3'],
     blacksmith: 'sound/sfx/blacksmith.mp3',
@@ -84,6 +86,8 @@ const SFX_LEVEL = {
     'sound/sfx/meow2.mp3': 1.91,
     'sound/sfx/meow3.mp3': 2.54,
     'sound/sfx/monster_death.mp3': 1.08,
+    'sound/sfx/slime_damaged.wav': 0.89,
+    'sound/sfx/slime_dead.wav': 1.25,
     'sound/sfx/punch_crit.mp3': 3.05,
     'sound/sfx/punch_hit.mp3': 2.07,
     'sound/sfx/sword_crit.mp3': 1.91,
@@ -94,6 +98,8 @@ function playSfx(v, gain = 1) {
     const path = Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v;
     playSound(path, gain * (SFX_LEVEL[path] || 1));
 }
+// Slimes (any monster named Slime, including the boss) have their own hit and death sounds
+function isSlime(m) { return !!m && /slime/i.test(m.name || ''); }
 // Sword equipped: sword sounds. No weapon or knuckles: punch sounds.
 function attackSfx(crit) {
     const w = player.equipped && player.equipped.weapon;
@@ -1624,7 +1630,7 @@ function runCombatTick() {
             }
         } else {
             critStreak = 0;
-            playSfx(attackSfx(false));
+            playSfx(isSlime(targetEnemy) ? SFX.slimeHit : attackSfx(false));
             const atkIdx = monstersList.indexOf(targetEnemy);
             if (atkIdx >= 0 && typeof playAtkFx === 'function') setTimeout(() => playAtkFx(`#monsters-lineup-container > div:nth-child(${atkIdx + 1}) img`), 0);
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');

@@ -5200,7 +5200,7 @@ function updateUI() {
                 setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
                 if (m.hp <= 0) {
                     m._deathAt = Date.now();
-                    playSfx(SFX.monsterDeath);
+                    playSfx(isSlime(m) ? SFX.slimeDead : SFX.monsterDeath);
                 }
             }
             const goneAt = m._deathAt ? Date.now() - m._deathAt >= monsterDeathTotalMs(m) : false;
