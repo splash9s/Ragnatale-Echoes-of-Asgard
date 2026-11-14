@@ -6172,8 +6172,19 @@ function fitPetPanel() {
     if (!box) return;
     const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1;
     box.style.setProperty('--ps', s);
+    // Anchor the panel to the top-right of the game stage (the stage is letterboxed when the window is not 16:9),
+    // so it stays on the game page instead of the black border around it
+    const st = document.querySelector('#view-character .town-stage') || document.querySelector('.town-stage');
+    if (st && st.getBoundingClientRect().width > 0) {
+        const r = st.getBoundingClientRect();
+        box.style.top = (r.top + 96 * s) + 'px';
+        box.style.right = (window.innerWidth - r.right + 24 * s) + 'px';
+    } else {
+        box.style.top = '96px';
+        box.style.right = '24px';
+    }
 }
-window.addEventListener('resize', fitPetPanel);
+window.addEventListener('resize', () => { fitPetPanel(); setTimeout(fitPetPanel, 0); }); // again after the stage has been refitted
 // Pressing outside the panel closes it (the Pets button and the pets on the floor keep their own clicks)
 document.addEventListener('pointerdown', (e) => {
     const box = document.getElementById('pet-panel');
