@@ -5627,7 +5627,7 @@ function toggleCharLight(side) {
 // Each change fades out (0.5s), swaps the picture, and fades back in (0.5s).
 const TENT_POSES = {
     sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 1061, top: 524, w: 240, h: 229, anim: '' },
-    sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 580, top: 680, w: 177, h: 98, anim: 'none' } // in the green box (bed)
+    sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 550, top: 650, w: 195, h: 108, anim: 'none' } // in the green box (bed)
 };
 // Sit frames: base 4; a run is 5, 8, stop on 8 for a bit, 5, 8, then back to the base 4
 const TENT_SIT_FRAMES = { 4: 'assets/pages/character/pose/sit_4.webp', 5: 'assets/pages/character/pose/sit_5.webp', 8: 'assets/pages/character/pose/sit_8.webp' };
@@ -6286,6 +6286,12 @@ function removeTentPetWalker(tok) {
 }
 // One step of wandering: stand for a while, pick a random spot on the floor, walk there, repeat
 function tentPetStep(w, dt) {
+    // Both lights off: the pets stop and stand on the base pose (no walking) until a light comes back on
+    if (!charLightState.left && !charLightState.right && isCharClear()) {
+        if (w.state !== 'idle') { w.state = 'idle'; w.idleLeft = tentPetIdleTime(); }
+        w.frame = 0; w.frameT = 0;
+        return;
+    }
     if (w.state === 'idle') {
         w.frame = 0; w.frameT = 0;
         w.idleLeft -= dt;
