@@ -109,11 +109,13 @@ function migrateSkills() {
 
 // ---------- ELEMENTS ----------
 // Fire > Wind > Earth > Water > Fire  (key beats value)
+// Element icons: in-game pictures from graphic/cha/page/elementingame.png (assets/icons/element_*.webp)
+const ELEMENT_ICON = (k) => `<img class="el-ico" src="assets/icons/element_${k}_q85.webp" alt="">`;
 const ELEMENTS = {
-    fire:  { name: "Fire",  icon: "🔥",  beats: "wind", color: "text-orange-400" },
-    wind:  { name: "Wind",  icon: "🌪️", beats: "earth", color: "text-teal-300" },
-    earth: { name: "Earth", icon: "🪨",  beats: "water", color: "text-amber-600" },
-    water: { name: "Water", icon: "💧",  beats: "fire", color: "text-sky-400" }
+    fire:  { name: "Fire",  icon: ELEMENT_ICON('fire'),  beats: "wind", color: "text-orange-400" },
+    wind:  { name: "Wind",  icon: ELEMENT_ICON('wind'),  beats: "earth", color: "text-teal-300" },
+    earth: { name: "Earth", icon: ELEMENT_ICON('earth'), beats: "water", color: "text-amber-600" },
+    water: { name: "Ice",   icon: ELEMENT_ICON('water'), beats: "fire", color: "text-sky-400" }
 };
 const ELEMENT_KEYS = Object.keys(ELEMENTS);
 const ELEMENT_ADVANTAGE = 1.25;
