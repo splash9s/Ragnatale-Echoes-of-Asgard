@@ -251,6 +251,30 @@ function showSignInPage() {
     document.getElementById('view-signin')?.classList.remove('hidden');
     signinTermsChanged();
 }
+// Draft player-facing terms. Shown from the Terms and Conditions link on the sign-in page.
+const TERMS_TEXT = `1. Your account
+You can play as a guest, or sign in with Gmail. A guest's progress stays on this device until an email is bound in the Settings menu. Keep your sign-in safe: you are responsible for what happens on your account.
+
+2. Your game data
+Your progress, characters and friend list are saved to our cloud service so they can be restored. We keep only what the game needs to run.
+
+3. Fair play
+Do not use bots, scripts, exploits or modified game files. We may reset progress or suspend accounts that break these rules.
+
+4. Virtual items
+Gold, Diamonds, items and other in-game goods have no real-world value and cannot be exchanged for money. Purchases of virtual items are final, unless the law says otherwise.
+
+5. Names and content
+Player names must not be offensive or impersonate other people. We may rename or remove content that breaks these rules.
+
+6. Changes
+We may update the game and these terms. Playing after an update means you accept the updated terms.
+
+7. Availability
+The game is provided as it is. We do not guarantee uninterrupted service.`;
+function showTermsModal() {
+    showModal('Terms and Conditions', TERMS_TEXT);
+}
 // Sign-in buttons stay locked until the Terms and Conditions are accepted
 function signinTermsChanged() {
     const ok = !!document.getElementById('signin-terms')?.checked;
