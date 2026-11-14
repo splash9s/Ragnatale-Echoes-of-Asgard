@@ -4,7 +4,7 @@
 
 const I18N = {
     en: {
-        gameTitle: "Welcome to Ragnatale",
+        gameTitle: "Welcome to Rune Thread",
         chooseAvatar: "Choose Your Avatar:",
         uploadAvatar: "Or Upload Custom Avatar Image:",
         enterName: "Enter Hero Name:",
@@ -49,7 +49,7 @@ const I18N = {
         combatLog: "Combat Log"
     },
     th: {
-        gameTitle: "ยินดีต้อนรับสู่ Ragnatale",
+        gameTitle: "ยินดีต้อนรับสู่ Rune Thread",
         chooseAvatar: "เลือกอวาตาร์ของคุณ:",
         uploadAvatar: "หรืออัปโหลดรูปภาพอวาตาร์เอง:",
         enterName: "ใส่ชื่อฮีโร่ของคุณ:",

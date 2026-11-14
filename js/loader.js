@@ -431,7 +431,7 @@ function hideLoading() {
 }
 
 window.addEventListener('load', () => {
-    setLoading(0, 'Starting Ragnatale...');
+    setLoading(0, 'Starting Rune Thread...');
     // The loading screen always goes away, even if the preload or the game start fails
     const start = () => {
         try { if (typeof startGame === 'function') startGame(); }
