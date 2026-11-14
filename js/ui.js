@@ -5628,12 +5628,9 @@ function toggleCharLight(side) {
 // ---- Tent poses: stand (default), sit (red carpet), sleep (both lights off, or back to the leather to stand).
 // Each change fades out (0.5s), swaps the picture, and fades back in (0.5s).
 const TENT_POSES = {
-    sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 470, top: 710, w: 176, h: 168, anim: 'none' }, // on the left side of the red carpet box,
+    sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 470, top: 694, w: 194, h: 185, anim: 'none' }, // on the left side of the red carpet box,
     sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 550, top: 650, w: 195, h: 108, anim: 'none' } // in the green box (bed)
 };
-// Sit frames: base 4; a run is 5, 8, stop on 8 for a bit, 5, 8, then back to the base 4
-const TENT_SIT_FRAMES = { 4: 'assets/pages/character/pose/sit_4.webp', 5: 'assets/pages/character/pose/sit_5.webp', 8: 'assets/pages/character/pose/sit_8.webp' };
-let tentPose = 'stand', tentPoseTarget = 'stand', tentPoseSwapTimer = null, tentSitTimer = null, tentSitSteps = [];
 function tentPoseLayout(el) {
     const P = TENT_POSES[tentPose];
     if (!P) return;
@@ -5655,40 +5652,14 @@ function tentPoseSet(name) {
     const el = document.getElementById('char-hero');
     if (!el) return;
     clearTimeout(tentPoseSwapTimer);
-    stopTentSit();
     el.style.transition = 'opacity .5s ease';
     el.style.opacity = '0';
     tentPoseSwapTimer = setTimeout(() => {
         tentPose = name;
         if (name === 'stand') { el.style.animation = ''; syncHeroSprites(); } // back to the gear-composed standing hero
         else tentPoseLayout(el);
-        // sitting is a still pose: no sit animation runs
         el.style.opacity = '1';
     }, 500);
-}
-function stopTentSit() {
-    clearTimeout(tentSitTimer);
-    tentSitTimer = null;
-    tentSitSteps = [];
-}
-// Every 10 to 15 seconds the sitting player plays one run
-function scheduleTentSit() {
-    clearTimeout(tentSitTimer);
-    tentSitTimer = setTimeout(playTentSit, 10000 + Math.random() * 5000);
-}
-function playTentSit() {
-    tentSitTimer = null;
-    if (tentPose !== 'sit' || tentPoseTarget !== 'sit') return;
-    const el = document.getElementById('char-hero');
-    if (!el || !isCharClear()) { scheduleTentSit(); return; }
-    tentSitSteps = [[5, 1500], [8, 3000], [5, 1500], [8, 1500], [4, 0]]; // extremely slow; stops on 8 before the second run
-    const step = () => {
-        if (tentPose !== 'sit' || !tentSitSteps.length) { scheduleTentSit(); return; }
-        const [frame, ms] = tentSitSteps.shift();
-        el.src = TENT_SIT_FRAMES[frame];
-        tentSitTimer = setTimeout(step, ms || 1);
-    };
-    step();
 }
 // Red carpet: sit down. Yellow leather: stand up.
 function tentSitClick() { if (isCharClear()) tentPoseSet('sit'); }
