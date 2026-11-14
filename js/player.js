@@ -383,7 +383,7 @@ function getDerivedStats() {
     const elemRes = { fire: extra.res_fire, wind: extra.res_wind, earth: extra.res_earth, water: extra.res_water };
     const finalMaxArmor = rn('glassCannon') > 0 ? 0 : maxArmor;
     if (player.runes.zeroArmor && finalMaxArmor === 0) flee += 10;
-    const matk = 10 + (ST.int * 2); // magic attack: INT x2, as STR x2 gives ATK
+    const matk = 10 + (ST.int * 2); // magic attack: WIS (the int stat) x2, as STR x2 gives ATK
     return { maxHp, maxArmor: finalMaxArmor, atk, matk, def, hit, flee, crit, aspd, movementSpeed, goldMultiplier, elemRes };
 }
 
