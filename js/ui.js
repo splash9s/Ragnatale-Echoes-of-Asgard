@@ -3253,18 +3253,26 @@ function gearCardHTML(item, label) {
 }
 
 function compareHTML(selected, equipped) {
+    // Compare table in the Item Details draft style: Stat | This item | Equipped | Diff
     const s = effectiveStats(selected);
     const e = effectiveStats(equipped);
-    const keys = new Set([...Object.keys(s), ...Object.keys(e)]);
-    const rows = [...keys].map(k => {
-        const d = (s[k] || 0) - (e[k] || 0);
-        if (!d) return '';
-        // Inline colour so the better/worse colour never depends on the style build: green = better, red = worse
-        return `<div class="font-bold ${d > 0 ? 'stat-better' : 'stat-worse'}">${STAT_LABELS[k] || k.toUpperCase()} ${d > 0 ? '+' : ''}${d}</div>`;
+    const keys = [...new Set([...Object.keys(s), ...Object.keys(e)])];
+    const fmt = v => (v > 0 ? '+' : '') + v;
+    const rows = keys.map(k => {
+        const now = s[k] || 0, eq = e[k] || 0, d = now - eq;
+        const cls = d > 0 ? 'up' : d < 0 ? 'down' : 'zero';
+        const diff = d === 0 ? '0' : (d > 0 ? '+' : '') + d;
+        return `<div class="dd-cmp-row"><span class="dd-cmp-label">${STAT_LABELS[k] || k.toUpperCase()}</span>`
+            + `<span class="dd-cmp-now">${fmt(now)}</span><span class="dd-cmp-eq">${equipped ? fmt(eq) : '—'}</span>`
+            + `<span class="dd-cmp-delta ${cls}">${diff}</span></div>`;
     }).join('');
-    return `<div class="flex flex-col gap-2">
-        <div class="flex gap-2 items-stretch">${gearCardHTML(selected, 'Selected')}${gearCardHTML(equipped, 'Equipped')}</div>
-        ${rows ? `<div class="pt-2 border-t border-slate-700 text-[10px] flex flex-col gap-0.5"><span class="text-slate-400">Change if equip:</span>${rows}</div>` : ''}
+    if (!rows) return '';
+    const note = equipped && equipped.name
+        ? `<div class="dd-cmp-note">Compared with <strong>${escapeHtml(equipped.name)}</strong></div>`
+        : `<div class="dd-cmp-note">Nothing equipped in this slot</div>`;
+    return `<div class="dd-cmp">
+        <div class="dd-cmp-head"><span>Stat</span><span>This item</span><span>Equipped</span><span>Diff</span></div>
+        ${rows}${note}
     </div>`;
 }
 
