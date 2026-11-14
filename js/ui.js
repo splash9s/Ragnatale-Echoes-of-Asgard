@@ -249,6 +249,15 @@ async function firstPlayStart() {
 function showSignInPage() {
     document.getElementById('view-name-select')?.classList.add('hidden');
     document.getElementById('view-signin')?.classList.remove('hidden');
+    signinTermsChanged();
+}
+// Sign-in buttons stay locked until the Terms and Conditions are accepted
+function signinTermsChanged() {
+    const ok = !!document.getElementById('signin-terms')?.checked;
+    ['signin-gmail-btn', 'signin-anon-btn'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.disabled = !ok;
+    });
 }
 function showCharacterPage() {
     document.getElementById('view-signin')?.classList.add('hidden');
