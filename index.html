@@ -1024,8 +1024,9 @@
                     <p class="text-xs text-slate-400">Choose your character.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-amber-400 bg-amber-500/10">
-                        <img alt="" src="assets/pages/character/tent/hero_standing_q85.webp" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
+                    <div class="relative flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-amber-400 bg-amber-500/10">
+                        <img id="create-hero-img" alt="" src="assets/cha/page/spin/spin_180_q85.webp" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
+                        <button type="button" id="create-spin-btn" onclick="spinCreateHero()" class="absolute bg-transparent border-0 p-0 cursor-pointer" style="right:6px; bottom:34px; width:44px; height:44px;" aria-label="Spin character" title="Spin 45°"><img src="assets/cha/page/btn_spin_q85.webp" alt="" style="width:44px; height:44px;"></button>
                         <span class="text-xs font-bold text-amber-300">Vanguard</span>
                     </div>
                     <div aria-disabled="true" class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-slate-700 bg-slate-900 cursor-not-allowed select-none">
@@ -1844,7 +1845,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114q"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114r"></script>
+    <script src="js/ui.js?v=20261115a"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
