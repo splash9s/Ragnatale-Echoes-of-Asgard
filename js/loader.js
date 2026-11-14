@@ -350,8 +350,23 @@ function isCriticalImage(src) {
     return CRITICAL_IMAGE_PREFIXES.some(prefix => src.startsWith(prefix));
 }
 
+// First visit (no local save): only the sign-in and character select art loads before the page opens.
+// The town art loads while the player is on those screens (loadTownArtInBackground).
+function isFirstVisit() {
+    try { return !localStorage.getItem('ragnatale_save'); } catch (e) { return false; }
+}
+const FIRST_SCREEN_PREFIXES = ['assets/compaign/']; // sign-in and character select backgrounds (map select art)
+function isFirstScreenImage(src) {
+    return FIRST_SCREEN_PREFIXES.some(prefix => src.startsWith(prefix));
+}
+
+// Resolves when the town art is ready; fast players wait on it (waitForTownArt) before the town opens
+let townArtResolve;
+window.townAssetsReady = new Promise(resolve => { townArtResolve = resolve; });
+
 function runPreload() {
-    const critical = LOADING_IMAGES.filter(isCriticalImage);
+    const firstVisit = isFirstVisit();
+    const critical = LOADING_IMAGES.filter(firstVisit ? isFirstScreenImage : isCriticalImage);
     const total = critical.length;
     let done = 0;
     return Promise.all(critical.map(src =>
@@ -359,8 +374,39 @@ function runPreload() {
             done++;
             setLoading((done / total) * 100, `Loading images: ${src} (${done} / ${total})`);
         })
-    )).then(() => loadHeroArtBands(HERO_ART_EARLY_BANDS)); // the hero's early gear art is needed on the town page
+    )).then(() => {
+        if (firstVisit) return; // the town art and hero art load in loadTownArtInBackground
+        townArtResolve();
+        return loadHeroArtBands(HERO_ART_EARLY_BANDS); // the hero's early gear art is needed on the town page
+    });
 }
+
+// First visit: the town art loads while the sign-in page is open
+function loadTownArtInBackground() {
+    const town = LOADING_IMAGES.filter(isCriticalImage);
+    let next = 0;
+    const worker = () => {
+        if (next >= town.length) return Promise.resolve();
+        const src = town[next++];
+        return preloadImage(src).then(worker, worker);
+    };
+    return Promise.all([worker(), worker(), worker()])
+        .then(() => loadHeroArtBands(HERO_ART_EARLY_BANDS))
+        .then(() => townArtResolve(), () => townArtResolve());
+}
+
+// Called before the town opens: if the town art is still loading, the loading screen waits for it
+window.waitForTownArt = async function () {
+    let ready = false;
+    window.townAssetsReady.then(() => { ready = true; });
+    await Promise.resolve();
+    if (ready) return;
+    const screen = document.getElementById('loading-screen');
+    if (screen) { screen.style.display = ''; screen.style.opacity = '1'; }
+    setLoading(0, 'Preparing town...');
+    await window.townAssetsReady;
+    hideLoading();
+};
 
 // Loads the rest of the images and all sounds in the background, a few at a time, with no progress bar.
 // A file that is not loaded yet still loads when its page opens, so nothing waits on this.
@@ -392,10 +438,12 @@ window.addEventListener('load', () => {
         catch (err) { console.error('Start failed:', err); }
         hideLoading();
     };
+    const firstVisit = isFirstVisit();
     runPreload()
         .then(() => setLoading(100, 'Preparing town...'))
         .catch(err => console.log('Preload failed:', err))
         .then(start)
+        .then(() => (firstVisit ? loadTownArtInBackground() : null))
         .then(preloadRest)
         .then(() => loadHeroArtBands(HERO_ART_LATER_BANDS)); // higher gear art, in level order, after the game starts
 });

@@ -290,6 +290,7 @@ async function startGameWithName() {
 
         if (nameInput) player.name = nameInput;
         player.avatar = START_AVATAR;
+        if (typeof waitForTownArt === 'function') await waitForTownArt(); // first visit: the town art may still be loading
         saveGame();
         if (typeof cloudPushProfile === 'function') cloudPushProfile(); // the friend list shows this name at once
 
