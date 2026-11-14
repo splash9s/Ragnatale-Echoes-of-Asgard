@@ -297,6 +297,36 @@
         #character-stage .tent-spark { position: absolute; z-index: 7; pointer-events: none; border-radius: 50%; background: #ffe3a0; box-shadow: 0 0 6px 2px rgba(255,190,90,.9); }
         /* Sparks belong to the tent (clear screen) only: never shown on the normal character page or in the inventory */
         #view-character:not(.screen-clear) .tent-spark { display: none !important; }
+        /* Item detail skin (inventory, equipped gear, shop): navy card, orange title, orange primary button, navy ghost buttons */
+        .dd-skin { color: #e9edf5; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; }
+        .dd-skin .font-black { color: #f5a00b; }
+        .dd-skin div[style*="border-bottom:2px solid #b8945a"] { border-bottom-color: #26344f !important; }
+        .dd-skin button.bg-amber-600 { background-color: #e8720c !important; color: #fff !important; border: 2px solid #e8720c; border-radius: 12px; font-size: 16px !important; padding-block: 14px !important; }
+        .dd-skin button.bg-amber-600:hover { background-color: #c45f08 !important; }
+        .dd-skin button.bg-red-600, .dd-skin button.bg-amber-700, .dd-skin button.bg-purple-600, .dd-skin button.bg-emerald-600 { background-color: #1b2740 !important; color: #e9edf5 !important; border: 2px solid #26344f; border-radius: 12px; font-size: 15px !important; padding-block: 12px !important; }
+        .dd-skin button.bg-red-600:hover, .dd-skin button.bg-amber-700:hover { background-color: #101a2e !important; }
+        .dd-skin #inv-detail-close { background: #1b2740; color: #e9edf5; border: 2px solid #26344f; border-radius: 10px; }
+        .dd-skin div, .dd-skin span, .dd-skin p { color: #e9edf5; }
+        .art-dark .art-panel.dd-skin *:not([class*="text-"]):not(button) { color: #e9edf5 !important; }
+        .art-dark .art-panel.dd-skin .text-slate-400, .art-dark .art-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
+        .art-dark .art-panel.dd-skin .text-slate-200 { color: #e9edf5 !important; }
+        .art-dark .art-panel.dd-skin button { color: #e9edf5 !important; }
+        .art-dark .art-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
+        .art-dark .art-panel.dd-skin .font-black { color: #f5a00b !important; }
+        #inv-detail-panel.dd-skin *:not([class*="text-"]):not(button), #shop-detail-panel.dd-skin *:not([class*="text-"]):not(button) { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin .text-slate-400, #inv-detail-panel.dd-skin .text-slate-300, #shop-detail-panel.dd-skin .text-slate-400, #shop-detail-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin button, #shop-detail-panel.dd-skin button { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin [class*="text-slate-9"], #shop-detail-panel.dd-skin [class*="text-slate-9"], #inv-detail-panel.dd-skin [class*="text-slate-2"], #shop-detail-panel.dd-skin [class*="text-slate-2"], #inv-detail-panel.dd-skin [class*="text-black"], #shop-detail-panel.dd-skin [class*="text-black"] { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin [class*="text-slate-5"], #shop-detail-panel.dd-skin [class*="text-slate-5"] { color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin button.bg-amber-600, #shop-detail-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
+        #inv-detail-panel.dd-skin .font-black, #shop-detail-panel.dd-skin .font-black { color: #f5a00b !important; }
+        .dd-skin .font-black { color: #f5a00b !important; }
+        .dd-skin button { color: #e9edf5; }
+        .dd-skin button.bg-amber-600 { color: #fff !important; }
+        .dd-skin .text-slate-400, .dd-skin .text-slate-300 { color: #9aa6bd !important; }
+        .dd-skin .text-slate-200 { color: #e9edf5 !important; }
+        .dd-skin .text-amber-200, .dd-skin .text-amber-300 { color: #f5a00b !important; }
+        .dd-skin .bg-slate-950\/60, .dd-skin .bg-slate-950 { background-color: #0b1322 !important; border-color: #26344f !important; }
         /* Tent light only on the tent view (clear screen); the equipment page is not lit */
         #view-character:not(.screen-clear) .sprite-light { display: none !important; }
         #view-character .sprite-light-left { background: radial-gradient(circle 620px at var(--lx, 0px) var(--ly, 0px), rgba(255,180,90,.85), rgba(255,150,60,.35) 50%, rgba(255,140,40,0) 100%); }
@@ -1315,7 +1345,7 @@
                         <div id="equipment-slots-container" class="absolute" style="left:0; top:0; width:400px; height:700px;"></div>
                         <div id="set-bonus-panel" class="hidden"></div>
                     </div>
-                    <div id="inv-detail-panel" data-drag-panel class="art-panel" style="left:0px; top:69px; width:756px; height:auto; max-height:1007px; overflow-y:auto; display:none; z-index:7; background-color:rgba(231,209,170,.9) !important; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
+                    <div id="inv-detail-panel" data-drag-panel class="art-panel dd-skin" style="left:0px; top:69px; width:756px; height:auto; max-height:1007px; overflow-y:auto; display:none; z-index:7; background-color:#111a2c !important; border:2px solid #26344f !important; border-radius:16px; padding:24px 26px; box-shadow:none;"></div>
                     <div id="char-panel-right" class="art-panel" style="left:762px; top:80px; width:1131px; height:980px; overflow:hidden;">
                         <div class="flex flex-col" style="position:absolute; left:20px; top:14px; width:1091px; gap:22px;">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1369,7 +1399,7 @@
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
                         </div>
                     </div>
-                    <div id="shop-detail-panel" data-drag-panel class="art-panel" style="left:1127px; top:214px; width:564px; height:716px; overflow-y:auto; display:none; z-index:6; background-color:#ead8b4 !important; opacity:1; border:none !important; border-radius:18px; padding:24px 26px; box-shadow:none;"></div>
+                    <div id="shop-detail-panel" data-drag-panel class="art-panel dd-skin" style="left:1127px; top:214px; width:564px; height:716px; overflow-y:auto; display:none; z-index:6; background-color:#111a2c !important; opacity:1; border:2px solid #26344f !important; border-radius:16px; padding:24px 26px; box-shadow:none;"></div>
                     <div id="shop-panel-right" class="art-panel" style="left:1127px; top:214px; width:564px; height:716px;">
                         <div id="shop-armory-section" class="flex flex-col gap-3">
                             <div id="armory-filter-bar" class="flex flex-wrap gap-2"></div>
