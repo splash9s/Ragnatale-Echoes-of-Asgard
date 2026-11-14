@@ -4173,13 +4173,36 @@ function renderCreateStats() {
             + `<span class="flex items-center gap-2"><span class="font-bold text-slate-100">${val}${add ? ` <span class="text-amber-300">+${add}</span>` : ''}</span>`
             + `<button type="button" onclick="addStat('${k}')"${full ? ' disabled' : ''} class="w-7 h-7 rounded-lg bg-amber-600 text-slate-950 font-black cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">+</button></span></div>`;
     }).join('');
-    // Derived combat numbers from the current gear and stats
-    const d = typeof getDerivedStats === 'function' ? getDerivedStats() : null;
-    if (d) {
-        const cells = [['ATK', d.atk], ['DEF', d.def], ['HIT', d.hit], ['FLEE', d.flee]];
-        rows.innerHTML += `<div class="mt-2 pt-2 border-t border-slate-700 grid grid-cols-2 gap-x-3 gap-y-1">`
-            + cells.map(([k, v]) => `<div class="flex items-center justify-between text-xs"><span class="text-slate-400 font-bold">${k}</span><span class="font-bold text-slate-100">${v}</span></div>`).join('')
+    // Derived combat numbers: the current value, and the preview with the pending stat points added
+    const now = typeof getDerivedStats === 'function' ? getDerivedStats() : null;
+    if (now) {
+        const next = previewDerivedStats();
+        const cells = [
+            ['ATK', now.atk, next.atk], ['DEF', now.def, next.def], ['HIT', now.hit, next.hit],
+            ['FLEE', now.flee, next.flee], ['CRIT', `${Math.round(now.crit * 10) / 10}%`, `${Math.round(next.crit * 10) / 10}%`], ['ASPD', now.aspd, next.aspd]
+        ];
+        rows.innerHTML += `<div class="mt-2 pt-2 border-t border-slate-700 grid grid-cols-1 gap-y-1">`
+            + cells.map(([k, a, b]) => {
+                const changed = String(a) !== String(b);
+                const val = changed
+                    ? `<span class="text-slate-500 line-through mr-1">${a}</span><span class="text-emerald-300 font-bold">${b}</span>`
+                    : `<span class="text-slate-100 font-bold">${b}</span>`;
+                return `<div class="flex items-center justify-between text-xs"><span class="text-slate-400 font-bold">${k}</span><span>${val}</span></div>`;
+            }).join('')
             + `</div>`;
+    }
+}
+
+// Derived stats as they would be with the pending stat points spent (player data is restored straight after)
+function previewDerivedStats() {
+    const saved = player.stats;
+    try {
+        const merged = { ...player.stats };
+        for (const k in pendingAlloc.stats) merged[k] = (merged[k] || 0) + (pendingAlloc.stats[k] || 0);
+        player.stats = merged;
+        return getDerivedStats();
+    } finally {
+        player.stats = saved;
     }
 }
 
