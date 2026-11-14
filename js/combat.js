@@ -142,10 +142,10 @@ const RUNE_DEFS = {
     shieldRecovery: { name: "Shield Mender Rune", rarity: 1, add: 20, once: true, desc: "Miss restores 20% armor", text: v => `Miss restores ${v}% armor` },
     riposte: { name: "Riposte Rune", rarity: 1, flag: true, desc: "Your attack after a dodge is always a crit", text: () => "Your attack after a dodge is always a crit" },
     surgeFocus: { name: "Surge Focus Rune", rarity: 4, add: 40, once: true, desc: "After a crit: next attack +40% crit chance", text: v => `After a crit: next attack +${v}% crit chance` },
-    fireBolt: { name: "Fire Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 fire bolts (50% ATK each)", text: v => `${v}% on hit: 4 fire bolts (50% ATK each)` },
-    coldBolt: { name: "Cold Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 cold bolts (50% ATK each)", text: v => `${v}% on hit: 4 cold bolts (50% ATK each)` },
-    thunderBolt: { name: "Thunder Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 thunder bolts (50% ATK each)", text: v => `${v}% on hit: 4 thunder bolts (50% ATK each)` },
-    rockBolt: { name: "Rock Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 rock bolts (50% ATK each)", text: v => `${v}% on hit: 4 rock bolts (50% ATK each)` },
+    fireBolt: { name: "Fire Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 fire bolts (50% MATK each)", text: v => `${v}% on hit: 4 fire bolts (50% MATK each)` },
+    coldBolt: { name: "Ice Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 ice bolts (50% MATK each)", text: v => `${v}% on hit: 4 ice bolts (50% MATK each)` },
+    thunderBolt: { name: "Wind Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 wind bolts (50% MATK each)", text: v => `${v}% on hit: 4 wind bolts (50% MATK each)` },
+    rockBolt: { name: "Earth Bolt Rune", rarity: 1, add: 10, desc: "10% on hit: 4 earth bolts (50% MATK each)", text: v => `${v}% on hit: 4 earth bolts (50% MATK each)` },
     archerFriendlyFire: { name: "Friendly Fire Rune", rarity: 2, add: 50, once: true, disabled: true, desc: "Archers: 50% chance to hit allies in front", text: () => "Archers: 50% chance to hit allies in front" },
     autoPotion: { name: "Auto Potion Rune", rarity: 1, flag: true, disabled: true, desc: "Drink a potion automatically below 25% HP", text: () => "Drink a potion automatically below 25% HP" },
     potionDamage: { name: "Alchemist's Fury Rune", rarity: 2, add: 50, once: true, disabled: true, desc: "After a potion: +50% damage for 5 sec", text: () => "After a potion: +50% damage for 5 sec" },
@@ -1601,12 +1601,14 @@ function runCombatTick() {
             const casters = getAliveMonsters().filter(m => ['range', 'mage', 'healer'].includes(roleOf(m)) && !m.status);
             if (casters.length) applyStunStatus(casters[Math.floor(Math.random() * casters.length)]);
         }
+        // Bolt runes: 4 bolts of their element, each 50% of MATK (element advantage applies as for other attacks)
+        const BOLT_ELEMENT = { fireBolt: 'fire', coldBolt: 'water', thunderBolt: 'wind', rockBolt: 'earth' };
         ['fireBolt', 'coldBolt', 'thunderBolt', 'rockBolt'].forEach(id => {
             const ch = runeN(id);
             if (ch > 0 && Math.random() * 100 < ch) {
                 for (let b = 0; b < 4; b++) {
                     if (targetEnemy.hp <= 0) break;
-                    const bolt = Math.floor(derived.atk * 0.5);
+                    const bolt = Math.max(1, Math.floor(derived.matk * 0.5 * getElementMultiplier(BOLT_ELEMENT[id], targetEnemy.element)));
                     targetEnemy.hp -= bolt;
                     logMessage(`[Bolt] ${RUNE_DEFS[id].name} hits ${targetEnemy.name} for ${bolt} damage`, 'drop');
                 }
