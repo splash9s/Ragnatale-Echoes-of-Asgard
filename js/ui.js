@@ -84,6 +84,10 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 5, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
+    { id: 'estone_fire', name: "Fire Elemental Stone", price: 3, type: 'estone', element: 'fire', desc: "Forge Fire onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_fire.webp' },
+    { id: 'estone_water', name: "Water Elemental Stone", price: 3, type: 'estone', element: 'water', desc: "Forge Water onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_water.webp' },
+    { id: 'estone_earth', name: "Earth Elemental Stone", price: 3, type: 'estone', element: 'earth', desc: "Forge Earth onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_earth.webp' },
+    { id: 'estone_wind', name: "Wind Elemental Stone", price: 3, type: 'estone', element: 'wind', desc: "Forge Wind onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_wind.webp' },
     { id: 'exp_2x_3h', name: "2x EXP (3 hours)", price: 10, type: 'boost', boost: 'exp', ms: 3 * 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 3 hours.", icon: 'assets/shop/diamond/expmulti.png' },
     { id: 'gold_2x_3h', name: "2x Gold (3 hours)", price: 5, type: 'boost', boost: 'gold', ms: 3 * 60 * 60 * 1000, desc: "Double gold from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
@@ -1109,7 +1113,6 @@ function petLick(el) {
         spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
     }
     el.dataset.licking = '1';
-    playSound('sound/cat-meow.mp3', 2.5);
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
     show(1);
     setTimeout(() => {
@@ -2566,6 +2569,10 @@ function buyDiamondItem(itemId) {
     } else if (item.type === 'boost') {
         startBoost(item.boost, item.ms);
         showModal("Boost Active", `${item.name} started. It lasts ${item.ms / (60 * 60 * 1000)} hours from now.`);
+    } else if (item.type === 'estone') {
+        if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
+        player.elementStones[item.element] = (player.elementStones[item.element] || 0) + 1;
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'pet') {
         addItemToInventory({ name: item.name, type: 'pet', slot: 'pet', qty: 1, stats: item.stats, desc: item.desc });
         floatSuccessAt("Purchased!");
@@ -5192,7 +5199,6 @@ function updateUI() {
                 setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
                 if (m.hp <= 0) {
                     m._deathAt = Date.now();
-                    if (typeof playSound === 'function') playSound('sound/slime_dead.mp3');
                 }
             }
             const goneAt = m._deathAt ? Date.now() - m._deathAt >= monsterDeathTotalMs(m) : false;
@@ -5894,7 +5900,6 @@ function strawHit(hit) {
     const { dmg, crit } = hit;
     showStrawDamage(String(dmg), crit);
     playStrawSlash(crit);
-    playSound(crit ? 'sound/critical.mp3' : 'sound/hit.mp3');
 }
 function strawAttack() {
     if (strawBusy) return;
@@ -5915,7 +5920,6 @@ const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    playSound('sound/blacksmith-hammer-swing.mp3'); // one sound per swing cycle, starts with the animation
     const total = SMITH_SWING_FRAMES.length * SMITH_SWINGS;
     for (let k = 0; k < total; k++) {
         setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k % SMITH_SWING_FRAMES.length]), k * SMITH_FRAME_MS);
@@ -5964,7 +5968,6 @@ function blackCatClick() {
     if (blackCatPlaying || Date.now() < blackCatCooldownUntil) return;
     blackCatPlaying = true;
     blackCatCooldownUntil = Date.now() + 10000;
-    playSound('sound/angrycat.mp3');
     const seq = [6, 4, 6];
     let i = 0;
     const step = () => {
@@ -6094,7 +6097,6 @@ let catWalkAnim = null, catShadowAnim = null, catFrameTimer = null, catWalkFrame
 function catClick() {
     if (catLicking || townWalker !== 'cat' || !catWalkAnim) return;
     catLicking = true;
-    playSound('sound/cat-meow.mp3', 2.5);
     catWalkAnim.pause();
     if (catShadowAnim) catShadowAnim.pause();
     clearInterval(catFrameTimer);
@@ -6335,7 +6337,6 @@ function ensureTentPetLoop() {
 function tentPetLick(w) {
     if (w.state === 'lick') return;
     w.state = 'lick';
-    playSound('sound/cat-meow.mp3', 2.5); // same sound as the main page pet
     w.cat.style.display = 'none';
     w.lick.style.display = 'block';
     if (petDailyPlay(tentPetItem(w.token))) {

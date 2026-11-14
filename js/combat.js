@@ -1002,7 +1002,6 @@ function checkLevelUps() {
         player.baseMaxExp = baseExpNeed(player.baseLv);
         player.statPoints += 3;
         logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points`, 'levelup');
-        playSound('sound/lvup.mp3');
     }
 
     if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
@@ -1046,7 +1045,6 @@ function awardKill(m) {
     if (stageSummary) { stageSummary.gold += finalGold; stageSummary.baseExp += baseExpGain; stageSummary.jobExp += jobExpGain; }
     logMessage(`[Victory] Defeated ${m.name}! Gained ${baseExpGain} Base EXP, ${jobExpGain} Class EXP and <span style="color: yellow;">${finalGold} Gold</span>`, 'winlose');
     player.gold += finalGold;
-    if (finalGold > 0) playSound('sound/coin-money.mp3');
     if (finalGold > 0) showMonsterGroundDrop(m, `<span style="display:flex; align-items:center; gap:4px;"><img src="assets/icons/goldpile_q85.webp" alt="" style="width:53px;height:41px;object-fit:contain;"><b style="color:#fde68a; font-size:22px; text-shadow:0 1px 2px #000;">+${finalGold}</b></span>`);
     if (m.isFinalBoss) { player.diamonds += 100; logMessage(`[Final Boss] Defeated! Reward: 100 Diamond`, 'drop'); }
     player.baseExp += baseExpGain;
@@ -1558,7 +1556,6 @@ function runCombatTick() {
             const critIdx = monstersList.indexOf(targetEnemy);
             if (critIdx >= 0 && typeof playCritFx === 'function') setTimeout(() => playCritFx(`#monsters-lineup-container > div:nth-child(${critIdx + 1}) img`), 0);
             updateQuestProgress('crit', 1);
-            playSound('sound/critical.mp3');
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
             critStreak++;
             if (runeN('critSplash') > 0) {
@@ -1580,7 +1577,6 @@ function runCombatTick() {
             }
         } else {
             critStreak = 0;
-            playSound('sound/hit.mp3');
             const atkIdx = monstersList.indexOf(targetEnemy);
             if (atkIdx >= 0 && typeof playAtkFx === 'function') setTimeout(() => playAtkFx(`#monsters-lineup-container > div:nth-child(${atkIdx + 1}) img`), 0);
             logMessage(`[Attack] Hit ${targetEnemy.name} for ${pDmg} damage`, 'combat');
@@ -1722,7 +1718,6 @@ function onStageCleared() {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
                 showModal("Event Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
-                playSound('sound/mvp.mp3');
                 updateUI();
                 saveGame();
                 return;
@@ -1731,7 +1726,6 @@ function onStageCleared() {
             if ((currentMode === 'voidtest' || currentMode === 'bossmap') && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 showModal(currentMode === 'bossmap' ? "Boss Gauntlet Cleared!" : "Void Test Map Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
-                playSound('sound/mvp.mp3');
                 updateUI();
                 saveGame();
                 return;
@@ -1754,7 +1748,6 @@ function onStageCleared() {
                 addItemToInventory(rollSetForDrop(reward));
 
                 showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
-                playSound('sound/mvp.mp3');
                 return;
             }
 
@@ -1763,7 +1756,6 @@ function onStageCleared() {
                 getEventState().dailyCleared = true;
                 updateUI();
                 saveGame();
-                playSound('sound/mvp.mp3');
                 openChest('gold');
                 switchView('town');
                 return;
@@ -1803,10 +1795,8 @@ function onStageCleared() {
         if (wasBossStage && currentStage < maxStages) {
             // Boss stage completed (not the last stage): show the result right away; closing it moves on
             showModal("Boss Defeated!", '', buildMapSummaryHTML('win', `Continue to Stage ${currentStage + 1}`, false, 'Boss Defeated'), () => continueRun());
-            playSound('sound/mvp.mp3');
         } else if (wasBossStage) {
             // Final boss: its result is the map result shown by proceedNext, so only the sound plays here
-            playSound('sound/mvp.mp3');
             continueRun();
         } else {
             continueRun();

@@ -4,12 +4,7 @@
 // ==========================================
 
 const LOADING_SOUNDS = [
-    'sound/bgm.mp3',
-    'sound/critical.mp3',
-    'sound/hit.mp3',
-    'sound/lvup.mp3',
-    'sound/mvp.mp3',
-    'sound/slime_dead.mp3'
+    'sound/bgm.mp3'
 ];
 
 const LOADING_IMAGES = [
