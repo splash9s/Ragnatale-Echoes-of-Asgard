@@ -57,10 +57,7 @@ const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).
 const GOLD_SHOP_CONSUMABLES = [
     { id: 'potion_minor', name: "Minor Healing Potion", price: 100, type: 'potion', heal: 200, desc: "Restores 200 HP" },
     { id: 'potion_med', name: "Medium Healing Potion", price: 300, type: 'potion', heal: 500, desc: "Restores 500 HP" },
-    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP" },
-    { id: 'gchest_copper', name: "Copper Chest", price: 2500, type: 'chest', chestType: 'copper', desc: "" },
-    { id: 'gchest_silver', name: "Silver Chest", price: 10000, type: 'chest', chestType: 'silver', desc: "" },
-    { id: 'gchest_gold', name: "Gold Chest", price: 20000, type: 'chest', chestType: 'gold', desc: "" }
+    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP" }
 ];
 
 // Healing potion numbers come from GOLD_SHOP_CONSUMABLES (matched by name), so potions already in a save heal the current amount.
@@ -4687,7 +4684,7 @@ function claimQuestMilestone(count) {
 const CHEST_REWARDS = {
     copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1 },
     silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1 },
-    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2 }
+    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 5 }
 };
 
 // Reward popups show item icons (gold shows the coin icon and amount)
@@ -4706,6 +4703,9 @@ function rewardPopupHTML(title, cells, extra = '') {
 function potionCellHTML(item, qty) {
     return `<div title="${item.name}" class="flex items-center justify-center relative" style="width:96px;height:92px;${REWARD_SLOT_BG}">${itemIconHTML(item)}<span class="absolute bottom-1 right-2 text-xs font-bold text-amber-200">x${qty}</span></div>`;
 }
+function diamondCellHTML(amount) {
+    return `<div class="flex flex-col items-center gap-1"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;"><span class="text-purple-300 font-bold text-sm">${amount} Diamonds</span></div>`;
+}
 function goldCellHTML(amount) {
     return `<div class="flex flex-col items-center gap-1"><img src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;"><span class="text-amber-300 font-bold text-sm">${amount} Gold</span></div>`;
 }
@@ -4718,6 +4718,11 @@ function openChest(chestType) {
     if (potionTemplate) {
         addItemToInventory({ ...potionTemplate, qty: potionQty });
         rewardCells.push(potionCellHTML(potionTemplate, potionQty));
+    }
+
+    if (cfg.diamonds) {
+        player.diamonds = (player.diamonds || 0) + cfg.diamonds;
+        rewardCells.push(diamondCellHTML(cfg.diamonds));
     }
 
     const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
