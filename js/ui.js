@@ -5619,7 +5619,7 @@ function toggleCharLight(side) {
 
 // ---- Tent poses: stand (default) and sleep (both lights off). Each change fades out (0.5s), swaps, and fades back in (0.5s).
 const TENT_POSES = {
-    sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 580, top: 680, w: 177, h: 98, anim: 'none' } // fitted into the bed (green box)
+    sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 1062, top: 692, w: 177, h: 98, anim: 'none' } // sized to the bed (green box), placed on the leather rug
 };
 let tentPose = 'stand', tentPoseTarget = 'stand', tentPoseSwapTimer = null;
 function tentPoseLayout(el) {
