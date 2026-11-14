@@ -98,7 +98,7 @@ const RUNE_DEFS = {
     focus: { name: "Inner Calm Rune", rarity: 1, add: 10, desc: "Missing restores 10% HP", text: v => `Missing restores ${v}% HP` },
     maxHpBonus: { name: "Vitality Rune", rarity: 5, add: 50, desc: "+50% of your current HP added to Max HP when picked", text: () => "+50% of your current HP added to Max HP when picked", onApply: () => { player.runes.vitalityFlat = (player.runes.vitalityFlat || 0) + Math.floor(player.hp * 0.5); } },
     firstHitBonus: { name: "Stunning Strike Rune", rarity: 2, add: 50, desc: "First hit on each enemy: +50% damage", text: v => `First hit on each enemy: +${v}% damage` },
-    randomHitCount: { name: "Chaos Rune", rarity: 4, add: 1, once: true, desc: "50% of attacks hit a random enemy and deal 50% ATK to the enemy behind", text: () => "50% of attacks hit a random enemy and deal 50% ATK to the enemy behind" },
+    randomHitCount: { name: "Chaos Rune", rarity: 4, add: 1, once: true, desc: "50% of attacks hit a random enemy. Each hit also deals 50% of ATK to the enemy directly behind", text: () => "50% of attacks hit a random enemy. Each hit also deals 50% of ATK to the enemy directly behind" },
     backstab: { name: "Backstab Rune", rarity: 2, add: 20, once: true, desc: "Each hit also deals 20% ATK damage to the enemy behind", text: v => `Each hit also deals ${v}% ATK damage to the enemy behind` },
     thorn: { name: "Briar Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage", text: v => `Reflect ${v}% of melee damage` },
     critHeal: { name: "Critical Heal Rune", rarity: 2, add: 5, desc: "Crit restores 5% HP", text: v => `Crit restores ${v}% HP` },
