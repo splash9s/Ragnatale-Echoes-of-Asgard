@@ -2536,7 +2536,8 @@ function renderRuneSlot() {
     const count = player.blacksmithRuneStones || 0;
     if (count < 1) blacksmithRuneOn = false;
     if (runeEl) {
-        runeEl.innerHTML = `<img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:36px;height:36px;object-fit:contain;"><span style="font-size:12px; font-weight:900; color:${blacksmithRuneOn ? '#86efac' : '#fca5a5'};">${blacksmithRuneOn ? 'ON' : 'OFF'}</span>`;
+        // Green border = Rune Stone on, red border = off (no text)
+        runeEl.innerHTML = `<div title="${blacksmithRuneOn ? 'Rune Stone on' : 'Rune Stone off'}" style="width:66px;height:66px;box-sizing:border-box;border:4px solid ${blacksmithRuneOn ? '#22c55e' : '#ef4444'};border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);"><img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:40px;height:40px;object-fit:contain;"></div>`;
     }
     if (balEl) balEl.innerHTML = `<img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;"> Rune Stone: ${count}`;
 }
@@ -2555,7 +2556,9 @@ function renderBlacksmithSlot() {
         return;
     }
     const lv = gear.refineLevel || 0;
-    slotEl.innerHTML = `${itemIconHTML(gear, 60)}<span>${lv > 0 ? '+' + lv : ''}</span>`;
+    // The +level sits behind the item icon, at the bottom of the box
+    slotEl.innerHTML = `<div style="position:relative; z-index:1; display:flex;">${itemIconHTML(gear, 60)}</div>`
+        + (lv > 0 ? `<span style="position:absolute; z-index:0; left:50%; bottom:2px; transform:translateX(-50%); font-size:16px; font-weight:900; color:#86efac; text-shadow:0 1px 3px #000; white-space:nowrap;">+${lv}</span>` : '');
     const isMax = lv >= 10;
     const cost = (lv + 1) * 100;
     const rateEl = document.getElementById('bs-success-rate');
