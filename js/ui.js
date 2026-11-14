@@ -5626,7 +5626,7 @@ function toggleCharLight(side) {
 // ---- Tent poses: stand (default), sit (red carpet), sleep (both lights off, or back to the leather to stand).
 // Each change fades out (0.5s), swaps the picture, and fades back in (0.5s).
 const TENT_POSES = {
-    sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 1061, top: 524, w: 240, h: 229, anim: '' },
+    sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 470, top: 583, w: 240, h: 229, anim: 'none' }, // on the left side of the red carpet box,
     sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 550, top: 650, w: 195, h: 108, anim: 'none' } // in the green box (bed)
 };
 // Sit frames: base 4; a run is 5, 8, stop on 8 for a bit, 5, 8, then back to the base 4
@@ -5679,7 +5679,7 @@ function playTentSit() {
     if (tentPose !== 'sit' || tentPoseTarget !== 'sit') return;
     const el = document.getElementById('char-hero');
     if (!el || !isCharClear()) { scheduleTentSit(); return; }
-    tentSitSteps = [[5, 350], [8, 1000], [5, 350], [8, 350], [4, 0]];
+    tentSitSteps = [[5, 1500], [8, 3000], [5, 1500], [8, 1500], [4, 0]]; // extremely slow; stops on 8 before the second run
     const step = () => {
         if (tentPose !== 'sit' || !tentSitSteps.length) { scheduleTentSit(); return; }
         const [frame, ms] = tentSitSteps.shift();
