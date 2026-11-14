@@ -931,7 +931,7 @@
             <!-- Same background as the map select page, blurred -->
             <div aria-hidden="true" class="absolute inset-0" style="background:url(assets/compaign/mapselect02_q85.webp) center/cover no-repeat; filter:blur(8px); transform:scale(1.06);"></div>
             <div class="relative bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl text-center">
-                <h2 class="text-lg font-bold text-amber-400 pixel-font">Welcome to Rune Thread</h2>
+                <h2 class="text-lg font-bold text-amber-400" style="font-family:Roboto,'Noto Sans Thai',sans-serif; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:5px;">Welcome to Rune Thread</h2>
                 <p class="text-xs text-slate-400">Sign in to keep your progress in the cloud.</p>
                 <div class="flex items-start gap-2 text-xs text-slate-300 text-left">
                     <input type="checkbox" id="signin-terms" onchange="signinTermsChanged()" class="mt-0.5 w-4 h-4 accent-amber-500 cursor-pointer">
@@ -971,7 +971,7 @@
             </aside>
             <div class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 shadow-2xl">
                 <div class="text-center">
-                    <h2 class="text-lg font-bold text-amber-400 pixel-font mb-1">RUNE THREAD</h2>
+                    <h2 class="text-lg font-bold text-amber-400 mb-1" style="font-family:Roboto,'Noto Sans Thai',sans-serif; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:5px;">RUNE THREAD</h2>
                     <p class="text-xs text-slate-400">Choose your character.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -992,12 +992,19 @@
                         <button type="button" onclick="randomPlayerName()" class="shrink-0 px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-xl text-xs cursor-pointer">Random</button>
                     </div>
                 </div>
-                <button onclick="startGameWithName()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg cursor-pointer">
-                    Begin Journey
+                <button type="button" onclick="startGameWithName()" class="begin-btn w-full flex justify-center bg-transparent border-0 p-0 cursor-pointer" aria-label="Begin Journey">
+                    <img class="begin-normal block" src="assets/cha/page/begin_v2_q85.webp" alt="Begin Journey" style="width:300px; max-width:100%; height:auto;">
+                    <img class="begin-press block" src="assets/cha/page/beginpress_v2_q85.webp" alt="" style="width:300px; max-width:100%; height:auto; display:none;">
                 </button>
             </div>
             </div>
         </div>
+
+        <style>
+            /* Begin Journey plaque: the pressed picture shows while the button is held */
+            .begin-btn:active .begin-normal { display: none !important; }
+            .begin-btn:active .begin-press { display: block !important; }
+        </style>
 
         <!-- VIEW: TOWN -->
         <div id="view-town" class="flex flex-col flex-1">
@@ -1784,7 +1791,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114al"></script>
+    <script src="js/ui.js?v=20261114am"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
