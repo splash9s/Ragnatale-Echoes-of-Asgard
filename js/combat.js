@@ -121,6 +121,8 @@ const SFX_LEVEL = {
     'sound/sfx/monster/human_dead3.mp3': 1.27,
     'sound/sfx/monster/human_dead4.mp3': 0.8,
     'sound/sfx/monster/mage_attack.mp3': 2.24,
+    'sound/sfx/monster/skeleton_damaged.mp3': 3.6,
+    'sound/sfx/monster/skeleton_dead.mp3': 3.8,
     'sound/sfx/monster/mossy_golem_attack.mp3': 1.15,
     'sound/sfx/monster/mossy_golem_damaged.mp3': 0.8,
     'sound/sfx/monster/mossy_golem_dead.mp3': 1.33,
@@ -145,7 +147,7 @@ const MONSTER_SFX = {
     M046: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },         // Jotun Frost Mage
     M060: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Battle Storm Mage
     M070: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Muspel Flame Mage
-    M084: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },         // Hel Stone Mage
+    M084: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'skeleton_damaged.mp3', dead: MSFX+'skeleton_dead.mp3' },       // Hel Stone Mage (skeleton sounds)
     // Healers (no attack sound of their own yet: the heal sound is used)
     M043: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },         // Frost Shaman
     M056: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Valkyrie Healer
