@@ -6031,3 +6031,27 @@ function togglePetWalk(tok) {
     renderPetPanel();
 }
 setInterval(syncTentPets, 1000);
+
+// Detail windows (item, shop, quest, skill, mail, events) can be dragged by their background.
+// Buttons and inputs keep their clicks; the stage scale is divided out so the panel follows the pointer exactly.
+(function () {
+    let drag = null;
+    const SKIP = 'button, a, input, select, textarea, label, [contenteditable]';
+    document.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0 || !e.target || !e.target.closest) return;
+        const panel = e.target.closest('[data-drag-panel]');
+        if (!panel || e.target.closest(SKIP)) return;
+        const rect = panel.getBoundingClientRect();
+        const scale = (panel.offsetWidth ? rect.width / panel.offsetWidth : 1) || 1;
+        drag = { el: panel, sx: e.clientX, sy: e.clientY, left: panel.offsetLeft, top: panel.offsetTop, scale };
+        panel.style.userSelect = 'none';
+    }, true);
+    document.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        drag.el.style.left = Math.round(drag.left + (e.clientX - drag.sx) / drag.scale) + 'px';
+        drag.el.style.top = Math.round(drag.top + (e.clientY - drag.sy) / drag.scale) + 'px';
+    });
+    const end = () => { if (drag) drag.el.style.userSelect = ''; drag = null; };
+    document.addEventListener('pointerup', end);
+    document.addEventListener('pointercancel', end);
+})();
