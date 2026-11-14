@@ -5851,7 +5851,9 @@ function playSmithSwing() {
 function scheduleSmithSwing() {
     setTimeout(() => {
         const town = document.getElementById('view-town');
-        if (town && !town.classList.contains('hidden')) playSmithSwing();
+        // Not while another page sits on top of the main page (create character, sign-in)
+        const covered = ['view-name-select', 'view-signin'].some(id => { const v = document.getElementById(id); return v && !v.classList.contains('hidden'); });
+        if (town && !town.classList.contains('hidden') && !covered) playSmithSwing();
     }, Math.random() * 60000);
     setTimeout(scheduleSmithSwing, 60000);
 }
