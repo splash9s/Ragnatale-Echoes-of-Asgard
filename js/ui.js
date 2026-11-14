@@ -5410,7 +5410,7 @@ function renderLibraryRules() {
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
             <h3 class="font-bold text-xs text-amber-400 mb-2">Monster Status</h3>
             <ul class="list-disc pl-4 text-[10px] text-slate-300 flex flex-col gap-1">
-                <li><span class="text-sky-300">Freeze</span>: cannot attack or dodge for 2 seconds, and takes the water element.</li>
+                <li><span class="text-sky-300">Freeze</span>: cannot attack or dodge for 2 seconds, and takes the ice element.</li>
                 <li><span class="text-lime-300">Rock</span>: cannot attack or dodge for 2 seconds, and takes the earth element.</li>
                 <li><span class="text-yellow-400">Stun</span>: cannot attack for 2 seconds (from the Stun Touch, Ranged Stun and Stun Burst runes).</li>
                 <li><span class="text-orange-400">Ignite</span> and <span class="text-lime-400">Poison</span>: damage over time while afflicted.</li>

@@ -36,7 +36,7 @@ function beginnerClearStep(level, chest) {
     return {
         id: `clear${level}`,
         title: `Clear LV ${level} of all path`,
-        desc: `Clear the LV ${level} map on every path: Fire, Water, Earth and Wind.`,
+        desc: `Clear the LV ${level} map on every path: Fire, Ice, Earth and Wind.`,
         pathsDone: () => beginnerPathKeys().map(pk => ({ name: pk, done: !!(player.clearedMaps || {})[`${pk}:map${level}`] })),
         chest,
         check: () => {

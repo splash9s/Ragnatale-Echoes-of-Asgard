@@ -1210,7 +1210,7 @@
                     <div class="expo-node" id="expo-node-earth" style="left:532px; top:390px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div class="expo-node" id="expo-node-final" style="left:939px; top:132px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div class="expo-node" id="expo-node-fire" style="left:1351px; top:388px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
-                    <div class="expo-node" id="expo-node-water" style="left:443px; top:712px;" onclick="openCampaignPath('water')" title="Water Path (Teal Cave)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-water" style="left:443px; top:712px;" onclick="openCampaignPath('water')" title="Ice Path (Teal Cave)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div class="expo-node" id="expo-node-wind" style="left:1406px; top:670px;" onclick="openCampaignPath('wind')" title="Wind Path (Storm)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div id="campaign-panel" class="expo-panel hidden">
@@ -1283,7 +1283,7 @@
 
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
                 <h3 class="text-sm font-bold text-amber-300">Element System</h3>
-                <p class="text-[11px] text-slate-300">Each element beats one other element. Fire beats Wind, Wind beats Earth, Earth beats Water, and Water beats Fire.</p>
+                <p class="text-[11px] text-slate-300">Each element beats one other element. Fire beats Wind, Wind beats Earth, Earth beats Ice, and Ice beats Fire.</p>
                 <ul class="text-[11px] text-slate-300 list-disc pl-5 flex flex-col gap-1">
                     <li>Attacking with the element that beats the target deals x1.25 damage.</li>
                     <li>Attacking with the element the target beats deals x0.75 damage.</li>
@@ -1294,8 +1294,8 @@
                 <div class="grid grid-cols-2 gap-2 text-[11px]">
                     <div class="p-2 rounded-lg bg-slate-950 border border-orange-500/40 text-orange-300">🔥 Fire Path: beats Wind</div>
                     <div class="p-2 rounded-lg bg-slate-950 border border-teal-400/40 text-teal-300">🌪️ Wind Path: beats Earth</div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-amber-600/40 text-amber-500">🪨 Earth Path: beats Water</div>
-                    <div class="p-2 rounded-lg bg-slate-950 border border-sky-400/40 text-sky-300">💧 Water Path: beats Fire</div>
+                    <div class="p-2 rounded-lg bg-slate-950 border border-amber-600/40 text-amber-500">🪨 Earth Path: beats Ice</div>
+                    <div class="p-2 rounded-lg bg-slate-950 border border-sky-400/40 text-sky-300">💧 Ice Path: beats Fire</div>
                 </div>
             </div>
 
@@ -1744,7 +1744,7 @@
                                 <div class="flex justify-between px-1"><span class="text-slate-400">CRIT</span><strong id="combat-derived-crit" class="text-slate-100">0%</strong></div>
                                 <div class="flex justify-between px-1"><span class="text-slate-400">ASPD</span><strong id="combat-derived-aspd" class="text-slate-100">0</strong></div>
                                 <div class="flex justify-between px-1"><span class="text-slate-400">FIRE</span><strong id="combat-res-fire" class="text-slate-100">0%</strong></div>
-                                <div class="flex justify-between px-1"><span class="text-slate-400">WATER</span><strong id="combat-res-water" class="text-slate-100">0%</strong></div>
+                                <div class="flex justify-between px-1"><span class="text-slate-400">ICE</span><strong id="combat-res-water" class="text-slate-100">0%</strong></div>
                                 <div class="flex justify-between px-1"><span class="text-slate-400">EARTH</span><strong id="combat-res-earth" class="text-slate-100">0%</strong></div>
                                 <div class="flex justify-between px-1"><span class="text-slate-400">WIND</span><strong id="combat-res-wind" class="text-slate-100">0%</strong></div>
                             </div>
@@ -1824,7 +1824,7 @@
     <!-- SCRIPTS -->
     <script src="data/items.js?v=20261110a"></script>
     <script src="data/monsters.js?v=20261105j"></script>
-    <script src="data/maps.js?v=20261113a"></script>
+    <script src="data/maps.js?v=20261114i"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261114g"></script>
@@ -1834,13 +1834,13 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114h"></script>
+    <script src="js/ui.js?v=20261114i"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261114x"></script>
     <script src="js/friends.js?v=20261113g"></script>
-    <script src="js/town.js?v=20261114h"></script>
+    <script src="js/town.js?v=20261114i"></script>
     <script src="js/loader.js?v=20261114f"></script>
 
 <script>
