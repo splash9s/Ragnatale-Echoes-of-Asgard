@@ -4219,20 +4219,22 @@ function previewDerivedStats() {
 
 // Top bar: who is logged in, and the Link Gmail button for guests
 async function refreshAccountBar() {
-    const text = document.getElementById('account-text');
-    const btn = document.getElementById('account-link-btn');
-    if (!text) return;
+    // Shown on the main page top bar and on the character select page (both use the same classes)
+    const texts = document.querySelectorAll('.account-text');
+    const btns = document.querySelectorAll('.account-link-btn');
+    if (!texts.length) return;
     const user = typeof cloudCurrentUser === 'function' ? await cloudCurrentUser() : null;
+    let msg, showLink = false;
     if (!user) {
-        text.textContent = 'Offline play. Your save is on this device only.';
-        btn?.classList.add('hidden');
+        msg = 'Offline play. Your save is on this device only.';
     } else if (user.is_anonymous) {
-        text.textContent = 'You are logged in as anonymous. Your save is on this device only.';
-        btn?.classList.remove('hidden');
+        msg = 'You are logged in as anonymous. Your save is on this device only.';
+        showLink = true;
     } else {
-        text.textContent = `Logged in with Gmail: ${user.email || ''}`;
-        btn?.classList.add('hidden');
+        msg = `Logged in with Gmail: ${user.email || ''}`;
     }
+    texts.forEach(t => { t.textContent = msg; });
+    btns.forEach(b => b.classList.toggle('hidden', !showLink));
 }
 
 function upgradeSkill(skillKey) {

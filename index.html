@@ -889,8 +889,8 @@
     <!-- TOP HEADER / HUD -->
     <header id="app-header" class="hidden bg-slate-950/80 border-b border-slate-800/80 backdrop-blur sticky top-0 z-40 px-4 py-2 flex justify-end items-center gap-3">
         <div id="account-bar" class="mr-auto flex items-center gap-3 min-w-0 text-xs text-slate-300">
-            <span id="account-text" class="min-w-0"></span>
-            <button id="account-link-btn" type="button" onclick="bindGmail()" class="hidden shrink-0 px-3 py-1 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold cursor-pointer">Link Gmail</button>
+            <span class="account-text min-w-0"></span>
+            <button type="button" onclick="bindGmail()" class="account-link-btn" class="hidden shrink-0 px-3 py-1 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold cursor-pointer">Link Gmail</button>
         </div>
         <div class="flex items-center gap-3">
             <div class="px-3 py-1 bg-slate-900/90 rounded-xl border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold text-amber-300 shadow-inner">
@@ -957,8 +957,13 @@
         <div id="view-name-select" class="hidden fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
             <!-- Same background as the sign-in page and the map select page, blurred -->
             <div aria-hidden="true" class="absolute inset-0" style="background:url(assets/compaign/mapselect02_q85.webp) center/cover no-repeat; filter:blur(8px); transform:scale(1.06);"></div>
+            <!-- Login status bar across the top, same as the main page top bar -->
+            <div class="absolute left-0 right-0 top-0 flex items-center gap-3 px-4 py-2 bg-slate-950/80 border-b border-slate-800/80 text-xs text-slate-300" style="z-index:3; min-height:44px;">
+                <span class="account-text min-w-0 flex-1"></span>
+                <button type="button" onclick="bindGmail()" class="account-link-btn hidden shrink-0 px-3 py-1 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold cursor-pointer">Link Gmail</button>
+            </div>
             <!-- Game name at the top centre of the page -->
-            <img src="assets/cha/page/rune_thread_logo_v2_q85.webp" alt="Rune Thread" class="absolute left-1/2 -translate-x-1/2 block" style="top:24px; z-index:2; width:240px; max-width:60vw; height:auto;">
+            <img src="assets/cha/page/rune_thread_logo_v2_q85.webp" alt="Rune Thread" class="absolute left-1/2 -translate-x-1/2 block" style="top:60px; z-index:2; width:240px; max-width:60vw; height:auto;">
             <div class="relative flex flex-col md:flex-row gap-4 items-stretch justify-center w-full max-w-3xl">
             <!-- Stat window: upgrade the starting stats here -->
             <aside id="create-stats" class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-5 w-full md:w-60 flex flex-col gap-3 shadow-2xl">
@@ -1792,7 +1797,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261114d"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114aq"></script>
+    <script src="js/ui.js?v=20261114ar"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
