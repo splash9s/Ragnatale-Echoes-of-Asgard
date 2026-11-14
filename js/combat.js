@@ -112,14 +112,11 @@ function playSfx(v, gain = 1) {
     const path = Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v;
     return playSound(path, gain * (SFX_LEVEL[path] || 1));
 }
-// A hit on a slime: the weapon swing starts first, then the slime's voice 0.2 s later, which cuts the swing off
+// A hit on a slime: the weapon swing plays in full, and the slime's voice starts 0.2 s later on top of it
 const SLIME_VOICE_DELAY_MS = 200;
 function playSlimeHitSfx(attackV) {
-    const swing = playSfx(attackV);
-    setTimeout(() => {
-        if (swing) { try { swing.pause(); sfxPlaying.delete(swing); } catch (e) {} }
-        playSfx(SFX.slimeHit);
-    }, SLIME_VOICE_DELAY_MS);
+    playSfx(attackV);
+    setTimeout(() => playSfx(SFX.slimeHit), SLIME_VOICE_DELAY_MS);
 }
 // Slimes (any monster named Slime, including the boss) have their own hit and death sounds
 function isSlime(m) { return !!m && /slime/i.test(m.name || ''); }
