@@ -263,7 +263,7 @@ const LOADING_IMAGES = [
     "assets/page01/straw/s7_q85.webp",
     "assets/page01/straw/s8_q85.webp",
     "assets/cha/shadowclean_q85.webp",
-    "assets/page01/mainfg02_q85.webp",
+    "assets/page01/mainfg02_v2_q85.webp",
     "assets/cha/chashadow_q85.webp",
     "assets/page01/cha_idle_0001_q85.webp",
     "assets/page01/characterbutton_q85.webp",
