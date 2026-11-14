@@ -71,6 +71,7 @@ const SFX = {
     slimeAttack: 'sound/sfx/slime_attack.mp3',
     gunFire: 'sound/sfx/gun_fire.mp3',
     bowFire: 'sound/sfx/bow_fire.mp3',
+    mageAttack: 'sound/sfx/mage_attack.mp3',
     slimeDead: 'sound/sfx/slime_dead.wav',
     meow: ['sound/sfx/meow1.mp3', 'sound/sfx/meow2.mp3', 'sound/sfx/meow3.mp3'],
     angryCat: ['sound/sfx/angrycat1.mp3', 'sound/sfx/angrycat2.mp3'],
@@ -98,6 +99,7 @@ const SFX_LEVEL = {
     'sound/sfx/slime_attack.mp3': 0.99,
     'sound/sfx/gun_fire.mp3': 1.66,
     'sound/sfx/bow_fire.mp3': 11.75,
+    'sound/sfx/mage_attack.mp3': 2.24,
     'sound/sfx/punch_crit.mp3': 3.05,
     'sound/sfx/punch_hit.mp3': 2.07,
     'sound/sfx/sword_crit.mp3': 1.91,
@@ -111,9 +113,10 @@ function playSfx(v, gain = 1) {
 // Slimes (any monster named Slime, including the boss) have their own hit and death sounds
 function isSlime(m) { return !!m && /slime/i.test(m.name || ''); }
 // Sword equipped: sword sounds. No weapon or knuckles: punch sounds.
-// Ranged monsters: gunners and snipers fire a gun, archers and crossbows fire a bow (mages have no sound)
+// Ranged monsters: mages cast, gunners and snipers fire a gun, archers and crossbows fire a bow
 function rangedFireSfx(m) {
     const n = (m && m.name) || '';
+    if (roleOf(m) === 'mage' || /mage/i.test(n)) return SFX.mageAttack;
     if (/gunner|sniper|shooter/i.test(n)) return SFX.gunFire;
     if (/archer|crossbow|ballista/i.test(n)) return SFX.bowFire;
     return null;
