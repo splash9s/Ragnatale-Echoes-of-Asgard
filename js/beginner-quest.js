@@ -104,6 +104,12 @@ function claimBeginnerQuest() {
 
 let beginnerLastHtml = '';
 
+// The reward shows as the chest icon (its name is kept as the tooltip)
+function beginnerRewardIcon(chest) {
+    const name = BEGINNER_CHEST_NAMES[chest] || 'Chest';
+    return `<span class="bq-reward-icon" title="${name}">${chestIconHTML(chest, 56)}</span>`;
+}
+
 function renderBeginnerQuest() {
     const el = document.getElementById('beginner-quest');
     if (!el) return;
@@ -124,7 +130,7 @@ function renderBeginnerQuest() {
             <div class="bq-head">Beginner Quest</div>
             <div class="bq-row bq-clickable" onclick="openBeginnerDetail()"><span class="bq-task">- ${step.title}</span><span class="bq-status ${done ? 'bq-done' : ''}">${status}</span></div>
             ${done ? `<button class="bq-claim" onclick="claimBeginnerQuest()">Claim</button>` : ''}
-            <div class="bq-reward">Reward: ${BEGINNER_CHEST_NAMES[step.chest]}</div>`;
+            <div class="bq-reward">Reward: ${beginnerRewardIcon(step.chest)}</div>`;
     }
     if (html !== beginnerLastHtml) {
         el.innerHTML = html;
@@ -170,7 +176,7 @@ function renderBeginnerDetail(force) {
             <div class="bq-desc">${step.desc || ''}</div>
             ${extra}
             <div class="bq-row"><span class="bq-task">Status</span><span class="bq-status ${done ? 'bq-done' : ''}">${done ? 'Complete' : 'In Progress'}</span></div>
-            <div class="bq-reward">Reward: ${BEGINNER_CHEST_NAMES[step.chest]}</div>
+            <div class="bq-reward">Reward: ${beginnerRewardIcon(step.chest)}</div>
             ${done ? `<button class="bq-claim" onclick="claimBeginnerQuest()">Claim</button>` : ''}`;
     }
     if (force || html !== beginnerDetailHtml) {

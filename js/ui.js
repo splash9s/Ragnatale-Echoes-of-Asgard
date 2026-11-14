@@ -3166,12 +3166,18 @@ const ITEM_ICON_RULES = [
     [/Dusk Crown/, 'gear_lv99_helm'],
     [/Starlight Void Crown/, 'gear_lv99_boss']
 ];
+// Chest icon (small chest art) for a chest type: 'copper', 'silver' or 'gold'
+function chestIconHTML(chestType, size = 64) {
+    const t = ['copper', 'silver', 'gold'].includes(chestType) ? chestType : 'copper';
+    return `<img src="assets/chest/${t}/${t}csmall_q85.webp" alt="${t} chest" style="width:${size}px;height:${Math.round(size * 0.8)}px;object-fit:contain;" />`;
+}
 function itemIconHTML(item, size = 70) {
     const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
     if (rule) {
         const src = rule[1].includes('/') ? rule[1] : `assets/items/${rule[1]}.png`; // full path, or an items-folder name
         return `<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     }
+    if (item && item.type === 'chest' && item.chestType) return chestIconHTML(item.chestType, size);
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
