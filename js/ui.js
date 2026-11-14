@@ -262,6 +262,7 @@ function showSignInPage() {
     document.getElementById('view-name-select')?.classList.add('hidden');
     document.getElementById('view-signin')?.classList.remove('hidden');
     signinTermsChanged();
+    playSound('sound/blacksmith-hammer-swing.mp3'); // blacksmith hammer sfx when the sign-in page opens
 }
 // Terms and Conditions shown from the sign-in page. Sections are numbered; Accept unlocks only after reading to the end.
 const TERMS_SECTIONS = [
@@ -5215,10 +5216,10 @@ function logMessage(msg, type = 'combat') {
 // ---------- EVENTS VIEW ----------
 // Left: event menu (eventleftmenuwindow). Right: banner, details, map choice and the start button.
 const EVENT_MENU = [
+    { key: 'quests',   label: 'Daily Quests',    banner: 'assets/events/banner_quest_q85.webp' },
     { key: 'daily',    label: 'Daily Challenge', banner: 'assets/events/banner_daily_q85.webp' },
     { key: 'gold',     label: 'Gold Frenzy',     banner: 'assets/events/banner_gold_q85.webp' },
     { key: 'xp',       label: 'Wisdom Trail',    banner: 'assets/events/banner_xp_q85.webp' },
-    { key: 'quests',   label: 'Daily Quests',    banner: 'assets/events/banner_quest_q85.webp' },
     { key: 'endless',  label: 'Void Tower',      banner: null },
     { key: 'voidtest', label: 'Void Test Map',   banner: null },
     { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
