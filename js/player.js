@@ -245,7 +245,7 @@ function migrateGear() {
 
 function createWelcomeMail() {
     return [
-        { id: 1, title: "Welcome Adventurer!", sender: "High Council", message: "Welcome to Ragnatale! Reward: 100,000 Gold and 1,000 Diamond.", rewards: { gold: 100000, diamonds: 1000 }, claimed: false }
+        { id: 1, title: "Welcome Adventurer!", sender: "High Council", message: "Welcome to Rune Thread! Reward: 100,000 Gold and 1,000 Diamond.", rewards: { gold: 100000, diamonds: 1000 }, claimed: false }
     ];
 }
 
