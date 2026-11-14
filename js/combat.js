@@ -106,8 +106,62 @@ const SFX_LEVEL = {
     'sound/sfx/punch_hit.mp3': 2.07,
     'sound/sfx/sword_crit.mp3': 1.91,
     'sound/sfx/sword_hit1.mp3': 1.32,
-    'sound/sfx/sword_hit2.mp3': 1.72
+    'sound/sfx/sword_hit2.mp3': 1.72,
+    'sound/sfx/monster/boss_golem_dead.mp3': 1.04,
+    'sound/sfx/monster/golem_attack.mp3': 0.73,
+    'sound/sfx/monster/golem_damaged.mp3': 0.61,
+    'sound/sfx/monster/golem_dead.mp3': 1.3,
+    'sound/sfx/monster/healer_heal.mp3': 4.32,
+    'sound/sfx/monster/human_damaged1.mp3': 0.99,
+    'sound/sfx/monster/human_damaged2.mp3': 1.07,
+    'sound/sfx/monster/human_damaged3.mp3': 0.83,
+    'sound/sfx/monster/human_damaged4.mp3': 0.97,
+    'sound/sfx/monster/human_dead1.mp3': 1.86,
+    'sound/sfx/monster/human_dead2.mp3': 1.01,
+    'sound/sfx/monster/human_dead3.mp3': 1.27,
+    'sound/sfx/monster/human_dead4.mp3': 0.8,
+    'sound/sfx/monster/mage_attack.mp3': 2.24,
+    'sound/sfx/monster/mossy_golem_attack.mp3': 1.15,
+    'sound/sfx/monster/mossy_golem_damaged.mp3': 0.8,
+    'sound/sfx/monster/mossy_golem_dead.mp3': 1.33,
+    'sound/sfx/monster/gun/bow_fire.mp3': 11.75,
+    'sound/sfx/monster/gun/gun_fire.mp3': 1.66
 };
+// Per-monster sounds (sound/sfx/monster/), keyed by monster id: attack, damaged (when hit), dead.
+// A monster without an entry, or without a field, falls back to the old sounds.
+const MSFX = 'sound/sfx/monster/';
+const MONSTER_SFX = {
+    // Golems
+    M006: { attack: MSFX+'golem_attack.mp3', damaged: MSFX+'golem_damaged.mp3', dead: MSFX+'golem_dead.mp3' },          // Rock Golem
+    M040: { attack: MSFX+'golem_attack.mp3', damaged: MSFX+'golem_damaged.mp3', dead: MSFX+'golem_dead.mp3' },          // Ice Golem
+    M025: { attack: MSFX+'mossy_golem_attack.mp3', damaged: MSFX+'mossy_golem_damaged.mp3', dead: MSFX+'mossy_golem_dead.mp3' }, // Mossy Boulder
+    M104: { attack: MSFX+'golem_attack.mp3', damaged: MSFX+'golem_damaged.mp3', dead: MSFX+'boss_golem_dead.mp3' },      // Void Colossus (boss)
+    // Archers and snipers
+    M003: { attack: MSFX+'gun/bow_fire.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead1.mp3' },        // Goblin Archer
+    M041: { attack: MSFX+'gun/bow_fire.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead2.mp3' },        // Frost Archer
+    M067: { attack: MSFX+'gun/bow_fire.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead3.mp3' },        // Flame Archer
+    M007: { attack: MSFX+'gun/gun_fire.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead4.mp3' },        // Kobold Sniper
+    // Mages
+    M046: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },         // Jotun Frost Mage
+    M060: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Battle Storm Mage
+    M070: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Muspel Flame Mage
+    M084: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },         // Hel Stone Mage
+    // Healers (no attack sound of their own yet: the heal sound is used)
+    M043: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },         // Frost Shaman
+    M056: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Valkyrie Healer
+    M069: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Ember Priest
+    M102: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },         // Halo Priest
+    // Melee humans and humanoid bosses: hit and death sounds only, no attack sound yet
+    M033: { damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead1.mp3' },   // Halo Warden
+    M012: { damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead2.mp3' },   // Sand King (boss)
+    M016: { damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead3.mp3' },   // Abyss Lord (boss)
+    M020: { damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead4.mp3' },   // Fallen Angel (boss)
+    M049: { damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },   // Hrym, Frost King (boss)
+    M062: { damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },   // Brynhild (boss)
+    M075: { damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },   // Surtr (boss)
+    M088: { damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },   // Queen Hel (boss)
+};
+function monsterSfxOf(m) { return (m && MONSTER_SFX[m.id]) || null; }
 function playSfx(v, gain = 1) {
     const path = Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v;
     return playSound(path, gain * (SFX_LEVEL[path] || 1));
@@ -120,6 +174,11 @@ function playSlimeHitSfx(attackV) {
 }
 // Slimes (any monster named Slime, including the boss) have their own hit and death sounds
 function isSlime(m) { return !!m && /slime/i.test(m.name || ''); }
+// A hit on a monster with its own sounds: the weapon swing plays in full, and its voice starts 0.2 s later on top
+function playMonsterHitSfx(attackV, damagedPath) {
+    playSfx(attackV);
+    setTimeout(() => playSfx(damagedPath), SLIME_VOICE_DELAY_MS);
+}
 // Sword equipped: sword sounds. No weapon or knuckles: punch sounds.
 // Ranged monsters: mages cast, gunners and snipers fire a gun, archers and crossbows fire a bow
 function rangedFireSfx(m) {
@@ -1428,6 +1487,7 @@ function monsterAct(m, derived, position = 0) {
         }
         if (player.runes.zeroArmor && player.armor > 0) eDmg = Math.floor(eDmg * 0.9);
         if (isSlime(m)) playSfx(SFX.slimeAttack); // slime attacks
+        else if (monsterSfxOf(m) && monsterSfxOf(m).attack) playSfx(monsterSfxOf(m).attack); // monster's own attack sound
         else if (rangedFireSfx(m)) playSfx(rangedFireSfx(m)); // ranged monsters fire
         takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
@@ -1662,6 +1722,7 @@ function runCombatTick() {
         } else {
             critStreak = 0;
             if (isSlime(targetEnemy)) playSlimeHitSfx(attackSfx(false));
+            else if (monsterSfxOf(targetEnemy) && monsterSfxOf(targetEnemy).damaged) playMonsterHitSfx(attackSfx(false), monsterSfxOf(targetEnemy).damaged);
             else playSfx(attackSfx(false));
             const atkIdx = monstersList.indexOf(targetEnemy);
             if (atkIdx >= 0 && typeof playAtkFx === 'function') setTimeout(() => playAtkFx(`#monsters-lineup-container > div:nth-child(${atkIdx + 1}) img`), 0);
