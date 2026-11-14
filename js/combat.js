@@ -72,8 +72,27 @@ const SFX = {
     coin: 'sound/sfx/coin.mp3',
     mapWin: 'sound/sfx/map_win.mp3'
 };
+// Loudness of each effect file, matched to the music (measured mean level), applied on top of the Effects volume
+const SFX_LEVEL = {
+    'sound/sfx/angrycat1.mp3': 0.85,
+    'sound/sfx/angrycat2.mp3': 0.84,
+    'sound/sfx/blacksmith.mp3': 1.84,
+    'sound/sfx/coin.mp3': 3.55,
+    'sound/sfx/levelup.mp3': 1.72,
+    'sound/sfx/map_win.mp3': 2.0,
+    'sound/sfx/meow1.mp3': 2.82,
+    'sound/sfx/meow2.mp3': 1.91,
+    'sound/sfx/meow3.mp3': 2.54,
+    'sound/sfx/monster_death.mp3': 1.08,
+    'sound/sfx/punch_crit.mp3': 3.05,
+    'sound/sfx/punch_hit.mp3': 2.07,
+    'sound/sfx/sword_crit.mp3': 1.91,
+    'sound/sfx/sword_hit1.mp3': 1.32,
+    'sound/sfx/sword_hit2.mp3': 1.72
+};
 function playSfx(v, gain = 1) {
-    playSound(Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v, gain);
+    const path = Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v;
+    playSound(path, gain * (SFX_LEVEL[path] || 1));
 }
 // Sword equipped: sword sounds. No weapon or knuckles: punch sounds.
 function attackSfx(crit) {
