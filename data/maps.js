@@ -268,7 +268,7 @@ const CAMPAIGN_STAGES = 11; // Fallback only. Every map sets campaignStages on i
 
 const CAMPAIGN_PATHS = {
     fire:  { name: "Fire Path",  element: 'fire',  icon: "🔥" },
-    water: { name: "Water Path", element: 'water', icon: "💧" },
+    water: { name: "Ice Path", element: 'water', icon: "💧" },
     earth: { name: "Earth Path", element: 'earth', icon: "🪨" },
     wind:  { name: "Wind Path",  element: 'wind',  icon: "🌪️" }
 };

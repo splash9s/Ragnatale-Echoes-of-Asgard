@@ -96,7 +96,7 @@
     }, true);
     window.onFinalNode = function () {
         if (typeof isFinalMapUnlocked === 'function' && !isFinalMapUnlocked()) {
-            showFloatNotice('Clear the Fire, Water, Earth and Wind paths first.');
+            showFloatNotice('Clear the Fire, Ice, Earth and Wind paths first.');
             return;
         }
         startExpedition('campaign', { final: true });
