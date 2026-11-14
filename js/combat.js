@@ -68,6 +68,7 @@ const SFX = {
     slimeHit: 'sound/sfx/slime_damaged.wav',
     dodge: 'sound/sfx/dodge.mp3',
     miss: 'sound/sfx/miss_01.wav',
+    slimeAttack: 'sound/sfx/slime_attack.mp3',
     slimeDead: 'sound/sfx/slime_dead.wav',
     meow: ['sound/sfx/meow1.mp3', 'sound/sfx/meow2.mp3', 'sound/sfx/meow3.mp3'],
     angryCat: ['sound/sfx/angrycat1.mp3', 'sound/sfx/angrycat2.mp3'],
@@ -92,6 +93,7 @@ const SFX_LEVEL = {
     'sound/sfx/slime_dead.wav': 1.25,
     'sound/sfx/dodge.mp3': 1,
     'sound/sfx/miss_01.wav': 1.43,
+    'sound/sfx/slime_attack.mp3': 0.99,
     'sound/sfx/punch_crit.mp3': 3.05,
     'sound/sfx/punch_hit.mp3': 2.07,
     'sound/sfx/sword_crit.mp3': 1.91,
@@ -1403,6 +1405,7 @@ function monsterAct(m, derived, position = 0) {
             if (Math.random() < 0.2) stunPlayerFor(2000, m, 'Lightning Spear');
         }
         if (player.runes.zeroArmor && player.armor > 0) eDmg = Math.floor(eDmg * 0.9);
+        if (isSlime(m)) playSfx(SFX.slimeAttack); // slime attacks
         takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
         if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'swordSweep' && m.attackCount % 3 === 0 && player.hp > 0) {
