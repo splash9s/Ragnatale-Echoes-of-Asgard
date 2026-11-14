@@ -417,33 +417,50 @@
         #view-character.screen-clear.pet-names-on .tent-pet-name { display: block; }
         #view-character.screen-clear.ui-off .tent-pet-name { display: none !important; }
         /* Pet management panel (right side of the cleared tent) */
-        #pet-panel { position: fixed; left: 24px; right: auto; top: 96px; width: min(760px, 42vw); top: 96px; bottom: 24px; z-index: 280; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; padding: 18px; background: #e7d1aa; border: 3px solid #b8945a; border-radius: 16px; color: #2a1a0e; box-shadow: 0 12px 30px rgba(0,0,0,.5); overflow-y: auto; }
+        /* Pet management panel: navy dialog style, 80% opaque, on the right side of the screen, draggable by its background */
+        #pet-panel { position: fixed; left: auto; right: 24px; top: 96px; bottom: 24px; width: min(760px, 42vw); z-index: 280; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; padding: 18px; background: rgba(17,26,44,.8); border: 2px solid #26344f; border-radius: 16px; color: #e9edf5; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; box-shadow: 0 12px 30px rgba(0,0,0,.5); overflow-y: auto; }
         #pet-panel .pet-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        #pet-panel h3 { font-size: 56px; font-weight: 900; margin: 0; }
-        #pet-panel .pet-x, #pet-panel .pet-back { font-size: 44px; font-weight: 800; padding: 4px 12px; border-radius: 8px; border: 2px solid #b8945a; background: #dbc5a0; color: #2a1a0e; cursor: pointer; }
+        #pet-panel h3 { font-size: 56px; font-weight: 900; margin: 0; color: #f5a00b; }
+        #pet-panel .pet-x, #pet-panel .pet-back, #pet-panel .pet-edit { font-size: 40px; font-weight: 800; padding: 4px 12px; border-radius: 10px; border: 2px solid #26344f; background: #1b2740; color: #e9edf5; cursor: pointer; }
         #pet-panel .pet-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-        #pet-panel .pet-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 12px; border-radius: 10px; border: 2px solid #b8945a; background: rgba(214,190,140,.5); color: #2a1a0e; cursor: pointer; text-align: left; font-size: 44px; font-weight: 800; }
+        #pet-panel .pet-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 12px; border-radius: 12px; border: 2px solid #26344f; background: #0b1322; color: #e9edf5; cursor: pointer; text-align: left; }
         #pet-panel .pet-row img { width: 48px; height: 43px; object-fit: contain; }
-        #pet-panel .pet-row-main { flex: 1; display: flex; flex-direction: column; }
-        #pet-panel .pet-row-main small { font-size: 32px; font-weight: 700; opacity: .85; }
-        #pet-panel .pet-tag { font-size: 32px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: rgba(201,162,39,.45); }
-        #pet-panel .pet-empty { font-size: 40px; margin: 0; }
+        #pet-panel .pet-row-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        #pet-panel .pet-row-main small { font-size: 32px; font-weight: 700; color: #9aa6bd; }
+        #pet-panel .pet-tag { font-size: 32px; font-weight: 800; padding: 2px 10px; border-radius: 8px; background: #e8720c; color: #fff; }
+        #pet-panel .pet-empty { font-size: 40px; margin: 0; color: #9aa6bd; }
         #pet-panel .pet-portrait { display: flex; justify-content: center; }
         #pet-panel .pet-portrait img { width: 96px; height: 86px; object-fit: contain; }
-        #pet-panel label { font-size: 36px; font-weight: 800; }
-        #pet-panel input, #pet-panel textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 40px; font-weight: 700; padding: 8px 10px; border-radius: 8px; border: 2px solid #b8945a; background: #f5e6c8; color: #2a1a0e; }
+        #pet-panel label { font-size: 36px; font-weight: 800; color: #9aa6bd; }
+        #pet-panel input, #pet-panel textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 40px; font-weight: 700; padding: 8px 10px; border-radius: 10px; border: 2px solid #26344f; background: #0b1322; color: #e9edf5; }
         #pet-panel textarea { resize: none; min-height: 220px; }
         #pet-panel > * { flex-shrink: 0; }
-        #pet-panel .pet-friend { display: flex; justify-content: space-between; align-items: baseline; font-size: 40px; font-weight: 800; }
-        #pet-panel .pet-friend span { font-size: 32px; font-weight: 700; }
-        #pet-panel .pet-bar { height: 16px; border-radius: 8px; border: 2px solid #b8945a; background: #cdb48a; overflow: hidden; }
-        #pet-panel .pet-bar i { display: block; height: 100%; background: linear-gradient(#f5cf6a, #c9851b); }
+        #pet-panel .pet-friend { display: flex; justify-content: space-between; align-items: baseline; font-size: 40px; font-weight: 800; color: #e9edf5; }
+        #pet-panel .pet-friend span { font-size: 32px; font-weight: 700; color: #9aa6bd; }
+        #pet-panel .pet-bar { height: 16px; border-radius: 8px; border: 2px solid #26344f; background: #0b1322; overflow: hidden; }
+        #pet-panel .pet-bar i { display: block; height: 100%; background: linear-gradient(#f5a00b, #e8720c); }
         #pet-panel .pet-field-head { display: flex; align-items: center; gap: 10px; }
-        #pet-panel .pet-edit, #pet-panel .pet-submit { font-size: 32px; font-weight: 800; padding: 3px 12px; border-radius: 8px; border: 2px solid #b8945a; background: #dbc5a0; color: #2a1a0e; cursor: pointer; }
-        #pet-panel .pet-submit { margin-left: auto; background: #c9a227; }
-        #pet-panel .pet-count { text-align: right; font-size: 28px; font-weight: 700; opacity: .8; margin-top: -4px; }
-        #pet-panel input[readonly], #pet-panel textarea[readonly] { background: #e9d7b5; border-style: dashed; cursor: default; pointer-events: none; user-select: none; }
-        #pet-panel .pet-walk { padding: 8px; font-size: 40px; font-weight: 800; border-radius: 10px; border: 2px solid #b8945a; background: #dbc5a0; color: #2a1a0e; cursor: pointer; }
+        #pet-panel .pet-submit { margin-left: auto; font-size: 32px; font-weight: 800; padding: 3px 12px; border-radius: 10px; border: 2px solid #e8720c; background: #e8720c; color: #fff; cursor: pointer; }
+        #pet-panel .pet-edit { font-size: 32px; padding: 3px 12px; }
+        #pet-panel .pet-count { text-align: right; font-size: 28px; font-weight: 700; color: #9aa6bd; margin-top: -4px; }
+        #pet-panel input[readonly], #pet-panel textarea[readonly] { background: #0b1322; border-style: dashed; cursor: default; pointer-events: none; user-select: none; color: #cfd7e6; }
+        #pet-panel .pet-walk { padding: 8px; font-size: 40px; font-weight: 800; border-radius: 12px; border: 2px solid #e8720c; background: #e8720c; color: #fff; cursor: pointer; }
+        #pet-panel .pet-walk:active { background: #c45f08; }
+        /* Tent pet picker: same navy dialog style */
+        #tent-pet-picker .tpp-box { width: 620px; max-width: 92vw; background: rgba(17,26,44,.96); border: 2px solid #26344f; border-radius: 16px; padding: 22px; color: #e9edf5; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; box-sizing: border-box; }
+        #tent-pet-picker .tpp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        #tent-pet-picker .tpp-title { font-size: 28px; font-weight: 900; margin: 0; color: #f5a00b; }
+        #tent-pet-picker .tpp-count { font-size: 22px; font-weight: 800; color: #9aa6bd; }
+        #tent-pet-picker .tpp-rows { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; }
+        #tent-pet-picker .tpp-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; border-radius: 12px; border: 2px solid #26344f; background: #0b1322; color: #e9edf5; font-size: 22px; font-weight: 800; cursor: pointer; text-align: left; }
+        #tent-pet-picker .tpp-row.on { border-color: #e8720c; background: rgba(232,114,12,.18); }
+        #tent-pet-picker .tpp-row img { width: 48px; height: 43px; object-fit: contain; }
+        #tent-pet-picker .tpp-name { flex: 1; }
+        #tent-pet-picker .tpp-state { color: #9aa6bd; }
+        #tent-pet-picker .tpp-row.on .tpp-state { color: #f5a00b; }
+        #tent-pet-picker .tpp-empty { font-size: 22px; color: #9aa6bd; margin: 0; }
+        #tent-pet-picker .tpp-foot { display: flex; justify-content: flex-end; margin-top: 16px; }
+        #tent-pet-picker .tpp-done { padding: 8px 26px; font-size: 24px; font-weight: 800; border-radius: 12px; border: 2px solid #e8720c; background: #e8720c; color: #fff; cursor: pointer; }
         .art-screen .char-clear-toggle { cursor: pointer; z-index: 10; }
         .art-screen .char-clear-toggle img { display: block; width: 100%; height: 100%; }
         .art-screen .char-clear-toggle .clr-press { display: none; }
@@ -1707,7 +1724,7 @@
     <script src="js/hero-body.js?v=20261112c"></script>
     <script src="js/combat.js?v=20261113c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261114t"></script>
+    <script src="js/ui.js?v=20261114u"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

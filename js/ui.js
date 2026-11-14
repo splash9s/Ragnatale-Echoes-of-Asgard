@@ -5748,14 +5748,14 @@ function renderTentPetPicker() {
     const rows = choices.length ? choices.map(c => {
         const on = sel.includes(String(c.token));
         const tok = typeof c.token === 'string' ? `'${c.token}'` : c.token;
-        return `<button onclick="toggleTentPet(${tok})" style="display:flex; align-items:center; gap:12px; width:100%; padding:10px 14px; border-radius:10px; border:2px solid ${on ? '#c9a227' : '#b8945a'}; background:${on ? 'rgba(201,162,39,.35)' : 'rgba(214,190,140,.5)'}; color:#2a1a0e; font-size:22px; font-weight:800; cursor:pointer; text-align:left;">`
-            + `<img src="assets/shop/diamond/ocatpet_q85.webp" alt="" style="width:48px; height:43px; object-fit:contain;">`
-            + `<span style="flex:1;">${c.name}${c.token === 'eq' ? ' (equipped)' : ''}</span><span>${on ? 'Walking' : 'Select'}</span></button>`;
-    }).join('') : `<p style="color:#2a1a0e; font-size:22px;">You have no pets yet. Buy one in the shop.</p>`;
-    box.innerHTML = `<div style="width:620px; max-width:92vw; background:#e7d1aa; border:3px solid #b8945a; border-radius:18px; padding:22px; color:#2a1a0e;">`
-        + `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h3 style="font-size:28px; font-weight:900;">Pets on the tent floor</h3><span style="font-size:22px; font-weight:800;">${sel.length} / ${TENT_PETS_MAX}</span></div>`
-        + `<div style="display:flex; flex-direction:column; gap:10px; max-height:60vh; overflow-y:auto;">${rows}</div>`
-        + `<div style="display:flex; justify-content:flex-end; margin-top:16px;"><button onclick="closeTentPetPicker()" style="padding:8px 26px; font-size:24px; font-weight:800; border-radius:10px; border:2px solid #b8945a; background:#dbc5a0; color:#2a1a0e; cursor:pointer;">Done</button></div></div>`;
+        return `<button class="tpp-row${on ? ' on' : ''}" onclick="toggleTentPet(${tok})">`
+            + `<img src="assets/shop/diamond/ocatpet_q85.webp" alt="">`
+            + `<span class="tpp-name">${c.name}${c.token === 'eq' ? ' (equipped)' : ''}</span><span class="tpp-state">${on ? 'Walking' : 'Select'}</span></button>`;
+    }).join('') : `<p class="tpp-empty">You have no pets yet. Buy one in the shop.</p>`;
+    box.innerHTML = `<div class="tpp-box">`
+        + `<div class="tpp-head"><h3 class="tpp-title">Pets on the tent floor</h3><span class="tpp-count">${sel.length} / ${TENT_PETS_MAX}</span></div>`
+        + `<div class="tpp-rows">${rows}</div>`
+        + `<div class="tpp-foot"><button class="tpp-done" onclick="closeTentPetPicker()">Done</button></div></div>`;
 }
 function toggleTentPet(token) {
     const sel = tentPetSelection().slice();
@@ -5946,6 +5946,7 @@ function openPetPanel() {
     {
         const box = document.createElement('div');
         box.id = 'pet-panel';
+        box.setAttribute('data-drag-panel', '');
         document.body.appendChild(box);
     }
     petPanelView = null; petEditField = null;
