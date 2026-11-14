@@ -1882,7 +1882,29 @@ function syncTentHand() {
     }
 }
 const SHADOW_BASE = { 'town-shadow': { left: 879, top: 770 }, 'char-shadow': { left: 339, top: 684 } };
+// Page change with a fade to black, so asset loading is hidden. The real change is switchViewNow().
+let pageFadeBusy = false;
+const PAGE_FADE_MS = 250;
 function switchView(viewName) {
+    const fade = document.getElementById('page-fade');
+    if (!fade || pageFadeBusy || document.getElementById('loading-screen')?.style.display !== 'none' && document.getElementById('loading-screen')) {
+        return switchViewNow(viewName);
+    }
+    pageFadeBusy = true;
+    fade.style.transition = `opacity ${PAGE_FADE_MS}ms ease`;
+    fade.style.pointerEvents = 'auto';
+    fade.style.opacity = '1';
+    setTimeout(() => {
+        try { switchViewNow(viewName); }
+        catch (err) { console.error('Page change failed:', err); }
+        requestAnimationFrame(() => {
+            fade.style.opacity = '0';
+            setTimeout(() => { fade.style.pointerEvents = 'none'; pageFadeBusy = false; }, PAGE_FADE_MS);
+        });
+    }, PAGE_FADE_MS);
+}
+
+function switchViewNow(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
     closePetPanel(); // leaving any page closes the pet menu and pet detail
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
