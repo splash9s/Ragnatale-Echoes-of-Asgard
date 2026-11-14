@@ -6093,3 +6093,30 @@ setInterval(syncTentPets, 1000);
     document.addEventListener('pointerup', end);
     document.addEventListener('pointercancel', end);
 })();
+
+// Popups close when a press lands outside every open popup (their own close buttons still work).
+// A press on a popup's card, or on another open popup, keeps it open; the Pets button keeps its own toggle.
+(function () {
+    const visible = (id) => { const el = document.getElementById(id); return !!el && el.style.display !== 'none' && !!el.innerHTML; };
+    const POPUPS = [
+        { open: () => { const m = document.getElementById('game-modal'); return !!m && !m.classList.contains('hidden'); },
+          el: () => document.querySelector('#game-modal > div'), close: () => closeModal() },
+        { open: () => visible('inv-detail-panel'), el: () => document.getElementById('inv-detail-panel'), close: () => closeInvDetail() },
+        { open: () => visible('shop-detail-panel'), el: () => document.getElementById('shop-detail-panel'), close: () => closeShopDetail() },
+        { open: () => { const el = document.getElementById('beginner-detail'); return !!el && el.style.display !== 'none'; },
+          el: () => document.getElementById('beginner-detail'), close: () => closeBeginnerDetail() },
+        { open: () => visible('result-item-detail'), el: () => document.getElementById('result-item-detail'), close: () => closeResultItemDetail() },
+        { open: () => !!document.getElementById('avatar-lock-panel')?.classList.contains('open'), el: () => document.getElementById('avatar-lock-panel'), close: () => closeAvatarLockInfo() },
+        { open: () => !!document.getElementById('pet-panel'), el: () => document.getElementById('pet-panel'), close: () => closePetPanel() },
+        { open: () => !!document.getElementById('tent-pet-picker'), el: () => document.getElementById('tent-pet-picker')?.firstElementChild, close: () => closeTentPetPicker() }
+    ];
+    document.addEventListener('pointerdown', (e) => {
+        const tgt = e.target;
+        if (!tgt || !tgt.closest || tgt.closest('#tent-pets-btn')) return;
+        const openNow = POPUPS.filter(p => p.open());
+        if (!openNow.length) return;
+        // Inside any open popup (its card or its contents) keeps everything open
+        if (openNow.some(p => { const el = p.el(); return el && el.contains(tgt); })) return;
+        openNow.forEach(p => p.close());
+    }, true);
+})();
