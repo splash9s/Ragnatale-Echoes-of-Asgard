@@ -836,7 +836,7 @@
         /* Campaign map tiles: soft background (selected tile keeps its amber highlight) */
         #campaign-map-list > button:not([class*="bg-amber"]) { background-color: rgba(143, 179, 169, .65) !important; }
         /* Campaign Dungeons: soft background on the Close button */
-        #campaign-panel button[onclick="closeCampaignPanel()"] { background-color: rgba(143, 179, 169, .65) !important; }
+        #campaign-panel .campaign-btn.campaign-start { width: 220px; height: 98px; }
         /* Player HP and armor block: dark panel behind it, like the monster cards */
         #combat-hp-under { background: rgba(2, 6, 23, .55); border: 1px solid #1e293b; border-radius: 8px; padding: 6px 8px; }
         /* Player HP and armor bars: track background matches the monster HP bars (slate-800); the black border stays */
@@ -1215,9 +1215,8 @@
                     <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div id="campaign-panel" class="expo-panel hidden">
                         <div class="expo-inner">
-                        <div class="flex justify-between items-center mb-3" style="display:flex; width:100%; justify-content:space-between; align-items:center;">
-                            <button onclick="closeCampaignPanel()" class="campaign-btn" aria-label="Close"><img class="cb-normal" src="assets/cha/page/btn_red_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_redpress_q85.webp" alt=""><span class="cb-label">Close</span></button>
-                            <button onclick="startExpedition('campaign')" class="campaign-btn" aria-label="Start Campaign"><img class="cb-normal" src="assets/cha/page/btn_yellow_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_yellowpress_q85.webp" alt=""><span class="cb-label">Start Campaign</span></button>
+                        <div class="mb-1" style="display:flex; width:100%; justify-content:flex-end; align-items:center;">
+                            <button onclick="startExpedition('campaign')" class="campaign-btn campaign-start" aria-label="Start Campaign"><img class="cb-normal" src="assets/cha/page/btn_start_glow_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_start_press_q85.webp" alt=""></button>
                         </div>
                         <div class="flex flex-col gap-3">
                             <div id="campaign-path-list" class="grid grid-cols-2 gap-2 mb-2"></div>
@@ -1841,7 +1840,7 @@
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261114x"></script>
     <script src="js/friends.js?v=20261113g"></script>
-    <script src="js/town.js?v=20261113b"></script>
+    <script src="js/town.js?v=20261114h"></script>
     <script src="js/loader.js?v=20261114f"></script>
 
 <script>

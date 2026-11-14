@@ -86,6 +86,14 @@
     window.closeCampaignPanel = function () {
         document.getElementById('campaign-panel')?.classList.add('hidden');
     };
+    // Clicking anywhere outside the campaign window closes it (map nodes still open their path)
+    document.addEventListener('pointerdown', function (e) {
+        const panel = document.getElementById('campaign-panel');
+        if (!panel || panel.classList.contains('hidden')) return;
+        if (panel.contains(e.target)) return;
+        if (e.target.closest && e.target.closest('.expo-node')) return;
+        window.closeCampaignPanel();
+    }, true);
     window.onFinalNode = function () {
         if (typeof isFinalMapUnlocked === 'function' && !isFinalMapUnlocked()) {
             showFloatNotice('Clear the Fire, Water, Earth and Wind paths first.');
