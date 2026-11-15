@@ -64,13 +64,17 @@
         if (!img) return;
         const normal = img.getAttribute('src');
         const pressed = normal.replace(/_q85\.webp$/, 'press_q85.webp');
+        // Buttons marked data-press="none" have no press picture and keep their own frames
+        const swap = el.dataset.press !== 'none';
         // Show the press image while the pointer is down
         // Hover shows the press image too (mouse over), click/tap shows it while held
-        el.addEventListener('pointerenter', () => { img.src = pressed; });
-        el.addEventListener('pointerdown', () => { img.src = pressed; });
-        el.addEventListener('pointerup', () => { img.src = normal; });
-        el.addEventListener('pointerleave', () => { img.src = normal; });
-        el.addEventListener('pointercancel', () => { img.src = normal; });
+        if (swap) {
+            el.addEventListener('pointerenter', () => { img.src = pressed; });
+            el.addEventListener('pointerdown', () => { img.src = pressed; });
+            el.addEventListener('pointerup', () => { img.src = normal; });
+            el.addEventListener('pointerleave', () => { img.src = normal; });
+            el.addEventListener('pointercancel', () => { img.src = normal; });
+        }
         el.addEventListener('click', () => {
             const fn = TOWN_ACTIONS[el.dataset.action];
             if (fn) fn();
