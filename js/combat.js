@@ -69,8 +69,6 @@ const SFX = {
     monsterDeath: 'sound/sfx/monster_death.mp3',
     slimeHit: 'sound/sfx/slime_damaged.mp3',
     dodge: 'sound/sfx/dodge.mp3',
-    playerHitShield: 'sound/sfx/combat/weapon/sword/block.mp3',
-    playerHitNoShield: 'sound/sfx/combat/weapon/punch/block.mp3',
     miss: 'sound/sfx/miss_01.wav',
     slimeAttack: 'sound/sfx/slime_attack.mp3',
     gunFire: 'sound/sfx/gun_fire.mp3',
@@ -140,8 +138,6 @@ const SFX_LEVEL = {
     'sound/sfx/gear/move.mp3': 17.38,
     'sound/sfx/gear/salvage.mp3': 2.99,
     'sound/sfx/button/ok.mp3': 1.26,
-    'sound/sfx/combat/weapon/sword/block.mp3': 1.35,
-    'sound/sfx/combat/weapon/punch/block.mp3': 1.43,
     'sound/sfx/gear/refine_success.mp3': 2.26,
     'sound/sfx/gear/refine_fail.mp3': 0.98,
     'sound/sfx/button/back.mp3': 1.43,
@@ -1385,8 +1381,6 @@ function takePlayerDamage(dmg, m, ignoreArmor = false) {
     // Element resistance from gear: a negative value means extra damage from that element
     const incomingRes = m && m.element ? (getDerivedStats().elemRes[m.element] || 0) * (m.elemSupport ? 2 : 1) : 0; // Elemental Support doubles the boss's element effect
     dmg = Math.floor(dmg * (1 - incomingRes / 100));
-    // Damage taken: block sound from the shield (sword block) or without one (punch block)
-    if (dmg > 0) playSfx(player.equipped && player.equipped.shield ? SFX.playerHitShield : SFX.playerHitNoShield);
     let remaining = dmg;
     let absorbed = 0;
     if (player.armor > 0 && !ignoreArmor) {
