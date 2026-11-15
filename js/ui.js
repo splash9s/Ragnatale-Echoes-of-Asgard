@@ -859,7 +859,10 @@ function showCombatText(selector, text, variant, delayMs = 0) {
         // Heal and regen numbers sit to the left of damage numbers so the two never share a spot
         const sideX = variant === 'heal' ? -COMBAT_TEXT_STEP * 1.4 : 0;
         d.style.left = ((b.left + b.width / 2 - ib.left) / sc + sideX) + 'px';
-        d.style.top = (((b.top - ib.top) / sc) - slot * COMBAT_TEXT_STEP) + 'px';
+        // 'below' labels sit under the anchor (used by the leave prompt), everything else above it
+        d.style.top = variant === 'below'
+            ? (((b.bottom - ib.top) / sc) + 6) + 'px'
+            : (((b.top - ib.top) / sc) - slot * COMBAT_TEXT_STEP) + 'px';
         stage.appendChild(d);
         setTimeout(() => { d.remove(); freeCombatTextSlot(selector, slot); }, variant === 'crit' ? 1400 : 900); // crit numbers stay 0.5s longer
     };

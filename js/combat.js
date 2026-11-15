@@ -2042,19 +2042,26 @@ function proceedToNextStage() {
 
 // Leaving a battle needs two taps: the first arms it and shows a prompt, the second within 3 seconds confirms
 let combatReturnArmed = null;
+// The return button shows its pressed picture while armed
+function setReturnArmed(on) {
+    document.getElementById('combat-return-btn')?.classList.toggle('armed', on);
+}
 function combatReturnClick() {
     if (combatReturnArmed) {
         clearTimeout(combatReturnArmed);
         combatReturnArmed = null;
+        setReturnArmed(false);
         returnToTown();
         return;
     }
-    showCombatText('#combat-return-btn', 'Tap again to leave', 'heal');
-    combatReturnArmed = setTimeout(() => { combatReturnArmed = null; }, 3000);
+    setReturnArmed(true);
+    showCombatText('#combat-return-btn', 'Tap again to leave', 'below');
+    combatReturnArmed = setTimeout(() => { combatReturnArmed = null; setReturnArmed(false); }, 3000);
 }
 
 function returnToTown() {
     if (combatReturnArmed) { clearTimeout(combatReturnArmed); combatReturnArmed = null; }
+    setReturnArmed(false);
     stopCombatTimers(); combatRunId++;
     removeGuideSpotlight();
     combatPaused = false;
