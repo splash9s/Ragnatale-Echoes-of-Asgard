@@ -1086,10 +1086,11 @@ function syncPagePetSprites(spec) {
     const pet = document.getElementById('town-pet');
     const house = document.getElementById('town-pet-house');
     if (house) {
-        // Pet house: 130px wide (a little bigger than the cat), floor just under the pet's feet, behind the pet. Always shown on the main page.
+        // Pet house: 156px wide (about 20% bigger than the first size, aspect kept), floor just under the pet's feet, behind the pet. Always shown on the main page.
         house.style.display = '';
-        house.style.left = (TOWN_DUMMY_FEET.left - 65) + 'px';
-        house.style.top = (TOWN_DUMMY_FEET.top + 4 - 98) + 'px';
+        const hw = 156, hh = Math.round(hw * 195 / 260);
+        house.style.left = (TOWN_DUMMY_FEET.left - hw / 2) + 'px';
+        house.style.top = (TOWN_DUMMY_FEET.top + 4 - hh) + 'px';
     }
     if (!pet) return;
     if (!spec) { pet.style.display = 'none'; return; }
