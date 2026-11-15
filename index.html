@@ -67,8 +67,8 @@
         #skill-pending-bar button[onclick="confirmPendingSkills()"] { background-color: #4f8a5b !important; border-color: #3a6b44 !important; color: #f4fbf5 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"]:hover { background-color: #5f9e6c !important; }
         /* Armor Break over the player: hard shake on the intact armor, then the broken pieces for 0.5 s */
-        .armor-break-fx { position: absolute; z-index: 7; pointer-events: none; transform: translate(-50%, -50%); animation: armorShake 0.5s linear forwards; }
-        .armor-break-fx.armor-break-go { animation: none; } /* broken pieces hold at full size for 0.5 s */
+        .armor-break-fx { position: absolute; z-index: 7; pointer-events: none; transform: translate(-50%, -50%); animation: armorShake 2s linear forwards; }
+        .armor-break-fx.armor-break-go { animation: none; } /* broken pieces hold at full size for 2 s */
         @keyframes armorShake {
             0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
             10% { transform: translate(calc(-50% - 7px), calc(-50% + 3px)) rotate(-2deg); }
@@ -1920,7 +1920,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116e"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116h"></script>
+    <script src="js/ui.js?v=20261116i"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

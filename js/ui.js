@@ -1250,7 +1250,7 @@ document.addEventListener('contextmenu', (e) => {
     if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable]')) e.preventDefault();
 });
 // Red flash on the player's battle sprite when it takes damage
-// Armor Break: the intact armor shakes hard for 0.5 s, then the broken pieces show for 0.5 s,
+// Armor Break: the intact armor shakes hard for 2 s, then the broken pieces show for 2 s,
 // drawn over the player character (a little bigger than the sprite)
 function playArmorBreakFx() {
     const sprite = document.getElementById('combat-player-sprite');
@@ -1267,8 +1267,8 @@ function playArmorBreakFx() {
     img.src = 'assets/combat/armorbreak/armor_1_q85.webp';
     img.style.cssText = `left:${cx}px; top:${cy}px; width:${w}px;`;
     stage.appendChild(img);
-    setTimeout(() => { img.src = 'assets/combat/armorbreak/armor_4_q85.webp'; img.classList.add('armor-break-go'); }, 500);
-    setTimeout(() => img.remove(), 1000);
+    setTimeout(() => { img.src = 'assets/combat/armorbreak/armor_4_q85.webp'; img.classList.add('armor-break-go'); }, 2000);
+    setTimeout(() => img.remove(), 4000);
 }
 function flashPlayerHurt() {
     const el = document.getElementById('combat-player-sprite');
