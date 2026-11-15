@@ -3836,20 +3836,18 @@ function sellInventoryItem(index, onDone) {
     if (item.favorite) { showFloatNotice("Locked items cannot be sold. Unlock it first."); return false; }
     if (item.slot && (item.levelReq || 1) >= 99) { showFloatNotice("Level 99 gear cannot be sold to the shop."); return false; }
     const total = getSellPrice(item);
-    const qtyText = (item.qty || 1) > 1 ? ` x${item.qty}` : '';
-    const sellMsg = `Sell ${item.name}${qtyText}?\n\nYou get: ${total} Gold\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
-    // Sale happens only after the player confirms in the game window
-    showGameConfirm("Sell Item", sellMsg, "Sell", () => {
+    // Same confirmation window as Sell All; the sale happens only after the player confirms
+    showBulkConfirm("Sell", `${total} Gold`, [{ it: item, i: index }], "Sell", () => {
         if (player.inventory[index] !== item) return; // the slot changed while the window was open
         player.gold += total;
         playSfx(SFX.coin);
         player.inventory[index] = null;
-        logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Gold`, 'drop');
+        logMessage(`[Shop] Sold ${item.name}${(item.qty || 1) > 1 ? ` x${item.qty}` : ''} for ${total} Gold`, 'drop');
         if (window.invDetailIndex === index) closeInvDetail();
         updateUI();
         saveGame();
         if (onDone) onDone();
-    });
+    }, item.slot ? 'equipment item(s)' : 'item(s)');
     return false;
 }
 
@@ -3942,12 +3940,13 @@ function salvageScrapGain(item) {
 }
 
 function salvageEquipmentItem(index, onDone) {
-    let item = player.inventory[index];
+    const item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { showFloatNotice("Locked items cannot be salvaged. Unlock it first."); return; }
-    let scrapGain = salvageScrapGain(item);
-    const salvageMsg = `Salvage ${item.name}?\n\nYou get: ${scrapGain} Iron Scrap\nRarity: ${confirmRarityText(item)} · Lv ${item.levelReq || 1}\nStats lost: ${confirmStatText(item)}\n\nThis cannot be undone.`;
-    const doSalvage = () => {
+    const scrapGain = salvageScrapGain(item);
+    // Same confirmation window as Salvage All (always shown for a single item)
+    showBulkConfirm("Salvage", `${scrapGain} Iron Scrap`, [{ it: item, i: index }], "Salvage", () => {
+        if (player.inventory[index] !== item) return; // the slot changed while the window was open
         player.inventory[index] = null;
         if (!addScraps(scrapGain)) {
             player.inventory[index] = item;
@@ -3959,9 +3958,7 @@ function salvageEquipmentItem(index, onDone) {
         updateUI();
         saveGame();
         if (onDone) onDone();
-    };
-    if (item.rarity >= 3) { showGameConfirm("Salvage Item", salvageMsg, "Salvage", doSalvage); return; }
-    doSalvage();
+    });
 }
 
 // Bag equipment that Salvage All / Sell All may touch: not favorites, not pets
@@ -3984,7 +3981,7 @@ function showGameConfirm(title, message, confirmLabel, onConfirm) {
 }
 
 // Salvage All / Sell All confirm: a plain pop-up box (no dim background, no blur), item icons, bold text
-function showBulkConfirm(title, gainText, targets, verb, onConfirm) {
+function showBulkConfirm(title, gainText, targets, verb, onConfirm, noun = 'equipment item(s)') {
     const esc = typeof escapeHtml === 'function' ? escapeHtml : (x => x);
     let box = document.getElementById('bulk-confirm');
     if (!box) { box = document.createElement('div'); box.id = 'bulk-confirm'; document.body.appendChild(box); }
@@ -3994,7 +3991,7 @@ function showBulkConfirm(title, gainText, targets, verb, onConfirm) {
     box.style.cssText = 'position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:310; width:max-content; max-width:min(520px,92vw); background:#0f172a; border:1px solid #334155; border-radius:16px; padding:16px 18px; box-shadow:0 10px 30px rgba(0,0,0,.5); display:flex; flex-direction:column; gap:10px;';
     box.innerHTML = `
         <div style="font-size:15px; font-weight:800; color:#fbbf24; text-align:center;">${esc(title)}</div>
-        <div style="font-size:12px; color:#e2e8f0;">${verb} ${targets.length} equipment item(s)?</div>
+        <div style="font-size:12px; color:#e2e8f0;">${verb} ${targets.length} ${noun}?</div>
         <div style="font-size:13px; font-weight:800; color:#4ade80;">You get: ${esc(gainText)}</div>
         <div style="display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto;">${rows}</div>
         <div style="font-size:12px; color:#94a3b8;">Locked items are kept.</div>
