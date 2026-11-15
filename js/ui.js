@@ -3495,16 +3495,27 @@ function showResultItemDetail(index) {
         ov.onclick = () => closeResultItemDetail();
         document.body.appendChild(ov);
     }
+    // Same layout and colours as the inventory item detail (ddFill), in a card on the result overlay
+    ov.innerHTML = '<div id="result-item-detail-panel" class="art-panel dd-skin" onclick="event.stopPropagation()" style="position:relative; width:756px; max-width:95vw; max-height:90vh; overflow-y:auto; background-color:#111a2c !important; border:2px solid #26344f !important; border-radius:16px; padding:24px 26px; box-shadow:none; text-align:left;"></div>';
+    const card = document.getElementById('result-item-detail-panel');
+    const isEquip = !!item.slot;
+    const isPotion = item.type === 'potion';
+    const rarity = RARITY_INFO[item.rarity];
+    const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    ov.innerHTML = `
-        <div onclick="event.stopPropagation()" class="relative char-detail-2x" style="width:756px; max-width:95vw; max-height:90vh; overflow-y:auto; background:rgba(231,209,170,.96); border:2px solid #b8945a; border-radius:14px; padding:18px; text-align:left;">
-            <button onclick="closeResultItemDetail()" class="absolute top-3 right-3 px-3 py-1 rounded-lg font-bold text-sm">✕</button>
-            <div class="flex items-center gap-4 pr-12 pb-3 mb-3" style="border-bottom:2px solid #b8945a;">
-                <span class="flex items-center justify-center" style="width:86px;height:86px;flex:none;">${itemIconHTML(item)}</span>
-                <div class="flex flex-col gap-2"><span class="font-black" style="font-size:28px;line-height:1.15;">${title}</span></div>
-            </div>
-            ${itemDetailBodyHTML(item)}
-        </div>`;
+    const canSell = item.slot !== 'pet';
+    ddFill(card, {
+        close: 'closeResultItemDetail()',
+        icon: itemIconHTML(item, 80),
+        name: title,
+        meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
+        compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        lore: !isEquip && !isPotion && item.desc ? item.desc : '',
+        price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : ''
+    });
+    // one close id only: the inventory panel owns #inv-detail-close
+    card.innerHTML = card.innerHTML.replace('id="inv-detail-close"', 'id="result-detail-close"');
     ov.style.display = 'flex';
 }
 function closeResultItemDetail() {
