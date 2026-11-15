@@ -123,6 +123,22 @@ const SFX_LEVEL = {
     'sound/sfx/monster/mage_attack.mp3': 2.24,
     'sound/sfx/monster/skeleton_damaged.mp3': 3.6,
     'sound/sfx/monster/skeleton_dead.mp3': 3.8,
+    'sound/sfx/monster/beast_attack1.mp3': 0.89,
+    'sound/sfx/monster/beast_attack2.mp3': 0.81,
+    'sound/sfx/monster/beast_damaged1.mp3': 0.75,
+    'sound/sfx/monster/beast_damaged2.mp3': 0.75,
+    'sound/sfx/monster/beast_dead1.mp3': 0.69,
+    'sound/sfx/monster/beast_dead2.mp3': 0.48,
+    'sound/sfx/monster/fallen_angel_attack.mp3': 1.52,
+    'sound/sfx/monster/fallen_angel_damaged.mp3': 1.06,
+    'sound/sfx/monster/fallen_angel_dead.mp3': 1.12,
+    'sound/sfx/monster/queen_hel_attack.mp3': 1.08,
+    'sound/sfx/monster/queen_hel_damaged.mp3': 0.85,
+    'sound/sfx/monster/queen_hel_dead.mp3': 1.41,
+    'sound/sfx/monster/human_attack1.mp3': 0.95,
+    'sound/sfx/monster/human_attack2.mp3': 1.02,
+    'sound/sfx/monster/human_attack3.mp3': 1.55,
+    'sound/sfx/monster/human_attack4.mp3': 1.47,
     'sound/sfx/monster/mossy_golem_attack.mp3': 1.15,
     'sound/sfx/monster/mossy_golem_damaged.mp3': 0.8,
     'sound/sfx/monster/mossy_golem_dead.mp3': 1.33,
@@ -153,15 +169,17 @@ const MONSTER_SFX = {
     M056: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Valkyrie Healer
     M069: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Ember Priest
     M102: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },         // Halo Priest
+    M008: { attack: MSFX+'beast_attack1.mp3', damaged: MSFX+'beast_damaged1.mp3', dead: MSFX+'beast_dead1.mp3' },  // Cave Beast (boss)
+    M024: { attack: MSFX+'beast_attack2.mp3', damaged: MSFX+'beast_damaged2.mp3', dead: MSFX+'beast_dead2.mp3' },  // Dusk World-Eater (boss)
     // Melee humans and humanoid bosses: hit and death sounds only, no attack sound yet
-    M033: { damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead1.mp3' },   // Halo Warden
-    M012: { damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead2.mp3' },   // Sand King (boss)
-    M016: { damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead3.mp3' },   // Abyss Lord (boss)
-    M020: { damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead4.mp3' },   // Fallen Angel (boss)
-    M049: { damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },   // Hrym, Frost King (boss)
-    M062: { damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },   // Brynhild (boss)
-    M075: { damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },   // Surtr (boss)
-    M088: { damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },   // Queen Hel (boss)
+    M033: { attack: MSFX+'human_attack1.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead1.mp3' },  // Halo Warden
+    M012: { attack: MSFX+'human_attack2.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead2.mp3' },  // Sand King (boss)
+    M016: { attack: MSFX+'human_attack3.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead3.mp3' },  // Abyss Lord (boss)
+    M020: { attack: MSFX+'fallen_angel_attack.mp3', damaged: MSFX+'fallen_angel_damaged.mp3', dead: MSFX+'fallen_angel_dead.mp3' },  // Fallen Angel (boss)
+    M049: { attack: MSFX+'human_attack4.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },  // Hrym, Frost King (boss)
+    M062: { attack: MSFX+'human_attack1.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },  // Brynhild (boss)
+    M075: { attack: MSFX+'human_attack2.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },  // Surtr (boss)
+    M088: { attack: MSFX+'queen_hel_attack.mp3', damaged: MSFX+'queen_hel_damaged.mp3', dead: MSFX+'queen_hel_dead.mp3' },  // Queen Hel (boss)
 };
 function monsterSfxOf(m) { return (m && MONSTER_SFX[m.id]) || null; }
 function playSfx(v, gain = 1) {
