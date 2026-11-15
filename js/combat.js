@@ -80,6 +80,10 @@ const SFX = {
     blacksmith: 'sound/sfx/blacksmith.mp3',
     levelup: 'sound/sfx/levelup.mp3',
     coin: 'sound/sfx/coin.mp3',
+    chestOpen: 'sound/sfx/gear/chest_open.mp3',
+    equip: 'sound/sfx/gear/equip.mp3',
+    move: 'sound/sfx/gear/move.mp3',
+    salvage: 'sound/sfx/gear/salvage.mp3',
     mapWin: 'sound/sfx/map_win.mp3'
 };
 // Loudness of each effect file, matched to the music (measured mean level), applied on top of the Effects volume
@@ -123,6 +127,10 @@ const SFX_LEVEL = {
     'sound/sfx/monster/mage_attack.mp3': 2.24,
     'sound/sfx/monster/skeleton_damaged.mp3': 3.6,
     'sound/sfx/monster/skeleton_dead.mp3': 3.8,
+    'sound/sfx/gear/chest_open.mp3': 4.17,
+    'sound/sfx/gear/equip.mp3': 7.0,
+    'sound/sfx/gear/move.mp3': 26.0,
+    'sound/sfx/gear/salvage.mp3': 3.8,
     'sound/sfx/monster/beast_attack1.mp3': 0.89,
     'sound/sfx/monster/beast_attack2.mp3': 0.81,
     'sound/sfx/monster/beast_damaged1.mp3': 0.75,

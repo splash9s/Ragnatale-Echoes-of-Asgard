@@ -2379,6 +2379,7 @@ function buyGoldConsumable(itemId) {
     }
 
     player.gold -= item.price;
+    playSfx(SFX.coin);
     logMessage(`[Shop] Purchased ${item.name}!`, 'drop');
     markBeginnerFlag('potion');
     floatSuccessAt("Purchased!");
@@ -2478,6 +2479,7 @@ function buyArmoryItem(itemIndex) {
     }
 
     player.gold -= price;
+    playSfx(SFX.coin);
     let gearItem = generatePoEItem(template, 1, 0);
     gearItem.buffs = [];
     gearItem.debuffs = [];
@@ -2537,6 +2539,7 @@ function buyDiamondItem(itemId) {
     }
 
     player.diamonds -= item.price;
+    playSfx(SFX.coin);
     player.diamondsSpent = (player.diamondsSpent || 0) + item.price; // total diamonds spent in the shop (avatar unlocks)
     if (item.type === 'resurrection') {
         player.resurrectionPotions = (player.resurrectionPotions || 0) + 1;
@@ -3064,6 +3067,7 @@ function invDrop(e, to) {
         player.inventory[from] = b || null;
         player.inventory[to] = a;
     }
+    playSfx(SFX.move);
     updateUI();
     saveGame();
 }
@@ -3109,6 +3113,7 @@ function sortInventory(key) {
         ((valueOf(a) - valueOf(b)) * sign) ||
         a.name.localeCompare(b.name));
     player.inventory = [...items, ...new Array(BAG_SLOTS - items.length).fill(null)];
+    playSfx(SFX.move);
     logMessage(`[Inventory] Sorted by ${field} (${dir === 'desc' ? 'high to low' : 'low to high'}). Locked first.`, 'drop');
     updateUI();
     saveGame();
@@ -3721,6 +3726,7 @@ function sellInventoryItem(index) {
     showGameConfirm("Sell Item", sellMsg, "Sell", () => {
         if (player.inventory[index] !== item) return; // the slot changed while the window was open
         player.gold += total;
+        playSfx(SFX.coin);
         player.inventory[index] = null;
         logMessage(`[Shop] Sold ${item.name}${qtyText} for ${total} Gold`, 'drop');
         if (window.invDetailIndex === index) closeInvDetail();
@@ -3807,6 +3813,7 @@ function executeEquipItem(index, targetSlot) {
     let currentEquipped = player.equipped[slotKey];
     player.equipped[slotKey] = item;
     player.inventory[index] = currentEquipped ? { ...currentEquipped } : null;
+    playSfx(SFX.equip);
     logMessage(`[Equipment] Equipped ${item.name}`, 'drop');
     updateUI();
     saveGame();
@@ -3830,6 +3837,7 @@ function salvageEquipmentItem(index) {
             showFloatNotice("Inventory is full! Cannot salvage.");
             return;
         }
+        playSfx(SFX.salvage);
         logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
         updateUI();
         saveGame();
@@ -3895,6 +3903,7 @@ function doSalvageAll(targets, gain) {
         showFloatNotice("Inventory is full! Cannot salvage.");
         return;
     }
+    playSfx(SFX.salvage);
     logMessage(`[Salvage] Salvaged ${targets.length} item(s) for ${gain} Iron Scrap(s)`, 'drop');
     updateUI();
     saveGame();
@@ -3907,6 +3916,7 @@ function sellAllEquipment() {
     showBulkConfirm("Sell All", `${total} Gold`, targets, "Sell", () => {
         targets.forEach(({ i }) => { player.inventory[i] = null; });
         player.gold += total;
+        playSfx(SFX.coin);
         logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
         updateUI();
         saveGame();
@@ -4803,6 +4813,22 @@ function playChestOpen(chestType, onDone) {
     const img = document.createElement('img');
     overlay.appendChild(img);
     document.body.appendChild(overlay);
+    // The overlay closes only when the animation has finished AND the chest sound has ended
+    const audio = playSfx(SFX.chestOpen);
+    let framesDone = false, soundDone = !audio;
+    let finished = false;
+    const finish = () => {
+        if (finished || !framesDone || !soundDone) return;
+        finished = true;
+        overlay.remove();
+        if (onDone) onDone();
+    };
+    if (audio) {
+        const markSoundDone = () => { soundDone = true; finish(); };
+        audio.addEventListener('ended', markSoundDone);
+        audio.addEventListener('error', markSoundDone);
+        setTimeout(markSoundDone, 10000); // safety: never leave the overlay stuck
+    }
     let i = 0;
     const showFrame = () => {
         const f = frames[i];
@@ -4816,10 +4842,7 @@ function playChestOpen(chestType, onDone) {
         setTimeout(() => {
             i++;
             if (i < frames.length) showFrame();
-            else {
-                overlay.remove();
-                if (onDone) onDone();
-            }
+            else { framesDone = true; finish(); } // the last frame holds until the sound ends
         }, f.ms);
     };
     showFrame();
@@ -6273,7 +6296,7 @@ function tentPetStep(w, dt) {
     if (w.state === 'idle') {
         w.frame = 0; w.frameT = 0;
         w.idleLeft -= dt;
-        if (w.idleLeft <= 0) { w.target = randomTentFloorPoint({ x: w.x, y: w.y }); w.state = 'walk'; }
+        if (w.idleLeft <= 0) { w.target = randomTentFloorPoint({ x: w.x, y: w.y }); w.state = 'walk'; playSfx(SFX.move); }
         return;
     }
     const dx = w.target.x - w.x, dy = w.target.y - w.y, d = Math.hypot(dx, dy), step = TENT_CAT.speed * dt;
