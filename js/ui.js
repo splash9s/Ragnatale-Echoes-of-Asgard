@@ -1962,7 +1962,7 @@ function switchView(viewName) {
     }
     if (viewName === 'setting') { showFloatPage('view-setting'); refreshAudioUI(); } // settings is a floating window over the main page
     if (viewName === 'market') {
-        document.getElementById('view-market')?.classList.remove('hidden');
+        showFloatPage('view-market'); // market is a floating window over the main page
         marketOpen();
     }
     if (viewName === 'library') {
