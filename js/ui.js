@@ -1980,11 +1980,11 @@ function switchView(viewName) {
         switchEventsTab(currentEventsTab);
     }
     if (viewName === 'shop') {
-        document.getElementById('view-shop')?.classList.remove('hidden');
+        showFloatPage('view-shop'); // shop is a floating window over the main page
         switchShopTab(currentShopTab);
     }
     if (viewName === 'blacksmith') {
-        document.getElementById('view-blacksmith')?.classList.remove('hidden');
+        showFloatPage('view-blacksmith'); // blacksmith is a floating window over the main page
         renderRefiningUI();
     }
     if (viewName === 'quests') {
