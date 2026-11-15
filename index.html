@@ -652,10 +652,17 @@
         #view-events.events-float { background: transparent; }
         #view-events.events-float .ts-bg { display: none !important; }
         #view-events.events-float .ts-inner { background: transparent !important; }
-        /* Mail, settings, shop, blacksmith and market as floating windows: no background, top bar and return button stay */
-        #view-quests.float-page, #view-setting.float-page, #view-shop.float-page, #view-blacksmith.float-page, #view-market.float-page { background: transparent; }
-        #view-quests.float-page .ts-bg, #view-setting.float-page .ts-bg, #view-shop.float-page .ts-bg, #view-blacksmith.float-page .ts-bg, #view-market.float-page .ts-bg { display: none !important; }
-        #view-quests.float-page .ts-inner, #view-setting.float-page .ts-inner, #view-shop.float-page .ts-inner, #view-blacksmith.float-page .ts-inner, #view-market.float-page .ts-inner { background: transparent !important; }
+        /* Mail, settings, shop, blacksmith, market and VIP shop as floating windows: no background, top bar and return button stay */
+        #view-quests.float-page, #view-setting.float-page, #view-shop.float-page, #view-blacksmith.float-page, #view-market.float-page, #view-vip.float-page { background: transparent; }
+        #view-quests.float-page .ts-bg, #view-setting.float-page .ts-bg, #view-shop.float-page .ts-bg, #view-blacksmith.float-page .ts-bg, #view-market.float-page .ts-bg, #view-vip.float-page .ts-bg { display: none !important; }
+        #view-quests.float-page .ts-inner, #view-setting.float-page .ts-inner, #view-shop.float-page .ts-inner, #view-blacksmith.float-page .ts-inner, #view-market.float-page .ts-inner, #view-vip.float-page .ts-inner { background: transparent !important; }
+        /* VIP shop slots: inventory slot size, diamond price under each */
+        .vip-cell { display: flex; flex-direction: column; align-items: center; width: 108px; }
+        .vip-slot { position: relative; width: 108px; height: 104px; padding: 0; border: 0; background: url(assets/pages/character/inventoryslot2.png) 0 0 / 100% 100% no-repeat; cursor: pointer; }
+        .vip-slot img { position: absolute; inset: 10px; width: calc(100% - 20px); height: calc(100% - 20px); object-fit: contain; }
+        .vip-slot:hover { filter: brightness(1.15); }
+        .vip-price { margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 22px; font-weight: 800; color: #fde68a; white-space: nowrap; text-shadow: 0 2px 4px #000; }
+        .vip-price img { width: 22px; height: 22px; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
         #view-friend .friend-myid { color: #f1e4c3; }
@@ -1201,6 +1208,9 @@
             <div class="ui" data-action="blacksmith" style="left:465px; top:858px; width:206px; height:209px;">
                 <img src="assets/page01/articanbutton_q85.webp" alt="" onerror="townSwap(this,'articanbutton.png')">
             </div>
+            <div class="ui" data-action="vip" style="left:24px; top:347px; width:298px; height:99px;">
+                <img id="vip-btn-img" src="assets/diamond/vip/vip_btn_1_q85.webp" alt="VIP Shop" style="width:100%; height:100%; display:block;">
+            </div>
             <div class="ui" data-action="expedition" style="left:1565px; top:934px; width:300px; height:96px;">
                 <img class="exp-glow" src="assets/page01/expedition_v3_q85.webp" alt="Expedition">
             </div>
@@ -1430,6 +1440,21 @@
         </div>
 
         <!-- VIEW: EVENTS (layout: left event menu, right banner + details, map choice, start) -->
+        <!-- VIP SHOP: floating window over the main page (same as Events): top bar and return button stay -->
+        <div id="view-vip" class="hidden art-screen art-dark">
+            <div id="vip-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img class="ts-bg" src="assets/pages/diamond/bg_q85.webp" alt="" style="width:1920px; height:1080px;">
+                    <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
+                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
+                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                    </div>
+                    <img class="art-frame" src="assets/diamond/vip/vip_window_q85.webp" alt="" style="left:300px; top:160px; width:1320px; height:737px;">
+                    <div id="vip-grid" style="position:absolute; z-index:3; left:377px; top:261px; width:1166px; height:614px; box-sizing:border-box; padding:36px 44px; overflow-y:auto; background:url(assets/diamond/vip/vip_slots_q85.webp) 0 0 / 100% 100% no-repeat; display:grid; grid-template-columns:repeat(auto-fill, 108px); justify-content:center; gap:34px 28px; align-content:start;"></div>
+                </div>
+            </div>
+        </div>
         <div id="view-events" class="hidden art-screen art-dark">
             <style>
                 #events-stage .ev-left, #events-stage .ev-right { position: absolute; }
@@ -1928,13 +1953,13 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116f"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116l"></script>
+    <script src="js/ui.js?v=20261116m"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
     <script src="js/beginner-quest.js?v=20261114x"></script>
     <script src="js/friends.js?v=20261113g"></script>
-    <script src="js/town.js?v=20261115a"></script>
+    <script src="js/town.js?v=20261116a"></script>
     <script src="js/loader.js?v=20261115c"></script>
 
 <script>

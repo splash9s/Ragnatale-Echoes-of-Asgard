@@ -1938,7 +1938,7 @@ function switchView(viewName) {
         currentShopTab = 'diamond';
         viewName = 'shop';
     }
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market', 'view-vip'];
     document.getElementById('view-town')?.classList.remove('friend-under');
     views.forEach(id => {
         let el = document.getElementById(id);
@@ -1949,10 +1949,10 @@ function switchView(viewName) {
     // Refresh badges on every screen change, so the character page shows current point alerts
     if (typeof updateTownAlerts === 'function') updateTownAlerts();
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market', 'vip'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market', 'vip'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -1984,6 +1984,10 @@ function switchView(viewName) {
         skillFocusHub();
     }
     if (viewName === 'setting') { showFloatPage('view-setting'); refreshAudioUI(); } // settings is a floating window over the main page
+    if (viewName === 'vip') {
+        showFloatPage('view-vip'); // VIP shop is a floating window over the main page
+        renderVipShop();
+    }
     if (viewName === 'market') {
         showFloatPage('view-market'); // market is a floating window over the main page
         marketOpen();
@@ -2553,6 +2557,27 @@ function buyArmoryItem(itemIndex) {
     updateUI();
     saveGame();
 }
+
+// VIP shop: the diamond shop items in inventory-size slots, price under each
+function renderVipShop() {
+    const grid = document.getElementById('vip-grid');
+    if (!grid) return;
+    grid.innerHTML = DIAMOND_SHOP_ITEMS.map(item => `
+        <div class="vip-cell">
+            <button class="vip-slot" title="${escapeHtml(item.name)}" onclick="buyDiamondItem('${item.id}')">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</button>
+            <div class="vip-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt="">${item.price}</div>
+        </div>`).join('');
+    grid.scrollTop = 0;
+}
+
+// VIP shop button: the nine shine frames play once every 10 seconds (frame 1 is the base button)
+function runVipShine() {
+    const img = document.getElementById('vip-btn-img');
+    if (!img) return;
+    for (let f = 1; f <= 9; f++) setTimeout(() => { img.src = `assets/diamond/vip/vip_btn_${f}_q85.webp`; }, (f - 1) * 90);
+    setTimeout(() => { img.src = 'assets/diamond/vip/vip_btn_1_q85.webp'; }, 9 * 90);
+}
+setInterval(runVipShine, 10000);
 
 function renderDiamondShop() {
     let container = document.getElementById('diamond-shop-items-container');
