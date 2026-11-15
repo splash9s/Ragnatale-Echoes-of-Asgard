@@ -485,6 +485,27 @@
         #view-character .tent-top-btn, #view-character .tent-ui-toggle { position: absolute; z-index: 10; display: none; height: 96px; padding: 0 40px; border-radius: 10px; border: 2px solid #b8945a; background: #dbc5a0; color: #2a1a0e; font-size: 48px; font-weight: 800; white-space: nowrap; cursor: pointer; }
         #view-character .tent-ui-toggle { right: 24px; bottom: 20px; }
         #view-character #tent-pets-btn { bottom: 103px; }
+        #view-character #tent-puzzle-btn { bottom: 186px; }
+        /* Slide puzzle: pet list -> puzzle list -> board */
+        #puzzle-panel, #puzzle-game { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(var(--ps, 1)); z-index: 290; width: 760px; box-sizing: border-box; padding: 18px; display: flex; flex-direction: column; gap: 12px; background: rgba(17,26,44,.94); border: 2px solid #26344f; border-radius: 16px; color: #e9edf5; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+        #puzzle-game { z-index: 300; }
+        #puzzle-panel .pz-head, #puzzle-game .pz-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        #puzzle-panel h3, #puzzle-game h3 { font-size: 56px; font-weight: 900; margin: 0; color: #f5a00b; }
+        #puzzle-panel .pz-x, #puzzle-panel .pz-back, #puzzle-game .pz-x, #puzzle-game .pz-back { font-size: 40px; font-weight: 800; padding: 4px 14px; border-radius: 10px; border: 2px solid #26344f; background: #1b2740; color: #e9edf5; cursor: pointer; }
+        #puzzle-panel .pz-sub, #puzzle-game .pz-sub { font-size: 32px; margin: 0; color: #9aa6bd; }
+        #puzzle-panel .pz-list { display: flex; flex-direction: column; gap: 8px; max-height: 760px; overflow-y: auto; }
+        #puzzle-panel .pz-row { display: flex; align-items: center; gap: 14px; width: 100%; padding: 8px 12px; border-radius: 12px; border: 2px solid #26344f; background: #0b1322; color: #e9edf5; cursor: pointer; text-align: left; font-size: 40px; font-weight: 800; }
+        #puzzle-panel .pz-row img { width: 72px; height: 72px; object-fit: contain; }
+        #puzzle-panel .pz-row .pz-name { flex: 1; min-width: 0; }
+        #puzzle-panel .pz-row small { font-size: 28px; color: #9aa6bd; font-weight: 700; }
+        #puzzle-game .pz-stats { font-size: 34px; font-weight: 800; color: #7dd3fc; text-align: center; }
+        #puzzle-game .pz-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; aspect-ratio: 1 / 1; padding: 6px; box-sizing: border-box; background: #0b1322; border: 2px solid #26344f; border-radius: 12px; }
+        #puzzle-game .pz-tile { border: 2px solid #26344f; border-radius: 8px; padding: 0; cursor: pointer; background-repeat: no-repeat; background-color: #14203a; }
+        #puzzle-game .pz-tile.blank { background: #0b1322; border-style: dashed; cursor: default; }
+        #puzzle-game .pz-tile:not(.blank):hover { filter: brightness(1.12); }
+        #puzzle-game .pz-foot { display: flex; justify-content: space-between; gap: 10px; }
+        #puzzle-game .pz-btn { flex: 1; font-size: 36px; font-weight: 800; padding: 10px; border-radius: 10px; border: 2px solid #26344f; background: #1b2740; color: #e9edf5; cursor: pointer; }
+        #puzzle-game .pz-win { font-size: 40px; font-weight: 900; text-align: center; color: #fde68a; margin: 0; }
         #view-character.screen-clear .tent-top-btn, #view-character.screen-clear .tent-ui-toggle { display: block; }
         /* Minimize button (bottom right): hides the UI; faded to 30% while the UI is hidden. Press image while held. */
         #view-character .tent-icon-btn { position: absolute; right: 24px; bottom: 20px; z-index: 10; display: none; width: 66px; height: 67px; cursor: pointer; transition: opacity .3s ease; }
@@ -1559,6 +1580,7 @@
                     <div class="char-light-zone" id="tent-stand-zone" style="position:absolute; left:1029px; top:649px; width:265px; height:63px; z-index:6; cursor:pointer;" onclick="tentStandClick()" title="Leather"></div>
                     <div class="char-light-zone" id="tent-desk-zone" style="position:absolute; left:1376px; top:652px; width:158px; height:80px; z-index:6; cursor:pointer;" onclick="openRuneLore()" title="Desk"></div>
                     <div id="tent-pets-btn" class="tent-icon-btn" onclick="openPetPanel()" title="Pets"><img class="min-normal" src="assets/cha/button/peticon_q85.webp" alt="Pets"><img class="min-press" src="assets/cha/button/peticonpress_q85.webp" alt=""></div>
+                    <div id="tent-puzzle-btn" class="tent-icon-btn" onclick="openPuzzlePanel()" title="Puzzle"><img class="min-normal" src="assets/tent/puzzle/puzzle_btn_q85.webp" alt="Puzzle"><img class="min-press" src="assets/tent/puzzle/puzzle_btn_press_q85.webp" alt=""></div>
                     <div id="tent-ui-toggle" class="tent-icon-btn" onclick="toggleTentUi()" title="Hide UI"><img class="min-normal" src="assets/cha/button/minimize_q85.webp" alt="Hide UI"><img class="min-press" src="assets/cha/button/minimizepress_q85.webp" alt=""></div>
                     <div class="ui char-clear-toggle" style="position:absolute; left:2px; top:2px; width:66px; height:67px;" onclick="toggleCharClear()" title="Clear screen">
                         <img class="clr-normal" src="assets/cha/button/clearscreen_q85.webp" alt="">
@@ -1957,7 +1979,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116f"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116y"></script>
+    <script src="js/ui.js?v=20261116za"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
