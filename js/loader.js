@@ -335,7 +335,19 @@ function preloadImage(src) {
 }
 
 function preloadSound(src) {
-    return fetch(src).then(r => r.blob()).catch(() => {}); // cached by the browser for later playback
+    // Download the file into the browser cache, and also prepare it as a media element, so the first play starts at once
+    return new Promise(resolve => {
+        const done = () => resolve();
+        try {
+            const a = new Audio();
+            a.preload = 'auto';
+            a.addEventListener('canplaythrough', done, { once: true });
+            a.addEventListener('error', done, { once: true });
+            a.src = src;
+            a.load();
+        } catch (err) { /* ignore: the play call will fetch it */ }
+        fetch(src).then(r => r.blob()).then(done, done); // cached by the browser for later playback
+    });
 }
 
 // Only the art the town needs is loaded before the game starts (main page, hero, cart, shared buttons).
@@ -415,9 +427,9 @@ function soundsToPreload() {
     return [...out];
 }
 function preloadRest() {
-    const rest = LOADING_IMAGES.filter(src => !isCriticalImage(src))
-        .map(src => () => preloadImage(src))
-        .concat(soundsToPreload().map(src => () => preloadSound(src)));
+    // Sounds first (they are small and needed as soon as the player taps), then the images
+    const rest = soundsToPreload().map(src => () => preloadSound(src))
+        .concat(LOADING_IMAGES.filter(src => !isCriticalImage(src)).map(src => () => preloadImage(src)));
     let next = 0;
     const worker = () => {
         if (next >= rest.length) return Promise.resolve();
