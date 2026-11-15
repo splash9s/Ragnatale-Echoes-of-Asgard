@@ -662,7 +662,7 @@
         .vip-slot img { position: absolute; left: 14px; top: 12px; width: calc(100% - 28px); height: calc(100% - 44px); object-fit: contain; }
         .vip-slot:hover { filter: brightness(1.15); }
         /* Price sits in the card's red-box strip (no diamond icon) */
-        .vip-price { position: absolute; left: 12px; width: 104px; top: 121px; height: 21px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #fde68a; white-space: nowrap; text-shadow: 0 1px 2px #000; pointer-events: none; }
+        .vip-price { position: absolute; left: 12px; width: 104px; top: 121px; height: 21px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #7dd3fc; white-space: nowrap; text-shadow: 0 1px 2px #000; pointer-events: none; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
         #view-friend .friend-myid { color: #f1e4c3; }
@@ -1447,6 +1447,7 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/diamond/bg_q85.webp" alt="" style="width:1920px; height:1080px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
+                    <div id="vip-balance" style="position:absolute; z-index:4; left:1640px; top:12px; width:190px; height:46px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(12,24,52,.85); border:2px solid #26344f; border-radius:12px; color:#7dd3fc; font-size:26px; font-weight:800; text-shadow:0 2px 4px #000;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:28px; height:28px;"><span id="vip-diamonds">0</span></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
@@ -1954,7 +1955,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116f"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116u"></script>
+    <script src="js/ui.js?v=20261116v"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
