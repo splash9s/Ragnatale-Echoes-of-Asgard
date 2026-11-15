@@ -2233,6 +2233,17 @@ function floatNoticeAt(text, ev) {
 }
 
 // Small green note at the click position that fades out by itself (used for successful purchases)
+function floatFailAt(text, ev) {
+    ev = ev || window.event;
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+    if (ev && (ev.clientX || ev.clientY)) { x = ev.clientX; y = ev.clientY; }
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#f87171; font-weight:800; font-size:22px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform 1.8s ease-out 0.4s, opacity 0.6s ease-in 1.4s;`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-220%)'; el.style.opacity = '0'; }));
+    setTimeout(() => el.remove(), 2200);
+}
 function floatSuccessAt(text, ev) {
     ev = ev || window.event;
     let x = window.innerWidth / 2, y = window.innerHeight / 2;
@@ -2855,12 +2866,14 @@ function forgeElementOnWeapon() {
     player.elementStones[el] -= need;
     if (Math.random() * 100 >= FORGE_SUCCESS_RATE) {
         playSfx(SFX.refineFail);
+        floatFailAt("Failed!");
         logMessage(`[Forge Failed] Forging ${baseName} failed. ${need} ${ELEMENTS[el].name} Elemental Stone(s) and ${cost} Gold are lost; the weapon is safe.`, 'combat');
     } else {
         if (!weapon.baseName) weapon.baseName = weapon.name;
         weapon.element = el;
         weapon.name = forgedWeaponName(weapon, el);
         playSfx(SFX.refineSuccess);
+        floatSuccessAt("Success!");
         logMessage(`[Forge] ${baseName} is now ${ELEMENTS[el].name} (${cost} Gold, ${need} ${ELEMENTS[el].name} Elemental Stone).`, 'levelup');
     }
     updateUI();
@@ -2897,6 +2910,7 @@ function refineEquipment(slot) {
     if (Math.random() * 100 <= successRate) {
         gear.refineLevel = current + 1;
         playSfx(SFX.refineSuccess);
+        floatSuccessAt("Success!");
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
     } else {
         if (player.blacksmithRuneEquipped) {
@@ -2904,11 +2918,13 @@ function refineEquipment(slot) {
             player.blacksmithRuneEquipped = false;
             gear.refineLevel = current;
             playSfx(SFX.refineFail);
+            floatFailAt("Failed!");
             logMessage(`[Refine Failed] Rune Stone protected ${gear.name} at +${current}.`, 'combat');
         } else {
             // Failure drops the refine level by 1 (never below +0)
             gear.refineLevel = Math.max(Math.min(current, 4), current - 1);
             playSfx(SFX.refineFail);
+            floatFailAt("Failed!");
             logMessage(`[Refine Failed] Upgrade failed. ${gear.name} dropped to +${gear.refineLevel}.`, 'combat');
         }
     }
