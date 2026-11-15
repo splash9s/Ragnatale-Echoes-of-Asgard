@@ -2576,6 +2576,8 @@ function renderVipShop() {
             <div class="vip-price">${item.price}</div>
         </div>`).join('');
     grid.scrollTop = 0;
+    const bal = document.getElementById('vip-diamonds');
+    if (bal) bal.innerText = player.diamonds;
 }
 
 // VIP shop button: the nine shine frames play once every 5 seconds (frame 1 is the base button)
@@ -5184,6 +5186,8 @@ function updateUI() {
     el = document.getElementById('shop-gold-value');
     if (el) el.innerText = player.gold;
     el = document.getElementById('town-diamonds');
+    if (el) el.innerText = player.diamonds;
+    el = document.getElementById('vip-diamonds');
     if (el) el.innerText = player.diamonds;
 
     let baseExpPct = Math.min(100, Math.floor((player.baseExp / player.baseMaxExp) * 100));
