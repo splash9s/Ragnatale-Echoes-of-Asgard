@@ -683,8 +683,8 @@
         .vip-cell { position: relative; display: flex; flex-direction: column; align-items: center; width: 128px; }
         .vip-slot { position: relative; width: 128px; height: 154px; padding: 0; border: 0; background: url(assets/diamond/vip/diamond_slot_q85.webp) 0 0 / 100% 100% no-repeat; cursor: pointer; }
         .vip-slot img { position: absolute; left: 14px; top: 12px; width: calc(100% - 28px); height: calc(100% - 44px); object-fit: contain; }
-        /* Elemental and blacksmith stones are drawn a little larger than the chests */
-        .vip-slot img.vip-big { transform: scale(1.2); }
+        /* Elemental and blacksmith stones: same size as the other items (no enlarge) */
+        .vip-slot img.vip-big { transform: none; }
         .vip-slot:hover { filter: brightness(1.15); }
         /* Price sits in the card's red-box strip (no diamond icon) */
         .vip-price { position: absolute; left: 12px; width: 104px; top: 123px; height: 21px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #7dd3fc; white-space: nowrap; text-shadow: 0 1px 2px #000; pointer-events: none; }
@@ -1981,7 +1981,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116f"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116zc"></script>
+    <script src="js/ui.js?v=20261116zd"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
