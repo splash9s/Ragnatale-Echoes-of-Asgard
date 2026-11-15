@@ -2856,14 +2856,12 @@ function forgeElementOnWeapon() {
     if (Math.random() * 100 >= FORGE_SUCCESS_RATE) {
         playSfx(SFX.refineFail);
         logMessage(`[Forge Failed] Forging ${baseName} failed. ${need} ${ELEMENTS[el].name} Elemental Stone(s) and ${cost} Gold are lost; the weapon is safe.`, 'combat');
-        showModal("Forging Failed", `The forge failed. Your ${baseName} is safe, but ${need} stone(s) and ${cost} Gold were used up.`);
     } else {
         if (!weapon.baseName) weapon.baseName = weapon.name;
         weapon.element = el;
         weapon.name = forgedWeaponName(weapon, el);
         playSfx(SFX.refineSuccess);
         logMessage(`[Forge] ${baseName} is now ${ELEMENTS[el].name} (${cost} Gold, ${need} ${ELEMENTS[el].name} Elemental Stone).`, 'levelup');
-        showModal("Elemental Forge", `Forged! Your weapon is now ${ELEMENTS[el].name}.`);
     }
     updateUI();
     renderRefiningUI();
@@ -2900,7 +2898,6 @@ function refineEquipment(slot) {
         gear.refineLevel = current + 1;
         playSfx(SFX.refineSuccess);
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
-        showModal("Refinement Successful!", `Your ${gear.name} was upgraded to +${gear.refineLevel}!`);
     } else {
         if (player.blacksmithRuneEquipped) {
             // Rune Stone equipped: the failed refine keeps the level and uses the equipped stone
@@ -2908,13 +2905,11 @@ function refineEquipment(slot) {
             gear.refineLevel = current;
             playSfx(SFX.refineFail);
             logMessage(`[Refine Failed] Rune Stone protected ${gear.name} at +${current}.`, 'combat');
-            showModal("Refinement Failed", `The upgrade failed, but the Blacksmith Rune Stone kept your ${gear.name} at +${current}.`);
         } else {
             // Failure drops the refine level by 1 (never below +0)
             gear.refineLevel = Math.max(Math.min(current, 4), current - 1);
             playSfx(SFX.refineFail);
             logMessage(`[Refine Failed] Upgrade failed. ${gear.name} dropped to +${gear.refineLevel}.`, 'combat');
-            showModal("Refinement Failed", `The upgrade process failed. Your ${gear.name} dropped to +${gear.refineLevel}.`);
         }
     }
 
