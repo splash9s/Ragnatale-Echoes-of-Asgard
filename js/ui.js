@@ -2572,7 +2572,7 @@ function renderVipShop() {
     if (!grid) return;
     grid.innerHTML = DIAMOND_SHOP_ITEMS.map(item => `
         <div class="vip-cell">
-            <button class="vip-slot" title="${escapeHtml(item.name)}" onclick="buyDiamondItem('${item.id}')">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</button>
+            <button class="vip-slot" title="${escapeHtml(item.name)}" onclick="buyDiamondItem('${item.id}')">${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
             <div class="vip-price">${item.price}</div>
         </div>`).join('');
     grid.scrollTop = 0;
