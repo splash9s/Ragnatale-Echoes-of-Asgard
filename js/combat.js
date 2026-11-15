@@ -1647,13 +1647,34 @@ function monsterTurnTick() {
     }
     updateUI();
 }
+// Battle speed (VIP only): 2x by default, 1x if the player picked it. Non-VIP always runs at 1x.
+function combatSpeedMult() {
+    if (!isVipActive()) return 1;
+    return player.battleSpeed === 1 ? 1 : 2;
+}
 // Starts the player's attack timer (ASPD) and the monsters' timer; stopCombatTimers clears both
+let combatTimerDerived = null;
 function startCombatTimers(derived) {
     stopCombatTimers();
-    // VIP: battle turns run twice as fast (the stage walk is already skipped for VIP)
-    const vipSpeed = isVipActive() ? 2 : 1;
-    combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)) / vipSpeed);
-    monsterInterval = setInterval(monsterTurnTick, COMBAT_MONSTER_MS / vipSpeed);
+    combatTimerDerived = derived;
+    const speed = combatSpeedMult(); // VIP battle turns run faster (the stage walk is already skipped for VIP)
+    combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)) / speed);
+    monsterInterval = setInterval(monsterTurnTick, COMBAT_MONSTER_MS / speed);
+}
+// The 1x / 2x button: VIP only. Switching during a battle restarts the timers at the new speed.
+function toggleBattleSpeed() {
+    if (!isVipActive()) return;
+    player.battleSpeed = combatSpeedMult() === 2 ? 1 : 2;
+    updateSpeedButton();
+    if (combatInterval !== null && combatTimerDerived) startCombatTimers(combatTimerDerived);
+    showCombatText('#combat-speed-btn', player.battleSpeed === 1 ? '1x Speed' : '2x Speed', 'heal');
+}
+function updateSpeedButton() {
+    const btn = document.getElementById('combat-speed-btn');
+    if (!btn) return;
+    btn.classList.toggle('hidden', !isVipActive());
+    const img = document.getElementById('combat-speed-img');
+    if (img) img.src = combatSpeedMult() === 2 ? 'assets/combat/speed/speed_2x_q85.webp' : 'assets/combat/speed/speed_1x_q85.webp';
 }
 function stopCombatTimers() {
     clearInterval(combatInterval); clearInterval(monsterInterval);
@@ -2114,6 +2135,7 @@ function updatePauseButton() {
     btn.classList.toggle('hidden', !isVipActive());
     btn.title = combatPaused ? 'Resume' : 'Pause';
     btn.classList.toggle('paused', combatPaused); // press graphic while paused
+    updateSpeedButton();
     const ar = document.getElementById('combat-auto-rune-btn');
     if (ar) {
         ar.classList.toggle('hidden', !isVipActive());
