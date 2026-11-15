@@ -416,6 +416,22 @@ function runeHighlightHtml(text) {
         });
 }
 
+// The rune pick window is open (set in showRuneChoices, cleared when a rune is picked)
+let runePickOpen = false;
+// Closing the rune window without picking (backdrop click) ends the pick and the battle carries on
+function onRunePickClosed() {
+    if (!runePickOpen) return; // closed because a rune was picked
+    runePickOpen = false;
+    removeRuneGuide();
+    const cb = window.runeCallback;
+    window.runeCallback = null;
+    if (cb) cb();
+}
+(function bindRunePickBackdrop() {
+    const gm = document.getElementById('game-modal');
+    if (gm) gm.addEventListener('click', e => { if (e.target === e.currentTarget && runePickOpen) closeModal(); });
+})();
+
 function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
     const choices = pickWeightedRunes(pool, 3).reduce((acc, id) => { acc.push(upgradeRuneChoice(id, pool, acc)); return acc; }, []);
@@ -463,7 +479,8 @@ function showRuneChoices(isNew) {
             <div class="rune-acq-list" style="display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:flex-start; gap:14px; flex:1; min-height:0; overflow-x:auto; overflow-y:hidden; padding:0 4px 6px;">${acquiredHtml}</div>
         </div></div>`;
     if (isNew) {
-        showModal("Rune Blessing", "", html);
+        runePickOpen = true;
+        showModal("Rune Blessing", "", html, onRunePickClosed);
         scheduleVipAutoRune(choices);
     } else {
         const area = document.getElementById('modal-content-area');
@@ -489,6 +506,7 @@ function refreshRuneChoices() {
 
 function selectRuneChoice(runeId, callback) {
     if (!isRuneOffered(runeId)) return;
+    runePickOpen = false; // a picked rune closes the window; the backdrop close does not apply
     removeRuneGuide();
     const def = RUNE_DEFS[runeId];
     applyRune(runeId);
