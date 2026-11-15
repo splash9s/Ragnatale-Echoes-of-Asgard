@@ -658,11 +658,11 @@
         #view-quests.float-page .ts-inner, #view-setting.float-page .ts-inner, #view-shop.float-page .ts-inner, #view-blacksmith.float-page .ts-inner, #view-market.float-page .ts-inner, #view-vip.float-page .ts-inner { background: transparent !important; }
         /* VIP shop slots: inventory slot size, diamond price under each */
         .vip-cell { position: relative; display: flex; flex-direction: column; align-items: center; width: 128px; }
-        .vip-slot { position: relative; width: 128px; height: 152px; padding: 0; border: 0; background: url(assets/diamond/vip/diamond_slot_q85.webp) 0 0 / 100% 100% no-repeat; cursor: pointer; }
+        .vip-slot { position: relative; width: 128px; height: 154px; padding: 0; border: 0; background: url(assets/diamond/vip/diamond_slot_q85.webp) 0 0 / 100% 100% no-repeat; cursor: pointer; }
         .vip-slot img { position: absolute; left: 14px; top: 12px; width: calc(100% - 28px); height: calc(100% - 44px); object-fit: contain; }
         .vip-slot:hover { filter: brightness(1.15); }
-        .vip-price { position: absolute; left: 0; right: 0; bottom: 6px; height: 24px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 22px; font-weight: 800; color: #fde68a; white-space: nowrap; text-shadow: 0 2px 4px #000; }
-        .vip-price img { width: 22px; height: 22px; }
+        /* Price sits in the card's red-box strip (no diamond icon) */
+        .vip-price { position: absolute; left: 12px; width: 104px; top: 121px; height: 21px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #fde68a; white-space: nowrap; text-shadow: 0 1px 2px #000; pointer-events: none; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
         #view-friend .friend-myid { color: #f1e4c3; }
@@ -1954,7 +1954,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116f"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116o"></script>
+    <script src="js/ui.js?v=20261116p"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
