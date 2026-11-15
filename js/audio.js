@@ -87,6 +87,23 @@ function setSfxVolume(v) {
     refreshAudioUI();
 }
 function saveAudioSettings() { saveGame(); }
+// Combat sound button: one switch for music and effects together (same settings as the Settings page)
+function soundIsOn() { const a = audioSettings(); return a.musicOn && a.sfxOn; }
+function toggleSoundAll() {
+    const next = !soundIsOn();
+    const a = audioSettings();
+    a.musicOn = next;
+    a.sfxOn = next;
+    const el = getMusicEl();
+    if (next) setMusicTrack(musicTrack || 'town');
+    else el.pause();
+    refreshAudioUI();
+    saveGame();
+}
+function updateSoundButton() {
+    const img = document.getElementById('combat-sound-img');
+    if (img) img.src = soundIsOn() ? 'assets/combat/sound/sound_on_q85.webp' : 'assets/combat/sound/sound_off_q85.webp';
+}
 // Plays one effect at the chosen volume, so the player can hear the level they set
 
 // Keeps the Settings page controls in step with the saved values
@@ -100,4 +117,5 @@ function refreshAudioUI() {
     setText('sfx-toggle-btn', a.sfxOn ? '🔊 Effects: On' : '🔊 Effects: Off');
     setVal('sfx-volume', a.sfxVol);
     setText('sfx-volume-text', a.sfxVol);
+    updateSoundButton();
 }
