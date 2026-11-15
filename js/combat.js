@@ -121,7 +121,7 @@ const SFX_LEVEL = {
     'sound/sfx/monster/golem_attack.mp3': 0.72,
     'sound/sfx/monster/golem_damaged.mp3': 0.6,
     'sound/sfx/monster/golem_dead.mp3': 1.3,
-    'sound/sfx/monster/healer_heal.mp3': 4.22,
+    'sound/sfx/monster/healer_heal.mp3': 2.06,
     'sound/sfx/monster/human_damaged1.mp3': 0.98,
     'sound/sfx/monster/human_damaged2.mp3': 0.97,
     'sound/sfx/monster/human_damaged3.mp3': 0.75,
