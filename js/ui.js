@@ -1961,6 +1961,10 @@ function switchView(viewName) {
     }
     if (viewName === 'events') {
         populateBossGauntletPick();
+        // Events is a floating window over the main page: the main page stays on screen behind it
+        document.getElementById('view-town')?.classList.remove('hidden');
+        document.getElementById('view-town')?.classList.add('friend-under');
+        document.getElementById('view-events')?.classList.add('events-float');
         document.getElementById('view-events')?.classList.remove('hidden');
         renderEventsView();
         switchEventsTab(currentEventsTab);
