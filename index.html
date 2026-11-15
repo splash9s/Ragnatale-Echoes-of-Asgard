@@ -65,6 +65,13 @@
         #skill-pending-bar button:hover { background-color: #e8d6b0 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"] { background-color: #4f8a5b !important; border-color: #3a6b44 !important; color: #f4fbf5 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"]:hover { background-color: #5f9e6c !important; }
+        /* Stat and skill pending bars: Yes (green glow) and No (red glow) picture buttons */
+        .yn-row { display: flex; gap: 16px; justify-content: center; align-items: center; }
+        .yn-btn { flex: none; width: 60px; height: 60px; padding: 0; border: 0; background: none; cursor: pointer; }
+        .yn-btn img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .yn-yes img { filter: drop-shadow(0 0 4px #22c55e) drop-shadow(0 0 6px #22c55e); }
+        .yn-no img { filter: drop-shadow(0 0 4px #ef4444) drop-shadow(0 0 6px #ef4444); }
+        .yn-btn:active img { transform: scale(0.94); }
         /* Skill page: SP badge and Confirm / Reset bar text 2x, boxes enlarged to fit */
         #view-skills #skill-sp-badge { left: 860px !important; top: 8px !important; width: 200px !important; height: 54px !important; }
         #view-skills #skill-sp-badge, #view-skills #skill-sp-badge * { font-size: 26px !important; }
@@ -1895,9 +1902,9 @@
     <script src="js/cloud.js?v=20261114c"></script>
     <script src="js/hero-art.js?v=20261112c"></script>
     <script src="js/hero-body.js?v=20261115aj"></script>
-    <script src="js/combat.js?v=20261116b"></script>
+    <script src="js/combat.js?v=20261116c"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116c"></script>
+    <script src="js/ui.js?v=20261116d"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

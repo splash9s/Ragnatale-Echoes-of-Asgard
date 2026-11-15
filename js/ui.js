@@ -3532,7 +3532,7 @@ function showResultItemDetail(index) {
     if (!ov) {
         ov = document.createElement('div');
         ov.id = 'result-item-detail';
-        ov.style.cssText = 'position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,.6); padding:16px;';
+        ov.style.cssText = 'position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,.6); padding:16px;';
         ov.onclick = () => closeResultItemDetail();
         document.body.appendChild(ov);
     }
@@ -4367,6 +4367,13 @@ function confirmPendingStats() {
     });
 }
 
+// Reset (red X) and Confirm (green check) as picture buttons, for the stat and skill pending bars
+function ynButtonsHTML(resetCall, confirmCall, confirmTitle) {
+    return `<div class="yn-row">`
+        + `<button onclick="${resetCall}" class="yn-btn yn-no" title="Reset" aria-label="Reset"><img src="assets/cha/page/character/no_q85.webp" alt="Reset"></button>`
+        + `<button onclick="${confirmCall}" class="yn-btn yn-yes" title="${confirmTitle}" aria-label="${confirmTitle}"><img src="assets/cha/page/character/yes_q85.webp" alt="${confirmTitle}"></button>`
+        + `</div>`;
+}
 function resetPendingStats() { pendingAlloc.stats = {}; updateUI(); }
 
 // Spends the pending stat points without a confirm step (used by Begin Journey on the character select page)
@@ -4506,10 +4513,7 @@ function renderPendingBars() {
             const parts = Object.entries(pendingAlloc.stats).filter(([, n]) => n > 0).map(([k, n]) => `${STAT_FULL_NAMES[k]} +${n}`).join(', ');
             sBar.innerHTML = `<div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/40 flex flex-col gap-2 text-[10px]">
                 <span class="text-amber-200">Pending: ${parts} (${total} pt)</span>
-                <div class="flex gap-2">
-                    <button onclick="resetPendingStats()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg cursor-pointer">Reset</button>
-                    <button onclick="confirmPendingStats()" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Confirm ${total} pt</button>
-                </div>${derivedPreviewRows()}</div>`;
+                ${ynButtonsHTML('resetPendingStats()', 'confirmPendingStats()', `Confirm ${total} pt`)}${derivedPreviewRows()}</div>`;
         } else {
             sBar.innerHTML = '';
         }
@@ -4520,10 +4524,7 @@ function renderPendingBars() {
         if (total > 0) {
             const parts = Object.entries(pendingAlloc.skills).filter(([, n]) => n > 0).map(([k, n]) => `${player.skills[k].name} +${n}`).join(', ');
             kBar.innerHTML = `<div class="p-2 rounded-lg bg-purple-500/10 border border-purple-500/40 flex flex-col gap-2 text-[10px]">
-                <div class="flex gap-2">
-                    <button onclick="resetPendingSkills()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg cursor-pointer">Reset</button>
-                    <button onclick="confirmPendingSkills()" class="flex-1 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-100 font-bold rounded-lg cursor-pointer">Confirm ${total} SP</button>
-                </div></div>`;
+                ${ynButtonsHTML('resetPendingSkills()', 'confirmPendingSkills()', `Confirm ${total} SP`)}</div>`;
         } else {
             kBar.innerHTML = '';
         }
