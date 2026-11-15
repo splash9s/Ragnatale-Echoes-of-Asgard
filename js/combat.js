@@ -2384,16 +2384,18 @@ function removeNextStageGuide() {
 // First time a rune pick window opens: glow the first card and say what to do
 function showRuneGuide() {
     if (guideFlag('rune')) return;
-    const card = document.querySelector('#rune-pick-root .rune-pick-card');
-    if (!card) return;
+    const root = document.getElementById('rune-pick-root'); // the whole pick window, not one card
+    if (!root || !root.querySelector('.rune-pick-card')) return;
     markGuide('rune');
-    guideGlowOn(card);
-    const tip = guideTipAbove('Pick one rune to power up this run.', card.getBoundingClientRect(), document.body);
+    guideGlowOn(root);
+    const tip = guideTipAbove('Pick one rune to power up this run.', root.getBoundingClientRect(), document.body);
     tip.style.position = 'fixed';
     tip.dataset.runeGuide = '1';
 }
 function removeRuneGuide() {
     document.querySelectorAll('[data-rune-guide="1"]').forEach(el => el.remove());
+    const root = document.getElementById('rune-pick-root');
+    if (root) guideGlowOff(root);
     document.querySelectorAll('#rune-pick-root .rune-pick-card').forEach(guideGlowOff);
 }
 
