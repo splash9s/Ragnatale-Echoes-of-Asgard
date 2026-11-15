@@ -6796,3 +6796,141 @@ setInterval(syncTentPets, 1000);
 })();
 
 // Button sounds removed: buttons play no sound.
+
+// ----- Tent slide puzzle: Puzzle button -> pet list -> that pet's puzzles -> 3x3 board -----
+// Puzzles belong to a pet kind (cat = Orange Cat / Support Slime sprites). Add more kinds here.
+const PUZZLES = {
+    cat: [{ id: 'cat_grass', name: 'Cat on Grass', img: 'assets/tent/puzzle/cat_grass_q85.webp' }]
+};
+function puzzleKeyOf(petName) {
+    const src = (PET_SPRITES[petName] || {}).src || '';
+    return src.includes('/ocat/') ? 'cat' : null;
+}
+let puzzlePetKey = null;   // null = pet list; otherwise the pet kind whose puzzles are listed
+let puzzlePetName = '';
+function openPuzzlePanel() {
+    if (document.getElementById('puzzle-panel')) { closePuzzlePanel(); return; } // pressing Puzzle again closes it
+    const box = document.createElement('div');
+    box.id = 'puzzle-panel';
+    document.body.appendChild(box);
+    box.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
+    puzzlePetKey = null;
+    renderPuzzlePanel();
+}
+function closePuzzlePanel() {
+    closePuzzleGame();
+    const box = document.getElementById('puzzle-panel');
+    if (box) box.remove();
+    puzzlePetKey = null;
+}
+function puzzleOpenPet(i) {
+    const c = tentPetChoices()[i];
+    if (!c) return;
+    puzzlePetName = c.name;
+    puzzlePetKey = puzzleKeyOf(c.name);
+    renderPuzzlePanel();
+}
+function renderPuzzlePanel() {
+    const box = document.getElementById('puzzle-panel');
+    if (!box) return;
+    let body = '';
+    if (puzzlePetKey === null) {
+        const choices = tentPetChoices();
+        const rows = choices.map((c, i) => {
+            const list = PUZZLES[puzzleKeyOf(c.name)] || [];
+            return `<button class="pz-row" onclick="puzzleOpenPet(${i})"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""><span class="pz-name">${petEsc(c.name)}</span><small>${list.length ? list.length + ' puzzle' + (list.length > 1 ? 's' : '') : 'No puzzles yet'}</small></button>`;
+        }).join('');
+        body = `<p class="pz-sub">Choose a pet</p><div class="pz-list">${rows || '<p class="pz-sub">You have no pets yet.</p>'}</div>`;
+        box.innerHTML = `<div class="pz-head"><h3>Puzzle</h3><button class="pz-x" onclick="closePuzzlePanel()">✕</button></div>${body}`;
+    } else {
+        const list = PUZZLES[puzzlePetKey] || [];
+        const rows = list.map((p, i) => `<button class="pz-row" onclick="openPuzzleGame(${i})"><img src="${p.img}" alt=""><span class="pz-name">${petEsc(p.name)}</span></button>`).join('');
+        body = `<p class="pz-sub">${petEsc(puzzlePetName)}'s puzzles</p><div class="pz-list">${rows || '<p class="pz-sub">No puzzles for this pet yet.</p>'}</div>`;
+        box.innerHTML = `<div class="pz-head"><button class="pz-back" onclick="puzzleBackToPets()">‹ Back</button><h3>Puzzle</h3><button class="pz-x" onclick="closePuzzlePanel()">✕</button></div>${body}`;
+    }
+}
+function puzzleBackToPets() {
+    puzzlePetKey = null;
+    renderPuzzlePanel();
+}
+// Board: 3x3, tiles 1-8 and the blank (0) at the end when solved. Shuffled by random legal moves, so it is always solvable.
+let puzzleGame = null;
+function puzzleNeighbors(i) {
+    const n = 3, r = Math.floor(i / n), c = i % n, out = [];
+    if (r > 0) out.push(i - n);
+    if (r < n - 1) out.push(i + n);
+    if (c > 0) out.push(i - 1);
+    if (c < n - 1) out.push(i + 1);
+    return out;
+}
+function puzzleIsSolved(tiles) {
+    return tiles.every((v, i) => v === (i + 1) % 9);
+}
+function puzzleShuffle(tiles) {
+    let b = tiles.indexOf(0), last = -1;
+    for (let k = 0; k < 300; k++) {
+        const opts = puzzleNeighbors(b).filter(x => x !== last);
+        const pick = opts[Math.floor(Math.random() * opts.length)];
+        tiles[b] = tiles[pick];
+        tiles[pick] = 0;
+        last = b;
+        b = pick;
+    }
+    if (puzzleIsSolved(tiles)) puzzleShuffle(tiles);
+}
+function openPuzzleGame(i) {
+    const p = (PUZZLES[puzzlePetKey] || [])[i];
+    if (!p) return;
+    closePuzzleGame();
+    const tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+    puzzleShuffle(tiles);
+    puzzleGame = { puzzle: p, tiles, moves: 0, solved: false };
+    const g = document.createElement('div');
+    g.id = 'puzzle-game';
+    document.body.appendChild(g);
+    g.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
+    renderPuzzleGame();
+}
+function closePuzzleGame() {
+    const g = document.getElementById('puzzle-game');
+    if (g) g.remove();
+    puzzleGame = null;
+}
+function puzzleGameMove(i) {
+    if (!puzzleGame || puzzleGame.solved) return;
+    const b = puzzleGame.tiles.indexOf(0);
+    if (!puzzleNeighbors(b).includes(i)) return;
+    puzzleGame.tiles[b] = puzzleGame.tiles[i];
+    puzzleGame.tiles[i] = 0;
+    puzzleGame.moves++;
+    if (puzzleIsSolved(puzzleGame.tiles)) puzzleGame.solved = true;
+    renderPuzzleGame();
+}
+function renderPuzzleGame() {
+    const g = document.getElementById('puzzle-game');
+    if (!g || !puzzleGame) return;
+    const { puzzle, tiles, moves, solved } = puzzleGame;
+    const cells = tiles.map((v, i) => {
+        if (v === 0) return `<button class="pz-tile blank" aria-label="empty"></button>`;
+        const col = (v - 1) % 3, row = Math.floor((v - 1) / 3);
+        return `<button class="pz-tile" onclick="puzzleGameMove(${i})" style="background-image:url(${puzzle.img}); background-size:300% 300%; background-position:${col * 50}% ${row * 50}%"></button>`;
+    }).join('');
+    g.innerHTML = `
+        <div class="pz-head"><button class="pz-back" onclick="openPuzzleGameBack()">‹ Back</button><h3>${petEsc(puzzle.name)}</h3><button class="pz-x" onclick="closePuzzleGame()">✕</button></div>
+        <div class="pz-stats">Moves: ${moves}</div>
+        <div class="pz-board">${cells}</div>
+        ${solved ? `<p class="pz-win">Solved in ${moves} moves!</p>` : ''}
+        <div class="pz-foot"><button class="pz-btn" onclick="restartPuzzleGame()">Shuffle again</button></div>`;
+}
+function restartPuzzleGame() {
+    if (!puzzleGame) return;
+    const tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+    puzzleShuffle(tiles);
+    puzzleGame.tiles = tiles;
+    puzzleGame.moves = 0;
+    puzzleGame.solved = false;
+    renderPuzzleGame();
+}
+function openPuzzleGameBack() {
+    closePuzzleGame();
+}
