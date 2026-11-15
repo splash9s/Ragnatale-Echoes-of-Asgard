@@ -63,7 +63,8 @@ function playSound(path, gain = 1) {
 // Sound effects (files in sound/sfx/). A list means a random pick from its numbered files.
 const SFX = {
     swordHit: 'sound/sfx/combat/sword_attack3.mp3',
-    armorBreak: 'sound/sfx/combat/guardbrake.mp3',
+    armorBreak0: 'sound/sfx/combat/guardbrake0.mp3', // Armor Break: first sound
+    armorBreak1: 'sound/sfx/combat/guardbrake1.mp3', // then this one, right after the first ends
     normalAttack: ['sound/sfx/combat/weapon/attack1.mp3', 'sound/sfx/combat/weapon/attack2.mp3'], // normal hits: one of the two, picked at random
     swordCrit: 'sound/sfx/sword_crit.mp3',
     punchHit: 'sound/sfx/punch_hit.mp3',
@@ -119,7 +120,8 @@ const SFX_LEVEL = {
     'sound/sfx/sword_hit1.mp3': 1.32,
     'sound/sfx/sword_hit2.mp3': 1.72,
     'sound/sfx/combat/sword_attack3.mp3': 1.17,
-    'sound/sfx/combat/guardbrake.mp3': 0.92,
+    'sound/sfx/combat/guardbrake0.mp3': 1.66,
+    'sound/sfx/combat/guardbrake1.mp3': 0.92,
     'sound/sfx/combat/weapon/attack1.mp3': 2.26,
     'sound/sfx/combat/weapon/attack2.mp3': 1.88,
     'sound/sfx/monster/boss_golem_dead.mp3': 1.04,
@@ -1419,7 +1421,8 @@ function takePlayerDamage(dmg, m, ignoreArmor = false) {
         remaining -= absorbed;
         if (player.armor <= 0 && !armorBrokenThisMap) {
             armorBrokenThisMap = true;
-            playSfx(SFX.armorBreak);
+            playSfx(SFX.armorBreak0);
+            setTimeout(() => playSfx(SFX.armorBreak1), 650); // clip is 0.65 s
             if (typeof playArmorBreakFx === 'function') playArmorBreakFx();
         }
     }
