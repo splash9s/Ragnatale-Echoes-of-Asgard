@@ -585,7 +585,7 @@ const HERO_BODY_GEAR = {
    lv90: {
     src: 'assets/body/gear/foot/ssattackfootlv90.png',
     x: 161,
-    y: 253,
+    y: 246,
     sc: 1
    },
    lv99: {
@@ -1007,7 +1007,7 @@ const HERO_BODY_GEAR = {
    lv90: {
     src: 'assets/body/gear/foot/ssbasefootlv90.png',
     x: 190,
-    y: 256,
+    y: 251,
     sc: 1
    },
    lv99: {
@@ -1411,7 +1411,7 @@ const HERO_BODY_GEAR = {
    lv60: {
     src: 'assets/body/gear/foot/ssblockfootlv60.png',
     x: 162,
-    y: 268,
+    y: 250,
     sc: 1
    },
    lv70: {
@@ -1423,13 +1423,13 @@ const HERO_BODY_GEAR = {
    lv80: {
     src: 'assets/body/gear/foot/ssblockfootlv80.png',
     x: 162,
-    y: 268,
+    y: 255,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/foot/ssblockfootlv90.png',
     x: 162,
-    y: 268,
+    y: 247,
     sc: 1
    },
    lv99: {
@@ -1580,14 +1580,14 @@ const HERO_BODY_GEAR = {
   wear: {
    lv0: {
     src: 'assets/body/gear/wear/sscriticalarmorlv0.png',
-    x: 203,
-    y: 85,
+    x: 190,
+    y: 87,
     sc: 1
    },
    lv1: {
     src: 'assets/body/gear/wear/sscriticalarmorlv1.png',
-    x: 215,
-    y: 56,
+    x: 208,
+    y: 60,
     sc: 1
    },
    lv10: {
@@ -1844,14 +1844,14 @@ const HERO_BODY_GEAR = {
    },
    lv80: {
     src: 'assets/body/gear/foot/sscriticalfootlv80.png',
-    x: 161,
-    y: 256,
+    x: 148,
+    y: 239,
     sc: 1
    },
    lv90: {
     src: 'assets/body/gear/foot/sscriticalfootlv90.png',
-    x: 161,
-    y: 256,
+    x: 153,
+    y: 239,
     sc: 1
    },
    lv99: {
