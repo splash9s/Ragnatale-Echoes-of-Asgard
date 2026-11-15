@@ -590,6 +590,7 @@
         /* Friends as a floating window over the main page: no background and no top bar */
         #view-friend.friend-float { background: transparent; }
         #view-town.friend-under:not(.hidden) { background: transparent; }
+        #view-town.friend-under:not(.hidden) .town-stage { filter: blur(6px); } /* the main page behind a floating window is blurred */
         #view-friend.friend-float .ts-inner { background: transparent !important; }
         #view-friend.friend-float #friend-stage .char-return { left: 1752px !important; top: 123px !important; z-index: 20 !important; } /* inside the panel, top right, above the content */
         #view-friend.friend-float .friend-window { left: 102px; top: 111px; }
