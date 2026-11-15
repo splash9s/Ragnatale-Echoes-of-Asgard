@@ -6921,7 +6921,7 @@ function renderPuzzleGame() {
     }).join('');
     g.innerHTML = `
         <div class="pz-head"><button class="pz-back" onclick="openPuzzleGameBack()">‹ Back</button><h3>${petEsc(puzzle.name)}</h3><button class="pz-x" onclick="closePuzzleGame()">✕</button></div>
-        <div class="pz-stats">Moves: ${moves}</div>
+        <div class="pz-ref-row"><img class="pz-ref" src="${puzzle.img}" alt="Complete picture"><span class="pz-stats">Moves: ${moves}</span></div>
         <div class="pz-board">${cells}</div>
         ${solved ? `<p class="pz-win">Solved in ${moves} moves!${reward ? '<br>' + reward : ''}</p>` : ''}
         <div class="pz-foot"><button class="pz-btn" onclick="restartPuzzleGame()">Shuffle again</button></div>`;
