@@ -63,6 +63,7 @@ function playSound(path, gain = 1) {
 // Sound effects (files in sound/sfx/). A list means a random pick from its numbered files.
 const SFX = {
     swordHit: 'sound/sfx/combat/sword_attack3.mp3',
+    armorBreak: 'sound/sfx/combat/guardbrake.mp3',
     normalAttack: ['sound/sfx/combat/weapon/attack1.mp3', 'sound/sfx/combat/weapon/attack2.mp3'], // normal hits: one of the two, picked at random
     swordCrit: 'sound/sfx/sword_crit.mp3',
     punchHit: 'sound/sfx/punch_hit.mp3',
@@ -118,6 +119,7 @@ const SFX_LEVEL = {
     'sound/sfx/sword_hit1.mp3': 1.32,
     'sound/sfx/sword_hit2.mp3': 1.72,
     'sound/sfx/combat/sword_attack3.mp3': 1.17,
+    'sound/sfx/combat/guardbrake.mp3': 0.92,
     'sound/sfx/combat/weapon/attack1.mp3': 2.26,
     'sound/sfx/combat/weapon/attack2.mp3': 1.88,
     'sound/sfx/monster/boss_golem_dead.mp3': 1.04,
@@ -522,6 +524,7 @@ function selectRuneChoice(runeId, callback) {
 
 // ---------- EXPEDITION SETUP ----------
 function startExpedition(mode, opts = {}) {
+    armorBrokenThisMap = false; // a new map gets its first Armor Break again
     if (mode === 'campaign' && typeof guideIntroDone === 'function') guideIntroDone(); // first campaign run ends the intro guide
     if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
         showModal("World-Eater", "Locked.");
@@ -1397,6 +1400,9 @@ function onPlayerDodged(m, source) {
 
 // Armor absorbs damage first, the rest goes to HP
 // Armor absorbs damage first, the rest goes to HP
+// Armor Break: the first time the player's armor reaches 0 on a map (reset when a map starts)
+let armorBrokenThisMap = false;
+
 function takePlayerDamage(dmg, m, ignoreArmor = false) {
     playPlayerReactAnim('block');
     flashPlayerHurt();
@@ -1411,6 +1417,11 @@ function takePlayerDamage(dmg, m, ignoreArmor = false) {
         absorbed = Math.min(player.armor, remaining);
         player.armor -= absorbed;
         remaining -= absorbed;
+        if (player.armor <= 0 && !armorBrokenThisMap) {
+            armorBrokenThisMap = true;
+            playSfx(SFX.armorBreak);
+            if (typeof playArmorBreakFx === 'function') playArmorBreakFx();
+        }
     }
     if (remaining > 0) player.hp -= remaining;
     logMessage(`[Combat] ${m.name} hits you for ${dmg} damage${absorbed ? ` (${absorbed} absorbed by armor)` : ''}`, 'combat');

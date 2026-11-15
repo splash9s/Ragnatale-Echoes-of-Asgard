@@ -1250,6 +1250,26 @@ document.addEventListener('contextmenu', (e) => {
     if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable]')) e.preventDefault();
 });
 // Red flash on the player's battle sprite when it takes damage
+// Armor Break: the intact armor shakes hard for 0.5 s, then the broken pieces shrink and fade for 0.5 s,
+// drawn over the player character (a little bigger than the sprite)
+function playArmorBreakFx() {
+    const sprite = document.getElementById('combat-player-sprite');
+    const stage = document.querySelector('#combat-stage .ts-inner');
+    if (!sprite || !stage) return;
+    const sc = parseFloat(stage.style.transform.replace(/[^0-9.]/g, '')) || 1;
+    const r = sprite.getBoundingClientRect(), ib = stage.getBoundingClientRect();
+    const cx = (r.left + r.width / 2 - ib.left) / sc;
+    const cy = (r.top + r.height * 0.45 - ib.top) / sc;
+    const w = (r.width / sc) * 1.15;
+    const img = document.createElement('img');
+    img.className = 'armor-break-fx';
+    img.alt = '';
+    img.src = 'assets/combat/armorbreak/armor_1_q85.webp';
+    img.style.cssText = `left:${cx}px; top:${cy}px; width:${w}px;`;
+    stage.appendChild(img);
+    setTimeout(() => { img.src = 'assets/combat/armorbreak/armor_4_q85.webp'; img.classList.add('armor-break-go'); }, 500);
+    setTimeout(() => img.remove(), 1000);
+}
 function flashPlayerHurt() {
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
