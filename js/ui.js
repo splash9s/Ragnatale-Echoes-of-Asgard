@@ -3915,6 +3915,21 @@ function sellInventoryItem(index, onDone, onCancel = null) {
 function isTwoHanded(item) {
     return !!(item && item.slot === 'weapon' && (item.twoHanded || /\(2H\)/.test(item.name || '')));
 }
+// Swap a hero picture only once the new picture is loaded: until then the old one is hidden,
+// so the browser never shows a frame of the previous picture (e.g. the gear figure) in the new place.
+const heroImgCache = {};
+function setHeroSrc(el, src) {
+    if (!el || !src) return;
+    if (el.getAttribute('src') === src) { el.style.visibility = ''; return; }
+    el.dataset.wantSrc = src;
+    let pre = heroImgCache[src];
+    if (!pre) { pre = new Image(); pre.src = src; heroImgCache[src] = pre; }
+    if (pre.complete && pre.naturalWidth > 0) { el.src = src; el.style.visibility = ''; return; }
+    el.style.visibility = 'hidden';
+    const show = () => { if (el.dataset.wantSrc === src) { el.src = src; el.style.visibility = ''; } };
+    pre.addEventListener('load', show, { once: true });
+    pre.addEventListener('error', show, { once: true });
+}
 function syncHeroSprites() {
     const f = combatPose().IDLE;
     if (!f) return; // still loading
@@ -3928,7 +3943,7 @@ function syncHeroSprites() {
         const tentNow = id === 'char-hero' && isCharClear();
         const spec = tentNow ? TENT_HERO : f;
         const src = tentNow ? tentHeroSrc : f.src;
-        if (el.getAttribute('src') !== src) el.src = src;
+        setHeroSrc(el, src);
         // The main page hero is 10% smaller than the character page hero
         const s = id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE;
         el.style.width = spec.w * s + 'px';
@@ -5867,7 +5882,7 @@ const TENT_POSES = {
 function tentPoseLayout(el) {
     const P = TENT_POSES[tentPose];
     if (!P) return;
-    el.src = P.src;
+    setHeroSrc(el, P.src);
     el.style.width = P.w + 'px';
     el.style.height = P.h + 'px';
     el.style.left = P.left + 'px';
