@@ -6586,3 +6586,13 @@ setInterval(syncTentPets, 1000);
         openNow.forEach(p => p.close());
     }, true);
 })();
+
+// Button sounds: OK / Confirm and the expedition plaque, Back (return and gear close), and the start buttons for campaign and events.
+// A capture-phase listener, so it plays even when the button's own handler stops the click.
+document.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('.campaign-start, .ev-start')) playSfx(SFX.buttonStart);
+    else if (t.closest('#modal-close-btn, .ui[data-action="expedition"]')) playSfx(SFX.buttonOk);
+    else if (t.closest('.char-return, .gear-close')) playSfx(SFX.buttonBack);
+}, true);
