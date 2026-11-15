@@ -383,6 +383,13 @@
         #inv-detail-panel.dd-skin .dd-cmp-delta.down { color: #ff7a7a !important; }
         #inv-detail-panel.dd-skin .dd-cmp-delta.zero { color: #9aa6bd !important; }
         #inv-detail-panel.dd-skin .dd-cmp-note { padding-top: 10px; color: #9aa6bd !important; font-size: 18px; }
+        /* Compare table everywhere it appears (dropped item modal too): rows in a grid, all text white */
+        .dd-cmp { border: 2px solid #26344f; border-radius: 12px; background: #0b1322; padding: 6px 16px 10px; font-size: 26px; color: #fff; }
+        .dd-cmp-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 2px solid #26344f; }
+        .dd-cmp-row:last-of-type { border-bottom: 0; }
+        .dd-cmp-row span:not(:first-child) { text-align: right; }
+        .dd-cmp, .dd-cmp * { color: #fff !important; font-variant-numeric: tabular-nums; }
+        .dd-cmp-note { padding-top: 10px; font-size: 18px; }
         #inv-detail-panel.dd-skin .dd-cmp-note strong { color: #e9edf5 !important; }
         #inv-detail-panel.dd-skin button.bg-amber-600, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
         #inv-detail-panel.dd-skin .font-black, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .font-black { color: #f5a00b !important; }
@@ -1832,7 +1839,7 @@
 
                     <!-- Pause (bottom right); Next Stage takes its place once the stage is cleared -->
                     <button id="combat-pause-btn" onclick="toggleCombatPause()" title="Pause" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="hidden combat-slot-btn"></button>
-                    <button id="combat-speed-btn" onclick="toggleBattleSpeed()" title="Battle speed (VIP)" class="hidden" style="position:absolute; left:1541px; top:694px; width:175px; height:178px; padding:0; border:0; background:none; cursor:pointer;"><img id="combat-speed-img" src="assets/combat/speed/speed_2x_q85.webp" alt="" style="width:100%; height:100%; object-fit:contain; display:block;"></button>
+                    <button id="combat-speed-btn" onclick="toggleBattleSpeed()" title="Battle speed (VIP)" class="hidden" style="position:absolute; left:1585px; top:739px; width:88px; height:89px; padding:0; border:0; background:none; cursor:pointer;"><img id="combat-speed-img" src="assets/combat/speed/speed_2x_q85.webp" alt="" style="width:100%; height:100%; object-fit:contain; display:block;"></button>
                     <button id="combat-auto-rune-btn" onclick="toggleVipAutoRune()" title="VIP: auto-pick a random rune" class="hidden combat-slot-btn" style="position:absolute; left:1351px; top:890px; width:175px; height:178px;"></button>
                     <button id="next-stage-btn" onclick="proceedToNextStage()" style="position:absolute; left:1733px; top:694px; width:175px; height:178px;" class="hidden bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-sm transition cursor-pointer shadow">Next Stage</button>
 

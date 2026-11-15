@@ -3479,7 +3479,6 @@ function compareHTML(selected, equipped) {
         ? `<div class="dd-cmp-note">Compared with <strong>${escapeHtml(equipped.name)}</strong></div>`
         : `<div class="dd-cmp-note">Nothing equipped in this slot</div>`;
     return `<div class="dd-cmp">
-        <div class="dd-cmp-head"><span>Stat</span><span>This item</span><span>Equipped</span><span>Diff</span></div>
         ${rows}${note}
     </div>`;
 }
