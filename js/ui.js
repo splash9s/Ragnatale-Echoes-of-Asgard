@@ -2589,7 +2589,6 @@ function buyDiamondItem(itemId) {
 
 // Blacksmith: pick an equipped gear from the list to load it into the gear slot, then refine it
 let blacksmithSelectedSlot = null;
-let blacksmithRuneOn = false;
 let blacksmithMode = 'refine';   // 'refine' or 'elemental' (the menu on the Blacksmith page)
 let blacksmithForgeEl = null;    // the element stone picked for the elemental forge
 // Elemental forge costs, from the weapon's item level (levelReq):
@@ -2618,14 +2617,23 @@ function blacksmithSelectElement(el) {
 function refineSuccessRate(lv) {
     return lv >= 5 ? Math.max(10, 100 - ((lv - 4) * 15)) : 100;
 }
+// Rune Stone slot works like an equip slot: click to equip one stone from stock (it leaves the stock), click again to unequip it back to stock
 function blacksmithToggleRune() {
     if (blacksmithMode === 'elemental') return; // the rune slot shows the picked element stone here
-    if (!blacksmithRuneOn && (player.blacksmithRuneStones || 0) < 1) {
-        showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
-        return;
+    if (!player.blacksmithRuneEquipped) {
+        if ((player.blacksmithRuneStones || 0) < 1) {
+            showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
+            return;
+        }
+        player.blacksmithRuneStones -= 1;
+        player.blacksmithRuneEquipped = true;
+    } else {
+        player.blacksmithRuneStones = (player.blacksmithRuneStones || 0) + 1;
+        player.blacksmithRuneEquipped = false;
     }
-    blacksmithRuneOn = !blacksmithRuneOn;
+    playSfx(SFX.equip);
     renderRefiningUI();
+    saveGame();
 }
 function blacksmithSelect(slot) {
     blacksmithSelectedSlot = slot;
@@ -2659,10 +2667,10 @@ function renderRuneSlot() {
         return;
     }
     const count = player.blacksmithRuneStones || 0;
-    if (count < 1) blacksmithRuneOn = false;
+    const equipped = !!player.blacksmithRuneEquipped;
     if (runeEl) {
-        // Green border = Rune Stone on, red border = off (no text)
-        runeEl.innerHTML = `<div title="${blacksmithRuneOn ? 'Rune Stone on' : 'Rune Stone off'}" style="width:66px;height:66px;box-sizing:border-box;border:4px solid ${blacksmithRuneOn ? '#22c55e' : '#ef4444'};border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);"><img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:40px;height:40px;object-fit:contain;"></div>`;
+        // Equip slot: shows the stone when one is equipped, empty when not
+        runeEl.innerHTML = `<div title="${equipped ? 'Rune Stone equipped (click to unequip)' : 'Click to equip a Rune Stone'}" style="width:66px;height:66px;box-sizing:border-box;border:4px solid ${equipped ? '#22c55e' : '#ef4444'};border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);"><img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:40px;height:40px;object-fit:contain;"></div>`;
     }
     if (balEl) balEl.innerHTML = `<img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;"> Rune Stone: ${count}`;
 }
@@ -2884,10 +2892,9 @@ function refineEquipment(slot) {
         logMessage(`[Refine Success] Upgraded ${gear.name} to +${gear.refineLevel}!`, 'levelup');
         showModal("Refinement Successful!", `Your ${gear.name} was upgraded to +${gear.refineLevel}!`);
     } else {
-        if (blacksmithRuneOn && (player.blacksmithRuneStones || 0) > 0) {
-            // Rune Stone on: the failed refine keeps the level and uses one stone
-            player.blacksmithRuneStones -= 1;
-            if (player.blacksmithRuneStones <= 0) blacksmithRuneOn = false;
+        if (player.blacksmithRuneEquipped) {
+            // Rune Stone equipped: the failed refine keeps the level and uses the equipped stone
+            player.blacksmithRuneEquipped = false;
             gear.refineLevel = current;
             playSfx(SFX.refineFail);
             logMessage(`[Refine Failed] Rune Stone protected ${gear.name} at +${current}.`, 'combat');
