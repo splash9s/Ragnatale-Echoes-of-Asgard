@@ -6600,12 +6600,18 @@ setInterval(syncTentPets, 1000);
     }, true);
 })();
 
-// Button sounds: OK / Confirm and the expedition plaque, Back (return and gear close), and the start buttons for campaign and events.
+// Button sounds. Start buttons (campaign, event) use the start sound. Stat "+" buttons (assign) make no sound.
+// Back, return, cancel and pet back use the back sound. Every other button uses the OK sound.
 // A capture-phase listener, so it plays even when the button's own handler stops the click.
 document.addEventListener('click', (e) => {
     const t = e.target;
     if (!t || !t.closest) return;
-    if (t.closest('.campaign-start, .ev-start')) playSfx(SFX.buttonStart);
-    else if (t.closest('#modal-close-btn, .ui[data-action="expedition"]')) playSfx(SFX.buttonOk);
-    else if (t.closest('.char-return, .gear-close')) playSfx(SFX.buttonBack);
+    if (t.closest('.campaign-start, .ev-start')) { playSfx(SFX.buttonStart); return; }
+    const btn = t.closest('button');
+    if (btn && btn.matches('button[onclick^="addStat("]')) return; // assign: no sound
+    if (t.closest('.char-return, .gear-close, .pet-back') || (btn && (btn.id === 'bulk-cancel' || /^\s*(back|cancel|return|\u2039|\u2190)/i.test(btn.textContent || '')))) {
+        playSfx(SFX.buttonBack);
+        return;
+    }
+    if (t.closest('.ui[data-action="expedition"]') || btn) playSfx(SFX.buttonOk);
 }, true);
