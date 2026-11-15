@@ -62,7 +62,7 @@ function playSound(path, gain = 1) {
 
 // Sound effects (files in sound/sfx/). A list means a random pick from its numbered files.
 const SFX = {
-    swordHit: ['sound/sfx/sword_hit1.mp3', 'sound/sfx/sword_hit2.mp3'],
+    swordHit: 'sound/sfx/combat/sword_attack3.mp3',
     swordCrit: 'sound/sfx/sword_crit.mp3',
     punchHit: 'sound/sfx/punch_hit.mp3',
     punchCrit: 'sound/sfx/punch_crit.mp3',
@@ -116,6 +116,7 @@ const SFX_LEVEL = {
     'sound/sfx/sword_crit.mp3': 1.91,
     'sound/sfx/sword_hit1.mp3': 1.32,
     'sound/sfx/sword_hit2.mp3': 1.72,
+    'sound/sfx/combat/sword_attack3.mp3': 1.4,
     'sound/sfx/monster/boss_golem_dead.mp3': 1.04,
     'sound/sfx/monster/golem_attack.mp3': 0.73,
     'sound/sfx/monster/golem_damaged.mp3': 0.61,
