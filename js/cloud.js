@@ -332,6 +332,15 @@ function cloudStatsFlush() {
         if (error) console.warn('Play stats not saved:', error.message);
     });
 }
+// One use of a game function (shown on the developer dashboard). At most one call per function every 5 seconds.
+const featureLastSent = {};
+function trackFeature(name) {
+    if (!name || !cloudClient || !cloudUserId || cloudDisabled) return;
+    const now = Date.now();
+    if (featureLastSent[name] && now - featureLastSent[name] < 5000) return;
+    featureLastSent[name] = now;
+    cloudClient.rpc('log_feature', { p_feature: name }).then(() => {});
+}
 function cloudLogSuspicious(kind) {
     if (!cloudClient || !cloudUserId || cloudDisabled) return;
     cloudClient.rpc('log_suspicious', { p_kind: kind, p_detail: null }).then(() => {});
@@ -343,7 +352,7 @@ function cloudCheckAdmin() {
         if (error || data !== true) return;
         window.isOwnerAccount = true; // the admin account is not shaded or locked by the intro guide
         const s = document.createElement('script');
-        s.src = 'js/admin.js?v=20261110a';
+        s.src = 'js/admin.js?v=20261116a';
         document.head.appendChild(s);
     });
 }

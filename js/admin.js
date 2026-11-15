@@ -12,6 +12,8 @@
     const td = 'padding:4px 8px;border-bottom:1px solid #332614;';
 
     let panel = null;
+    // Readable names for the feature keys the game reports (see supabase/feature_usage.sql)
+    const FEATURE_LABELS = { town: 'Main page', shop: 'Shop', blacksmith: 'Blacksmith', market: 'Market', diamond: 'Diamond shop', vip: 'VIP shop', events: 'Events', friend: 'Friends', mail: 'Mail', setting: 'Settings', skills: 'Skills', tent: 'Tent', puzzle: 'Slide puzzle', pets: 'Pets', expedition: 'Expedition', diamond_buy: 'Diamond purchase', inventory: 'Inventory' };
 
     function stat(label, value) {
         return `<div style="${box}"><div style="font-size:12px;color:#c9b48a;">${esc(label)}</div><div style="font-size:22px;font-weight:700;">${esc(value)}</div></div>`;
@@ -27,13 +29,14 @@
     }
 
     async function fetchAll() {
-        const [ov, users, sus] = await Promise.all([
+        const [ov, users, sus, feat] = await Promise.all([
             cloudClient.rpc('admin_overview'),
             cloudClient.rpc('admin_users', { p_limit: 50 }),
             cloudClient.rpc('admin_suspicious', { p_limit: 50 }),
+            cloudClient.rpc('admin_feature_usage'),
         ]);
-        const errs = [ov, users, sus].filter(r => r.error).map(r => r.error.message);
-        return { ov: ov.data || {}, users: users.data || [], sus: sus.data || [], errs };
+        const errs = [ov, users, sus, feat].filter(r => r.error).map(r => r.error.message);
+        return { ov: ov.data || {}, users: users.data || [], sus: sus.data || [], feat: feat.data || [], errs };
     }
 
     function render(d) {
@@ -55,6 +58,10 @@
                 stat('4 days', dp.day_4), stat('5 days', dp.day_5), stat('6 days', dp.day_6),
                 stat('7 days or more', dp.day_7_plus),
             ])),
+            section('Function use (players and total uses)', `<div style="overflow:auto;max-height:320px;"><table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <tr><th style="${th}">Function</th><th style="${th}">Players</th><th style="${th}">Total uses</th><th style="${th}">Last used</th></tr>
+                ${d.feat.length ? d.feat.map(f => `<tr><td style="${td}">${esc(FEATURE_LABELS[f.feature] || f.feature)}</td><td style="${td}">${esc(f.players)}</td><td style="${td}">${esc(f.uses)}</td><td style="${td}">${esc(when(f.last_used))}</td></tr>`).join('') : `<tr><td style="${td}" colspan="4">No use recorded yet.</td></tr>`}
+            </table></div>`),
             section('Suspicious activity', grid([
                 stat('Last 24 hours', o.suspicious_24h),
             ]) + `<div style="font-size:12px;margin-top:6px;color:#c9b48a;">Last 7 days by kind: ${esc(kv(o.suspicious_by_kind))}</div>`),
