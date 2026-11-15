@@ -65,9 +65,9 @@
         #skill-pending-bar button:hover { background-color: #e8d6b0 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"] { background-color: #4f8a5b !important; border-color: #3a6b44 !important; color: #f4fbf5 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"]:hover { background-color: #5f9e6c !important; }
-        /* Armor Break over the player: hard shake on the intact armor, then shrink and fade the broken pieces */
+        /* Armor Break over the player: hard shake on the intact armor, then the broken pieces for 0.5 s */
         .armor-break-fx { position: absolute; z-index: 7; pointer-events: none; transform: translate(-50%, -50%); animation: armorShake 0.5s linear forwards; }
-        .armor-break-fx.armor-break-go { animation: armorBreakOut 0.5s ease-in forwards; }
+        .armor-break-fx.armor-break-go { animation: none; } /* broken pieces hold at full size for 0.5 s */
         @keyframes armorShake {
             0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
             10% { transform: translate(calc(-50% - 7px), calc(-50% + 3px)) rotate(-2deg); }
@@ -79,10 +79,6 @@
             70% { transform: translate(calc(-50% - 4px), calc(-50% + 2px)) rotate(-1deg); }
             80% { transform: translate(calc(-50% + 4px), calc(-50% - 1px)) rotate(0.5deg); }
             90% { transform: translate(calc(-50% - 2px), calc(-50% + 1px)) rotate(0deg); }
-        }
-        @keyframes armorBreakOut {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, calc(-50% + 20px)) scale(0.7); opacity: 0; }
         }
         /* Stat and skill pending bars: Yes (green glow) and No (red glow) picture buttons */
         .yn-row { display: flex; gap: 16px; justify-content: center; align-items: center; }
@@ -1923,7 +1919,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116e"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116e"></script>
+    <script src="js/ui.js?v=20261116f"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>

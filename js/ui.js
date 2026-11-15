@@ -1250,7 +1250,7 @@ document.addEventListener('contextmenu', (e) => {
     if (!e.target.closest || !e.target.closest('input, textarea, [contenteditable]')) e.preventDefault();
 });
 // Red flash on the player's battle sprite when it takes damage
-// Armor Break: the intact armor shakes hard for 0.5 s, then the broken pieces shrink and fade for 0.5 s,
+// Armor Break: the intact armor shakes hard for 0.5 s, then the broken pieces show for 0.5 s,
 // drawn over the player character (a little bigger than the sprite)
 function playArmorBreakFx() {
     const sprite = document.getElementById('combat-player-sprite');
