@@ -3476,7 +3476,7 @@ function compareHTML(selected, equipped) {
     }).join('');
     if (!rows) return '';
     const note = equipped && equipped.name
-        ? `<div class="dd-cmp-note">Compared with <strong>${escapeHtml(equipped.name)}</strong></div>`
+        ? `<div class="dd-cmp-note">Compared with <strong>${equipped.name}</strong></div>`
         : `<div class="dd-cmp-note">Nothing equipped in this slot</div>`;
     return `<div class="dd-cmp">
         ${rows}${note}
@@ -3551,7 +3551,8 @@ function showResultItemDetail(index) {
         compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
-        secondary: iconActionButtons(item, isEquip, canSell, `resultSalvageItem(${index})`, `resultSellItem(${index})`)
+        secondary: iconActionButtons(item, isEquip, canSell, `resultSalvageItem(${index})`, `resultSellItem(${index})`),
+        rowRight: true
     });
     // one close id only: the inventory panel owns #inv-detail-close
     card.innerHTML = card.innerHTML.replace('id="inv-detail-close"', 'id="result-detail-close"');
@@ -3579,17 +3580,15 @@ function resultSellItem(index) {
     const item = stageSummary && stageSummary.items ? stageSummary.items[index] : null;
     if (!item) return;
     const bag = resultItemBagIndex(item);
-    closeResultItemDetail();
-    if (bag < 0) { showFloatNotice("This item is no longer in your bag."); return; }
-    sellInventoryItem(bag);
+    if (bag < 0) { showFloatNotice("This item is no longer in your bag."); closeResultItemDetail(); return; }
+    sellInventoryItem(bag, closeResultItemDetail); // back to the combat result once sold
 }
 function resultSalvageItem(index) {
     const item = stageSummary && stageSummary.items ? stageSummary.items[index] : null;
     if (!item) return;
     const bag = resultItemBagIndex(item);
-    closeResultItemDetail();
-    if (bag < 0) { showFloatNotice("This item is no longer in your bag."); return; }
-    salvageEquipmentItem(bag);
+    if (bag < 0) { showFloatNotice("This item is no longer in your bag."); closeResultItemDetail(); return; }
+    salvageEquipmentItem(bag, closeResultItemDetail); // back to the combat result once salvaged
 }
 
 // Shared item detail body (inventory detail and the combat result's item detail use it)
@@ -3618,8 +3617,9 @@ function itemDetailBodyHTML(item) {
 }
 // Item detail layout shared by inventory, equipped gear and shop (the "Item Details" draft style)
 function ddFill(panel, o) {
-    const row = o.secondary && o.secondary.length
-        ? `<div class="dd-row" style="grid-template-columns:repeat(${o.secondary.length},minmax(0,1fr))">${o.secondary.join('')}</div>` : '';
+    const n = o.secondary ? o.secondary.length : 0;
+    const rowStyle = o.rowRight ? `grid-template-columns:repeat(${n},64px); justify-content:end;` : `grid-template-columns:repeat(${n},minmax(0,1fr))`;
+    const row = n ? `<div class="dd-row" style="${rowStyle}">${o.secondary.join('')}</div>` : '';
     panel.scrollTop = 0;
     panel.innerHTML = `
         <button id="inv-detail-close" onclick="${o.close}" class="dd-close" aria-label="Close">✕</button>
@@ -3827,7 +3827,7 @@ function confirmItemList(targets) {
     return shown.join('\n');
 }
 
-function sellInventoryItem(index) {
+function sellInventoryItem(index, onDone) {
     const item = player.inventory[index];
     if (!item) return false;
     if (item.favorite) { showFloatNotice("Locked items cannot be sold. Unlock it first."); return false; }
@@ -3845,6 +3845,7 @@ function sellInventoryItem(index) {
         if (window.invDetailIndex === index) closeInvDetail();
         updateUI();
         saveGame();
+        if (onDone) onDone();
     });
     return false;
 }
@@ -3937,7 +3938,7 @@ function salvageScrapGain(item) {
     return Math.min(5, Math.max(1, Math.floor((item.levelReq || 1) / 5) + 1));
 }
 
-function salvageEquipmentItem(index) {
+function salvageEquipmentItem(index, onDone) {
     let item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { showFloatNotice("Locked items cannot be salvaged. Unlock it first."); return; }
@@ -3954,6 +3955,7 @@ function salvageEquipmentItem(index) {
         logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
         updateUI();
         saveGame();
+        if (onDone) onDone();
     };
     if (item.rarity >= 3) { showGameConfirm("Salvage Item", salvageMsg, "Salvage", doSalvage); return; }
     doSalvage();
