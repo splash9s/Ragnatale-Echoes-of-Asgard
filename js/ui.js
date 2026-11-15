@@ -6808,6 +6808,8 @@ function puzzleKeyOf(petName) {
 }
 let puzzlePetKey = null;   // null = pet list; otherwise the pet kind whose puzzles are listed
 let puzzlePetName = '';
+let puzzlePetItem = null;  // the pet item that is being played with (friendship is added to it)
+const PZ_N = 5;            // board is 5 x 5
 function openPuzzlePanel() {
     if (document.getElementById('puzzle-panel')) { closePuzzlePanel(); return; } // pressing Puzzle again closes it
     const box = document.createElement('div');
@@ -6827,6 +6829,7 @@ function puzzleOpenPet(i) {
     const c = tentPetChoices()[i];
     if (!c) return;
     puzzlePetName = c.name;
+    puzzlePetItem = c.item;
     puzzlePetKey = puzzleKeyOf(c.name);
     renderPuzzlePanel();
 }
@@ -6856,7 +6859,7 @@ function puzzleBackToPets() {
 // Board: 3x3, tiles 1-8 and the blank (0) at the end when solved. Shuffled by random legal moves, so it is always solvable.
 let puzzleGame = null;
 function puzzleNeighbors(i) {
-    const n = 3, r = Math.floor(i / n), c = i % n, out = [];
+    const n = PZ_N, r = Math.floor(i / n), c = i % n, out = [];
     if (r > 0) out.push(i - n);
     if (r < n - 1) out.push(i + n);
     if (c > 0) out.push(i - 1);
@@ -6864,11 +6867,11 @@ function puzzleNeighbors(i) {
     return out;
 }
 function puzzleIsSolved(tiles) {
-    return tiles.every((v, i) => v === (i + 1) % 9);
+    return tiles.every((v, i) => v === (i + 1) % (PZ_N * PZ_N));
 }
 function puzzleShuffle(tiles) {
     let b = tiles.indexOf(0), last = -1;
-    for (let k = 0; k < 300; k++) {
+    for (let k = 0; k < 800; k++) {
         const opts = puzzleNeighbors(b).filter(x => x !== last);
         const pick = opts[Math.floor(Math.random() * opts.length)];
         tiles[b] = tiles[pick];
@@ -6882,9 +6885,9 @@ function openPuzzleGame(i) {
     const p = (PUZZLES[puzzlePetKey] || [])[i];
     if (!p) return;
     closePuzzleGame();
-    const tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+    const tiles = puzzleSolvedTiles();
     puzzleShuffle(tiles);
-    puzzleGame = { puzzle: p, tiles, moves: 0, solved: false };
+    puzzleGame = { puzzle: p, tiles, moves: 0, solved: false, reward: '' };
     const g = document.createElement('div');
     g.id = 'puzzle-game';
     document.body.appendChild(g);
@@ -6903,34 +6906,54 @@ function puzzleGameMove(i) {
     puzzleGame.tiles[b] = puzzleGame.tiles[i];
     puzzleGame.tiles[i] = 0;
     puzzleGame.moves++;
-    if (puzzleIsSolved(puzzleGame.tiles)) puzzleGame.solved = true;
+    if (puzzleIsSolved(puzzleGame.tiles)) { puzzleGame.solved = true; puzzleGame.reward = puzzleRewardPet(); }
     renderPuzzleGame();
 }
 function renderPuzzleGame() {
     const g = document.getElementById('puzzle-game');
     if (!g || !puzzleGame) return;
-    const { puzzle, tiles, moves, solved } = puzzleGame;
+    const { puzzle, tiles, moves, solved, reward } = puzzleGame;
     const cells = tiles.map((v, i) => {
         if (v === 0) return `<button class="pz-tile blank" aria-label="empty"></button>`;
-        const col = (v - 1) % 3, row = Math.floor((v - 1) / 3);
-        return `<button class="pz-tile" onclick="puzzleGameMove(${i})" style="background-image:url(${puzzle.img}); background-size:300% 300%; background-position:${col * 50}% ${row * 50}%"></button>`;
+        const col = (v - 1) % PZ_N, row = Math.floor((v - 1) / PZ_N);
+        const pct = 100 / (PZ_N - 1);
+        return `<button class="pz-tile" onclick="puzzleGameMove(${i})" style="background-image:url(${puzzle.img}); background-size:${PZ_N * 100}% ${PZ_N * 100}%; background-position:${col * pct}% ${row * pct}%"></button>`;
     }).join('');
     g.innerHTML = `
         <div class="pz-head"><button class="pz-back" onclick="openPuzzleGameBack()">‹ Back</button><h3>${petEsc(puzzle.name)}</h3><button class="pz-x" onclick="closePuzzleGame()">✕</button></div>
         <div class="pz-stats">Moves: ${moves}</div>
         <div class="pz-board">${cells}</div>
-        ${solved ? `<p class="pz-win">Solved in ${moves} moves!</p>` : ''}
+        ${solved ? `<p class="pz-win">Solved in ${moves} moves!${reward ? '<br>' + reward : ''}</p>` : ''}
         <div class="pz-foot"><button class="pz-btn" onclick="restartPuzzleGame()">Shuffle again</button></div>`;
 }
 function restartPuzzleGame() {
     if (!puzzleGame) return;
-    const tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+    const tiles = puzzleSolvedTiles();
     puzzleShuffle(tiles);
     puzzleGame.tiles = tiles;
     puzzleGame.moves = 0;
     puzzleGame.solved = false;
+    puzzleGame.reward = '';
     renderPuzzleGame();
 }
 function openPuzzleGameBack() {
     closePuzzleGame();
+}
+
+function puzzleSolvedTiles() {
+    const t = [];
+    for (let k = 1; k < PZ_N * PZ_N; k++) t.push(k);
+    t.push(0);
+    return t;
+}
+// Solving a puzzle gives the pet +1 friendship, once per day per pet
+function puzzleRewardPet() {
+    const item = puzzlePetItem;
+    if (!item) return '';
+    const day = petDayKey();
+    if (item.lastPuzzleDay === day) return 'Already rewarded today. Come back tomorrow!';
+    item.lastPuzzleDay = day;
+    addPetFriendship(item, 1);
+    if (typeof saveGame === 'function') saveGame();
+    return `${petEsc(item.name || puzzlePetName)} +1 friendship!`;
 }
