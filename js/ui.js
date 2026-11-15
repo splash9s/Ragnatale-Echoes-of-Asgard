@@ -5175,7 +5175,7 @@ function updateUI() {
         // Closed cells after the open bag slots, shown with the grey slot graphic (not usable)
         const INVENTORY_CELLS = BAG_MAX_SLOTS;
         for (let i = bagSlotCount(); i < INVENTORY_CELLS; i++) {
-            invGrid.innerHTML += `<div class="w-[77px] h-[79px]" style="width:77px; height:79px; background-image:url('assets/pages/character/inventoryslotgrey_q85.webp'); background-size:100% 100%;"></div>`;
+            invGrid.innerHTML += `<div class="w-[108px] h-[104px]" style="width:108px; height:104px; background-image:url('assets/pages/character/inventoryslotgrey_q85.webp'); background-size:100% 100%;"></div>`;
         }
         let invCountEl = document.getElementById('inventory-count');
         if (invCountEl) invCountEl.innerText = `${filledSlots} / ${bagSlotCount()} slots`;
