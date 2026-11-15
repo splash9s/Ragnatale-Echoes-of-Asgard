@@ -405,10 +405,19 @@ window.waitForTownArt = async function () {
 
 // Loads the rest of the images and all sounds in the background, a few at a time, with no progress bar.
 // A file that is not loaded yet still loads when its page opens, so nothing waits on this.
+// Every sound effect and music file, so the first play does not wait for the download
+function soundsToPreload() {
+    const out = new Set(LOADING_SOUNDS);
+    if (typeof SFX !== 'undefined') {
+        Object.values(SFX).forEach(v => (Array.isArray(v) ? v : [v]).forEach(p => { if (typeof p === 'string') out.add(p); }));
+    }
+    if (typeof SFX_LEVEL !== 'undefined') Object.keys(SFX_LEVEL).forEach(p => out.add(p));
+    return [...out];
+}
 function preloadRest() {
     const rest = LOADING_IMAGES.filter(src => !isCriticalImage(src))
         .map(src => () => preloadImage(src))
-        .concat(LOADING_SOUNDS.map(src => () => preloadSound(src)));
+        .concat(soundsToPreload().map(src => () => preloadSound(src)));
     let next = 0;
     const worker = () => {
         if (next >= rest.length) return Promise.resolve();
