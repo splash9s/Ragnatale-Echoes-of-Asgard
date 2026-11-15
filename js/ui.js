@@ -6158,6 +6158,8 @@ scheduleCatWalk(1500); // first walk right after the main page shows (the cat wa
 const TENT_PETS_MAX = 3;
 const tentPetWalkers = new Map(); // token -> walker
 const TENT_PET_IDLE = { min: 0.8, max: 3 }; // seconds a pet stands still between walks
+const TENT_PET_MOVE_SFX_GAP_MS = 4000; // minimum gap between pet walk sounds
+let tentPetMoveSfxAt = -Infinity;
 let tentPetLoopOn = false, tentPetLastT = null;
 // Pet data lives on the pet item itself: petName, petBio (optional), friendship (points). Art and game stats still use item.name.
 const PET_DEFAULT_BIO = 'A stray orange cat who wandered into camp one night. Ragged and wary at first, but loyal once fed.';
@@ -6309,7 +6311,13 @@ function tentPetStep(w, dt) {
     if (w.state === 'idle') {
         w.frame = 0; w.frameT = 0;
         w.idleLeft -= dt;
-        if (w.idleLeft <= 0) { w.target = randomTentFloorPoint({ x: w.x, y: w.y }); w.state = 'walk'; playSfx(SFX.move); }
+        if (w.idleLeft <= 0) {
+            w.target = randomTentFloorPoint({ x: w.x, y: w.y }); w.state = 'walk';
+            // Pet walks: sound only while the tent is on screen, and at most once every few seconds across all pets
+            const tentOpen = !document.getElementById('view-character')?.classList.contains('hidden');
+            const nowMs = performance.now();
+            if (tentOpen && nowMs - tentPetMoveSfxAt > TENT_PET_MOVE_SFX_GAP_MS) { tentPetMoveSfxAt = nowMs; playSfx(SFX.move); }
+        }
         return;
     }
     const dx = w.target.x - w.x, dy = w.target.y - w.y, d = Math.hypot(dx, dy), step = TENT_CAT.speed * dt;
