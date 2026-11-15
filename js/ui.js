@@ -1937,7 +1937,10 @@ function showFloatPage(viewId) {
     document.getElementById(viewId)?.classList.add('float-page');
     document.getElementById(viewId)?.classList.remove('hidden');
 }
+// Each page's usage is counted for the developer dashboard (feature names must match supabase/feature_usage.sql)
+const FEATURE_BY_VIEW = { town: 'town', shop: 'shop', blacksmith: 'blacksmith', market: 'market', diamond: 'diamond', vip: 'vip', events: 'events', friend: 'friend', quests: 'mail', setting: 'setting', skills: 'skills', character: 'tent', expeditions: 'expedition', inventory: 'inventory' };
 function switchView(viewName) {
+    if (typeof trackFeature === 'function' && FEATURE_BY_VIEW[viewName]) trackFeature(FEATURE_BY_VIEW[viewName]);
     if (viewName !== 'character' && typeof closePuzzlePanel === 'function') closePuzzlePanel(); // leaving the tent closes the puzzle
     if (viewName !== 'combat') restoreAfterCombat();
     closePetPanel(); // leaving any page closes the pet menu and pet detail
@@ -2622,6 +2625,7 @@ function startBoost(kind, ms) {
 }
 
 function buyDiamondItem(itemId) {
+    if (typeof trackFeature === 'function') trackFeature('diamond_buy');
     let item = DIAMOND_SHOP_ITEMS.find(i => i.id === itemId);
     if (!item) return;
     if (item.type === 'vip' && isVipActive()) {
@@ -6602,6 +6606,7 @@ function petEsc(s) {
     return f(String(s));
 }
 function openPetPanel() {
+    if (typeof trackFeature === 'function' && !document.getElementById('pet-panel')) trackFeature('pets');
     if (document.getElementById('pet-panel')) { closePetPanel(); return; } // pressing Pets again closes it
     {
         const box = document.createElement('div');
@@ -6812,6 +6817,7 @@ let puzzlePetName = '';
 let puzzlePetItem = null;  // the pet item that is being played with (friendship is added to it)
 const PZ_N = 4;            // board is 4 x 4
 function openPuzzlePanel() {
+    if (typeof trackFeature === 'function') trackFeature('puzzle');
     if (document.getElementById('puzzle-panel')) { closePuzzlePanel(); return; } // pressing Puzzle again closes it
     const box = document.createElement('div');
     box.id = 'puzzle-panel';
