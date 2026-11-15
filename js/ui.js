@@ -4314,23 +4314,28 @@ function renderCreateStats() {
             + `<button type="button" onclick="addStat('${k}')"${full ? ' disabled' : ''} class="w-7 h-7 rounded-lg bg-amber-600 text-slate-950 font-black cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">+</button></span></div>`;
     }).join('');
     // Derived combat numbers: the current value, and the preview with the pending stat points added
+    const preview = derivedPreviewRows();
+    if (preview) rows.innerHTML += preview;
+}
+
+// Derived combat numbers as a preview: the current value struck through and the value with the pending stat points (empty if no stats)
+function derivedPreviewRows() {
     const now = typeof getDerivedStats === 'function' ? getDerivedStats() : null;
-    if (now) {
-        const next = previewDerivedStats();
-        const cells = [
-            ['HP', now.maxHp, next.maxHp], ['ATK', now.atk, next.atk], ['MATK', now.matk, next.matk], ['DEF', now.def, next.def],
-            ['HIT', now.hit, next.hit], ['FLEE', now.flee, next.flee], ['CRIT', `${Math.round(now.crit * 10) / 10}%`, `${Math.round(next.crit * 10) / 10}%`], ['ASPD', now.aspd, next.aspd]
-        ];
-        rows.innerHTML += `<div class="mt-2 pt-2 border-t border-slate-700 grid grid-cols-1 gap-y-1">`
-            + cells.map(([k, a, b]) => {
-                const changed = String(a) !== String(b);
-                const val = changed
-                    ? `<span class="text-slate-500 line-through mr-1">${a}</span><span class="text-emerald-300 font-bold">${b}</span>`
-                    : `<span class="text-slate-100 font-bold">${b}</span>`;
-                return `<div class="flex items-center justify-between text-xs"><span class="text-slate-400 font-bold">${k}</span><span>${val}</span></div>`;
-            }).join('')
-            + `</div>`;
-    }
+    if (!now) return '';
+    const next = previewDerivedStats();
+    const cells = [
+        ['HP', now.maxHp, next.maxHp], ['ATK', now.atk, next.atk], ['MATK', now.matk, next.matk], ['DEF', now.def, next.def],
+        ['HIT', now.hit, next.hit], ['FLEE', now.flee, next.flee], ['CRIT', `${Math.round(now.crit * 10) / 10}%`, `${Math.round(next.crit * 10) / 10}%`], ['ASPD', now.aspd, next.aspd]
+    ];
+    return `<div class="mt-2 pt-2 border-t border-slate-700 grid grid-cols-1 gap-y-1">`
+        + cells.map(([k, a, b]) => {
+            const changed = String(a) !== String(b);
+            const val = changed
+                ? `<span class="text-slate-500 line-through mr-1">${a}</span><span class="text-emerald-300 font-bold">${b}</span>`
+                : `<span class="text-slate-100 font-bold">${b}</span>`;
+            return `<div class="flex items-center justify-between text-xs"><span class="text-slate-400 font-bold">${k}</span><span>${val}</span></div>`;
+        }).join('')
+        + `</div>`;
 }
 
 // Derived stats as they would be with the pending stat points spent (player data is restored straight after)
@@ -4411,7 +4416,7 @@ function renderPendingBars() {
                 <div class="flex gap-2">
                     <button onclick="resetPendingStats()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg cursor-pointer">Reset</button>
                     <button onclick="confirmPendingStats()" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg cursor-pointer">Confirm ${total} pt</button>
-                </div></div>`;
+                </div>${derivedPreviewRows()}</div>`;
         } else {
             sBar.innerHTML = '';
         }
