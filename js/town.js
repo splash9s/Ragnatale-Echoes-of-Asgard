@@ -80,6 +80,7 @@
 
     // ---- Campaign map (Expedition Gates) ----
     window.openCampaignPath = function (path) {
+        playSfx(SFX.buttonOk); // path picked on the map select page (the path nodes are not buttons, so no global click sound)
         if (typeof selectCampaignPath === 'function') selectCampaignPath(path);
         document.getElementById('campaign-panel')?.classList.remove('hidden');
     };
