@@ -1086,8 +1086,8 @@ function syncPagePetSprites(spec) {
     const pet = document.getElementById('town-pet');
     const house = document.getElementById('town-pet-house');
     if (house) {
-        // Pet house: 130px wide (a little bigger than the cat), floor just under the pet's feet, behind the pet
-        house.style.display = spec ? '' : 'none';
+        // Pet house: 130px wide (a little bigger than the cat), floor just under the pet's feet, behind the pet. Always shown on the main page.
+        house.style.display = '';
         house.style.left = (TOWN_DUMMY_FEET.left - 65) + 'px';
         house.style.top = (TOWN_DUMMY_FEET.top + 4 - 98) + 'px';
     }
