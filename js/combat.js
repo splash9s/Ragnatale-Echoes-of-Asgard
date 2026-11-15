@@ -84,6 +84,9 @@ const SFX = {
     equip: 'sound/sfx/gear/equip.mp3',
     move: 'sound/sfx/gear/move.mp3',
     salvage: 'sound/sfx/gear/salvage.mp3',
+    buttonOk: 'sound/sfx/button/ok.mp3',
+    buttonBack: 'sound/sfx/button/back.mp3',
+    buttonStart: 'sound/sfx/button/start_battle.mp3',
     mapWin: 'sound/sfx/map_win.mp3'
 };
 // Loudness of each effect file, matched to the music (measured mean level), applied on top of the Effects volume
@@ -131,6 +134,9 @@ const SFX_LEVEL = {
     'sound/sfx/gear/equip.mp3': 7.0,
     'sound/sfx/gear/move.mp3': 26.0,
     'sound/sfx/gear/salvage.mp3': 3.8,
+    'sound/sfx/button/ok.mp3': 2.24,
+    'sound/sfx/button/back.mp3': 2.0,
+    'sound/sfx/button/start_battle.mp3': 4.7,
     'sound/sfx/monster/beast_attack1.mp3': 0.89,
     'sound/sfx/monster/beast_attack2.mp3': 0.81,
     'sound/sfx/monster/beast_damaged1.mp3': 0.75,
