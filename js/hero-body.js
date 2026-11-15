@@ -2240,7 +2240,10 @@ const heroBodyImgs = {};
 function heroBodyImage(src) {
     if (!heroBodyImgs[src]) {
         const img = new Image();
-        if (typeof HERO_ART !== 'undefined' && HERO_ART[src]) img.src = HERO_ART[src]; // data URL on file:// pages
+        // Embedded copies are keyed by the plain path; a '?v=' cache tag must not hide them (it left the image empty)
+        const plain = src.split('?')[0];
+        if (typeof HERO_ART !== 'undefined' && HERO_ART[plain] && plain === src) img.src = HERO_ART[plain]; // data URL on file:// pages
+        else img.src = src; // no embedded copy (e.g. a '?v=' tagged file): load it from the server
         heroBodyImgs[src] = img;
     }
     return heroBodyImgs[src];
