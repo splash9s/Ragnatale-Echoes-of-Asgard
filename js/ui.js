@@ -1426,10 +1426,19 @@ function showAvatarLockInfo(av, tileEl) {
     panel.innerHTML = `<div class="font-bold text-amber-300">Locked</div><div class="mt-1">${avatarLockTitle(av) || 'This avatar is locked.'}</div>`;
     const hostRect = host.getBoundingClientRect();
     const tileRect = tileEl.getBoundingClientRect();
-    // Right-column tiles open the panel on their left, so it stays inside the picker
-    const onRight = (tileRect.left - hostRect.left) > host.clientWidth / 2;
-    panel.style.left = onRight ? (tileRect.left - hostRect.left - 300 - 12) + 'px' : (tileRect.right - hostRect.left + 12) + 'px';
-    panel.style.top = (tileRect.top - hostRect.top) + 'px';
+    // Work in the picker's own (unscaled) pixels, so the stage scale does not shift the panel
+    const k = (hostRect.width / (host.offsetWidth || 1)) || 1;
+    const W = 300, GAP = 12;
+    const tileL = (tileRect.left - hostRect.left) / k, tileR = (tileRect.right - hostRect.left) / k;
+    const hostW = host.offsetWidth, hostH = host.offsetHeight;
+    // Open on the right of the tile when there is room, otherwise on its left; always keep it inside the picker
+    const fitsRight = hostW - tileR >= W + GAP;
+    let left = fitsRight ? tileR + GAP : tileL - W - GAP;
+    left = Math.max(0, Math.min(left, hostW - W));
+    let top = (tileRect.top - hostRect.top) / k;
+    top = Math.max(0, Math.min(top, hostH - 120));
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
     host.appendChild(panel);
     requestAnimationFrame(() => panel.classList.add('open'));
     // Listen after this click finishes, so the opening click does not close it
