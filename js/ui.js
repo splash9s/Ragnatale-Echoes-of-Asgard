@@ -57,7 +57,8 @@ const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).
 const GOLD_SHOP_CONSUMABLES = [
     { id: 'potion_minor', name: "Minor Healing Potion", price: 100, type: 'potion', heal: 200, desc: "Restores 200 HP" },
     { id: 'potion_med', name: "Medium Healing Potion", price: 300, type: 'potion', heal: 500, desc: "Restores 500 HP" },
-    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP" }
+    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP" },
+    { id: 'pet_orange_cat_gold', name: "Orange Cat", price: 10000, type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100", icon: 'assets/shop/diamond/ocatpet_q85.webp' }
 ];
 
 // Healing potion numbers come from GOLD_SHOP_CONSUMABLES (matched by name), so potions already in a save heal the current amount.
@@ -1046,6 +1047,7 @@ function applyPlayerFrame(img, f, dy = 0) {
 const PET_SPRITES = {
     'Orange Cat Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Support Slime Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
+    'Orange Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
 };
 const COMBAT_PET_GAP_X = 120;
 // Fine position of the combat pet (px) from the player's feet anchor: 50 left, 60 up
@@ -3220,7 +3222,7 @@ const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', ga
 const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
 // Inventory icons (PNG, transparent) for consumables and materials; other items keep the emoji
 const ITEM_ICON_RULES = [
-    [/Orange Cat Pet|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
+    [/Orange Cat( Pet)?|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
