@@ -3690,7 +3690,7 @@ function showItemDetail(index, refresh = false) {
 
 function equipFromDetail(index) { if (executeEquipItem(index)) closeInvDetail(); }
 function usePotionFromDetail(index) { if (useInventoryPotion(index)) closeInvDetail(); }
-function salvageFromDetail(index) { salvageEquipmentItem(index); closeInvDetail(); }
+function salvageFromDetail(index) { salvageEquipmentItem(index, closeInvDetail); } // detail stays open while the confirm shows, like Sell
 function sellFromDetail(index) { if (sellInventoryItem(index)) closeInvDetail(); }
 
 function useOrEquipItem(index) { showItemDetail(index); }
