@@ -6643,18 +6643,4 @@ setInterval(syncTentPets, 1000);
     }, true);
 })();
 
-// Button sounds. Start buttons (campaign, event) use the start sound. Stat "+" buttons (assign) make no sound.
-// Back, return, cancel and pet back use the back sound. Every other button uses the OK sound.
-// A capture-phase listener, so it plays even when the button's own handler stops the click.
-document.addEventListener('click', (e) => {
-    const t = e.target;
-    if (!t || !t.closest) return;
-    if (t.closest('.campaign-start, .ev-start')) { playSfx(SFX.buttonStart); return; }
-    const btn = t.closest('button');
-    if (btn && btn.matches('button[onclick^="addStat("]')) return; // assign: no sound
-    if (t.closest('.char-return, .gear-close, .pet-back') || (btn && (btn.id === 'bulk-cancel' || /^\s*(back|cancel|return|\u2039|\u2190)/i.test(btn.textContent || '')))) {
-        playSfx(SFX.buttonBack);
-        return;
-    }
-    if (t.closest('.ui[data-action]') || btn) playSfx(SFX.buttonOk); // main page menu icons and the expedition plaque, plus all buttons
-}, true);
+// Button sounds removed: buttons play no sound.
