@@ -63,6 +63,7 @@ function playSound(path, gain = 1) {
 // Sound effects (files in sound/sfx/). A list means a random pick from its numbered files.
 const SFX = {
     swordHit: 'sound/sfx/combat/sword_attack3.mp3',
+    normalAttack: ['sound/sfx/combat/weapon/attack1.mp3', 'sound/sfx/combat/weapon/attack2.mp3'], // normal hits: one of the two, picked at random
     swordCrit: 'sound/sfx/sword_crit.mp3',
     punchHit: 'sound/sfx/punch_hit.mp3',
     punchCrit: 'sound/sfx/punch_crit.mp3',
@@ -117,6 +118,8 @@ const SFX_LEVEL = {
     'sound/sfx/sword_hit1.mp3': 1.32,
     'sound/sfx/sword_hit2.mp3': 1.72,
     'sound/sfx/combat/sword_attack3.mp3': 1.17,
+    'sound/sfx/combat/weapon/attack1.mp3': 2.26,
+    'sound/sfx/combat/weapon/attack2.mp3': 1.88,
     'sound/sfx/monster/boss_golem_dead.mp3': 1.04,
     'sound/sfx/monster/golem_attack.mp3': 0.72,
     'sound/sfx/monster/golem_damaged.mp3': 0.6,
@@ -230,8 +233,9 @@ function rangedFireSfx(m) {
 function attackSfx(crit) {
     const w = player.equipped && player.equipped.weapon;
     const punch = !w || /knuckle/i.test(w.name || '');
-    if (punch) return crit ? SFX.punchCrit : SFX.punchHit;
-    return crit ? SFX.swordCrit : SFX.swordHit;
+    if (!crit) return SFX.normalAttack;
+    if (punch) return SFX.punchCrit;
+    return SFX.swordCrit;
 }
 
 function runeN(key) {
