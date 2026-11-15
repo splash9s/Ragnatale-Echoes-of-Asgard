@@ -1938,6 +1938,7 @@ function showFloatPage(viewId) {
     document.getElementById(viewId)?.classList.remove('hidden');
 }
 function switchView(viewName) {
+    if (viewName !== 'character' && typeof closePuzzlePanel === 'function') closePuzzlePanel(); // leaving the tent closes the puzzle
     if (viewName !== 'combat') restoreAfterCombat();
     closePetPanel(); // leaving any page closes the pet menu and pet detail
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
@@ -6814,6 +6815,9 @@ function openPuzzlePanel() {
     if (document.getElementById('puzzle-panel')) { closePuzzlePanel(); return; } // pressing Puzzle again closes it
     const box = document.createElement('div');
     box.id = 'puzzle-panel';
+    box.setAttribute('data-drag-panel', '');
+    box.style.left = (window.innerWidth / 2) + 'px';
+    box.style.top = (window.innerHeight / 2) + 'px';
     document.body.appendChild(box);
     box.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
     puzzlePetKey = null;
@@ -6890,6 +6894,9 @@ function openPuzzleGame(i) {
     puzzleGame = { puzzle: p, tiles, moves: 0, solved: false, reward: '' };
     const g = document.createElement('div');
     g.id = 'puzzle-game';
+    g.setAttribute('data-drag-panel', '');
+    g.style.left = (window.innerWidth / 2) + 'px';
+    g.style.top = (window.innerHeight / 2) + 'px';
     document.body.appendChild(g);
     g.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
     renderPuzzleGame();
@@ -6897,6 +6904,7 @@ function openPuzzleGame(i) {
 function closePuzzleGame() {
     const g = document.getElementById('puzzle-game');
     if (g) g.remove();
+    closeRefZoom();
     puzzleGame = null;
 }
 function puzzleGameMove(i) {
@@ -6921,7 +6929,7 @@ function renderPuzzleGame() {
     }).join('');
     g.innerHTML = `
         <div class="pz-head"><button class="pz-back" onclick="openPuzzleGameBack()">‹ Back</button><h3>${petEsc(puzzle.name)}</h3><button class="pz-x" onclick="closePuzzleGame()">✕</button></div>
-        <div class="pz-ref-row"><img class="pz-ref" src="${puzzle.img}" alt="Complete picture"><span class="pz-stats">Moves: ${moves}</span></div>
+        <div class="pz-ref-row"><img class="pz-ref" src="${puzzle.img}" alt="Complete picture" title="Click to enlarge" onclick="toggleRefZoom('${puzzle.img}')"><span class="pz-stats">Moves: ${moves}</span></div>
         <div class="pz-board">${cells}</div>
         ${solved ? `<p class="pz-win">Solved in ${moves} moves!${reward ? '<br>' + reward : ''}</p>` : ''}
         <div class="pz-foot"><button class="pz-btn" onclick="restartPuzzleGame()">Shuffle again</button></div>`;
@@ -6956,4 +6964,18 @@ function puzzleRewardPet() {
     addPetFriendship(item, 1);
     if (typeof saveGame === 'function') saveGame();
     return `${petEsc(item.name || puzzlePetName)} +1 friendship!`;
+}
+
+// Reference picture: click to enlarge over the game, click the big picture again to minimize
+function toggleRefZoom(src) {
+    if (document.getElementById('puzzle-ref-zoom')) { closeRefZoom(); return; }
+    const z = document.createElement('div');
+    z.id = 'puzzle-ref-zoom';
+    z.innerHTML = `<img src="${src}" alt="Complete picture">`;
+    z.onclick = closeRefZoom;
+    document.body.appendChild(z);
+}
+function closeRefZoom() {
+    const z = document.getElementById('puzzle-ref-zoom');
+    if (z) z.remove();
 }

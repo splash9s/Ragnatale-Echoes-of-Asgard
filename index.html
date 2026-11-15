@@ -500,7 +500,9 @@
         #puzzle-panel .pz-row small { font-size: 28px; color: #9aa6bd; font-weight: 700; }
         #puzzle-game .pz-stats { font-size: 34px; font-weight: 800; color: #7dd3fc; text-align: center; }
         #puzzle-game .pz-ref-row { display: flex; align-items: center; justify-content: center; gap: 18px; }
-        #puzzle-game .pz-ref { width: 110px; height: 110px; object-fit: cover; border: 2px solid #b8945a; border-radius: 8px; background: #0b1322; }
+        #puzzle-ref-zoom { position: fixed; inset: 0; z-index: 320; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.7); cursor: zoom-out; }
+        #puzzle-ref-zoom img { width: min(80vmin, 720px); height: min(80vmin, 720px); object-fit: cover; border: 3px solid #b8945a; border-radius: 10px; background: #0b1322; }
+        #puzzle-game .pz-ref { cursor: zoom-in; }         #puzzle-game .pz-ref { width: 110px; height: 110px; object-fit: cover; border: 2px solid #b8945a; border-radius: 8px; background: #0b1322; }
         #puzzle-game .pz-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; aspect-ratio: 1 / 1; padding: 6px; box-sizing: border-box; background: #0b1322; border: 2px solid #26344f; border-radius: 12px; }
         #puzzle-game .pz-tile { border: 2px solid #26344f; border-radius: 8px; padding: 0; cursor: pointer; background-repeat: no-repeat; background-color: #14203a; }
         #puzzle-game .pz-tile.blank { background: #0b1322; border-style: dashed; cursor: default; }
@@ -1981,7 +1983,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116f"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116zd"></script>
+    <script src="js/ui.js?v=20261116ze"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
