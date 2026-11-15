@@ -30,8 +30,8 @@
         #char-panel-left::-webkit-scrollbar, #char-panel-mid::-webkit-scrollbar, #char-panel-right::-webkit-scrollbar { display: none; }
         #char-hp-card, #char-hp-card * { color: #e2e8f0 !important; }
         #char-hp-card { background-color: #1e3a5f !important; border: 2px solid #0f1f3d !important; }
-        #skill-sp-badge { background-color: #dbc5a0 !important; border: 2px solid #c09e6a !important; border-radius: 8px; color: #2a1a0e !important; }
-        #skill-sp-badge * { color: #2a1a0e !important; }
+        #skill-sp-badge { background-color: #111a2c !important; border: 2px solid #26344f !important; border-radius: 16px; color: #e9edf5 !important; }
+        #skill-sp-badge * { color: #e9edf5 !important; }
         #skill-pending-bar:empty { display: none !important; }
         /* Skill page: zoomable star map (4000x2233) with skill nodes; drag to pan, wheel or +/- to zoom */
         #skill-viewport { position: absolute; left: 0; top: 70px; width: 1920px; height: 1010px; overflow: hidden; z-index: 2; cursor: grab; touch-action: none; user-select: none; }
@@ -54,7 +54,7 @@
         #skill-detail * { color: #e9edf5; }
         #skill-detail h3 { color: #f5a00b !important; }
         #skill-zoom { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 6; display: flex; flex-direction: column; gap: 14px; }
-        #skill-zoom button { width: 84px; height: 84px; border-radius: 16px; background: rgba(231,209,170,.85); border: 3px solid #b8945a; color: #2a1a0e; font-size: 48px; font-weight: 800; line-height: 1; cursor: pointer; }
+        #skill-zoom button { width: 84px; height: 84px; border-radius: 16px; background: #111a2c; border: 2px solid #26344f; color: #e9edf5; font-size: 48px; font-weight: 800; line-height: 1; cursor: pointer; }
         /* Slide-out detail panel is open: keep the zoom buttons clear of it */
         #skill-viewport:has(#skill-detail.open) #skill-zoom { right: 630px; }
         /* Skill confirm bar: parchment and gold like the page, behind the SP badge */
@@ -66,6 +66,8 @@
         #skill-pending-bar button:hover { background-color: #e8d6b0 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"] { background-color: #4f8a5b !important; border-color: #3a6b44 !important; color: #f4fbf5 !important; }
         #skill-pending-bar button[onclick="confirmPendingSkills()"]:hover { background-color: #5f9e6c !important; }
+        /* Yes / No pictures: no button box behind them */
+        #skill-pending-bar button.yn-btn, #skill-pending-bar button.yn-btn:hover { background: none !important; border: 0 !important; }
         /* Armor Break over the player: hard shake on the intact armor, then the broken pieces for 0.5 s */
         .armor-break-fx { position: absolute; z-index: 7; pointer-events: none; transform: translate(-50%, -50%); animation: armorShake 2s linear forwards; }
         .armor-break-fx.armor-break-go { animation: none; } /* broken pieces hold at full size for 2 s */
