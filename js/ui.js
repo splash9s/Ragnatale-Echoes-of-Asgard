@@ -3604,14 +3604,14 @@ function resultSellItem(index) {
     if (!item) return;
     const bag = resultItemBagIndex(item);
     if (bag < 0) { showFloatNotice("This item is no longer in your bag."); closeResultItemDetail(); return; }
-    sellInventoryItem(bag, closeResultItemDetail); // back to the combat result once sold
+    sellInventoryItem(bag, closeResultItemDetail, closeResultItemDetail); // back to the combat result once sold or cancelled
 }
 function resultSalvageItem(index) {
     const item = stageSummary && stageSummary.items ? stageSummary.items[index] : null;
     if (!item) return;
     const bag = resultItemBagIndex(item);
     if (bag < 0) { showFloatNotice("This item is no longer in your bag."); closeResultItemDetail(); return; }
-    salvageEquipmentItem(bag, closeResultItemDetail); // back to the combat result once salvaged
+    salvageEquipmentItem(bag, closeResultItemDetail, closeResultItemDetail); // back to the combat result once salvaged or cancelled
 }
 
 // Shared item detail body (inventory detail and the combat result's item detail use it)
@@ -3850,7 +3850,7 @@ function confirmItemList(targets) {
     return shown.join('\n');
 }
 
-function sellInventoryItem(index, onDone) {
+function sellInventoryItem(index, onDone, onCancel = null) {
     const item = player.inventory[index];
     if (!item) return false;
     if (item.favorite) { showFloatNotice("Locked items cannot be sold. Unlock it first."); return false; }
@@ -3867,7 +3867,7 @@ function sellInventoryItem(index, onDone) {
         updateUI();
         saveGame();
         if (onDone) onDone();
-    }, item.slot ? 'equipment item(s)' : 'item(s)');
+    }, item.slot ? 'equipment item(s)' : 'item(s)', onCancel);
     return false;
 }
 
@@ -3959,7 +3959,7 @@ function salvageScrapGain(item) {
     return Math.min(5, Math.max(1, Math.floor((item.levelReq || 1) / 5) + 1));
 }
 
-function salvageEquipmentItem(index, onDone) {
+function salvageEquipmentItem(index, onDone, onCancel = null) {
     const item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { showFloatNotice("Locked items cannot be salvaged. Unlock it first."); return; }
@@ -3978,7 +3978,7 @@ function salvageEquipmentItem(index, onDone) {
         updateUI();
         saveGame();
         if (onDone) onDone();
-    });
+    }, 'equipment item(s)', onCancel);
 }
 
 // Bag equipment that Salvage All / Sell All may touch: not favorites, not pets
@@ -4001,7 +4001,7 @@ function showGameConfirm(title, message, confirmLabel, onConfirm) {
 }
 
 // Salvage All / Sell All confirm: a plain pop-up box (no dim background, no blur), item icons, bold text
-function showBulkConfirm(title, gainText, targets, verb, onConfirm, noun = 'equipment item(s)') {
+function showBulkConfirm(title, gainText, targets, verb, onConfirm, noun = 'equipment item(s)', onCancel = null) {
     const esc = typeof escapeHtml === 'function' ? escapeHtml : (x => x);
     let box = document.getElementById('bulk-confirm');
     if (!box) { box = document.createElement('div'); box.id = 'bulk-confirm'; document.body.appendChild(box); }
@@ -4021,7 +4021,7 @@ function showBulkConfirm(title, gainText, targets, verb, onConfirm, noun = 'equi
             <button type="button" id="bulk-yes" style="padding:8px 14px; border-radius:12px; background:#dc2626; color:#fff; font-weight:700; font-size:12px; cursor:pointer; border:0;">${esc(title)}</button>
         </div>`;
     const close = () => { box.style.display = 'none'; };
-    box.querySelector('#bulk-cancel').onclick = close;
+    box.querySelector('#bulk-cancel').onclick = () => { close(); if (onCancel) onCancel(); };
     box.querySelector('#bulk-yes').onclick = () => { close(); onConfirm(); };
 }
 
