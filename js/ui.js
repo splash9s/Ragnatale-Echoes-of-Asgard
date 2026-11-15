@@ -2570,14 +2570,14 @@ function renderVipShop() {
     grid.scrollTop = 0;
 }
 
-// VIP shop button: the nine shine frames play once every 10 seconds (frame 1 is the base button)
+// VIP shop button: the nine shine frames play once every 5 seconds (frame 1 is the base button)
 function runVipShine() {
     const img = document.getElementById('vip-btn-img');
     if (!img) return;
     for (let f = 1; f <= 9; f++) setTimeout(() => { img.src = `assets/diamond/vip/vip_btn_${f}_q85.webp`; }, (f - 1) * 90);
     setTimeout(() => { img.src = 'assets/diamond/vip/vip_btn_1_q85.webp'; }, 9 * 90);
 }
-setInterval(runVipShine, 10000);
+setInterval(runVipShine, 5000);
 
 function renderDiamondShop() {
     let container = document.getElementById('diamond-shop-items-container');
