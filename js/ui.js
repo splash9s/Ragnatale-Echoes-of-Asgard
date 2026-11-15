@@ -4827,8 +4827,7 @@ function playChestOpen(chestType, onDone) {
     overlay.appendChild(img);
     document.body.appendChild(overlay);
     // The overlay closes only when the animation has finished AND the chest sound has ended
-    const audio = playSfx(SFX.chestOpen);
-    let framesDone = false, soundDone = !audio;
+    let framesDone = false, soundDone = false; // the sound starts after a 1 s delay (see below)
     let finished = false;
     const finish = () => {
         if (finished || !framesDone || !soundDone) return;
@@ -4836,12 +4835,14 @@ function playChestOpen(chestType, onDone) {
         overlay.remove();
         if (onDone) onDone();
     };
-    if (audio) {
+    setTimeout(() => {
+        const audio = playSfx(SFX.chestOpen);
+        if (!audio) { soundDone = true; finish(); return; } // effects off: nothing to wait for
         const markSoundDone = () => { soundDone = true; finish(); };
         audio.addEventListener('ended', markSoundDone);
         audio.addEventListener('error', markSoundDone);
         setTimeout(markSoundDone, 10000); // safety: never leave the overlay stuck
-    }
+    }, 1000);
     let i = 0;
     const showFrame = () => {
         const f = frames[i];
@@ -6617,5 +6618,5 @@ document.addEventListener('click', (e) => {
         playSfx(SFX.buttonBack);
         return;
     }
-    if (t.closest('.ui[data-action="expedition"]') || btn) playSfx(SFX.buttonOk);
+    if (t.closest('.ui[data-action]') || btn) playSfx(SFX.buttonOk); // main page menu icons and the expedition plaque, plus all buttons
 }, true);
