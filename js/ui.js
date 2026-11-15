@@ -4852,7 +4852,7 @@ function playChestOpen(chestType, onDone) {
     overlay.appendChild(img);
     document.body.appendChild(overlay);
     // The overlay closes only when the animation has finished AND the chest sound has ended
-    let framesDone = false, soundDone = false; // the sound starts after a 1 s delay (see below)
+    let framesDone = false, soundDone = false; // the sound starts after a 1 s delay (1.5 s for silver and gold; see below)
     let finished = false;
     const finish = () => {
         if (finished || !framesDone || !soundDone) return;
@@ -4867,7 +4867,7 @@ function playChestOpen(chestType, onDone) {
         audio.addEventListener('ended', markSoundDone);
         audio.addEventListener('error', markSoundDone);
         setTimeout(markSoundDone, 10000); // safety: never leave the overlay stuck
-    }, 1000);
+    }, chestType === 'copper' ? 1000 : 1500); // silver and gold start 0.5 s later
     let i = 0;
     const showFrame = () => {
         const f = frames[i];
