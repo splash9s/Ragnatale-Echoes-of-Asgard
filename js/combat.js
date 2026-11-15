@@ -1667,7 +1667,7 @@ function toggleBattleSpeed() {
     player.battleSpeed = combatSpeedMult() === 2 ? 1 : 2;
     updateSpeedButton();
     if (combatInterval !== null && combatTimerDerived) startCombatTimers(combatTimerDerived);
-    showCombatText('#combat-speed-btn', player.battleSpeed === 1 ? '1x Speed' : '2x Speed', 'heal');
+    showCombatText('#combat-speed-btn', player.battleSpeed === 1 ? '1x' : '2x'); // default white bold float text
 }
 function updateSpeedButton() {
     const btn = document.getElementById('combat-speed-btn');

@@ -99,6 +99,7 @@ function toggleSoundAll() {
     else el.pause();
     refreshAudioUI();
     saveGame();
+    showCombatText('#combat-sound-btn', next ? 'Sound On' : 'Sound Off');
 }
 function updateSoundButton() {
     const img = document.getElementById('combat-sound-img');
