@@ -7,9 +7,30 @@
 //   3) Start Campaign (Earth Lv. 1 is selected by the Earth Path)
 // The admin account (window.isOwnerAccount) is not shaded or locked, but the blink still shows.
 // Starting any campaign expedition ends the guide.
+// Before the expedition steps, a new player is walked through the welcome mail: Mail button, open the
+// welcome mail, Claim (the mail id 1 gift). The expedition steps start once it is claimed.
 // ==========================================
 
+function guideWelcomeMailUnclaimed() {
+    return (player.mailBox || []).some(m => m.id === 1 && !m.claimed);
+}
+
 const GUIDE_INTRO_STEPS = [
+    {
+        text: 'Tap Mail to get your welcome gift',
+        visible: () => guideViewVisible('view-town') && guideWelcomeMailUnclaimed(),
+        target: () => document.querySelector('#view-town .ui[data-action="mail"]')
+    },
+    {
+        text: 'Tap Welcome Adventurer! to open it',
+        visible: () => guideViewVisible('view-quests') && guideWelcomeMailUnclaimed() && mailSelectedId !== 1,
+        target: () => document.querySelector('#view-quests .ml-row[onclick="selectMail(1)"]')
+    },
+    {
+        text: 'Tap Claim to receive your reward',
+        visible: () => guideViewVisible('view-quests') && guideWelcomeMailUnclaimed() && mailSelectedId === 1,
+        target: () => document.querySelector('#view-quests button.ml-claim[onclick="claimMail(1)"]')
+    },
     {
         text: 'Tap Expedition to start your adventure',
         visible: () => guideViewVisible('view-town'),
