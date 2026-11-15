@@ -5119,6 +5119,7 @@ function updateUI() {
     renderElementStats();
     let derived = getDerivedStats();
     player.hp = Math.min(player.hp, derived.maxHp);
+    player.armor = Math.min(Math.max(0, player.armor || 0), derived.maxArmor); // armor follows the new max when gear changes
 
     let el = document.getElementById('header-player-name');
     if (el) el.innerText = (player.name || '').slice(0, MAX_NAME_LENGTH);
