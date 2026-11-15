@@ -14,11 +14,16 @@
 function guideWelcomeMailUnclaimed() {
     return (player.mailBox || []).some(m => m.id === 1 && !m.claimed);
 }
+// The main page stays in the DOM behind floating windows (mail, shop...), so it only counts as "on the main page"
+// when no floating window is open
+function guideOnTown() {
+    return guideViewVisible('view-town') && !document.querySelector('#view-quests:not(.hidden), #view-setting:not(.hidden), #view-friend:not(.hidden), #view-events:not(.hidden), #view-shop:not(.hidden), #view-blacksmith:not(.hidden), #view-market:not(.hidden)');
+}
 
 const GUIDE_INTRO_STEPS = [
     {
         text: 'Tap Mail to get your welcome gift',
-        visible: () => guideViewVisible('view-town') && guideWelcomeMailUnclaimed(),
+        visible: () => guideOnTown() && guideWelcomeMailUnclaimed(),
         target: () => document.querySelector('#view-town .ui[data-action="mail"]')
     },
     {
@@ -32,8 +37,13 @@ const GUIDE_INTRO_STEPS = [
         target: () => document.querySelector('#view-quests button.ml-claim[onclick="claimMail(1)"]')
     },
     {
+        text: 'Tap Return to go back',
+        visible: () => guideViewVisible('view-quests') && !guideWelcomeMailUnclaimed(),
+        target: () => document.querySelector('#mail-stage .char-return')
+    },
+    {
         text: 'Tap Expedition to start your adventure',
-        visible: () => guideViewVisible('view-town'),
+        visible: () => guideOnTown(),
         target: () => document.querySelector('#view-town .ui[data-action="expedition"]')
     },
     {
