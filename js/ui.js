@@ -4581,6 +4581,8 @@ async function claimMail(mailId) {
     if (mail.rewards.diamonds) player.diamonds += mail.rewards.diamonds;
     if (mail.rewards.refiningStones) player.refiningStones += mail.rewards.refiningStones;
     if (mail.rewards.resurrection) player.resurrectionPotions = (player.resurrectionPotions || 0) + mail.rewards.resurrection;
+    // VIP days are added after any VIP time already left
+    if (mail.rewards.vipDays) player.vipUntil = Math.max(Date.now(), player.vipUntil || 0) + mail.rewards.vipDays * 24 * 60 * 60 * 1000;
     // LV rewards: each level is granted through checkLevelUps (stat points and SP as usual), capped at the max levels
     for (let i = 0; i < (mail.rewards.baseLv || 0) && player.baseLv < MAX_BASE_LV; i++) {
         player.baseExp = player.baseMaxExp;
@@ -4633,6 +4635,7 @@ function mailRewardText(r) {
     if (r.diamonds) parts.push(`${r.diamonds} Diamonds`);
     if (r.refiningStones) parts.push(`${r.refiningStones} Refining Stones`);
     if (r.resurrection) parts.push(`${r.resurrection} Resurrection Potion`);
+    if (r.vipDays) parts.push(`${r.vipDays} day VIP`);
     for (const [id, q] of Object.entries(r.potions || {})) {
         if (q > 0) parts.push(`${q} ${(GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id }).name}`);
     }
