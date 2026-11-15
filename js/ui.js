@@ -3551,7 +3551,7 @@ function showResultItemDetail(index) {
         compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
-        secondary: resultItemActionButtons(item, index, isEquip, canSell)
+        secondary: iconActionButtons(item, isEquip, canSell, `resultSalvageItem(${index})`, `resultSellItem(${index})`)
     });
     // one close id only: the inventory panel owns #inv-detail-close
     card.innerHTML = card.innerHTML.replace('id="inv-detail-close"', 'id="result-detail-close"');
@@ -3561,11 +3561,13 @@ function closeResultItemDetail() {
     const ov = document.getElementById('result-item-detail');
     if (ov) { ov.style.display = 'none'; ov.innerHTML = ''; }
 }
-// Salvage and Sell as the same round picture buttons as Salvage All / Sell All
-function resultItemActionButtons(item, index, isEquip, canSell) {
+// Salvage and Sell as the same round picture buttons as Salvage All / Sell All (inventory detail and combat result)
+function iconActionButtons(item, isEquip, canSell, salvageCall, sellCall) {
     const out = [];
-    if (isEquip && item.slot !== 'pet' && !item.favorite) out.push(`<button onclick="resultSalvageItem(${index})" class="inv-icon-btn" title="Salvage" aria-label="Salvage"><img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt=""></button>`);
-    if (canSell && !item.favorite) out.push(`<button onclick="resultSellItem(${index})" class="inv-icon-btn" title="Sell for ${getSellPrice(item)} Gold" aria-label="Sell"><img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt=""></button>`);
+    const salvageImg = `<img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt="">`;
+    const sellImg = `<img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt="">`;
+    if (isEquip && item.slot !== 'pet' && !item.favorite) out.push(`<button onclick="${salvageCall}" class="inv-icon-btn" title="Salvage" aria-label="Salvage">${salvageImg}</button>`);
+    if (canSell && !item.favorite) out.push(`<button onclick="${sellCall}" class="inv-icon-btn" title="Sell for ${getSellPrice(item)} Gold" aria-label="Sell">${sellImg}</button>`);
     return out;
 }
 // The result card shows a copy of the item; find the same item in the bag before selling or salvaging it
@@ -3663,9 +3665,7 @@ function showItemDetail(index, refresh = false) {
         ? `<button onclick="openChestFromDetail(${index})" class="dd-btn primary">Open</button>`
         : isEquip ? `<button onclick="equipFromDetail(${index})" class="dd-btn primary">Equip</button>`
         : isPotion ? `<button onclick="usePotionFromDetail(${index})" class="dd-btn primary">Equip</button>` : '';
-    const secondary = [];
-    if (canSalvage) secondary.push(`<button onclick="salvageFromDetail(${index})" class="dd-btn ghost">Salvage</button>`);
-    if (canSell && !item.favorite) secondary.push(`<button onclick="sellFromDetail(${index})" class="dd-btn ghost">Sell</button>`);
+    const secondary = iconActionButtons(item, isEquip, canSell, `salvageFromDetail(${index})`, `sellFromDetail(${index})`);
     if (isGearItem(item) && canSell) secondary.push(`<button onclick="toggleFavorite(${index})" class="dd-btn ghost">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`);
     const panel = document.getElementById('inv-detail-panel');
     if (!panel) return;
