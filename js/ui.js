@@ -1906,6 +1906,7 @@ function switchView(viewName) {
         viewName = 'shop';
     }
     let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market'];
+    document.getElementById('view-town')?.classList.remove('friend-under');
     views.forEach(id => {
         let el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -1937,6 +1938,10 @@ function switchView(viewName) {
         updateTentTopLabels();
     }
     if (viewName === 'friend') {
+        // Friends is a floating window over the main page: the main page stays on screen behind it
+        document.getElementById('view-town')?.classList.remove('hidden');
+        document.getElementById('view-town')?.classList.add('friend-under');
+        document.getElementById('view-friend')?.classList.add('friend-float');
         document.getElementById('view-friend')?.classList.remove('hidden');
         openFriendPage();
     }
