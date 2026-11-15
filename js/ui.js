@@ -6810,7 +6810,7 @@ function puzzleKeyOf(petName) {
 let puzzlePetKey = null;   // null = pet list; otherwise the pet kind whose puzzles are listed
 let puzzlePetName = '';
 let puzzlePetItem = null;  // the pet item that is being played with (friendship is added to it)
-const PZ_N = 5;            // board is 5 x 5
+const PZ_N = 4;            // board is 4 x 4
 function openPuzzlePanel() {
     if (document.getElementById('puzzle-panel')) { closePuzzlePanel(); return; } // pressing Puzzle again closes it
     const box = document.createElement('div');
