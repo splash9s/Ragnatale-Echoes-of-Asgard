@@ -3550,7 +3550,8 @@ function showResultItemDetail(index) {
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
         compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
-        price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : ''
+        price: '',
+        secondary: resultItemActionButtons(item, index, isEquip, canSell)
     });
     // one close id only: the inventory panel owns #inv-detail-close
     card.innerHTML = card.innerHTML.replace('id="inv-detail-close"', 'id="result-detail-close"');
@@ -3559,6 +3560,34 @@ function showResultItemDetail(index) {
 function closeResultItemDetail() {
     const ov = document.getElementById('result-item-detail');
     if (ov) { ov.style.display = 'none'; ov.innerHTML = ''; }
+}
+// Salvage and Sell as the same round picture buttons as Salvage All / Sell All
+function resultItemActionButtons(item, index, isEquip, canSell) {
+    const out = [];
+    if (isEquip && item.slot !== 'pet' && !item.favorite) out.push(`<button onclick="resultSalvageItem(${index})" class="inv-icon-btn" title="Salvage" aria-label="Salvage"><img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt=""></button>`);
+    if (canSell && !item.favorite) out.push(`<button onclick="resultSellItem(${index})" class="inv-icon-btn" title="Sell for ${getSellPrice(item)} Gold" aria-label="Sell"><img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt=""></button>`);
+    return out;
+}
+// The result card shows a copy of the item; find the same item in the bag before selling or salvaging it
+function resultItemBagIndex(item) {
+    const key = JSON.stringify({ ...item, qty: 1 });
+    return player.inventory.findIndex(it => it && JSON.stringify({ ...it, qty: 1 }) === key);
+}
+function resultSellItem(index) {
+    const item = stageSummary && stageSummary.items ? stageSummary.items[index] : null;
+    if (!item) return;
+    const bag = resultItemBagIndex(item);
+    closeResultItemDetail();
+    if (bag < 0) { showFloatNotice("This item is no longer in your bag."); return; }
+    sellInventoryItem(bag);
+}
+function resultSalvageItem(index) {
+    const item = stageSummary && stageSummary.items ? stageSummary.items[index] : null;
+    if (!item) return;
+    const bag = resultItemBagIndex(item);
+    closeResultItemDetail();
+    if (bag < 0) { showFloatNotice("This item is no longer in your bag."); return; }
+    salvageEquipmentItem(bag);
 }
 
 // Shared item detail body (inventory detail and the combat result's item detail use it)
