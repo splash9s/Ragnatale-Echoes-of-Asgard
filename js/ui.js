@@ -5941,7 +5941,7 @@ const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    playSfx(SFX.blacksmith); // one sound per swing cycle, starts with the animation
+    playSfx(SFX.blacksmith, 0.5); // one sound per swing cycle, starts with the animation; half volume
     const total = SMITH_SWING_FRAMES.length * SMITH_SWINGS;
     for (let k = 0; k < total; k++) {
         setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k % SMITH_SWING_FRAMES.length]), k * SMITH_FRAME_MS);
