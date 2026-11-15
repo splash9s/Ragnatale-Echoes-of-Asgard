@@ -1899,6 +1899,13 @@ function syncTentHand() {
     }
 }
 const SHADOW_BASE = { 'town-shadow': { left: 879, top: 770 }, 'char-shadow': { left: 339, top: 684 } };
+// Floating pages (mail, settings): the main page stays on screen behind them, blurred (see float-page in index.html)
+function showFloatPage(viewId) {
+    document.getElementById('view-town')?.classList.remove('hidden');
+    document.getElementById('view-town')?.classList.add('friend-under');
+    document.getElementById(viewId)?.classList.add('float-page');
+    document.getElementById(viewId)?.classList.remove('hidden');
+}
 function switchView(viewName) {
     if (viewName !== 'combat') restoreAfterCombat();
     closePetPanel(); // leaving any page closes the pet menu and pet detail
@@ -1953,7 +1960,7 @@ function switchView(viewName) {
         renderSkillPage();
         skillFocusHub();
     }
-    if (viewName === 'setting') { document.getElementById('view-setting')?.classList.remove('hidden'); refreshAudioUI(); }
+    if (viewName === 'setting') { showFloatPage('view-setting'); refreshAudioUI(); } // settings is a floating window over the main page
     if (viewName === 'market') {
         document.getElementById('view-market')?.classList.remove('hidden');
         marketOpen();
@@ -1981,7 +1988,7 @@ function switchView(viewName) {
         renderRefiningUI();
     }
     if (viewName === 'quests') {
-        document.getElementById('view-quests')?.classList.remove('hidden');
+        showFloatPage('view-quests'); // mail is a floating window over the main page
         renderMailBox();
         syncServerMail(); // friend gifts that arrived while playing
     }

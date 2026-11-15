@@ -598,6 +598,10 @@
         #view-events.events-float { background: transparent; }
         #view-events.events-float .ts-bg { display: none !important; }
         #view-events.events-float .ts-inner { background: transparent !important; }
+        /* Mail and settings as floating windows: no background, top bar and return button stay */
+        #view-quests.float-page, #view-setting.float-page { background: transparent; }
+        #view-quests.float-page .ts-bg, #view-setting.float-page .ts-bg { display: none !important; }
+        #view-quests.float-page .ts-inner, #view-setting.float-page .ts-inner { background: transparent !important; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
         #view-friend .friend-myid { color: #f1e4c3; }
