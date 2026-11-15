@@ -44,7 +44,7 @@
                 const url = 'url("' + (el.currentSrc || el.src) + '")';
                 live.add(el);
                 const g = glintFor(el, stage);
-                g.style.display = '';
+                g.style.display = 'block'; // the class starts hidden; show it explicitly
                 g.style.left = ((r.left - ib.left) / sc) + 'px';
                 g.style.top = ((r.top - ib.top) / sc) + 'px';
                 g.style.width = (r.width / sc) + 'px';
