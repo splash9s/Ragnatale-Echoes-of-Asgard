@@ -1494,7 +1494,10 @@ function monsterAct(m, derived, position = 0) {
         const hurtAllies = getAliveMonsters().filter(x => x !== m && x.hp < x.maxHp).sort((a, b) => (a.hp / a.maxHp) - (b.hp / b.maxHp));
         const wounded = hurtAllies[0] || (m.hp < m.maxHp ? m : null); // no hurt ally: heal self
         if (wounded) {
-            startMonsterAttack(m, (monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0) + position * COMBAT_MONSTER_STAGGER_MS); // healing plays the attack animation
+            const healDelay = (monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0) + position * COMBAT_MONSTER_STAGGER_MS;
+            startMonsterAttack(m, healDelay); // healing plays the attack animation
+            const healSfx = monsterSfxOf(m);
+            if (healSfx && healSfx.attack) setTimeout(() => playSfx(healSfx.attack), healDelay); // healer's heal sound, in step with the animation
             const amount = Math.min(m.heal, wounded.maxHp - wounded.hp);
             wounded.hp += amount;
             logMessage(`[Heal] ${m.name} heals ${wounded.name} for ${amount} HP`, 'combat');
@@ -1739,6 +1742,8 @@ function runCombatTick() {
             if (critIdx >= 0 && typeof playCritFx === 'function') setTimeout(() => playCritFx(`#monsters-lineup-container > div:nth-child(${critIdx + 1}) img`), 0);
             updateQuestProgress('crit', 1);
             playSfx(attackSfx(true));
+            const critVoice = monsterSfxOf(targetEnemy);
+            if (!isSlime(targetEnemy) && critVoice && critVoice.damaged) setTimeout(() => playSfx(critVoice.damaged), SLIME_VOICE_DELAY_MS); // monster's hurt voice on crits too
             logMessage(`[Critical!] Attacked ${targetEnemy.name} for critical ${pDmg} damage!`, 'combat');
             critStreak++;
             if (runeN('critSplash') > 0) {
