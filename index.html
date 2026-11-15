@@ -590,10 +590,9 @@
         /* Friends as a floating window over the main page: no background and no top bar */
         #view-friend.friend-float { background: transparent; }
         #view-town.friend-under:not(.hidden) { background: transparent; }
-        #view-friend.friend-float #friend-stage { position: relative; left: -4px; top: -32px; } /* centres the window frame on screen */
-        #view-friend.friend-float img[src*="friend/window_q85"] { display: none !important; } /* the panel fill is the background: hidden in floating mode */
         #view-friend.friend-float .ts-inner { background: transparent !important; }
-        #view-friend.friend-float #friend-stage .char-return { left: 1738px !important; top: 146px !important; } /* inside the content window, top right */
+        #view-friend.friend-float #friend-stage .char-return { left: 1752px !important; top: 123px !important; z-index: 20 !important; } /* inside the panel, top right, above the content */
+        #view-friend.friend-float .friend-window { left: 102px; top: 111px; }
         #view-friend.friend-float .ts-bg, #view-friend.friend-float .char-header-bar { display: none !important; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
@@ -1161,7 +1160,7 @@
             <div id="friend-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/friend/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'friendpage.png')">
-                    <img src="assets/pages/friend/window_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
+                    <img src="assets/pages/friend/window_panel_q85.webp" alt="" style="position:absolute; left:35px; top:62px; width:1851px; height:955px; pointer-events:none;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
