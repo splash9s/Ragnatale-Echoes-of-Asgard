@@ -100,7 +100,7 @@ const SFX_LEVEL = {
     'sound/sfx/angrycat2.mp3': 0.84,
     'sound/sfx/blacksmith.mp3': 1.84,
     'sound/sfx/coin.mp3': 3.55,
-    'sound/sfx/levelup.mp3': 1.72,
+    'sound/sfx/levelup.mp3': 0.92,
     'sound/sfx/map_win.mp3': 2.0,
     'sound/sfx/meow1.mp3': 2.82,
     'sound/sfx/meow2.mp3': 1.91,
