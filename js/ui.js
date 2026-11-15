@@ -2667,7 +2667,7 @@ function renderRuneSlot() {
         if (runeEl) {
             const e = blacksmithForgeEl && ELEMENTS[blacksmithForgeEl];
             runeEl.innerHTML = e
-                ? `<img src="assets/items/elemental/stone_${blacksmithForgeEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;"><span style="font-size:12px; font-weight:900; color:#fff; text-shadow:0 1px 3px #000;">x${stones[blacksmithForgeEl] || 0}</span>`
+                ? `<img src="assets/items/elemental/stone_${blacksmithForgeEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;">`
                 : '<span style="opacity:.6; font-size:11px;">Pick stone</span>';
         }
         if (balEl) {
