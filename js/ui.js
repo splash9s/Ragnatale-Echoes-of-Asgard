@@ -78,9 +78,9 @@ function potionHealText(item) {
 }
 
 const DIAMOND_SHOP_ITEMS = [
-    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
-    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 50, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
-    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, Get Resurrection Potion everyday.", price: 10, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
+    { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 50, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
+    { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 10, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
     { id: 'pet_loyal_slime', name: "Orange Cat Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 50, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp' },
     { id: 'res_potion', name: "Resurrection Potion", price: 1, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 8, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
@@ -93,6 +93,9 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'gold_2x_3h', name: "2x Gold (3 hours)", price: 5, type: 'boost', boost: 'gold', ms: 3 * 60 * 60 * 1000, desc: "Double gold from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'stat_reset', name: "Status Reset Service", price: 10, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 10, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
+    { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 27, type: 'bag', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/goldchest.png' },
+    { id: 'pet_box', name: "Pet Box", price: 50, type: 'box', boxType: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 10, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'dchest_copper', name: "Copper Chest", price: 1, type: 'chest', chestType: 'copper', desc: "", icon: 'assets/shop/diamond/copperchest.png' },
     { id: 'dchest_silver', name: "Silver Chest", price: 3, type: 'chest', chestType: 'silver', desc: "", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'dchest_gold', name: "Gold Chest", price: 5, type: 'chest', chestType: 'gold', desc: "", icon: 'assets/shop/diamond/goldchest.png' }
@@ -2502,7 +2505,7 @@ function buyArmoryItem(itemIndex) {
         floatNoticeAt("Not enough Gold", window.event);
         return;
     }
-    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
+    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_MAX_SLOTS).fill(null);
     let emptyIdx = player.inventory.findIndex(s => s === null);
     if (emptyIdx === -1) {
         showModal("Purchase Failed", "Inventory is full!");
@@ -2564,6 +2567,14 @@ function buyDiamondItem(itemId) {
         floatNoticeAt("Not enough Diamonds", window.event);
         return;
     }
+    if (item.type === 'bag' && bagSlotCount() >= BAG_MAX_SLOTS) {
+        showModal("Bag Full Size", "Your bag is already at its maximum size.");
+        return;
+    }
+    if (item.type === 'box' && countFreeCapacity({ name: item.name, type: 'box', qty: 1 }) < 1) {
+        showModal("Purchase Failed", "Inventory is full!");
+        return;
+    }
     if (item.type === 'chest' && countFreeCapacity({ name: item.name, type: 'chest', qty: 1 }) < 1) {
         showModal("Purchase Failed", "Inventory is full!");
         return;
@@ -2594,6 +2605,12 @@ function buyDiamondItem(itemId) {
         }
         player.jobSp += refunded;
         showModal("Skill Reset Successful", `All skills reset and ${refunded} Class SP refunded!`);
+    } else if (item.type === 'bag') {
+        player.bagExpansions = (player.bagExpansions || 0) + 1;
+        showModal("Bag Expanded", `Your bag now has ${bagSlotCount()} slots.`);
+    } else if (item.type === 'box') {
+        placeItemInInventory({ name: item.name, type: 'box', boxType: item.boxType, desc: item.desc, qty: 1 });
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'chest') {
         placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
         floatSuccessAt("Purchased!");
@@ -2978,11 +2995,13 @@ function isStackable(item) {
     return !!item && (item.type === 'potion' || item.type === 'material' || item.type === 'chest' || item.stackable === true || /Potion/.test(item.name || ''));
 }
 
+// The bag's open slots (the rest of the 63-cell grid is locked)
+function openInventory() { return (player.inventory || []).slice(0, bagSlotCount()); }
 function countFreeCapacity(newItem) {
     const limit = stackLimit(newItem);
     const stackable = isStackable(newItem);
     let cap = 0;
-    for (const s of player.inventory) {
+    for (const s of openInventory()) {
         if (s === null) cap += limit;
         else if (stackable && s.name === newItem.name && isStackable(s)) cap += Math.max(0, stackLimit(s) - (s.qty || 1));
     }
@@ -2991,14 +3010,14 @@ function countFreeCapacity(newItem) {
 
 // Places an item into the bag, merging into existing stacks first. All-or-nothing.
 function placeItemInInventory(newItem) {
-    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
+    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_MAX_SLOTS).fill(null);
     let qty = newItem.qty || 1;
     if (countFreeCapacity(newItem) < qty) return false;
 
     const stackable = isStackable(newItem);
     const limit = stackLimit(newItem);
     if (stackable) {
-        for (const s of player.inventory) {
+        for (const s of openInventory()) {
             if (qty <= 0) break;
             if (s && s.name === newItem.name && isStackable(s)) {
                 const add = Math.min(stackLimit(s) - (s.qty || 1), qty);
@@ -3007,7 +3026,7 @@ function placeItemInInventory(newItem) {
         }
     }
     while (qty > 0) {
-        const idx = player.inventory.findIndex(x => x === null);
+        const idx = openInventory().findIndex(x => x === null);
         if (idx === -1) break;
         const put = Math.min(limit, qty);
         player.inventory[idx] = { ...newItem, qty: put };
@@ -3156,7 +3175,7 @@ function sortInventory(key) {
         ((b.favorite ? 1 : 0) - (a.favorite ? 1 : 0)) ||
         ((valueOf(a) - valueOf(b)) * sign) ||
         a.name.localeCompare(b.name));
-    player.inventory = [...items, ...new Array(BAG_SLOTS - items.length).fill(null)];
+    player.inventory = [...items, ...new Array(BAG_MAX_SLOTS - items.length).fill(null)];
     playSfx(SFX.move);
     logMessage(`[Inventory] Sorted by ${field} (${dir === 'desc' ? 'high to low' : 'low to high'}). Locked first.`, 'drop');
     updateUI();
@@ -3183,7 +3202,7 @@ function unequipItem(slotName) {
     let item = player.equipped[slotName];
     if (!item) return;
 
-    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
+    if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_MAX_SLOTS).fill(null);
     let emptyIdx = player.inventory.findIndex(s => s === null);
     if (emptyIdx === -1) {
         showFloatNotice("Inventory is full!");
@@ -3231,6 +3250,8 @@ const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', ga
 const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
 // Inventory icons (PNG, transparent) for consumables and materials; other items keep the emoji
 const ITEM_ICON_RULES = [
+    [/Pet Box/, 'assets/shop/diamond/silverchest.png'],
+    [/Costume Box/, 'assets/shop/diamond/copperchest.png'],
     [/Orange Cat( Pet)?|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
@@ -3601,7 +3622,9 @@ function showItemDetail(index, refresh = false) {
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
     const canSell = item.slot !== 'pet';
     const canSalvage = isEquip && item.slot !== 'pet' && !item.favorite;
-    const primary = item.type === 'chest'
+    const primary = item.type === 'box'
+        ? `<button onclick="openBoxFromDetail(${index})" class="dd-btn primary">Open</button>`
+        : item.type === 'chest'
         ? `<button onclick="openChestFromDetail(${index})" class="dd-btn primary">Open</button>`
         : isEquip ? `<button onclick="equipFromDetail(${index})" class="dd-btn primary">Equip</button>`
         : isPotion ? `<button onclick="usePotionFromDetail(${index})" class="dd-btn primary">Equip</button>` : '';
@@ -4539,7 +4562,7 @@ async function claimMail(mailId) {
     }
     // Auction items (market mail) are full gear objects; each one needs a free bag slot
     const marketItems = Array.isArray(mail.rewards.items) ? mail.rewards.items.filter(it => it && it.name) : [];
-    const freeSlots = Array.isArray(player.inventory) ? player.inventory.filter(s => s === null).length : 0;
+    const freeSlots = Array.isArray(player.inventory) ? openInventory().filter(s => s === null).length : 0;
     const slotsNeeded = (gear ? 1 : 0) + (bossHelm ? 1 : 0) + marketItems.length;
     if (slotsNeeded > 0 && freeSlots < slotsNeeded) {
         showModal('Inventory Full', 'Make room in your bag to claim this mail.');
@@ -5124,10 +5147,10 @@ function updateUI() {
     let invGrid = document.getElementById('inventory-grid');
     if (invGrid) {
         invGrid.innerHTML = '';
-        if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_SLOTS).fill(null);
-        while (player.inventory.length < BAG_SLOTS) player.inventory.push(null);
+        if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_MAX_SLOTS).fill(null);
+        while (player.inventory.length < BAG_MAX_SLOTS) player.inventory.push(null);
         let filledSlots = 0;
-        player.inventory.forEach((item, index) => {
+        openInventory().forEach((item, index) => {
             if (item) filledSlots++;
             if (!itemMatchesFilter(item)) return;
             let itemName = item ? item.name : '';
@@ -5143,12 +5166,12 @@ function updateUI() {
             `;
         });
         // Closed cells after the open bag slots, shown with the grey slot graphic (not usable)
-        const INVENTORY_CELLS = BAG_SLOTS; // every cell is an open slot
-        for (let i = BAG_SLOTS; i < INVENTORY_CELLS; i++) {
+        const INVENTORY_CELLS = BAG_MAX_SLOTS;
+        for (let i = bagSlotCount(); i < INVENTORY_CELLS; i++) {
             invGrid.innerHTML += `<div class="w-[77px] h-[79px]" style="width:77px; height:79px; background-image:url('assets/pages/character/inventoryslotgrey_q85.webp'); background-size:100% 100%;"></div>`;
         }
         let invCountEl = document.getElementById('inventory-count');
-        if (invCountEl) invCountEl.innerText = `${filledSlots} / ${BAG_SLOTS} slots`;
+        if (invCountEl) invCountEl.innerText = `${filledSlots} / ${bagSlotCount()} slots`;
     }
 
     el = document.getElementById('stat-points');
@@ -5469,6 +5492,27 @@ function toggleEquippedFavorite(slot) {
 }
 
 
+// Boxes: a random reward from the box's pool. A costume box with no costumes yet stays unopened.
+const PET_BOX_POOL = [
+    { name: "Orange Cat Pet", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100" },
+];
+const COSTUME_BOX_POOL = []; // costumes go here
+function openBoxFromDetail(index) {
+    const item = player.inventory[index];
+    if (!item || item.type !== 'box') return;
+    const pool = item.boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
+    if (!pool.length) { showModal("Costume Box", "Costumes are coming soon. The box is kept."); return; }
+    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1 };
+    // A box that is the last one frees its own slot; a stack needs room for the reward
+    if ((item.qty || 1) > 1 && countFreeCapacity(reward) < 1) { showModal("Inventory Full", "Make room in your bag first."); return; }
+    closeInvDetail();
+    if ((item.qty || 1) > 1) item.qty--;
+    else player.inventory[index] = null;
+    placeItemInInventory(reward);
+    showModal(item.name, `You got ${reward.name}!`);
+    updateUI();
+    saveGame();
+}
 function openChestFromDetail(index) {
     const item = player.inventory[index];
     if (!item || item.type !== 'chest') return;

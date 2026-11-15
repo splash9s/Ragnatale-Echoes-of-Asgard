@@ -4,7 +4,11 @@
 
 const MAX_POTION_SLOT = 5;
 const ASPD_CAP = 150; // max ASPD (attack interval = 2000 - ASPD x 10 ms, so 150 = 500 ms)
-const BAG_SLOTS = 63;
+const BAG_MAX_SLOTS = 63;   // the bag grid is 9 x 7 cells at most (the array length)
+const BAG_BASE_SLOTS = 45;  // a new bag: 9 x 5
+const BAG_EXPAND_STEP = 9;  // each Bag Expansion adds one row of 9
+// Open bag slots for this player: base + expansions, never beyond the grid
+function bagSlotCount() { return Math.min(BAG_MAX_SLOTS, BAG_BASE_SLOTS + BAG_EXPAND_STEP * ((typeof player !== 'undefined' && player.bagExpansions) || 0)); }
 
 let player = {
     name: "Hero",
@@ -52,7 +56,7 @@ let player = {
         pet: null,
         potionSlot: { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" }
     },
-    inventory: new Array(BAG_SLOTS).fill(null),
+    inventory: new Array(BAG_MAX_SLOTS).fill(null),
     runes: { critBonus: 0, maxHpBonus: 0, firstHitBonus: 0, alwaysCritFirst: false, chainAttackCount: 0, randomHitCount: 0, resurrectionUsed: false }
 };
 
@@ -438,15 +442,23 @@ function loadGame() {
             if (!player.equipped.potionSlot) {
                 player.equipped.potionSlot = { name: "Minor Healing Potion", type: "potion", heal: 50, qty: 3, desc: "Restores 50 HP" };
             }
-            // Bag is 63 open slots (9 x 7 grid). The stash was removed: any old stash items move into free bag slots.
+            // The bag has bagSlotCount() open slots. Items in slots past that move to the mailbox, so nothing is lost.
+            // The stash was removed: any old stash items move into free open bag slots.
             const oldBag = Array.isArray(player.inventory) ? player.inventory : [];
             const oldStash = Array.isArray(player.stash) ? player.stash : [];
-            player.inventory = new Array(BAG_SLOTS).fill(null);
-            oldBag.slice(0, BAG_SLOTS).forEach((it, i) => { player.inventory[i] = it || null; });
+            const openSlots = bagSlotCount();
+            player.inventory = new Array(BAG_MAX_SLOTS).fill(null);
+            const overflow = [];
+            oldBag.forEach((it, i) => { if (!it) return; if (i < openSlots) player.inventory[i] = it; else overflow.push(it); });
             oldStash.filter(Boolean).forEach(it => {
-                const idx = player.inventory.findIndex(s => s === null);
+                const idx = player.inventory.slice(0, openSlots).findIndex(s => s === null);
                 if (idx !== -1) player.inventory[idx] = it;
+                else overflow.push(it);
             });
+            if (overflow.length) {
+                if (!Array.isArray(player.mailBox)) player.mailBox = [];
+                player.mailBox.unshift({ id: Date.now(), title: "Bag Overflow", sender: "Bag Office", message: `Your bag now has ${openSlots} slots. Items that did not fit were sent here.`, rewards: { items: overflow }, claimed: false, sentAt: Date.now() });
+            }
             delete player.stash;
             // Old saves kept scraps as a counter: move them into the bag as stacks
             if (player.materials && player.materials.ironScraps > 0 && typeof addScraps === 'function') {

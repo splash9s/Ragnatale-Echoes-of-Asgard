@@ -1089,6 +1089,7 @@ function renderCombatStatus() {
     const buffs = [];
     if (boostActive('exp')) buffs.push(`2x EXP · ${boostTimeText(boostLeftMs('exp'))}`);
     if (boostActive('gold')) buffs.push(`2x Gold · ${boostTimeText(boostLeftMs('gold'))}`);
+    if (boostActive('drop')) buffs.push(`2x Drops · ${boostTimeText(boostLeftMs('drop'))}`);
     const debuffs = [];
     Object.entries(playerTimedDebuffs).forEach(([k, d]) => { if (now < d.until) debuffs.push(`${k.toUpperCase()} -${d.pct}% · ${boostTimeText(d.until - now)}`); });
     if (now < playerDebuffs.curseUntil) debuffs.push(`Curse: ATK -20% · ${boostTimeText(playerDebuffs.curseUntil - now)}`);
@@ -1213,6 +1214,7 @@ function awardKill(m) {
     if (isEvent && currentEvent === 'xp') { baseExpGain *= 2; jobExpGain *= 2; finalGold = 0; }
     if (boostActive('exp')) { baseExpGain *= 2; jobExpGain *= 2; } // 2x EXP diamond boost
     if (boostActive('gold')) finalGold *= 2; // 2x Gold diamond boost
+    if (boostActive('drop')) finalGold *= 2; // 2x Drop Rate diamond boost (gold part)
     const bossKill = !!(m.isBoss || m.isMiniBoss);
     const bossExp = bossKill ? skillBonus('bossExpPct') : 0;
     baseExpGain = Math.floor(baseExpGain * (1 + (skillBonus('baseExpPct') + skillBonus('allExpPct') + bossExp) / 100));
@@ -1242,7 +1244,7 @@ function awardKill(m) {
 
     const pool = typeof GEAR_POOL !== 'undefined' ? (GEAR_POOL[activeMap.dropKey || 'map1'] || GEAR_POOL.map1) : [];
     const itemChance = isVoidTest ? 1 : 0.01;
-    if (!m.isBoss && !m.isMiniBoss && pool.length > 0 && Math.random() < itemChance) {
+    if (!m.isBoss && !m.isMiniBoss && pool.length > 0 && Math.random() < Math.min(1, itemChance * (boostActive('drop') ? 2 : 1))) { // 2x Drop Rate doubles the item chance
         const template = pool[Math.floor(Math.random() * pool.length)];
         const droppedItem = generatePoEItem(template);
         logMessage(`[Monster Drop] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
@@ -1648,8 +1650,10 @@ function monsterTurnTick() {
 // Starts the player's attack timer (ASPD) and the monsters' timer; stopCombatTimers clears both
 function startCombatTimers(derived) {
     stopCombatTimers();
-    combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)));
-    monsterInterval = setInterval(monsterTurnTick, COMBAT_MONSTER_MS);
+    // VIP: battle turns run twice as fast (the stage walk is already skipped for VIP)
+    const vipSpeed = isVipActive() ? 2 : 1;
+    combatInterval = setInterval(runCombatTick, Math.max(400, 2000 - (derived.aspd * 10)) / vipSpeed);
+    monsterInterval = setInterval(monsterTurnTick, COMBAT_MONSTER_MS / vipSpeed);
 }
 function stopCombatTimers() {
     clearInterval(combatInterval); clearInterval(monsterInterval);
