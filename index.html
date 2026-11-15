@@ -594,6 +594,10 @@
         #view-friend.friend-float #friend-stage .char-return { left: 1752px !important; top: 123px !important; z-index: 20 !important; } /* inside the panel, top right, above the content */
         #view-friend.friend-float .friend-window { left: 102px; top: 111px; }
         #view-friend.friend-float .ts-bg, #view-friend.friend-float .char-header-bar { display: none !important; }
+        /* Events as a floating window over the main page: no background, top bar and return button stay */
+        #view-events.events-float { background: transparent; }
+        #view-events.events-float .ts-bg { display: none !important; }
+        #view-events.events-float .ts-inner { background: transparent !important; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
         #view-friend .friend-myid { color: #f1e4c3; }
