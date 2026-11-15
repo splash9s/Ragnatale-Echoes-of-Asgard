@@ -591,7 +591,9 @@
         #view-friend.friend-float { background: transparent; }
         #view-town.friend-under:not(.hidden) { background: transparent; }
         #view-friend.friend-float #friend-stage { position: relative; left: -4px; top: -32px; } /* centres the window frame on screen */
-        #view-friend.friend-float #friend-stage .char-return { top: 34px; } /* stays at the top-right corner after the shift */
+        #view-friend.friend-float img[src*="friend/window_q85"] { display: none !important; } /* the panel fill is the background: hidden in floating mode */
+        #view-friend.friend-float .ts-inner { background: transparent !important; }
+        #view-friend.friend-float #friend-stage .char-return { left: 1738px !important; top: 146px !important; } /* inside the content window, top right */
         #view-friend.friend-float .ts-bg, #view-friend.friend-float .char-header-bar { display: none !important; }
         /* Friend page v2: window art with the content inside the red box (left 105, top 244, 1728 x 765), image buttons */
         #view-friend .friend-window { left: 105px; top: 140px; width: 1728px; height: 869px; padding: 6px 30px; gap: 14px; background: none; border-radius: 0; color: #f1e4c3; }
