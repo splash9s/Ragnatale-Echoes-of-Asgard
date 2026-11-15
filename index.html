@@ -788,6 +788,14 @@
         @media (prefers-reduced-motion: reduce) { .player-idle, .monster-idle { animation: none; } }
         .combat-dmg.miss { color: #ffffff; font-size: 39px; letter-spacing: 1px; }
         /* Item dropped on the ground where a monster fell (js/ui.js showGroundDrop): a soft golden glow */
+        /* Glint sweeping left to right over combat sprites (js/shine-fx.js). The mask keeps it to the sprite shape. */
+        .shine-glint { position: absolute; z-index: 4; pointer-events: none; display: none;
+            background: linear-gradient(100deg, rgba(255,255,255,0) 42%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 58%) no-repeat;
+            background-size: 300% 100%; mix-blend-mode: screen;
+            -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            animation: shineSweep 3.2s ease-in-out infinite; }
+        @keyframes shineSweep { 0% { background-position: 100% 0; } 55%, 100% { background-position: 0% 0; } }
+        @media (prefers-reduced-motion: reduce) { .shine-glint { display: none !important; } }
         .ground-drop { position: absolute; z-index: 3; pointer-events: none; transform: translate(-50%, 0); filter: drop-shadow(0 0 4px #fde68a) drop-shadow(0 0 10px rgba(251,191,36,.8)); line-height: 0; }
         .combat-dmg.stun { color: #facc15; font-size: 39px; letter-spacing: 1px; }
         .combat-dmg.heal { color: #4ade80; }
@@ -1854,6 +1862,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261115x"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
+    <script src="js/shine-fx.js?v=20261115a"></script>
     <script src="js/ui.js?v=20261115af"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261111a"></script>
