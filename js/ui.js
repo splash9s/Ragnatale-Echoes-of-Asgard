@@ -2611,6 +2611,7 @@ function blacksmithSetMode(mode) {
 }
 function blacksmithSelectElement(el) {
     blacksmithForgeEl = el;
+    if (el) playSfx(SFX.equip); // the element stone goes into the slot
     renderRefiningUI();
 }
 // Refine success: +0 to +4 always succeed; from +5 the rate drops 15% per level (minimum 10%)
