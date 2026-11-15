@@ -2040,7 +2040,21 @@ function proceedToNextStage() {
     }
 }
 
+// Leaving a battle needs two taps: the first arms it and shows a prompt, the second within 3 seconds confirms
+let combatReturnArmed = null;
+function combatReturnClick() {
+    if (combatReturnArmed) {
+        clearTimeout(combatReturnArmed);
+        combatReturnArmed = null;
+        returnToTown();
+        return;
+    }
+    showCombatText('#combat-return-btn', 'Tap again to leave', 'heal');
+    combatReturnArmed = setTimeout(() => { combatReturnArmed = null; }, 3000);
+}
+
 function returnToTown() {
+    if (combatReturnArmed) { clearTimeout(combatReturnArmed); combatReturnArmed = null; }
     stopCombatTimers(); combatRunId++;
     removeGuideSpotlight();
     combatPaused = false;
