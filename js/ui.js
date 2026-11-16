@@ -5960,14 +5960,17 @@ function wornCostumeTentSrc(pose) {
     return (set && set[pose]) || null;
 }
 function tentStandSrc() { return wornCostumeTentSrc('stand') || tentHeroSrc; }
+// Tent level 3 moves the sleep pose 20 px left and 20 px up (its bed is drawn a bit lower in that scene)
+const TENT_POSE_NUDGE = { 3: { sleep: { dx: -20, dy: -20 } } };
 function tentPoseLayout(el) {
     const P = TENT_POSES[tentPose];
     if (!P) return;
+    const nudge = (TENT_POSE_NUDGE[homeTentLevel()] || {})[tentPose] || { dx: 0, dy: 0 };
     setHeroSrc(el, wornCostumeTentSrc(tentPose) || P.src);
     el.style.width = P.w + 'px';
     el.style.height = P.h + 'px';
-    el.style.left = P.left + 'px';
-    el.style.top = P.top + 'px';
+    el.style.left = (P.left + nudge.dx) + 'px';
+    el.style.top = (P.top + nudge.dy) + 'px';
     el.style.maxWidth = 'none';
     el.style.maxHeight = 'none';
     el.style.animation = P.anim;
