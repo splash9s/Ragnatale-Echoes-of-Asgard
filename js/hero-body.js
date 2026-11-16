@@ -2392,13 +2392,13 @@ function heroBodyHeadX(pose, loadout) {
 // Each frame shares one canvas and feet point, so the poses line up with the gear-composed ones.
 const COSTUME_SETS = {
   christmas: {
-      attack: { src: 'assets/costume/christmas/attack_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 449.0 },
-      critical: { src: 'assets/costume/christmas/critical_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 503.0 },
-      base: { src: 'assets/costume/christmas/base_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 306.0 },
-      block: { src: 'assets/costume/christmas/block_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 448.5 },
-      attack02: { src: 'assets/costume/christmas/attack02_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 549.5 },
-      fall: { src: 'assets/costume/christmas/fall_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 263.5 },
-      critical02: { src: 'assets/costume/christmas/critical02_v2_q90.webp', w: 799, h: 399, fx: 347.0, fy: 399.0, tx: 466.0 },
+      attack: { src: 'assets/costume/christmas/attack_v3_q90.webp', w: 501, h: 386, fx: 177.0, fy: 386.0, tx: 279.0 },
+      critical: { src: 'assets/costume/christmas/critical_v3_q90.webp', w: 478, h: 367, fx: 167.0, fy: 367.0, tx: 323.0 },
+      base: { src: 'assets/costume/christmas/base_v3_q90.webp', w: 493, h: 399, fx: 347.0, fy: 399.0, tx: 306.0 },
+      block: { src: 'assets/costume/christmas/block_v3_q90.webp', w: 422, h: 356, fx: 153.0, fy: 356.0, tx: 254.5 },
+      attack02: { src: 'assets/costume/christmas/attack02_v3_q90.webp', w: 480, h: 378, fx: 28.0, fy: 378.0, tx: 230.5 },
+      fall: { src: 'assets/costume/christmas/fall_v3_q90.webp', w: 426, h: 287, fx: 337.0, fy: 287.0, tx: 253.5 },
+      critical02: { src: 'assets/costume/christmas/critical02_v3_q90.webp', w: 456, h: 355, fx: 132.0, fy: 355.0, tx: 251.0 },
   },
 };
 // The worn costume's frame for a pose, or null when no costume is worn (gear shows)
