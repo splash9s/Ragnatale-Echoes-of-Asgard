@@ -734,6 +734,9 @@ function finalStageMult(stage) {
 
 function spawnFinalStage() {
     const mult = finalStageMult(currentStage);
+    // The final boss stage gets a darker vignette (CSS: #combat-stage.final-stage)
+    const stageEl = document.getElementById('combat-stage');
+    if (stageEl) stageEl.classList.toggle('final-stage', currentStage === maxStages);
     if (currentStage === maxStages) {
         const boss = makeBoss(curveBoss(MONSTERS_DATA.bossWorldEater, 99)); // final boss: top of the level curve, then FINAL_BOSS_MULT
         const up = v => Math.floor(v * FINAL_BOSS_MULT);
@@ -816,6 +819,8 @@ function supportedElemMult(mult, m) {
 }
 
 function spawnStageMonsters() {
+    const stageEl = document.getElementById('combat-stage');
+    if (stageEl) stageEl.classList.remove('final-stage');
     // A new stage starts: fold the Max HP gained last stage into the carried bonus,
     // so later gains are a % of the Max HP at this stage's start
     player.mhpCarry = (player.mhpCarry || 1) * (1 + stageMaxHpAdd());
