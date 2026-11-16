@@ -1681,10 +1681,11 @@ function monsterTurnTick() {
     }
     updateUI();
 }
-// Battle speed (VIP only): 2x by default, 1x if the player picked it. Non-VIP always runs at 1x.
+// Battle speed: 1.2x by default for everyone. The VIP button cycles 1.2x -> 2x -> 1x -> 1.2x. Non-VIP always runs at the default.
+const DEFAULT_BATTLE_SPEED = 1.2;
 function combatSpeedMult() {
-    if (!isVipActive()) return 1;
-    return player.battleSpeed === 1 ? 1 : 2;
+    if (!isVipActive()) return DEFAULT_BATTLE_SPEED;
+    return player.battleSpeed || DEFAULT_BATTLE_SPEED;
 }
 // Starts the player's attack timer (ASPD) and the monsters' timer; stopCombatTimers clears both
 let combatTimerDerived = null;
@@ -1698,17 +1699,19 @@ function startCombatTimers(derived) {
 // The 1x / 2x button: VIP only. Switching during a battle restarts the timers at the new speed.
 function toggleBattleSpeed() {
     if (!isVipActive()) return;
-    player.battleSpeed = combatSpeedMult() === 2 ? 1 : 2;
+    const cur = combatSpeedMult();
+    const next = cur === DEFAULT_BATTLE_SPEED ? 2 : (cur === 2 ? 1 : DEFAULT_BATTLE_SPEED);
+    player.battleSpeed = next;
     updateSpeedButton();
     if (combatInterval !== null && combatTimerDerived) startCombatTimers(combatTimerDerived);
-    showCombatText('#combat-speed-btn', player.battleSpeed === 1 ? '1x' : '2x'); // default white bold float text
+    showCombatText('#combat-speed-btn', next + 'x'); // default white bold float text
 }
 function updateSpeedButton() {
     const btn = document.getElementById('combat-speed-btn');
     if (!btn) return;
     btn.classList.toggle('hidden', !isVipActive());
     const img = document.getElementById('combat-speed-img');
-    if (img) img.src = combatSpeedMult() === 2 ? 'assets/combat/speed/speed_2x_q85.webp' : 'assets/combat/speed/speed_1x_q85.webp';
+    if (img) img.src = combatSpeedMult() === 2 ? 'assets/combat/speed/speed_2x_q85.webp' : 'assets/combat/speed/speed_1x_q85.webp'; // 1.2x uses the 1x icon
 }
 function stopCombatTimers() {
     clearInterval(combatInterval); clearInterval(monsterInterval);
