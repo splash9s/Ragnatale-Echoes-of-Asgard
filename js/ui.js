@@ -6193,16 +6193,17 @@ function setSmithFrame(i) {
     const el = document.getElementById('town-smith');
     if (el) el.src = `assets/page01/smith/k${i}_q85.webp`;
 }
-const SMITH_SWINGS = 2; // the hammer comes down twice per swing cycle
-const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const SMITH_SWING_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9]; // one swing: raise, one hit, raise again
+const SMITH_HIT_FRAME = 6; // the hammer lands on the anvil here; the sound plays on this frame
 function playSmithSwing() {
     if (smithSwinging) return;
     smithSwinging = true;
-    playSfx(SFX.blacksmith, 0.5); // one sound per swing cycle, starts with the animation; half volume
-    const total = SMITH_SWING_FRAMES.length * SMITH_SWINGS;
+    const total = SMITH_SWING_FRAMES.length;
     for (let k = 0; k < total; k++) {
-        setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k % SMITH_SWING_FRAMES.length]), k * SMITH_FRAME_MS);
+        setTimeout(() => setSmithFrame(SMITH_SWING_FRAMES[k]), k * SMITH_FRAME_MS);
     }
+    const hitIndex = SMITH_SWING_FRAMES.indexOf(SMITH_HIT_FRAME);
+    setTimeout(() => playSfx(SFX.blacksmith, 0.5), hitIndex * SMITH_FRAME_MS); // one hit, one sound, in sync with the hammer
     setTimeout(() => { smithSwinging = false; setSmithFrame(SMITH_IDLE_FRAME); }, total * SMITH_FRAME_MS);
 }
 // Shopkeeper at the shop on the main page: idle sway; once a minute she plays her book-and-quill sequence
