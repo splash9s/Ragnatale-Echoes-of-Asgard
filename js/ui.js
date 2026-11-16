@@ -2571,17 +2571,73 @@ function buyArmoryItem(itemIndex) {
 }
 
 // VIP shop: the diamond shop items in inventory-size slots, price under each
+// VIP shop: menu (categories) on the left, item list in the middle, item detail on the right, Buy below
+// plate: which menu plate picture (0-5) belongs to the category (sheet order: gift, diamond, crown, armor, potion, paw)
+const VIP_CATS = [
+    { key: 'all', label: 'All', plate: 0, types: null },
+    { key: 'stone', label: 'Stones & Material', plate: 1, types: ['estone', 'bs_rune', 'material', 'copper'] },
+    { key: 'vip', label: 'VIP & Boost', plate: 2, types: ['vip', 'boost'] },
+    { key: 'box', label: 'Boxes & Bags', plate: 3, types: ['box', 'chest', 'bag'] },
+    { key: 'potion', label: 'Potions & Service', plate: 4, types: ['potion', 'resurrection', 'service', 'skill_reset'] },
+    { key: 'pet', label: 'Pets', plate: 5, types: ['pet'] },
+];
+let vipCat = 'all';
+let vipSelected = null;
+function vipItemsOf(cat) {
+    const c = VIP_CATS.find(x => x.key === cat) || VIP_CATS[0];
+    return DIAMOND_SHOP_ITEMS.filter(i => !c.types || c.types.includes(i.type));
+}
 function renderVipShop() {
-    const grid = document.getElementById('vip-grid');
-    if (!grid) return;
-    grid.innerHTML = DIAMOND_SHOP_ITEMS.map(item => `
-        <div class="vip-cell">
-            <button class="vip-slot" title="${escapeHtml(item.name)}" onclick="buyDiamondItem('${item.id}')">${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
-            <div class="vip-price">${item.price}</div>
-        </div>`).join('');
-    grid.scrollTop = 0;
+    renderVipMenu();
+    renderVipList();
+    renderVipDetail();
     const bal = document.getElementById('vip-diamonds');
     if (bal) bal.innerText = player.diamonds;
+}
+function renderVipMenu() {
+    const m = document.getElementById('vip-menu');
+    if (!m) return;
+    m.innerHTML = VIP_CATS.map(c => `
+        <button class="vip-menu-btn${c.key === vipCat ? ' sel' : ''}" title="${escapeHtml(c.label)}" onclick="vipSetCat('${c.key}')">
+            <img class="vm-normal" src="assets/diamond/vip/ui/menu${c.plate}_n_q85.webp" alt="">
+            <img class="vm-press" src="assets/diamond/vip/ui/menu${c.plate}_p_q85.webp" alt="">
+        </button>`).join('');
+}
+function renderVipList() {
+    const grid = document.getElementById('vip-grid');
+    if (!grid) return;
+    const keepScroll = grid.scrollTop;
+    grid.innerHTML = vipItemsOf(vipCat).map(item => `
+        <div class="vip-cell">
+            <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
+            <div class="vip-price">${item.price}</div>
+        </div>`).join('');
+    grid.scrollTop = keepScroll;
+}
+function renderVipDetail() {
+    const d = document.getElementById('vip-detail');
+    if (!d) return;
+    const item = DIAMOND_SHOP_ITEMS.find(i => i.id === vipSelected);
+    d.innerHTML = item
+        ? `<div class="vd-icon">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</div>
+           <div class="vd-name">${escapeHtml(item.name)}</div>
+           <div class="vd-desc">${escapeHtml(item.desc)}</div>
+           <div class="vd-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt="">${item.price}</div>`
+        : '<p class="vd-empty">Select an item</p>';
+}
+function vipSetCat(key) {
+    vipCat = key;
+    renderVipMenu();
+    renderVipList();
+}
+function vipSelect(id) {
+    vipSelected = id;
+    renderVipList();
+    renderVipDetail();
+}
+function vipBuySelected() {
+    if (!vipSelected) return;
+    buyDiamondItem(vipSelected);
 }
 
 // VIP shop button: the nine shine frames play once every 5 seconds (frame 1 is the base button)
