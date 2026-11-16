@@ -1086,7 +1086,7 @@ function syncPagePetSprites(spec) {
     if (house) {
         // Pet house: 156px wide (about 20% bigger than the first size, aspect kept), floor just under the pet's feet, behind the pet. Always shown on the main page.
         house.style.display = '';
-        const hw = 156, hh = Math.round(hw * 271 / 300); // new pet house art: 300x271
+        const hw = 156, hh = Math.round(hw * HOME_PET_RATIO[homePetHouseLevel()]); // each pet house level has its own height (300 px wide art)
         house.style.left = (TOWN_DUMMY_FEET.left - hw / 2 + 35) + 'px'; // 35px right of the pet spot
         house.style.top = (TOWN_DUMMY_FEET.top + 4 - hh - 25) + 'px'; // 25px up (5px down from the last spot)
     }
@@ -5233,6 +5233,7 @@ function renderElementStats() {
 }
 
 function updateUI() {
+    if (typeof applyHomeArt === 'function') applyHomeArt(); // tent and pet house levels show on screen
     if (typeof renderCreateStats === 'function') renderCreateStats(); // character select stat window
     syncHeroSprites();
     if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
@@ -7083,4 +7084,99 @@ function toggleRefZoom(src) {
 function closeRefZoom() {
     const z = document.getElementById('puzzle-ref-zoom');
     if (z) z.remove();
+}
+
+
+// ---- Home management (tent button): upgrade the tent and the pet house with gold ----
+const HOME_TENT_ART = {
+    1: { off: 'assets/pages/character/tent/tent_off_q85.webp', left: 'assets/pages/character/bg_q85.webp', right: 'assets/pages/character/tent/tent_right_q85.webp', both: 'assets/pages/character/tent/tent_both_q85.webp' },
+    2: { off: 'assets/pages/character/tent/v2/off_q85.webp', left: 'assets/pages/character/tent/v2/left_q85.webp', right: 'assets/pages/character/tent/v2/right_q85.webp', both: 'assets/pages/character/tent/v2/both_q85.webp' },
+    3: { off: 'assets/pages/character/tent/v3/off_q85.webp', left: 'assets/pages/character/tent/v3/left_q85.webp', right: 'assets/pages/character/tent/v3/right_q85.webp', both: 'assets/pages/character/tent/v3/both_q85.webp' }
+};
+const HOME_TENT_COST = { 2: 20000, 3: 100000 };     // gold to reach each tent level
+const HOME_PET_ART = { 1: 'assets/town/pethouse_q85.webp', 2: 'assets/town/pethouse2_q85.webp', 3: 'assets/town/pethouse3_q85.webp' };
+const HOME_PET_RATIO = { 1: 271 / 300, 2: 265 / 300, 3: 261 / 300 };
+const HOME_PET_COST = { 2: 10000, 3: 30000 };       // gold to reach each pet house level
+function homeTentLevel() { return Math.min(3, Math.max(1, (player && player.tentLevel) || 1)); }
+function homePetHouseLevel() { return Math.min(3, Math.max(1, (player && player.petHouseLevel) || 1)); }
+// Puts the current tent and pet house art on screen (only changes an image when its file differs)
+function applyHomeArt() {
+    if (typeof player === 'undefined' || !player) return;
+    const t = HOME_TENT_ART[homeTentLevel()];
+    const setSrc = (id, src) => { const el = document.getElementById(id); if (el && el.getAttribute('src') !== src) el.setAttribute('src', src); };
+    setSrc('tent-left', t.left); setSrc('tent-right', t.right); setSrc('tent-both', t.both);
+    const off = document.querySelector('#view-character .ts-bg');
+    if (off && off.getAttribute('src') !== t.off) off.setAttribute('src', t.off);
+    setSrc('town-pet-house', HOME_PET_ART[homePetHouseLevel()]);
+}
+function homeStyles() {
+    if (document.getElementById('home-panel-style')) return;
+    const st = document.createElement('style');
+    st.id = 'home-panel-style';
+    st.textContent = '#home-panel { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(var(--ps, 1)); z-index: 290; width: 640px; box-sizing: border-box; padding: 18px; background: #0f172a; border: 2px solid #b8945a; border-radius: 14px; color: #e9edf5; font-family: inherit; }'
+        + ' #home-panel h3 { margin: 0; color: #fbbf24; font-size: 30px; font-weight: 900; }'
+        + ' #home-panel .hm-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }'
+        + ' #home-panel .hm-x { background: #1e293b; border: 1px solid #334155; color: #e9edf5; border-radius: 8px; width: 44px; height: 44px; font-size: 20px; cursor: pointer; }'
+        + ' #home-panel .hm-gold { color: #fde68a; font-weight: 800; font-size: 18px; margin: 6px 0 10px; }'
+        + ' #home-panel .hm-card { border: 2px solid #26344f; background: #0b1322; border-radius: 12px; padding: 12px; margin-bottom: 10px; }'
+        + ' #home-panel .hm-card h4 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }'
+        + ' #home-panel .hm-card p { margin: 0 0 8px; color: #9aa6bd; font-size: 16px; }'
+        + ' #home-panel .hm-btn { width: 100%; padding: 10px; border-radius: 10px; border: 0; background: #b45309; color: #fff8e7; font-weight: 800; font-size: 18px; cursor: pointer; }'
+        + ' #home-panel .hm-btn:disabled { opacity: .45; cursor: default; }';
+    document.head.appendChild(st);
+}
+function openHomePanel() {
+    if (friendTentVisiting()) return;
+    homeStyles();
+    let box = document.getElementById('home-panel');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'home-panel';
+        box.setAttribute('data-drag-panel', '');
+        box.style.left = (window.innerWidth / 2) + 'px';
+        box.style.top = (window.innerHeight / 2) + 'px';
+        document.body.appendChild(box);
+        box.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
+    }
+    renderHomePanel();
+}
+function closeHomePanel() {
+    const box = document.getElementById('home-panel');
+    if (box) box.remove();
+}
+function homeCard(kind, title, level, costs, curName) {
+    const next = level + 1;
+    const max = level >= 3;
+    const cost = max ? 0 : costs[next];
+    const btn = max
+        ? `<button class="hm-btn" disabled>Max level</button>`
+        : `<button class="hm-btn" onclick="homeUpgrade('${kind}')" ${player.gold < cost ? 'disabled' : ''}>Upgrade to Lv. ${next} · ${cost.toLocaleString()} gold</button>`;
+    return `<div class="hm-card"><h4>${title}</h4><p>Current: Lv. ${level} (${curName})</p>${btn}</div>`;
+}
+function renderHomePanel() {
+    const box = document.getElementById('home-panel');
+    if (!box || typeof player === 'undefined') return;
+    const tentLv = homeTentLevel(), houseLv = homePetHouseLevel();
+    box.innerHTML = `<div class="hm-head"><h3>Home</h3><button class="hm-x" onclick="closeHomePanel()">✕</button></div>
+        <div class="hm-gold">Gold: ${Number(player.gold || 0).toLocaleString()}</div>`
+        + homeCard('tent', 'Tent', tentLv, HOME_TENT_COST, ['', 'Basic', 'Improved', 'Grand'][tentLv])
+        + homeCard('pet', 'Pet House', houseLv, HOME_PET_COST, ['', 'Basic', 'Cozy', 'Royal'][houseLv]);
+}
+function homeUpgrade(kind) {
+    if (typeof player === 'undefined' || !player) return;
+    const lv = kind === 'tent' ? homeTentLevel() : homePetHouseLevel();
+    if (lv >= 3) return;
+    const next = lv + 1;
+    const cost = kind === 'tent' ? HOME_TENT_COST[next] : HOME_PET_COST[next];
+    const name = kind === 'tent' ? 'Tent' : 'Pet House';
+    if (player.gold < cost) { showFloatNotice('Not enough gold.'); return; }
+    confirmAction('Upgrade ' + name, `Upgrade ${name} to Lv. ${next} for ${cost.toLocaleString()} gold?`, () => {
+        if (player.gold < cost) { showFloatNotice('Not enough gold.'); return; }
+        player.gold -= cost;
+        if (kind === 'tent') player.tentLevel = next; else player.petHouseLevel = next;
+        applyHomeArt();
+        updateUI();
+        if (typeof saveGame === 'function') saveGame();
+        renderHomePanel();
+    });
 }
