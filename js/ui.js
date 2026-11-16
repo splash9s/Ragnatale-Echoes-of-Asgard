@@ -3491,7 +3491,7 @@ const ITEM_ICON_RULES = [
 // Chest icon (small chest art) for a chest type: 'copper', 'silver' or 'gold'
 function chestIconHTML(chestType, size = 64) {
     const t = ['copper', 'silver', 'gold', 'costume', 'pet'].includes(chestType) ? chestType : 'copper';
-    const file = (t === 'costume' || t === 'pet') ? `${t}icon_q85.webp` : `${t}csmall_q85.webp`; // costume and pet have their own item icons
+    const file = (t === 'costume' || t === 'pet') ? `${t}icon_q85.webp?v=${CHEST_ART_VER}` : `${t}csmall_q85.webp`; // costume and pet have their own item icons
     return `<img src="assets/chest/${t}/${file}" alt="${t} chest" style="width:${size}px;height:${Math.round(size * 0.8)}px;object-fit:contain;" />`;
 }
 function itemIconHTML(item, size = 70) {
@@ -5063,13 +5063,15 @@ function openChest(chestType) {
 }
 
 // Chest opening animation for copper, silver and gold (total 3.0 s each). Frame 2 holds with a shake; the final frame gets a light burst.
+// Chest art version: bump when the chest pictures are re-cut so browsers do not show old frames
+const CHEST_ART_VER = '20261116b';
 function chestFrames(type) {
     return [
-        { src: `assets/chest/${type}/${type}c0_q85.webp`, ms: 500 },
-        { src: `assets/chest/${type}/${type}c1_q85.webp`, ms: 1000, shake: true },
-        { src: `assets/chest/${type}/${type}c2_q85.webp`, ms: 400 },
-        { src: `assets/chest/${type}/${type}c3_q85.webp`, ms: 400 },
-        { src: `assets/chest/${type}/${type}c4_q85.webp`, ms: 700, burst: true }
+        { src: `assets/chest/${type}/${type}c0_q85.webp?v=${CHEST_ART_VER}`, ms: 500 },
+        { src: `assets/chest/${type}/${type}c1_q85.webp?v=${CHEST_ART_VER}`, ms: 1000, shake: true },
+        { src: `assets/chest/${type}/${type}c2_q85.webp?v=${CHEST_ART_VER}`, ms: 400 },
+        { src: `assets/chest/${type}/${type}c3_q85.webp?v=${CHEST_ART_VER}`, ms: 400 },
+        { src: `assets/chest/${type}/${type}c4_q85.webp?v=${CHEST_ART_VER}`, ms: 700, burst: true }
     ];
 }
 const CHEST_OPEN_FRAMES = { copper: chestFrames('copper'), silver: chestFrames('silver'), gold: chestFrames('gold'), costume: chestFrames('costume'), pet: chestFrames('pet') };
