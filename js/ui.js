@@ -1947,7 +1947,7 @@ function switchView(viewName) {
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
     // The Diamond Cash Shop is a tab on the Shop page now
     if (viewName === 'diamond') {
-        currentShopTab = 'diamond';
+        currentShopTab = 'shop';
         viewName = 'shop';
     }
     let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market', 'view-vip'];
@@ -2226,7 +2226,7 @@ function dailyFreeCardHTML(key) {
 }
 
 // ---------- SHOP PAGE TABS (Diamond default, Shop second) ----------
-let currentShopTab = 'diamond';
+let currentShopTab = 'shop'; // the Diamond tab is removed from the shop page
 
 function isFreeGoldAvailable() { return !isDailyFreeClaimed('gold'); }
 function isFreeDiamondAvailable() { return !isDailyFreeClaimed('diamond'); }
@@ -2267,9 +2267,9 @@ function updateShopTabButtons() {
 }
 
 function switchShopTab(tabName) {
-    if (tabName !== 'diamond' && tabName !== 'shop') tabName = 'diamond';
+    tabName = 'shop'; // only the Shop tab is left on the shop page
     currentShopTab = tabName;
-    const isDiamond = tabName === 'diamond';
+    const isDiamond = false;
     document.getElementById('shop-diamond-section')?.classList.toggle('hidden', !isDiamond);
     document.getElementById('shop-gold-section')?.classList.toggle('hidden', isDiamond);
     // The gear shop (right window) always shows
@@ -2609,7 +2609,7 @@ function renderVipList() {
     const keepScroll = grid.scrollTop;
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
         <div class="vip-cell">
-            <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
+            <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
             <div class="vip-price">${item.price}</div>
         </div>`).join('');
     grid.scrollTop = keepScroll;
