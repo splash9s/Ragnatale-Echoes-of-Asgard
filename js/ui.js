@@ -725,6 +725,7 @@ function monsterSpriteOf(m) { return MONSTER_SPRITES[m.id] || null; }
 function monsterDeathFrames(m) { const s = monsterSpriteOf(m); return s ? s.dead : COMBAT_SLIME_DEATH_FRAMES; }
 // Bosses (and mini-bosses) stay on screen BOSS_DEATH_STAY_MS after they fall: first the damaged pose, then the death frames.
 const BOSS_DEATH_STAY_MS = 3000;
+const FINAL_BOSS_DEATH_STAY_MS = 6000; // the final boss falls more slowly
 const BOSS_HURT_MS = 600;
 function monsterIsBoss(m) { return !!(m && (m.isBoss || m.isMiniBoss)); }
 // Only full bosses get the slow-motion death (mini-bosses play the normal death speed, no fade)
@@ -732,7 +733,10 @@ function monsterIsSlowDeath(m) { return !!(m && m.isBoss); }
 function monsterDeathHurtMs(m) { return monsterIsBoss(m) && monsterHurtFrames(m).length ? BOSS_HURT_MS : 0; }
 function monsterDeathMs(m) {
     const s = monsterSpriteOf(m);
-    if (monsterIsSlowDeath(m)) return Math.round((BOSS_DEATH_STAY_MS - monsterDeathHurtMs(m)) / Math.max(1, monsterDeathFrames(m).length));
+    if (monsterIsSlowDeath(m)) {
+        const stay = m.isFinalBoss ? FINAL_BOSS_DEATH_STAY_MS : BOSS_DEATH_STAY_MS;
+        return Math.round((stay - monsterDeathHurtMs(m)) / Math.max(1, monsterDeathFrames(m).length));
+    }
     return s ? s.deathMs : COMBAT_DEATH_FRAME_MS;
 }
 function monsterDeathTotalMs(m) { return monsterDeathHurtMs(m) + monsterDeathFrames(m).length * monsterDeathMs(m); }
