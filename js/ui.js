@@ -3490,7 +3490,8 @@ const ITEM_ICON_RULES = [
 // Chest icon (small chest art) for a chest type: 'copper', 'silver' or 'gold'
 function chestIconHTML(chestType, size = 64) {
     const t = ['copper', 'silver', 'gold', 'costume', 'pet'].includes(chestType) ? chestType : 'copper';
-    return `<img src="assets/chest/${t}/${t}csmall_q85.webp" alt="${t} chest" style="width:${size}px;height:${Math.round(size * 0.8)}px;object-fit:contain;" />`;
+    const file = (t === 'costume' || t === 'pet') ? `${t}icon_q85.webp` : `${t}csmall_q85.webp`; // costume and pet have their own item icons
+    return `<img src="assets/chest/${t}/${file}" alt="${t} chest" style="width:${size}px;height:${Math.round(size * 0.8)}px;object-fit:contain;" />`;
 }
 function itemIconHTML(item, size = 70) {
     const rule = item && item.name ? ITEM_ICON_RULES.find(r => r[0].test(item.name)) : null;
