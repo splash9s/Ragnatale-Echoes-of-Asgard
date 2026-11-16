@@ -1088,7 +1088,7 @@ function syncPagePetSprites(spec) {
     if (house) {
         // Pet house: 156px wide (about 20% bigger than the first size, aspect kept), floor just under the pet's feet, behind the pet. Always shown on the main page.
         house.style.display = '';
-        const hw = 156, hh = Math.round(hw * 195 / 260);
+        const hw = 156, hh = Math.round(hw * 271 / 300); // new pet house art: 300x271
         house.style.left = (TOWN_DUMMY_FEET.left - hw / 2 + 35) + 'px'; // 35px right of the pet spot
         house.style.top = (TOWN_DUMMY_FEET.top + 4 - hh - 25) + 'px'; // 25px up (5px down from the last spot)
     }
