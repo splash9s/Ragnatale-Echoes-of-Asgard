@@ -5061,7 +5061,7 @@ function openChest(chestType) {
 
 // Chest opening animation for copper, silver and gold (total 3.0 s each). Frame 2 holds with a shake; the final frame gets a light burst.
 // Chest art version: bump when the chest pictures are re-cut so browsers do not show old frames
-const CHEST_ART_VER = '20261116b';
+const CHEST_ART_VER = '20261116c';
 function chestFrames(type) {
     return [
         { src: `assets/chest/${type}/${type}c0_q85.webp?v=${CHEST_ART_VER}`, ms: 500 },
@@ -6949,7 +6949,7 @@ function renderPuzzlePanel() {
             const list = PUZZLES[puzzleKeyOf(c.name)] || [];
             // A pet whose puzzle was solved today (its daily friendship reward is used) gets a check mark
             const doneToday = !!(c.item && c.item.lastPuzzleDay === petDayKey());
-            const mark = doneToday ? `<b class="pz-done" style="color:#4ade80; font-size:26px; font-weight:900; white-space:nowrap;">&#10004; Done today</b>` : '';
+            const mark = doneToday ? `<b class="pz-done" style="color:#4ade80; font-size:26px; font-weight:900; white-space:nowrap;">&#10004;</b>` : '';
             return `<button class="pz-row" onclick="puzzleOpenPet(${i})"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""><span class="pz-name">${petEsc(c.name)}</span>${mark}<small>${list.length ? list.length + ' puzzle' + (list.length > 1 ? 's' : '') : 'No puzzles yet'}</small></button>`;
         }).join('');
         body = `<p class="pz-sub">Choose a pet</p><div class="pz-list">${rows || '<p class="pz-sub">You have no pets yet.</p>'}</div>`;
