@@ -20,7 +20,8 @@ function guideUpCharPage() { return guideViewVisible('view-character'); }
 function guideUpStatsHidden() { return !!document.getElementById('view-character')?.classList.contains('stats-hidden'); }
 function guideUpSkillsOpen() { return guideViewVisible('view-skills'); }
 function guideUpNeedStat() { return (player.statPoints || 0) > 0 && !guideFlag('upStatUp'); }
-function guideUpNeedSkill() { return (player.jobSp || 0) > 0 && !guideFlag('upSkUp'); }
+// Skill points still to spend: points not yet put into a pending skill
+function guideUpNeedSkill() { return ((player.jobSp || 0) - (typeof pendingSkillTotal === 'function' ? pendingSkillTotal() : 0)) > 0 && !guideFlag('upSkUp'); }
 function guideUpStatBtn() { return document.querySelector('#view-character .char-stats-panel button[onclick^="addStat("]:not([disabled])'); }
 function guideUpSkillBtn() { return document.querySelector('#view-skills button[onclick^="upgradeSkill("]:not([disabled])'); }
 function guideUpPendingSkills() { return Object.values(pendingAlloc.skills || {}).reduce((a, b) => a + b, 0); }
@@ -57,8 +58,9 @@ const GUIDE_UPGRADE_STEPS = [
         targets: () => [guideUpSkillBtn()]
     },
     {
+        // Also when no skill can take a point (all locked or maxed): the guide must not stall on the skills page
         text: 'Tap the return button to leave the skills',
-        visible: () => guideUpSkillsOpen() && !guideUpNeedSkill(),
+        visible: () => guideUpSkillsOpen() && (!guideUpNeedSkill() || !guideUpSkillBtn()),
         targets: () => [document.querySelector('#view-skills .char-return')]
     }
 ];
