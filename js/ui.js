@@ -98,7 +98,8 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'dchest_copper', name: "Copper Chest", price: 10, type: 'chest', chestType: 'copper', desc: "", icon: 'assets/shop/diamond/copperchest.png' },
     { id: 'dchest_silver', name: "Silver Chest", price: 30, type: 'chest', chestType: 'silver', desc: "", icon: 'assets/shop/diamond/silverchest.png' },
-    { id: 'dchest_gold', name: "Gold Chest", price: 50, type: 'chest', chestType: 'gold', desc: "", icon: 'assets/shop/diamond/goldchest.png' }
+    { id: 'dchest_gold', name: "Gold Chest", price: 50, type: 'chest', chestType: 'gold', desc: "", icon: 'assets/shop/diamond/goldchest.png' },
+    { id: 'dchest_costume', name: "Costume Chest", price: 500, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
 
