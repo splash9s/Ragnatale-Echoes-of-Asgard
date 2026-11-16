@@ -987,8 +987,8 @@
         .heavy-vignette { position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, .9) 100%); }
         .crit-fx-layer.heavy-on .heavy-vignette { animation: heavyVignette .6s ease-out; }
         @keyframes heavyVignette { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
-        #combat-stage.heavy-shake { animation: heavyShake .45s linear; }
-        @keyframes heavyShake { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-6px, 4px); } 20% { transform: translate(5px, -5px); } 30% { transform: translate(-5px, -3px); } 40% { transform: translate(4px, 3px); } 50% { transform: translate(-3px, 2px); } 60% { transform: translate(2px, -2px); } 70% { transform: translate(-2px, 1px); } 80% { transform: translate(1px, 0); } 90% { transform: translate(0, 0); } }
+        #combat-stage.heavy-shake { animation: heavyShake .7s linear; }
+        @keyframes heavyShake { 0%, 100% { transform: translate(0, 0); } 8% { transform: translate(-14px, 8px) rotate(-0.4deg); } 16% { transform: translate(13px, -12px) rotate(0.4deg); } 24% { transform: translate(-12px, -6px); } 32% { transform: translate(11px, 9px) rotate(-0.3deg); } 40% { transform: translate(-9px, 5px); } 50% { transform: translate(8px, -7px); } 60% { transform: translate(-6px, 4px); } 72% { transform: translate(4px, -3px); } 84% { transform: translate(-2px, 1px); } }
         /* Black vignette over the whole combat scene (below monsters and panels, below the critical light) */
         .combat-vignette { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; z-index: 3; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, .92) 100%); }
         /* Critical slash light: a soft light source that lights up the scene around the monster */
@@ -1981,9 +1981,9 @@
     <script src="js/cloud.js?v=20261116a"></script>
     <script src="js/hero-art.js?v=20261112c"></script>
     <script src="js/hero-body.js?v=20261115aj"></script>
-    <script src="js/combat.js?v=20261116f"></script>
+    <script src="js/combat.js?v=20261116g"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116zi"></script>
+    <script src="js/ui.js?v=20261116zj"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
