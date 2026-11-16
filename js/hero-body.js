@@ -2338,6 +2338,8 @@ function heroBodyFeet(ctx, W, H) {
 const heroBodyCache = {};
 // A composed frame { src, w, h, fx, fy } for a pose and gear set, or null while its art is still loading
 function heroBodyFrame(pose, loadout) {
+    const costume = heroCostumeFrame(pose); // a worn costume overrides every gear-composed pose
+    if (costume) return costume;
     loadout = loadout || heroBodyLoadout();
     const key = pose + '|' + HERO_BODY_SLOTS.map(s => loadout[s] || '-').join(',');
     if (heroBodyCache[key]) return heroBodyCache[key];
@@ -2386,6 +2388,26 @@ function heroBodyHeadX(pose, loadout) {
     return head.x + img.naturalWidth * (head.sc || 1) / 2 - minX;
 }
 
+// Costume sets: a full set of battle poses that replaces the gear-composed hero while the costume is worn.
+// Each frame shares one canvas and feet point, so the poses line up with the gear-composed ones.
+const COSTUME_SETS = {
+  christmas: {
+      attack: { src: 'assets/costume/christmas/attack_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 444.4 },
+      critical: { src: 'assets/costume/christmas/critical_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 507.9 },
+      base: { src: 'assets/costume/christmas/base_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 308.5 },
+      block: { src: 'assets/costume/christmas/block_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 447.0 },
+      attack02: { src: 'assets/costume/christmas/attack02_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 552.5 },
+      fall: { src: 'assets/costume/christmas/fall_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 266.0 },
+      critical02: { src: 'assets/costume/christmas/critical02_q90.webp', w: 804, h: 407, fx: 350.0, fy: 407.0, tx: 466.5 },
+  },
+};
+// The worn costume's frame for a pose, or null when no costume is worn (gear shows)
+function heroCostumeFrame(pose) {
+    const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
+    if (!c || !c.costumeId) return null;
+    const set = COSTUME_SETS[c.costumeId];
+    return (set && set[pose]) || null;
+}
 // The battle hero's frames for the current gear. Dodge shows the block frame with the lunge back.
 // An attack shows attack then attack02; a critical shows critical then critical02. A defeat shows the fall (dead) pose.
 function combatPose() {
