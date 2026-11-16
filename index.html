@@ -205,6 +205,26 @@
 .campaign-btn:active .cb-press { display: block; }
 #campaign-panel .campaign-btn .cb-label, .art-dark .expo-panel .campaign-btn .cb-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: #ffffff !important; text-shadow: 0 1px 2px #000; pointer-events: none; white-space: nowrap; }
 .campaign-btn:hover .cb-normal { filter: brightness(1.12); }
+        /* VIP shop layout: menu (left), item list (centre), item detail (right), buy */
+        #vip-menu .vip-menu-btn { position: relative; width: 165px; height: 117px; padding: 0; border: 0; background: none; cursor: pointer; color: #e9edf5; font: 800 22px 'Roboto', 'Noto Sans Thai', sans-serif; }
+        #vip-menu .vip-menu-btn img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+        #vip-menu .vip-menu-btn .vm-press { display: none; }
+        #vip-menu .vip-menu-btn:active .vm-normal, #vip-menu .vip-menu-btn.sel .vm-normal { display: none; }
+        #vip-menu .vip-menu-btn:active .vm-press, #vip-menu .vip-menu-btn.sel .vm-press { display: block; }
+        #vip-menu .vip-menu-btn span { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-shadow: 0 2px 4px #000; pointer-events: none; }
+        #vip-menu .vip-menu-btn.sel span { color: #fde68a; }
+        .vip-glow { position: absolute; left: 50%; top: 44%; width: 118px; height: 118px; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(250,204,21,1) 0%, rgba(250,204,21,.55) 35%, rgba(250,204,21,0) 68%); pointer-events: none; z-index: 0; }
+        .vip-slot img { z-index: 1; }
+        .vip-slot.selected { box-shadow: inset 0 0 0 3px #facc15, 0 0 14px 3px rgba(250,204,21,.8); }
+        .vip-buy .vb-press { display: none; }
+        .vip-buy:active .vb-normal { display: none; }
+        .vip-buy:active .vb-press { display: block; }
+        #vip-detail .vd-empty { margin: auto; color: #9aa6bd; font-size: 26px; }
+        #vip-detail .vd-icon img { width: 150px; height: 150px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(250,204,21,.6)); }
+        #vip-detail .vd-name { font-size: 32px; font-weight: 900; color: #facc15; }
+        #vip-detail .vd-desc { font-size: 22px; line-height: 1.4; color: #cbd5e1; }
+        #vip-detail .vd-price { display: flex; align-items: center; gap: 8px; font-size: 36px; font-weight: 900; color: #7dd3fc; }
+        #vip-detail .vd-price img { width: 32px; height: 32px; }
 </style>
     <style>
         .town-stage { position: relative; width: 100%; overflow: hidden; }
@@ -1480,7 +1500,10 @@
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <img class="art-frame" src="assets/diamond/vip/vip_window_q85.webp" alt="" style="left:0; top:0; width:1920px; height:1080px;">
-                    <div id="vip-grid" style="position:absolute; z-index:3; left:150px; top:265px; width:1620px; height:750px; box-sizing:border-box; padding:24px 40px; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill, 128px); justify-content:center; gap:34px 28px; align-content:start;"></div>
+                    <div id="vip-menu" style="position:absolute; z-index:3; left:149px; top:255px; width:214px; height:701px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between; align-items:center;"></div>
+                    <div id="vip-grid" style="position:absolute; z-index:3; left:392px; top:255px; width:918px; height:706px; box-sizing:border-box; padding:12px 14px; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,128px); gap:16px 14px; justify-content:start; align-content:start;"></div>
+                    <div id="vip-detail" style="position:absolute; z-index:3; left:1353px; top:303px; width:385px; height:588px; box-sizing:border-box; padding:24px 26px; display:flex; flex-direction:column; align-items:center; gap:14px; color:#e9edf5; font-family:'Roboto','Noto Sans Thai',sans-serif; text-align:center; overflow-y:auto;"></div>
+                    <button id="vip-buy" class="vip-buy" onclick="vipBuySelected()" style="position:absolute; z-index:3; left:1357px; top:891px; width:377px; height:97px; padding:0; border:0; background:none; cursor:pointer;"><img class="vb-normal" src="assets/diamond/vip/ui/buy_q85.webp" alt="Buy" style="width:100%; height:100%; display:block;"><img class="vb-press" src="assets/diamond/vip/ui/buy_press_q85.webp" alt="" style="width:100%; height:100%; display:none;"></button>
                 </div>
             </div>
         </div>
@@ -1983,7 +2006,7 @@
     <script src="js/hero-body.js?v=20261115aj"></script>
     <script src="js/combat.js?v=20261116g"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
-    <script src="js/ui.js?v=20261116zk"></script>
+    <script src="js/ui.js?v=20261116zo"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261113e"></script>
