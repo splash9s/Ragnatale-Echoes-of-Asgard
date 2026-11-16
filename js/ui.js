@@ -3489,7 +3489,7 @@ const ITEM_ICON_RULES = [
 ];
 // Chest icon (small chest art) for a chest type: 'copper', 'silver' or 'gold'
 function chestIconHTML(chestType, size = 64) {
-    const t = ['copper', 'silver', 'gold'].includes(chestType) ? chestType : 'copper';
+    const t = ['copper', 'silver', 'gold', 'costume', 'pet'].includes(chestType) ? chestType : 'copper';
     return `<img src="assets/chest/${t}/${t}csmall_q85.webp" alt="${t} chest" style="width:${size}px;height:${Math.round(size * 0.8)}px;object-fit:contain;" />`;
 }
 function itemIconHTML(item, size = 70) {
@@ -5060,7 +5060,7 @@ function chestFrames(type) {
         { src: `assets/chest/${type}/${type}c4_q85.webp`, ms: 700, burst: true }
     ];
 }
-const CHEST_OPEN_FRAMES = { copper: chestFrames('copper'), silver: chestFrames('silver'), gold: chestFrames('gold') };
+const CHEST_OPEN_FRAMES = { copper: chestFrames('copper'), silver: chestFrames('silver'), gold: chestFrames('gold'), costume: chestFrames('costume'), pet: chestFrames('pet') };
 function playChestOpen(chestType, onDone) {
     const frames = CHEST_OPEN_FRAMES[chestType] || CHEST_OPEN_FRAMES.copper;
     const overlay = document.createElement('div');
@@ -5084,7 +5084,7 @@ function playChestOpen(chestType, onDone) {
         audio.addEventListener('ended', markSoundDone);
         audio.addEventListener('error', markSoundDone);
         setTimeout(markSoundDone, 10000); // safety: never leave the overlay stuck
-    }, chestType === 'copper' ? 1000 : 1500); // silver and gold start 0.5 s later
+    }, chestType === 'copper' ? 1000 : 1500); // silver, gold, costume and pet start 0.5 s later
     let i = 0;
     const showFrame = () => {
         const f = frames[i];
