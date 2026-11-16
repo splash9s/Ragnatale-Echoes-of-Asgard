@@ -7141,17 +7141,35 @@ function openHomePanel() {
     renderHomePanel();
 }
 function closeHomePanel() {
+    homePending = null;
     const box = document.getElementById('home-panel');
     if (box) box.remove();
 }
+// The kind of upgrade waiting for a yes/no inside the panel ('tent' or 'pet'), or null
+let homePending = null;
 function homeCard(kind, title, level, costs, curName) {
     const next = level + 1;
     const max = level >= 3;
     const cost = max ? 0 : costs[next];
-    const btn = max
-        ? `<button class="hm-btn" disabled>Max level</button>`
-        : `<button class="hm-btn" onclick="homeUpgrade('${kind}')" ${player.gold < cost ? 'disabled' : ''}>Upgrade to Lv. ${next} · ${cost.toLocaleString()} gold</button>`;
+    let btn;
+    if (max) {
+        btn = `<button class="hm-btn" disabled>Max level</button>`;
+    } else if (homePending === kind) {
+        const ok = player.gold >= cost;
+        btn = `<p>Upgrade to Lv. ${next} for ${cost.toLocaleString()} gold?</p>`
+            + `<div style="display:flex; gap:8px;"><button class="hm-btn" style="background:#1e293b; color:#e9edf5;" onclick="homeCancel()">Cancel</button>`
+            + `<button class="hm-btn" onclick="homeConfirm('${kind}')" ${ok ? '' : 'disabled'}>${ok ? 'Confirm' : 'Not enough gold'}</button></div>`;
+    } else {
+        btn = `<button class="hm-btn" onclick="homeAsk('${kind}')" ${player.gold < cost ? 'disabled' : ''}>Upgrade to Lv. ${next} · ${cost.toLocaleString()} gold</button>`;
+    }
     return `<div class="hm-card"><h4>${title}</h4><p>Current: Lv. ${level} (${curName})</p>${btn}</div>`;
+}
+function homeAsk(kind) { homePending = kind; renderHomePanel(); }
+function homeCancel() { homePending = null; renderHomePanel(); }
+function homeConfirm(kind) {
+    homeUpgrade(kind);
+    homePending = null;
+    renderHomePanel();
 }
 function renderHomePanel() {
     const box = document.getElementById('home-panel');
@@ -7168,15 +7186,10 @@ function homeUpgrade(kind) {
     if (lv >= 3) return;
     const next = lv + 1;
     const cost = kind === 'tent' ? HOME_TENT_COST[next] : HOME_PET_COST[next];
-    const name = kind === 'tent' ? 'Tent' : 'Pet House';
     if (player.gold < cost) { showFloatNotice('Not enough gold.'); return; }
-    confirmAction('Upgrade ' + name, `Upgrade ${name} to Lv. ${next} for ${cost.toLocaleString()} gold?`, () => {
-        if (player.gold < cost) { showFloatNotice('Not enough gold.'); return; }
-        player.gold -= cost;
-        if (kind === 'tent') player.tentLevel = next; else player.petHouseLevel = next;
-        applyHomeArt();
-        updateUI();
-        if (typeof saveGame === 'function') saveGame();
-        renderHomePanel();
-    });
+    player.gold -= cost;
+    if (kind === 'tent') player.tentLevel = next; else player.petHouseLevel = next;
+    applyHomeArt();
+    updateUI();
+    if (typeof saveGame === 'function') saveGame();
 }
