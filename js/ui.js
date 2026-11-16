@@ -2902,7 +2902,7 @@ function renderRefiningUI() {
 
     let any = false;
     for (let [slot, gear] of Object.entries(player.equipped)) {
-        if (!gear || slot === 'pet' || slot === 'potionSlot') continue;
+        if (!gear || NO_GEAR_SLOTS.includes(slot) || slot === 'potionSlot') continue;
         any = true;
         let currentRefine = gear.refineLevel || 0;
         let isMax = currentRefine >= 10;
@@ -3501,6 +3501,7 @@ function itemIconHTML(item, size = 70) {
         return `<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     }
     if (item && item.type === 'chest' && item.chestType) return chestIconHTML(item.chestType, size);
+    if (item && item.costumeId && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
@@ -3662,14 +3663,14 @@ function showResultItemDetail(index) {
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    const canSell = item.slot !== 'pet';
+    const canSell = !NO_GEAR_SLOTS.includes(item.slot);
     ddFill(card, {
         close: 'closeResultItemDetail()',
         icon: itemIconHTML(item, 80),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
-        compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
         secondary: iconActionButtons(item, isEquip, canSell, `resultSalvageItem(${index})`, `resultSellItem(${index})`),
@@ -3688,7 +3689,7 @@ function iconActionButtons(item, isEquip, canSell, salvageCall, sellCall) {
     const out = [];
     const salvageImg = `<img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt="">`;
     const sellImg = `<img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt="">`;
-    if (isEquip && item.slot !== 'pet' && !item.favorite) out.push(`<button onclick="${salvageCall}" class="inv-icon-btn" title="Salvage" aria-label="Salvage">${salvageImg}</button>`);
+    if (isEquip && !NO_GEAR_SLOTS.includes(item.slot) && !item.favorite) out.push(`<button onclick="${salvageCall}" class="inv-icon-btn" title="Salvage" aria-label="Salvage">${salvageImg}</button>`);
     if (canSell && !item.favorite) out.push(`<button onclick="${sellCall}" class="inv-icon-btn" title="Sell for ${getSellPrice(item)} Gold" aria-label="Sell">${sellImg}</button>`);
     return out;
 }
@@ -3726,7 +3727,7 @@ function itemDetailBodyHTML(item) {
     if (!isEquip && !isPotion && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>`;
     if (item.setName) body += setInfoHTML(item.setName);
-    if (isEquip && item.slot !== 'pet') {
+    if (isEquip && !NO_GEAR_SLOTS.includes(item.slot)) {
         body += compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]);
     } else if (isEquip && item.stats) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
@@ -3778,8 +3779,8 @@ function showItemDetail(index, refresh = false) {
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    const canSell = item.slot !== 'pet';
-    const canSalvage = isEquip && item.slot !== 'pet' && !item.favorite;
+    const canSell = !NO_GEAR_SLOTS.includes(item.slot);
+    const canSalvage = isEquip && !NO_GEAR_SLOTS.includes(item.slot) && !item.favorite;
     const primary = item.type === 'box'
         ? `<button onclick="openBoxFromDetail(${index})" class="dd-btn primary">Open</button>`
         : item.type === 'chest'
@@ -3796,7 +3797,7 @@ function showItemDetail(index, refresh = false) {
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
-        compare: isEquip && item.slot !== 'pet' ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
         primary, secondary
@@ -3824,11 +3825,11 @@ function showEquippedDetail(slot, refresh = false) {
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
     const extra = [];
     if (item.element) extra.push(`<span class="dd-note">${elementDetailHTML(item.element)}</span>`);
-    if (!isPotion && slot !== 'pet') extra.push(`<div class="dd-stats">${buffsDetailHTML(item.buffs, item.debuffs)}</div>`);
+    if (!isPotion && !NO_GEAR_SLOTS.includes(slot)) extra.push(`<div class="dd-stats">${buffsDetailHTML(item.buffs, item.debuffs)}</div>`);
     if (item.setName) extra.push(setInfoHTML(item.setName));
     const unequip = isPotion ? 'unequipPotionFromDetail()' : `unequipFromDetail('${slot}')`;
     const secondary = [];
-    if (!isPotion && slot !== 'pet') secondary.push(`<button onclick="toggleEquippedFavorite('${slot}')" class="dd-btn ghost">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`);
+    if (!isPotion && !NO_GEAR_SLOTS.includes(slot)) secondary.push(`<button onclick="toggleEquippedFavorite('${slot}')" class="dd-btn ghost">${item.favorite ? '★ Unlock' : '☆ Lock'}</button>`);
     const rarity = RARITY_INFO[item.rarity];
     showEquippedPanelDD(item, {
         close: 'closeInvDetail()',
@@ -4096,7 +4097,7 @@ function salvageEquipmentItem(index, onDone, onCancel = null) {
 
 // Bag equipment that Salvage All / Sell All may touch: not favorites, not pets
 function bulkEquipTargets() {
-    return player.inventory.map((it, i) => ({ it, i })).filter(({ it }) => it && it.slot && it.slot !== 'pet' && !it.favorite);
+    return player.inventory.map((it, i) => ({ it, i })).filter(({ it }) => it && it.slot && !NO_GEAR_SLOTS.includes(it.slot) && !it.favorite);
 }
 
 // In-game confirmation window (replaces the browser confirm box). onConfirm runs only when the player presses the confirm button.
@@ -4993,7 +4994,8 @@ function claimQuestMilestone(count) {
 const CHEST_REWARDS = {
     copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1 },
     silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1 },
-    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 5 }
+    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 5 },
+    costume: { potion: null, rarities: [], items: 0, costume: true } // one random costume from COSTUME_BOX_POOL
 };
 
 // Reward popups show item icons (gold shows the coin icon and amount)
@@ -5019,6 +5021,8 @@ function goldCellHTML(amount) {
     return `<div class="flex flex-col items-center gap-1"><img src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;"><span class="text-amber-300 font-bold text-sm">${amount} Gold</span></div>`;
 }
 
+// Slots that hold no gear stats (pet and costume): no sell, salvage, refine or stat compare
+const NO_GEAR_SLOTS = ['pet', 'costume'];
 function openChest(chestType) {
     const cfg = CHEST_REWARDS[chestType] || CHEST_REWARDS.copper;
     const potionTemplate = GOLD_SHOP_CONSUMABLES.find(i => i.id === cfg.potion);
@@ -5043,6 +5047,12 @@ function openChest(chestType) {
             addItemToInventory(gear);
             rewardCells.push(rewardCellHTML(gear));
         }
+    }
+
+    if (cfg.costume && COSTUME_BOX_POOL.length) {
+        const costume = { ...COSTUME_BOX_POOL[Math.floor(Math.random() * COSTUME_BOX_POOL.length)], qty: 1 };
+        addItemToInventory(costume);
+        rewardCells.push(rewardCellHTML(costume));
     }
 
     const showRewards = () => showModal("Chest Opened!", '', rewardPopupHTML('You received:', rewardCells.join('')));
@@ -5166,7 +5176,7 @@ const INVENTORY_FILTERS = [
     { key: 'all', label: 'All' }, { key: 'weapon', label: 'Weapon' }, { key: 'shield', label: 'Shield' },
     { key: 'hat', label: 'Hat' }, { key: 'midHead', label: 'Mid Head' }, { key: 'mouth', label: 'Mouth' },
     { key: 'armor', label: 'Armor' }, { key: 'garment', label: 'Garment' }, { key: 'footgear', label: 'Boots' },
-    { key: 'ring', label: 'Ring' }, { key: 'pet', label: 'Pet' }, { key: 'potion', label: 'Potion' }
+    { key: 'ring', label: 'Ring' }, { key: 'pet', label: 'Pet' }, { key: 'costume', label: 'Costume' }, { key: 'potion', label: 'Potion' }
 ];
 let inventoryFilter = 'all';
 
@@ -5297,6 +5307,7 @@ function updateUI() {
             { slot: 'ringLeft', img: 'ring.png', x: 79, y: 672 },
             { slot: 'ringRight', img: 'ring.png', x: 445, y: 672 },
             { slot: 'pet', img: 'petslot.png', x: 156, y: 779 },
+            { slot: 'costume', img: 'costumeslot.png', x: 262, y: 779 },
             { slot: 'potionSlot', img: 'potionslot.png', x: 368, y: 779 },
         ];
         // Only these slots show the equipped item's picture: hat, middle head, lower head (mouth), left hand (shield) and right hand (weapon). Other slots keep their default graphic.
@@ -5673,7 +5684,9 @@ function toggleEquippedFavorite(slot) {
 const PET_BOX_POOL = [
     { name: "Orange Cat Pet", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100" },
 ];
-const COSTUME_BOX_POOL = []; // costumes go here
+const COSTUME_BOX_POOL = [
+    { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
+];
 function openBoxFromDetail(index) {
     const item = player.inventory[index];
     if (!item || item.type !== 'box') return;
