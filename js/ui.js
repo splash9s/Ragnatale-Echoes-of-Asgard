@@ -6948,7 +6948,10 @@ function renderPuzzlePanel() {
         const choices = tentPetChoices();
         const rows = choices.map((c, i) => {
             const list = PUZZLES[puzzleKeyOf(c.name)] || [];
-            return `<button class="pz-row" onclick="puzzleOpenPet(${i})"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""><span class="pz-name">${petEsc(c.name)}</span><small>${list.length ? list.length + ' puzzle' + (list.length > 1 ? 's' : '') : 'No puzzles yet'}</small></button>`;
+            // A pet whose puzzle was solved today (its daily friendship reward is used) gets a check mark
+            const doneToday = !!(c.item && c.item.lastPuzzleDay === petDayKey());
+            const mark = doneToday ? `<b class="pz-done" style="color:#4ade80; font-size:26px; font-weight:900; white-space:nowrap;">&#10004; Done today</b>` : '';
+            return `<button class="pz-row" onclick="puzzleOpenPet(${i})"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""><span class="pz-name">${petEsc(c.name)}</span>${mark}<small>${list.length ? list.length + ' puzzle' + (list.length > 1 ? 's' : '') : 'No puzzles yet'}</small></button>`;
         }).join('');
         body = `<p class="pz-sub">Choose a pet</p><div class="pz-list">${rows || '<p class="pz-sub">You have no pets yet.</p>'}</div>`;
         box.innerHTML = `<div class="pz-head"><h3>Puzzle</h3><button class="pz-x" onclick="closePuzzlePanel()">✕</button></div>${body}`;
