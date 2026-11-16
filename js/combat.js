@@ -299,6 +299,8 @@ const RUNE_DEFS = {
     retribution: { name: "Retribution Rune", rarity: 3, add: 5, once: true, desc: "Heals hit a random enemy for 5% of the heal", text: v => `Heals hit a random enemy for ${v}% of the heal` },
     killBlast: { name: "Shockwave Rune", rarity: 4, add: 20, once: true, desc: "Kill: 20% ATK damage to all other enemies", text: v => `Kill: ${v}% ATK damage to all other enemies` },
     elementIgnore: { name: "Void Rune", rarity: 5, flag: true, desc: "Ignore enemy elements", text: () => "Ignore enemy elements" },
+    armorStance: { name: "Iron Stance Rune", rarity: 2, flag: true, desc: "While armor is above 0: +20% damage", text: () => "While armor is above 0: +20% damage" },
+    armorBreath: { name: "Guardian Breath Rune", rarity: 2, flag: true, desc: "Each attack restores 20% armor", text: () => "Each attack restores 20% armor" },
     bulwark: { name: "Bulwark Rune", rarity: 3, add: 1, desc: "Refill armor when picked", text: () => "Refill armor when picked", onApply: () => { player.armor = getDerivedStats().maxArmor; } },
     lastStand: { name: "Last Stand Rune", rarity: 3, add: 1, desc: "Refill HP when picked", text: () => "Refill HP when picked", onApply: () => { player.hp = getDerivedStats().maxHp; } },
     angelOfDeath: { name: "Angel of Death Rune", rarity: 5, flag: true, desc: "Once per run: revive at full HP", text: () => "Once per run: revive at full HP" },
@@ -1736,6 +1738,12 @@ function runCombatTick() {
         targetEnemy = alive[Math.floor(Math.random() * alive.length)];
     }
 
+    if (runeN('armorBreath') > 0) {
+        const brAmt = Math.floor(derived.maxArmor * 0.2);
+        player.armor = Math.min(derived.maxArmor, player.armor + brAmt);
+        logMessage(`[Rune] Guardian Breath restores ${brAmt} armor`, 'drop');
+    }
+
     if (runeN('fortify') > 0 && attackCount % 3 === 0) {
         const fortAmt = Math.floor(derived.maxArmor * runeN('fortify') / 100);
         player.armor = Math.min(derived.maxArmor, player.armor + fortAmt);
@@ -1782,6 +1790,7 @@ function runCombatTick() {
         if (runeN('monsterHunter') > 0 && !targetEnemy.isBoss && !targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + runeN('monsterHunter') / 100));
         if (runeN('sameTarget') > 0) pDmg = Math.floor(pDmg * (1 + 0.1 * sameTargetStreak(targetEnemy))); // Same Target Rune
         if (runeN('ironFortress') > 0 && player.armor > 0) pDmg = Math.floor(pDmg * 3);
+        if (runeN('armorStance') > 0 && player.armor > 0) pDmg = Math.floor(pDmg * 1.2);
         if (player.runes.patientReady) { pDmg = pDmg * 4; player.runes.patientReady = false; }
         if (runeN('tenfold') > 0 && Math.random() < 0.05) { pDmg = pDmg * 10; logMessage("[Dragon's Gamble] 10x damage!", 'levelup'); }
         if (attackCount % 3 === 0 && runeN('divineLight') > 0) {
