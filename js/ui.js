@@ -4001,7 +4001,7 @@ function syncHeroSprites() {
         // The tent (clear screen) shows the standing base with its hand animation; the gear page keeps the gear-composed hero
         const tentNow = id === 'char-hero' && isCharClear();
         const spec = tentNow ? TENT_HERO : f;
-        const src = tentNow ? tentHeroSrc : f.src;
+        const src = tentNow ? tentStandSrc() : f.src;
         setHeroSrc(el, src);
         // The main page hero is 10% smaller than the character page hero
         const s = id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE;
@@ -5950,10 +5950,20 @@ const TENT_POSES = {
     sit: { src: 'assets/pages/character/pose/sit_4.webp', left: 470, top: 694, w: 194, h: 185, anim: 'none' }, // on the left side of the red carpet box,
     sleep: { src: 'assets/pages/character/pose/sleep_q85.webp', left: 536, top: 642, w: 224, h: 124, anim: 'none' } // in the green box (bed)
 };
+// Costume tent pictures: the worn costume's stand, sit and sleep (same canvas sizes as the gear pictures)
+const COSTUME_TENT = {
+    christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' }
+};
+function wornCostumeTentSrc(pose) {
+    const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
+    const set = c && c.costumeId && COSTUME_TENT[c.costumeId];
+    return (set && set[pose]) || null;
+}
+function tentStandSrc() { return wornCostumeTentSrc('stand') || tentHeroSrc; }
 function tentPoseLayout(el) {
     const P = TENT_POSES[tentPose];
     if (!P) return;
-    setHeroSrc(el, P.src);
+    setHeroSrc(el, wornCostumeTentSrc(tentPose) || P.src);
     el.style.width = P.w + 'px';
     el.style.height = P.h + 'px';
     el.style.left = P.left + 'px';
