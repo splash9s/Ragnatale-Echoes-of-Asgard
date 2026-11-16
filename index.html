@@ -1387,38 +1387,21 @@
         <!-- VIEW: MARKET (auction house, gear for gold) -->
         <div id="view-market" class="hidden art-screen art-dark">
             <style>
-                /* Market: cream and gold panels, pixel buttons, matching the shop and blacksmith */
-                #view-market .mk-panel { position: absolute; box-sizing: border-box; background: rgba(255, 250, 235, .92); border: 3px solid #b8945a; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; box-shadow: 0 12px 30px rgba(0, 0, 0, .45); color: #2a1a0e; }
-                #view-market button { font-size: 24px !important; font-family: 'Roboto', 'Noto Sans Thai', sans-serif; font-weight: 700; cursor: pointer; }
+                #view-market .mk-panel { position: absolute; box-sizing: border-box; background: rgba(20, 14, 8, .6); border: 2px solid #b8945a; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+                #view-market button { font-size: 24px !important; }
                 #view-market #market-tabs, #view-market #market-cats { flex-direction: column; flex-wrap: nowrap; }
-                #view-market #market-tabs button, #view-market #market-cats button { width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px; }
-                /* Buttons: pixel art, active = yellow (gold) or blue, idle = parchment */
-                #view-market button.bg-amber-600, #view-market button.bg-sky-700 { background: url(assets/pages/button/yellowbutton_q85.webp) center / 100% 100% no-repeat !important; border: 0 !important; color: #fff !important; text-shadow: 0 1px 2px #000; }
-                #view-market button.bg-sky-700 { background-image: url(assets/pages/button/bluebutton_q85.webp) !important; }
-                #view-market button.bg-amber-600:hover, #view-market button.bg-amber-500 { background-image: url(assets/pages/button/yellowbutton_q85.webp) !important; }
-                #view-market button.bg-slate-800, #view-market button.bg-slate-900 { background: rgba(214, 190, 140, .55) !important; border: 1px solid #b8945a !important; color: #2a1a0e !important; }
-                #view-market button.bg-slate-800:hover, #view-market button.bg-slate-700 { background: rgba(214, 190, 140, .85) !important; }
-                #view-market button.bg-slate-950 { color: #2a1a0e; }
-                /* Rows and text on cream */
-                #view-market #market-body .bg-slate-900 { background: rgba(255, 250, 235, .95) !important; border: 2px solid #b8945a !important; color: #2a1a0e; }
-                #view-market #market-body .text-amber-200 { color: #7a4e12 !important; }
-                #view-market #market-body .text-amber-300, #view-market #market-body .text-amber-400 { color: #8a5a14 !important; }
-                #view-market #market-body .text-slate-400, #view-market #market-body .text-slate-500 { color: #6b5a44 !important; }
-                #view-market #market-body .text-slate-300, #view-market #market-body .text-slate-200 { color: #3a2a18 !important; }
-                #view-market #market-body .text-sky-300 { color: #1e5f8a !important; }
-                #view-market #market-body .text-emerald-300 { color: #1f7a4d !important; }
-                #view-market #market-body .font-bold.text-amber-200 { color: #7a4e12 !important; }
-                #view-market #market-body select, #view-market #market-body input { background: #fffdf5 !important; color: #2a1a0e !important; border: 2px solid #b8945a !important; border-radius: 8px; font-size: 24px; }
-                #view-market #market-body .text-sm, #view-market #market-body .text-xs, #view-market #market-body .text-\[10px\], #view-market #market-body .text-\[11px\] { font-size: 22px !important; }
+                #view-market #market-tabs button, #view-market #market-cats button { width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; }
+                #view-market #market-gold { font-size: 26px; color: #fde68a; }
                 #view-market #market-body { font-size: 24px; }
-                #view-market #market-gold { font-size: 26px; color: #2a1a0e; }
+                #view-market #market-body .text-sm, #view-market #market-body .text-xs, #view-market #market-body .text-\[10px\] { font-size: 22px !important; }
+                #view-market #market-body select, #view-market #market-body input { font-size: 24px; }
             </style>
             <div id="market-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/artisan/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
-                    <div id="market-gold-top" style="position:absolute; left:1640px; top:12px; height:46px; display:flex; align-items:center; gap:8px; padding:0 18px; box-sizing:border-box; border-radius:12px; background:rgba(255,250,235,.9); border:2px solid #b8945a; color:#2a1a0e; font-size:26px; font-weight:700;"><img src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"><span id="market-gold"></span></div>
-                    <div style="position:absolute; right:40px; bottom:20px; font-size:22px; color:#2a1a0e; background:rgba(255,250,235,.9); border:2px solid #b8945a; border-radius:12px; padding:6px 16px;">Auctions for gear, paid in gold. Level 10 and up, Gmail-linked accounts.</div>
+                    <div id="market-gold-top" style="position:absolute; right:110px; top:18px; font-size:26px; color:#fde68a; font-weight:bold;"><span id="market-gold"></span></div>
+                    <div style="position:absolute; right:40px; bottom:20px; font-size:22px; color:#f8fafc; background:rgba(20,14,8,.7); border:1px solid #b8945a; border-radius:10px; padding:4px 12px;">Auctions for gear, paid in gold. Level 10 and up, Gmail-linked accounts.</div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
                         <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
                         <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
@@ -2023,7 +2006,7 @@
     <script src="js/combat.js?v=20261116j"></script>
     <script src="js/crit-fx.js?v=20261110e"></script>
     <script src="js/ui.js?v=20261116zze"></script>
-    <script src="js/market.js?v=20261116b"></script>
+    <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
     <script src="js/beginner-quest.js?v=20261114x"></script>

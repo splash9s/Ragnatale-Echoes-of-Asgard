@@ -105,7 +105,7 @@ function renderMarket() {
     if (!document.getElementById('view-market')) return;
     if (tabs) tabs.innerHTML = [['buy', 'Buy'], ['sell', 'Sell'], ['mine', 'My Auctions']].map(([k, l]) =>
         `<button onclick="setMarketTab('${k}')" class="px-4 py-2 rounded-xl font-bold text-sm cursor-pointer ${marketTab === k ? 'bg-amber-600 text-slate-950' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}">${l}</button>`).join('');
-    if (gold) gold.textContent = Number(player.gold || 0).toLocaleString();
+    if (gold) gold.textContent = `Your gold: ${Number(player.gold || 0).toLocaleString()}`;
     if (cats) cats.innerHTML = marketTab === 'buy' ? MARKET_CATEGORIES.map(([k, l]) =>
         `<button onclick="setMarketCat('${k}')" class="px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${marketCat === k ? 'bg-sky-700 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${l}</button>`).join('') : '';
     if (marketTab === 'buy') renderMarketBuy();
