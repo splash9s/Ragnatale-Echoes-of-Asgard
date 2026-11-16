@@ -93,7 +93,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'gold_2x_3h', name: "2x Gold (3 hours)", price: 50, type: 'boost', boost: 'gold', ms: 3 * 60 * 60 * 1000, desc: "Double gold from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'stat_reset', name: "Status Reset Service", price: 100, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 100, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
-    { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/goldchest.png' },
+    { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/inventoryexp_q85.webp' },
     { id: 'pet_box', name: "Pet Box", price: 500, type: 'box', boxType: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'dchest_costume', name: "Costume Chest", price: 500, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
