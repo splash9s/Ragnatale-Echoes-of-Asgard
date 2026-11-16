@@ -2602,7 +2602,7 @@ function renderDiamondShop() {
 
     DIAMOND_SHOP_ITEMS.forEach(item => {
         container.innerHTML += `
-            <div class="p-3 bg-slate-900/80 rounded-xl border border-purple-500/40 flex justify-between items-center">
+            <div class="p-3 bg-slate-900/80 rounded-xl border flex justify-between items-center" style="border-color:#facc15;box-shadow:0 0 10px 2px rgba(250,204,21,.55), inset 0 0 8px rgba(250,204,21,.25);">
                 <div class="flex items-center gap-3 min-w-0">
                     ${item.icon ? `<img src="${item.icon}" alt="" style="width:56px;height:56px;object-fit:contain;flex:0 0 auto;">` : ''}
                     <div class="min-w-0">
