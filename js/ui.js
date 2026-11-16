@@ -2575,10 +2575,10 @@ function buyArmoryItem(itemIndex) {
 // plate: which menu plate picture (0-5) belongs to the category (sheet order: gift, diamond, crown, armor, potion, paw)
 const VIP_CATS = [
     { key: 'all', label: 'All', plate: 0, types: null },
-    { key: 'stone', label: 'Stones & Material', plate: 1, types: ['estone', 'bs_rune', 'material', 'copper'] },
+    { key: 'stone', label: 'Diamond', plate: 1, types: [] }, // top-up and buy diamond (items to come)
     { key: 'vip', label: 'VIP & Boost', plate: 2, types: ['vip', 'boost'] },
     { key: 'box', label: 'Boxes & Bags', plate: 3, types: ['box', 'chest', 'bag'] },
-    { key: 'potion', label: 'Potions & Service', plate: 4, types: ['potion', 'resurrection', 'service', 'skill_reset'] },
+    { key: 'potion', label: 'Consumable', plate: 4, types: ['potion', 'resurrection', 'service', 'skill_reset', 'estone', 'bs_rune', 'material', 'copper'] },
     { key: 'pet', label: 'Pets', plate: 5, types: ['pet'] },
 ];
 let vipCat = 'all';
