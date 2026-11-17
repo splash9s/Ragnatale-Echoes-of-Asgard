@@ -3955,7 +3955,7 @@ function openDiamondTopUp(item) {
     const url = item.payLink + '?client_reference_id=' + encodeURIComponent(uid);
     window.open(url, '_blank', 'noopener');
     if (typeof startTopUpWatch === 'function') startTopUpWatch();
-    showModal("Top-up", `Complete the payment in the new tab. ${item.diamonds} diamonds are added once Stripe confirms the payment.`);
+    showModal("Top-up", `Complete the payment in the new tab. ${item.diamonds} diamonds are added once Stripe confirms the payment.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
 }
 
 function getItemBasePrice(item) {
