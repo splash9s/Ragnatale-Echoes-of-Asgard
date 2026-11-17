@@ -78,6 +78,8 @@ function potionHealText(item) {
 }
 
 const DIAMOND_SHOP_ITEMS = [
+    // Real-money top-up: opens the Stripe payment link. Diamonds are credited by the server after payment is confirmed.
+    { id: 'topup_4200', name: "4,200 Diamonds", desc: "Top up 4,200 diamonds for 300 THB.", price: 0, type: 'topup', vipCat: 'stone', thb: 300, diamonds: 4200, payLink: 'https://buy.stripe.com/test_28E5kE0x46Zwd2K6Kp0Fi00', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 4000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
@@ -2585,7 +2587,11 @@ const VIP_CATS = [
 ];
 // Diamond shop sale: every item is this percent off
 const DIAMOND_SHOP_DISCOUNT = 20;
-function dsPrice(item) { return Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
+function dsPrice(item) { return item.type === 'topup' ? item.price : Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
+function vipPriceTagHTML(item) {
+    if (item.type === 'topup') return `${item.thb} THB`;
+    return `<s style="opacity:.6; font-size:.8em;">${item.price}</s> ${dsPrice(item)} <span style="color:#4ade80; font-size:.75em;">-${DIAMOND_SHOP_DISCOUNT}%</span>`;
+}
 let vipCat = 'all';
 let vipSelected = null;
 function vipItemsOf(cat) {
@@ -2617,7 +2623,7 @@ function renderVipList() {
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
         <div class="vip-cell">
             <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
-            <div class="vip-price"><s style="opacity:.6; font-size:.8em;">${item.price}</s> ${dsPrice(item)} <span style="color:#4ade80; font-size:.75em;">-${DIAMOND_SHOP_DISCOUNT}%</span></div>
+            <div class="vip-price">${vipPriceTagHTML(item)}</div>
         </div>`).join('');
     grid.scrollTop = keepScroll;
 }
@@ -2629,7 +2635,7 @@ function renderVipDetail() {
         ? `<div class="vd-icon">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</div>
            <div class="vd-name">${escapeHtml(item.name)}</div>
            <div class="vd-desc">${escapeHtml(item.desc)}</div>
-           <div class="vd-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt=""><s style="opacity:.6; margin-right:6px;">${item.price}</s>${dsPrice(item)} <span style="color:#4ade80;">-${DIAMOND_SHOP_DISCOUNT}%</span></div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
+           <div class="vd-price">${item.type === 'topup' ? '' : '<img src="assets/icons/diamondiconsmall_q85.webp" alt="">'}${vipPriceTagHTML(item)}</div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
         : '<p class="vd-empty">Select an item</p>';
 }
 // Drop rates shown on a chest's detail before purchase. Figures come from the same tables that openChest uses.
@@ -2710,6 +2716,7 @@ function buyDiamondItem(itemId) {
     if (typeof trackFeature === 'function') trackFeature('diamond_buy');
     let item = DIAMOND_SHOP_ITEMS.find(i => i.id === itemId);
     if (!item) return;
+    if (item.type === 'topup') { openDiamondTopUp(item); return; }
     if (item.type === 'vip' && isVipActive()) {
         showModal("VIP Active", `You already have a VIP Pass until ${new Date(player.vipUntil).toLocaleDateString()}. You can buy another after it expires.`);
         return;
@@ -3939,6 +3946,15 @@ function useInventoryPotion(index) {
     updateUI();
     saveGame();
     return true;
+}
+
+// Opens the Stripe payment link. client_reference_id carries the player's Supabase user ID so the webhook knows who to credit.
+function openDiamondTopUp(item) {
+    const uid = typeof cloudUserId !== 'undefined' ? cloudUserId : null;
+    if (!uid) { showModal("Sign in needed", "Sign in with Google before you top up diamonds."); return; }
+    const url = item.payLink + '?client_reference_id=' + encodeURIComponent(uid);
+    window.open(url, '_blank', 'noopener');
+    showModal("Top-up", `Complete the payment in the new tab. ${item.diamonds} diamonds are added once Stripe confirms the payment.`);
 }
 
 function getItemBasePrice(item) {
