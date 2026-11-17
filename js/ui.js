@@ -93,8 +93,8 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'gold_2x_3h', name: "2x Gold (3 hours)", price: 50, type: 'boost', boost: 'gold', ms: 3 * 60 * 60 * 1000, desc: "Double gold from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'stat_reset', name: "Status Reset Service", price: 100, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 100, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
-    { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/inventoryexp_q85.webp' },
-    { id: 'pet_box', name: "Pet Box", price: 500, type: 'box', boxType: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', vipCat: 'vip', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/inventoryexp_q85.webp' },
+    { id: 'pet_box', name: "Pet Box", price: 500, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'dchest_costume', name: "Costume Chest", price: 500, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
@@ -2587,7 +2587,9 @@ let vipCat = 'all';
 let vipSelected = null;
 function vipItemsOf(cat) {
     const c = VIP_CATS.find(x => x.key === cat) || VIP_CATS[0];
-    return DIAMOND_SHOP_ITEMS.filter(i => !c.types || c.types.includes(i.type));
+    if (!c.types) return DIAMOND_SHOP_ITEMS;
+    // vipCat pins an item to one tab, overriding its type
+    return DIAMOND_SHOP_ITEMS.filter(i => i.vipCat ? i.vipCat === c.key : c.types.includes(i.type));
 }
 function renderVipShop() {
     renderVipMenu();
@@ -5012,9 +5014,9 @@ function claimQuestMilestone(count) {
 
 // Chest rewards: a stack of healing potions (count inclusive), then armory gear with a rarity roll per item
 const CHEST_REWARDS = {
-    copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1 },
-    silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1 },
-    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 5 },
+    copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1, diamonds: 1 },
+    silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1, diamonds: 10 },
+    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 50 },
     costume: { potion: null, rarities: [], items: 0, costume: true } // one random costume from COSTUME_BOX_POOL
 };
 
