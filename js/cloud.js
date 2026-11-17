@@ -28,7 +28,7 @@ async function claimDiamondTopups() {
         if (n > 0) {
             player.diamonds = (player.diamonds || 0) + n;
             saveGame();
-            showModal('Diamonds added', `${n.toLocaleString()} diamonds were added to your account.`);
+            showModal('Diamonds added', `${n.toLocaleString()} diamonds were added to your account.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
         }
         return n;
     } catch (e) {
