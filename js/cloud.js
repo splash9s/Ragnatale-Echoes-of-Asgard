@@ -67,6 +67,9 @@ async function cloudStart() {
         cloudCheckAdmin();
         if (!cloudListening) {
             cloudListening = true;
+            // Check for new top-ups every minute and when the player returns to the tab
+            setInterval(claimDiamondTopups, 60000);
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') claimDiamondTopups(); });
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudFlush(); });
             window.addEventListener('pagehide', cloudFlush);
         }
