@@ -2576,13 +2576,16 @@ function buyArmoryItem(itemIndex) {
 // VIP shop: menu (categories) on the left, item list in the middle, item detail on the right, Buy below
 // plate: which menu plate picture (0-5) belongs to the category (sheet order: gift, diamond, crown, armor, potion, paw)
 const VIP_CATS = [
-    { key: 'all', label: 'All', plate: 0, types: null },
+    { key: 'all', label: 'Highlight', plate: 0, types: null }, // first page: every item at the sale price
     { key: 'stone', label: 'Diamond', plate: 1, types: [] }, // top-up and buy diamond (items to come)
     { key: 'vip', label: 'VIP & Boost', plate: 2, types: ['vip', 'boost'] },
     { key: 'box', label: 'Boxes & Bags', plate: 3, types: ['box', 'chest', 'bag'] },
     { key: 'potion', label: 'Consumable', plate: 4, types: ['potion', 'resurrection', 'service', 'skill_reset', 'estone', 'bs_rune', 'material', 'copper'] },
     { key: 'pet', label: 'Pets', plate: 5, types: ['pet'] },
 ];
+// Diamond shop sale: every item is this percent off
+const DIAMOND_SHOP_DISCOUNT = 20;
+function dsPrice(item) { return Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
 let vipCat = 'all';
 let vipSelected = null;
 function vipItemsOf(cat) {
@@ -2614,7 +2617,7 @@ function renderVipList() {
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
         <div class="vip-cell">
             <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
-            <div class="vip-price">${item.price}</div>
+            <div class="vip-price"><s style="opacity:.6; font-size:.8em;">${item.price}</s> ${dsPrice(item)} <span style="color:#4ade80; font-size:.75em;">-${DIAMOND_SHOP_DISCOUNT}%</span></div>
         </div>`).join('');
     grid.scrollTop = keepScroll;
 }
@@ -2626,7 +2629,7 @@ function renderVipDetail() {
         ? `<div class="vd-icon">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</div>
            <div class="vd-name">${escapeHtml(item.name)}</div>
            <div class="vd-desc">${escapeHtml(item.desc)}</div>
-           <div class="vd-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt="">${item.price}</div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
+           <div class="vd-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt=""><s style="opacity:.6; margin-right:6px;">${item.price}</s>${dsPrice(item)} <span style="color:#4ade80;">-${DIAMOND_SHOP_DISCOUNT}%</span></div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
         : '<p class="vd-empty">Select an item</p>';
 }
 // Drop rates shown on a chest's detail before purchase. Figures come from the same tables that openChest uses.
@@ -2712,7 +2715,8 @@ function buyDiamondItem(itemId) {
         return;
     }
 
-    if (player.diamonds < item.price) {
+    const cost = dsPrice(item);
+    if (player.diamonds < cost) {
         floatNoticeAt("Not enough Diamonds", window.event);
         return;
     }
@@ -2729,9 +2733,9 @@ function buyDiamondItem(itemId) {
         return;
     }
 
-    player.diamonds -= item.price;
+    player.diamonds -= cost;
     playSfx(SFX.coin);
-    player.diamondsSpent = (player.diamondsSpent || 0) + item.price; // total diamonds spent in the shop (avatar unlocks)
+    player.diamondsSpent = (player.diamondsSpent || 0) + cost; // total diamonds spent in the shop (avatar unlocks)
     if (item.type === 'resurrection') {
         player.resurrectionPotions = (player.resurrectionPotions || 0) + 1;
         floatSuccessAt("Purchased!");
