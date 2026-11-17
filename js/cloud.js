@@ -20,7 +20,7 @@ function cloudInitClient() {
 
 // Adds diamonds from Stripe top-ups the server has recorded for this player. Each top-up is claimed once.
 async function claimDiamondTopups() {
-    if (!cloudClient || typeof player === 'undefined') return;
+    if (!cloudClient || typeof player === 'undefined') return 0;
     try {
         const { data, error } = await cloudClient.rpc('claim_diamond_topups');
         if (error) throw error;
@@ -30,10 +30,23 @@ async function claimDiamondTopups() {
             saveGame();
             showModal('Diamonds added', `${n.toLocaleString()} diamonds were added to your account.`);
         }
+        return n;
     } catch (e) {
         console.warn('Top-up claim failed:', e);
+        return 0;
     }
 }
+
+// After a top-up is opened, check every 15 seconds. Stop once diamonds are added, or after 5 minutes.
+function startTopUpWatch() {
+    let tries = 0;
+    const id = setInterval(async () => {
+        tries++;
+        const n = await claimDiamondTopups();
+        if (n > 0 || tries >= 20) clearInterval(id);
+    }, 15000);
+}
+window.startTopUpWatch = startTopUpWatch;
 
 // Sync the save for a signed-in player. Reloads once if the cloud save is newer than this browser's.
 // A browser with no save and no session is a first play: the sign-in page signs the player in first.
@@ -67,8 +80,7 @@ async function cloudStart() {
         cloudCheckAdmin();
         if (!cloudListening) {
             cloudListening = true;
-            // Check for new top-ups every minute and when the player returns to the tab
-            setInterval(claimDiamondTopups, 60000);
+            // Also check when the player returns to the tab (a payment may have finished in another tab)
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') claimDiamondTopups(); });
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudFlush(); });
             window.addEventListener('pagehide', cloudFlush);

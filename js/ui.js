@@ -3954,6 +3954,7 @@ function openDiamondTopUp(item) {
     if (!uid) { showModal("Sign in needed", "Sign in with Google before you top up diamonds."); return; }
     const url = item.payLink + '?client_reference_id=' + encodeURIComponent(uid);
     window.open(url, '_blank', 'noopener');
+    if (typeof startTopUpWatch === 'function') startTopUpWatch();
     showModal("Top-up", `Complete the payment in the new tab. ${item.diamonds} diamonds are added once Stripe confirms the payment.`);
 }
 
