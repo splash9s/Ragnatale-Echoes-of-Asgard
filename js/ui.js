@@ -78,17 +78,17 @@ function potionHealText(item) {
 }
 
 const DIAMOND_SHOP_ITEMS = [
-    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 3000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
+    { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 4000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
     { id: 'pet_loyal_slime', name: "Orange Cat Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 500, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp' },
     { id: 'res_potion', name: "Resurrection Potion", price: 10, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 80, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 50, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
-    { id: 'estone_fire', name: "Fire Elemental Stone", price: 30, type: 'estone', element: 'fire', desc: "Forge Fire onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_fire.webp' },
-    { id: 'estone_water', name: "Water Elemental Stone", price: 30, type: 'estone', element: 'water', desc: "Forge Water onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_water.webp' },
-    { id: 'estone_earth', name: "Earth Elemental Stone", price: 30, type: 'estone', element: 'earth', desc: "Forge Earth onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_earth.webp' },
-    { id: 'estone_wind', name: "Wind Elemental Stone", price: 30, type: 'estone', element: 'wind', desc: "Forge Wind onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_wind.webp' },
+    { id: 'estone_fire', name: "Fire Elemental Stone", price: 50, type: 'estone', element: 'fire', desc: "Forge Fire onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_fire.webp' },
+    { id: 'estone_water', name: "Water Elemental Stone", price: 50, type: 'estone', element: 'water', desc: "Forge Water onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_water.webp' },
+    { id: 'estone_earth', name: "Earth Elemental Stone", price: 50, type: 'estone', element: 'earth', desc: "Forge Earth onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_earth.webp' },
+    { id: 'estone_wind', name: "Wind Elemental Stone", price: 50, type: 'estone', element: 'wind', desc: "Forge Wind onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_wind.webp' },
     { id: 'exp_2x_3h', name: "2x EXP (3 hours)", price: 100, type: 'boost', boost: 'exp', ms: 3 * 60 * 60 * 1000, desc: "Double Base and Class EXP from kills for 3 hours.", icon: 'assets/shop/diamond/expmulti.png' },
     { id: 'gold_2x_3h', name: "2x Gold (3 hours)", price: 50, type: 'boost', boost: 'gold', ms: 3 * 60 * 60 * 1000, desc: "Double gold from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'stat_reset', name: "Status Reset Service", price: 100, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
