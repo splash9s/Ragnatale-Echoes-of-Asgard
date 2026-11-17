@@ -2624,8 +2624,27 @@ function renderVipDetail() {
         ? `<div class="vd-icon">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</div>
            <div class="vd-name">${escapeHtml(item.name)}</div>
            <div class="vd-desc">${escapeHtml(item.desc)}</div>
-           <div class="vd-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt="">${item.price}</div>`
+           <div class="vd-price"><img src="assets/icons/diamondiconsmall_q85.webp" alt="">${item.price}</div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
         : '<p class="vd-empty">Select an item</p>';
+}
+// Drop rates shown on a chest's detail before purchase. Figures come from the same tables that openChest uses.
+function chestDropRatesHTML(chestType) {
+    const cfg = CHEST_REWARDS[chestType];
+    if (!cfg) return '';
+    const rows = [];
+    if (cfg.costume) {
+        const n = COSTUME_BOX_POOL.length;
+        if (n) COSTUME_BOX_POOL.forEach(c => rows.push(`${escapeHtml(c.name)}: ${(100 / n).toFixed(1)}%`));
+        else rows.push('Costumes: coming soon');
+    }
+    if (cfg.items) {
+        const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS.length : 0;
+        rows.push(`Gear: ${cfg.items} random item${cfg.items > 1 ? 's' : ''} from ${pool} pieces, each piece equally likely`);
+        rows.push(`Gear rarity: equal chance of ${cfg.rarities.join(', ')}`);
+    }
+    if (cfg.potion) rows.push(`Always: ${cfg.potionMin} to ${cfg.potionMax} potions`);
+    if (cfg.diamonds) rows.push(`Always: ${cfg.diamonds} diamonds`);
+    return `<div class="vd-desc" style="text-align:left; margin-top:8px;"><div style="font-weight:700; margin-bottom:4px;">Drop rates</div>${rows.map(r => `<div>${r}</div>`).join('')}</div>`;
 }
 function vipSetCat(key) {
     vipCat = key;
