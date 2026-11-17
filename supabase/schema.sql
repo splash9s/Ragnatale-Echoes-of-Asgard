@@ -1,4 +1,4 @@
--- Ragnatale: Supabase schema (run once in the SQL editor of project krtzvossvqddhveozcnb)
+-- Rune Thread: Supabase schema (run once in the SQL editor of project krtzvossvqddhveozcnb)
 
 -- One save per player (the whole player object as JSON)
 create table if not exists public.saves (

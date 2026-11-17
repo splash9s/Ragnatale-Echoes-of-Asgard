@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - COMBAT.JS
+// RUNE THREAD - COMBAT.JS
 // ==========================================
 
 let currentMode = 'campaign';

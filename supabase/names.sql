@@ -1,4 +1,4 @@
--- Ragnatale: unique player names.
+-- Rune Thread: unique player names.
 -- Run once in the SQL editor of project krtzvossvqddhveozcnb, after friends.sql.
 
 -- Older profiles may already share a name (for example the default 'Hero').

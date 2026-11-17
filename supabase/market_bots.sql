@@ -1,4 +1,4 @@
--- Ragnatale: market bot listings (Traveling Merchant). Run once in the SQL editor, after supabase/market.sql.
+-- Rune Thread: market bot listings (Traveling Merchant). Run once in the SQL editor, after supabase/market.sql.
 -- After this, a daily job (pg_cron, 00:00 UTC = 07:00 Bangkok) refreshes the bot listings by itself.
 -- Bot listings have no seller account: their gold is not paid out, and unsold bot items expire without mail.
 -- Re-running replaces the open bot listings that have no bids (listings with bids are kept until they end).

@@ -1,4 +1,4 @@
--- Ragnatale: how many players use each function (shown on the developer dashboard).
+-- Rune Thread: how many players use each function (shown on the developer dashboard).
 -- Run after admin.sql. Safe to re-run.
 
 create table if not exists public.feature_usage (

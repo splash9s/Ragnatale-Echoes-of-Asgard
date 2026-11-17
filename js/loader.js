@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - LOADER
+// RUNE THREAD - LOADER
 // Shows the loading screen, preloads images and sounds with a progress bar, then starts the game.
 // ==========================================
 

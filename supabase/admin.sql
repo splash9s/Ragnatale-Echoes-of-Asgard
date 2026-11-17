@@ -1,4 +1,4 @@
--- Ragnatale: player stats, suspicious activity and the developer dashboard.
+-- Rune Thread: player stats, suspicious activity and the developer dashboard.
 -- Run after schema.sql (any time after that). Safe to re-run.
 -- Only the owner's Google account (is_admin below) can read the admin functions.
 

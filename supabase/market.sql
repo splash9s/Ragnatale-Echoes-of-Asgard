@@ -1,4 +1,4 @@
--- Ragnatale: auction market (gear only, gold). Run once in the SQL editor, after schema.sql and friends.sql
+-- Rune Thread: auction market (gear only, gold). Run once in the SQL editor, after schema.sql and friends.sql
 -- (uses mail and profiles). Rules: level 10+, Gmail-linked accounts only, 6h / 12h / 24h auctions,
 -- listing fee 5% of the start price (paid when listed), sale fee 5% of the final price (taken from the seller).
 -- Outbid gold and won or returned items are sent by mail, and the game claims them like any other mail.

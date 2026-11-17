@@ -1,4 +1,4 @@
--- Ragnatale: visit a friend's tent (read-only) and the visitor log kept for 3 days.
+-- Rune Thread: visit a friend's tent (read-only) and the visitor log kept for 3 days.
 -- Run once in the SQL editor of project krtzvossvqddhveozcnb, after friends.sql (and requests.sql).
 
 -- Who visited whose tent. Rows older than 3 days are deleted whenever a visit is made or the list is read.

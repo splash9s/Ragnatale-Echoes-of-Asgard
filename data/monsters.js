@@ -25,7 +25,7 @@ const MONSTERS_DATA = {
     leafSpriteMage: { id: "M026", name: "Leaf Sprite Mage", appearance: "Tiny sprite in a leaf hood, swinging a twig staff", element: 'wind', role: 'mage', hp: 19, maxHp: 19, atkMin: 6, atkMax: 7, hit: 89, flee: 74, baseExp: 28, jobExp: 20, gold: 33, isRanged: true, mageType: 'wind', skills: [] },
     haloWarden: { id: "M033", name: "Halo Warden", appearance: "Silver-armoured celestial shield-bearer with a large tower shield engraved with wing shapes. A bright golden halo floats above the helmet, and thin blue light streams from the armour seams.", element: 'wind', role: 'tank', hp: 617, maxHp: 617, atkMin: 62, atkMax: 79, hit: 285, flee: 186, baseExp: 975, jobExp: 715, gold: 1365, isRanged: false, armor: 30, skills: [] },
 };
-// ---- Ragnatale expansion: Lv 60-99 maps, healers, and support units ----
+// ---- Rune Thread expansion: Lv 60-99 maps, healers, and support units ----
 Object.assign(MONSTERS_DATA, {
     // Jotunheim (new map)
     frostTroll: { id: "M037", name: "Frost Troll", appearance: "Hulking grey troll with icicle spikes on its back and a bone club", element: 'water', role: 'melee', hp: 630, maxHp: 630, atkMin: 162, atkMax: 216, hit: 585, flee: 450, baseExp: 450, jobExp: 315, gold: 360, isRanged: false, skills: [] },

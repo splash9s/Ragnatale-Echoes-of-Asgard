@@ -1,4 +1,4 @@
--- Ragnatale: friend requests. Run once in the SQL editor of project krtzvossvqddhveozcnb,
+-- Rune Thread: friend requests. Run once in the SQL editor of project krtzvossvqddhveozcnb,
 -- after friends.sql and names.sql. Adding a friend now sends a request; the other player accepts it.
 
 create table if not exists public.friend_requests (

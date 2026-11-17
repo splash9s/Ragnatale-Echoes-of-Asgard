@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - UI.JS
+// RUNE THREAD - UI.JS
 // ==========================================
 
 // Avatar set. Each entry has an unlock rule; an entry with no rule is open to everyone.
