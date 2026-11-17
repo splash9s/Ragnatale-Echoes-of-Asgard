@@ -18,6 +18,23 @@ function cloudInitClient() {
     return cloudClient;
 }
 
+// Adds diamonds from Stripe top-ups the server has recorded for this player. Each top-up is claimed once.
+async function claimDiamondTopups() {
+    if (!cloudClient || typeof player === 'undefined') return;
+    try {
+        const { data, error } = await cloudClient.rpc('claim_diamond_topups');
+        if (error) throw error;
+        const n = Number(data) || 0;
+        if (n > 0) {
+            player.diamonds = (player.diamonds || 0) + n;
+            saveGame();
+            showModal('Diamonds added', `${n.toLocaleString()} diamonds were added to your account.`);
+        }
+    } catch (e) {
+        console.warn('Top-up claim failed:', e);
+    }
+}
+
 // Sync the save for a signed-in player. Reloads once if the cloud save is newer than this browser's.
 // A browser with no save and no session is a first play: the sign-in page signs the player in first.
 async function cloudStart() {
@@ -43,6 +60,7 @@ async function cloudStart() {
                 return;
             }
         }
+        await claimDiamondTopups();
         cloudPushProfile();
         if (typeof player !== 'undefined') syncServerMail();
         cloudStatsStart();
