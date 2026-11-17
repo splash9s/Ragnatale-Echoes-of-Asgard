@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - I18N.JS (MULTILINGUAL DICTIONARY)
+// RUNE THREAD - I18N.JS (MULTILINGUAL DICTIONARY)
 // ==========================================
 
 const I18N = {

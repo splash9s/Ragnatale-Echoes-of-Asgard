@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - MARKET (auction house)
+// RUNE THREAD - MARKET (auction house)
 // Gear auctions for gold. Level 10+, Gmail-linked accounts only. Rules are enforced on the server
 // (supabase/market.sql); this file shows them and keeps the gold and bag in step with each accepted action.
 // Flow: Sell takes the item out of the bag only after the server accepts the listing. Bidding takes gold

@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - DATA/QUESTS.JS
+// RUNE THREAD - DATA/QUESTS.JS
 // ==========================================
 
 const DAILY_QUESTS_POOL = [

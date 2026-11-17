@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - GAME.JS (BOOTSTRAP ENTRY POINT)
+// RUNE THREAD - GAME.JS (BOOTSTRAP ENTRY POINT)
 // ==========================================
 
 window.addEventListener('DOMContentLoaded', () => {

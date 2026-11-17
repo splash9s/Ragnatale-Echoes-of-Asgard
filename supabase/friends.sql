@@ -1,4 +1,4 @@
--- Ragnatale: friends, friend gifts and player IDs.
+-- Rune Thread: friends, friend gifts and player IDs.
 -- Run once in the SQL editor of project krtzvossvqddhveozcnb, after schema.sql.
 
 -- Public face of each player: name, base level, avatar and a short ID for adding friends.

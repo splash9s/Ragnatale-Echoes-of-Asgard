@@ -1,4 +1,4 @@
--- Ragnatale: reserved player names (staff-like names cannot be used).
+-- Rune Thread: reserved player names (staff-like names cannot be used).
 -- Run once in the SQL editor after names.sql. Replaces public.name_available.
 
 create or replace function public.name_available(p_name text)

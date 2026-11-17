@@ -1,5 +1,5 @@
 // ==========================================
-// RAGNATALE - PLAYER.JS
+// RUNE THREAD - PLAYER.JS
 // ==========================================
 
 const MAX_POTION_SLOT = 5;
