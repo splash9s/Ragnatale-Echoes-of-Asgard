@@ -245,8 +245,12 @@ function migrateGear() {
         if (it.setName === 'beach') it.setName = 'merchant';
         if (!SET_SLOTS.includes(it.slot)) it.setName = null;
     };
-    for (const k in player.equipped) fix(player.equipped[k]);
-    if (Array.isArray(player.inventory)) player.inventory.forEach(fix);
+    // Forged weapons: rebuild the name so older saves pick up the current name colours
+    const refreshForged = it => {
+        if (it && it.baseName && it.element && ELEMENTS[it.element] && typeof forgedWeaponName === 'function') it.name = forgedWeaponName(it, it.element);
+    };
+    for (const k in player.equipped) { fix(player.equipped[k]); refreshForged(player.equipped[k]); }
+    if (Array.isArray(player.inventory)) player.inventory.forEach(it => { fix(it); refreshForged(it); });
 }
 
 function createWelcomeMail() {

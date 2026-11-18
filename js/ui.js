@@ -2812,7 +2812,8 @@ function elementStoneCost(gear) { return Math.max(1, Math.ceil(forgeItemLevel(ge
 function forgedWeaponName(gear, el) {
     const esc = (t) => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const color = FORGE_ELEMENT_COLOR[el] || '#ffffff';
-    return `<span style="color:#22c55e; font-weight:900;">${esc((player.name || 'Hero').slice(0, MAX_NAME_LENGTH))}</span> <span style="color:${color}; font-weight:900;">${ELEMENTS[el].name}</span> ${esc(gear.baseName || gear.name)}`;
+    // Colours come from the fn-* classes in index.html (player green, element colour, base name orange)
+    return `<span class="fn-player">${esc((player.name || 'Hero').slice(0, MAX_NAME_LENGTH))}</span> <span class="fn-el fn-el-${el}">${ELEMENTS[el].name}</span> <span class="fn-base">${esc(gear.baseName || gear.name)}</span>`;
 }
 function blacksmithSetMode(mode) {
     blacksmithMode = mode;
@@ -3550,7 +3551,8 @@ function elementDetailHTML(el) {
     const e = ELEMENTS[el];
     if (!e) return '';
     const weakKey = Object.keys(ELEMENTS).find(k => ELEMENTS[k].beats === el);
-    return `<span class="text-cyan-300">${e.icon} ${e.name} element: strong vs ${ELEMENTS[e.beats].name}, weak vs ${ELEMENTS[weakKey].name}</span>`;
+    const nm = k => `<span class="fn-el fn-el-${k}">${ELEMENTS[k].name}</span>`;
+    return `<span class="el-line">${e.icon} ${nm(el)} element: strong vs ${nm(e.beats)}, weak vs ${nm(weakKey)}</span>`;
 }
 
 function buffsDetailHTML(buffs, debuffs) {
@@ -3612,7 +3614,7 @@ function gearCardHTML(item, label) {
         <span class="text-[9px] uppercase tracking-wider text-slate-500">${label}</span>
         <span class="font-bold ${r.text} break-words">${item.name}${item.refineLevel > 0 ? ' +' + item.refineLevel : ''}</span>
         <span class="${r.text}">${r.name} · R${item.rarity}</span>
-        ${item.element && ELEMENTS[item.element] ? `<span class="text-cyan-300">${ELEMENTS[item.element].icon} ${ELEMENTS[item.element].name}</span>` : ''}
+        ${item.element && ELEMENTS[item.element] ? `<span class="text-cyan-300">${ELEMENTS[item.element].icon} <span class="fn-el fn-el-${item.element}">${ELEMENTS[item.element].name}</span></span>` : ''}
         ${stats}${buffs}${debuffs}
     </div>`;
 }
