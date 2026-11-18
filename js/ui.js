@@ -7729,7 +7729,7 @@ function addPlank(m, qty = 1) {
 // Rarity colours (the inner border on gear in the bag)
 const RARITY_HEX = { 1: '#94a3b8', 2: '#34d399', 3: '#60a5fa', 4: '#c084fc', 5: '#fbbf24' };
 
-// Hold a gear cell for 3 seconds (mouse hover) or long-press it (touch) to open its detail window
+// Hold a bag cell for 0.5 seconds (mouse hover) or long-press it (touch) to open its detail window
 const BAG_HOVER_MS = 500, BAG_LONGPRESS_MS = 500;
 let bagHoverTimer = null, bagPressTimer = null, bagPressStart = null, bagSuppressClick = false;
 let bagHoverOpenedIdx = null; // the window was opened by hovering this cell: it closes when the pointer leaves
@@ -7741,7 +7741,7 @@ function bagCancelTimers() { clearTimeout(bagHoverTimer); clearTimeout(bagPressT
 function bagOpenIfGear(index, byHover = false) {
     if (bulkMode) return; // select mode: taps pick cells, no detail window
     const it = player.inventory[index];
-    if (!it || !it.slot) return; // gear only
+    if (!it) return; // any bag item: gear, materials, potions, tickets
     showItemDetail(index);
     bagHoverOpenedIdx = byHover ? index : null;
 }
