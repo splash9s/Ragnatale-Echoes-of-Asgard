@@ -43,6 +43,7 @@ const AVATAR_SET = [
     { path: "assets/avatars/money2_q85.webp", spend: 100 },
     { path: "assets/avatars/money3_q85.webp", spend: 1000 },
     { path: "assets/avatars/girlmeme_q85.webp" }, // new: no condition yet
+    { path: "assets/avatars/strawman_q85.webp", hit: 1000 }, // hit the straw man 1000 times
 ];
 const AVATARS = AVATAR_SET.map(a => a.path);
 // Avatar value is either an emoji or an image path (assets/avatars/... or data:image...)
@@ -187,6 +188,7 @@ function isAvatarUnlocked(av) {
     if (rule.lv && (player.baseLv || 1) < rule.lv) return false;
     if (rule.spend && (player.diamondsSpent || 0) <= rule.spend) return false;
     if (rule.die && (player.deathCount || 0) < rule.die) return false;
+    if (rule.hit && (player.strawHits || 0) < rule.hit) return false;
     if (rule.boss) return FINAL_PATH_KEYS.every(pk => !!(player.clearedMaps && player.clearedMaps[`${pk}:map${rule.boss}`]));
     return true;
 }
@@ -197,6 +199,7 @@ function avatarLockText(av) {
     if (rule.boss) return `Boss Lv. ${rule.boss}`;
     if (rule.spend) return `Diamonds bought over ${rule.spend}`;
     if (rule.die) return `Died ${rule.die} times`;
+    if (rule.hit) return `Straw man hits ${rule.hit}`;
     return '';
 }
 function avatarLockTitle(av) {
@@ -206,6 +209,7 @@ function avatarLockTitle(av) {
     if (rule.boss) return `Defeat the Map Lv. ${rule.boss} boss on all 4 elements`;
     if (rule.spend) return `Buy more than ${rule.spend} diamonds in total`;
     if (rule.die) return `Die ${rule.die} times in total`;
+    if (rule.hit) return `Hit the straw man ${rule.hit} times in total`;
     return '';
 }
 
@@ -6685,6 +6689,8 @@ function playStrawSlash(crit) {
 // One straw hit: damage number, slash, and the combat hit or crit sound
 function strawHit(hit) {
     const { dmg, crit } = hit;
+    player.strawHits = (player.strawHits || 0) + 1; // total straw man hits (avatar unlock)
+    if (player.strawHits % 10 === 0 && typeof saveGame === 'function') saveGame();
     showStrawDamage(String(dmg), crit);
     playStrawSlash(crit);
     playSfx(attackSfx(crit));

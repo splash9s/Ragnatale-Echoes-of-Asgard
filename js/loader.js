@@ -25,6 +25,7 @@ const LOADING_IMAGES = [
     "assets/avatars/snowwolf_q85.webp",
     "assets/avatars/starlightmender_q85.webp",
     "assets/avatars/man1_q85.webp",
+    "assets/avatars/strawman_q85.webp",
     "assets/avatars/man2_q85.webp",
     "assets/avatars/man3_q85.webp",
     "assets/avatars/woman1_q85.webp",
