@@ -1813,6 +1813,7 @@ function runCombatTick() {
         const isCrit = (isFirstHitOfBattle && player.runes.alwaysCritFirst) || runeN('relentless') > 0 || riposteCrit || (Math.random() * 100 < derived.crit + surgeBonus);
         playPlayerAttackAnim(isCrit);
         targetEnemy.lastHitCrit = !!isCrit;
+        targetEnemy.lastHitElem = (elemMult > 1 && !player.runes.elementIgnore) ? (player.equipped.weapon?.element || null) : null; // element advantage shows the number in that element's colour
         if (isCrit) {
             pDmg = Math.floor(pDmg * (1.5 + (skillBonus('critDmgPct') + setStat('critDmgPct')) / 100));
             const critIdx = monstersList.indexOf(targetEnemy);
