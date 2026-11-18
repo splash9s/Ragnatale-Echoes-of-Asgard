@@ -7902,7 +7902,7 @@ document.addEventListener('click', (e) => {
 
 
 // ---- Level up animation: the 2x2 sheet frames play in the order 4, 1, 2, 3, 3, 2, 1, 4, fading in and out ----
-const LEVELUP_FX_FRAMES = [4, 1, 2, 3, 3, 2, 1, 4].map(n => `assets/effects/levelup_f${n}_q85.webp`);
+const LEVELUP_FX_FRAMES = [4, 1, 2, 3, 3, 2, 1, 4].map(n => `assets/effects/levelup_f${n}_v2_q85.webp`);
 const LEVELUP_FX_STEP_MS = 110;
 let levelUpFxTimers = [];
 function playLevelUpFx() {
