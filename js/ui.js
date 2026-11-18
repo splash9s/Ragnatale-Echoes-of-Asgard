@@ -4301,8 +4301,11 @@ function executeEquipItem(index, targetSlot) {
     return true;
 }
 
+// Iron Scraps per salvaged gear: 1 base, +0 to +4 from rarity (Common to Legendary), +0 to +5 from refine level (+2 per 2 levels). Range 1-10.
 function salvageScrapGain(item) {
-    return Math.min(5, Math.max(1, Math.floor((item.levelReq || 1) / 5) + 1));
+    const rarity = Math.min(5, Math.max(1, Math.floor(Number(item.rarity) || 1)));
+    const refine = Math.min(10, Math.max(0, Math.floor(Number(item.refineLevel) || 0)));
+    return Math.min(10, 1 + (rarity - 1) + Math.floor(refine / 2));
 }
 
 function salvageEquipmentItem(index, onDone, onCancel = null) {
