@@ -7796,3 +7796,73 @@ document.addEventListener('click', (e) => {
 }, true);
 // A tap on a cell opens the window for good: leaving the cell no longer closes it
 document.addEventListener('click', (e) => { if (bagCellIndex(e.target) !== null) bagHoverOpenedIdx = null; }, true);
+
+// ---- Shop gear rows: same as the bag. Hover 0.5 s (or long-press on touch) opens the detail window; leaving closes it
+// unless the pointer moved into the window; a tap opens it for good ----
+let shopHoverTimer = null, shopPressTimer = null, shopPressStart = null, shopSuppressClick = false;
+let shopHoverOpenedIdx = null;
+function shopRowIndex(target) {
+    const row = target && target.closest ? target.closest('#shop-items-container [data-shop-idx]') : null;
+    return row ? Number(row.dataset.shopIdx) : null;
+}
+function shopInDetail(target) { return !!(target && target.closest && target.closest('#shop-detail-panel')); }
+function shopOpenFromPointer(idx, byHover) {
+    if (window.shopDetailIdx === idx) { shopHoverOpenedIdx = null; return; } // already open: keep it
+    showArmoryItemDetail(idx);
+    shopHoverOpenedIdx = byHover ? idx : null;
+}
+function shopCloseIfHoverOpened() {
+    if (shopHoverOpenedIdx === null) return;
+    shopHoverOpenedIdx = null;
+    closeShopDetail();
+}
+document.addEventListener('pointerover', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const idx = shopRowIndex(e.target);
+    clearTimeout(shopHoverTimer); shopHoverTimer = null;
+    if (idx === null) return;
+    shopHoverTimer = setTimeout(() => shopOpenFromPointer(idx, true), BAG_HOVER_MS);
+});
+document.addEventListener('pointerout', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const idx = shopRowIndex(e.target);
+    const to = e.relatedTarget;
+    const fromRow = idx !== null;
+    const fromPanel = shopInDetail(e.target);
+    if (!fromRow && !fromPanel) return;
+    if (fromRow && (shopRowIndex(to) === idx || shopInDetail(to))) return;
+    if (fromPanel && (shopInDetail(to) || shopRowIndex(to) !== null)) return;
+    if (fromRow) clearTimeout(shopHoverTimer);
+    shopCloseIfHoverOpened();
+});
+document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    const idx = shopRowIndex(e.target);
+    if (idx === null) return;
+    shopPressStart = { x: e.clientX, y: e.clientY };
+    clearTimeout(shopPressTimer);
+    shopPressTimer = setTimeout(() => {
+        shopSuppressClick = true;
+        setTimeout(() => { shopSuppressClick = false; }, 800);
+        shopOpenFromPointer(idx, false);
+    }, BAG_LONGPRESS_MS);
+}, true);
+document.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch' || !shopPressStart) return;
+    if (Math.hypot(e.clientX - shopPressStart.x, e.clientY - shopPressStart.y) > 10) clearTimeout(shopPressTimer);
+});
+document.addEventListener('pointerup', () => { clearTimeout(shopPressTimer); shopPressStart = null; });
+document.addEventListener('pointercancel', () => { clearTimeout(shopPressTimer); shopPressStart = null; });
+// A tap on a row that is already open (from hover or long-press) keeps it open instead of toggling it shut;
+// a long-press's own tap is swallowed the same way
+document.addEventListener('click', (e) => {
+    const idx = shopRowIndex(e.target);
+    if (idx === null) return;
+    if (shopSuppressClick || (shopHoverOpenedIdx === idx && window.shopDetailIdx === idx)) {
+        shopSuppressClick = false;
+        shopHoverOpenedIdx = null;
+        e.stopPropagation(); e.preventDefault();
+    } else if (window.shopDetailIdx !== idx) {
+        shopHoverOpenedIdx = null;
+    }
+}, true);
