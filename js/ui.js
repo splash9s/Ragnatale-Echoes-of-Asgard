@@ -2902,8 +2902,10 @@ function blacksmithSelect(slot) {
     blacksmithSelectedSlot = slot;
     renderRefiningUI();
 }
+// Return: clears the picked weapon and, in Elemental mode, puts the picked element stone back (nothing is spent until Forge)
 function blacksmithCancel() {
     blacksmithSelectedSlot = null;
+    if (blacksmithMode === 'elemental') blacksmithForgeEl = null;
     renderRefiningUI();
 }
 function blacksmithRefineSelected() {
