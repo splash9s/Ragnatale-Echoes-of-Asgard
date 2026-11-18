@@ -7483,15 +7483,28 @@ const HOME_PET_RATIO = { 1: 271 / 300, 2: 265 / 300, 3: 261 / 300 };
 const HOME_PET_COST = { 2: 10000, 3: 30000 };       // gold to reach each pet house level
 function homeTentLevel() { return Math.min(3, Math.max(1, (player && player.tentLevel) || 1)); }
 function homePetHouseLevel() { return Math.min(3, Math.max(1, (player && player.petHouseLevel) || 1)); }
+// The level shown on screen: the player picks any level they own (defaults to the owned level)
+function homeTentViewLevel() { return Math.min(homeTentLevel(), Math.max(1, (player && player.tentView) || homeTentLevel())); }
+function homePetViewLevel() { return Math.min(homePetHouseLevel(), Math.max(1, (player && player.petView) || homePetHouseLevel())); }
+// EXP and gold bonus (percent) from each owned level: Lv 2 = +3%, Lv 3 = +6%, for the tent and for the pet house
+const HOME_BONUS_PCT = { 1: 0, 2: 3, 3: 6 };
+function homeBonusPct() { return HOME_BONUS_PCT[homeTentLevel()] + HOME_BONUS_PCT[homePetHouseLevel()]; }
+function homeSetView(kind, lv) {
+    if (typeof player === 'undefined' || !player) return;
+    if (kind === 'tent') player.tentView = lv; else player.petView = lv;
+    applyHomeArt();
+    renderHomePanel();
+    if (typeof saveGame === 'function') saveGame();
+}
 // Puts the current tent and pet house art on screen (only changes an image when its file differs)
 function applyHomeArt() {
     if (typeof player === 'undefined' || !player) return;
-    const t = HOME_TENT_ART[homeTentLevel()];
+    const t = HOME_TENT_ART[homeTentViewLevel()];
     const setSrc = (id, src) => { const el = document.getElementById(id); if (el && el.getAttribute('src') !== src) el.setAttribute('src', src); };
     setSrc('tent-left', t.left); setSrc('tent-right', t.right); setSrc('tent-both', t.both);
     const off = document.querySelector('#view-character .ts-bg');
     if (off && off.getAttribute('src') !== t.off) off.setAttribute('src', t.off);
-    setSrc('town-pet-house', HOME_PET_ART[homePetHouseLevel()]);
+    setSrc('town-pet-house', HOME_PET_ART[homePetViewLevel()]);
 }
 function homeStyles() {
     if (document.getElementById('home-panel-style')) return;
@@ -7506,7 +7519,10 @@ function homeStyles() {
         + ' #home-panel .hm-card h4 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }'
         + ' #home-panel .hm-card p { margin: 0 0 8px; color: #9aa6bd; font-size: 16px; }'
         + ' #home-panel .hm-btn { width: 100%; padding: 10px; border-radius: 10px; border: 0; background: #b45309; color: #fff8e7; font-weight: 800; font-size: 18px; cursor: pointer; }'
-        + ' #home-panel .hm-btn:disabled { opacity: .45; cursor: default; }';
+        + ' #home-panel .hm-btn:disabled { opacity: .45; cursor: default; }'
+        + ' #home-panel .hm-picks { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }'
+        + ' #home-panel .hm-pick { padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e9edf5; font-weight: 700; font-size: 15px; cursor: pointer; }'
+        + ' #home-panel .hm-pick.on { border-color: #fbbf24; background: #78350f; color: #fff8e7; }';
     document.head.appendChild(st);
 }
 function openHomePanel() {
@@ -7549,7 +7565,12 @@ function homeCard(kind, title, level, costs, curName) {
         btn = `<button class="hm-btn" onclick="homeAsk('${kind}')" ${haveEnough ? '' : 'disabled'}>Upgrade to Lv. ${next} · ${cost.toLocaleString()} gold + ${planks} Planks</button>`;
     }
     const have = max ? '' : `<p>Planks: ${countPlanks()} / ${planks} needed</p>`;
-    return `<div class="hm-card"><h4>${title}</h4><p>Current: Lv. ${level} (${curName})</p>${have}${btn}</div>`;
+    const viewLv = kind === 'tent' ? homeTentViewLevel() : homePetViewLevel();
+    const picks = [];
+    for (let l = 1; l <= level; l++) picks.push(`<button class="hm-pick${l === viewLv ? ' on' : ''}" onclick="homeSetView('${kind}',${l})">Lv. ${l}</button>`);
+    const picker = `<p>Show on screen:</p><div class="hm-picks">${picks.join('')}</div>`;
+    const bonus = `<p>Bonus: +${HOME_BONUS_PCT[level]}% EXP and gold</p>`;
+    return `<div class="hm-card"><h4>${title}</h4><p>Current: Lv. ${level} (${curName})</p>${bonus}${picker}${have}${btn}</div>`;
 }
 function homeAsk(kind) { homePending = kind; renderHomePanel(); }
 function homeCancel() { homePending = null; renderHomePanel(); }
@@ -7565,7 +7586,8 @@ function renderHomePanel() {
     box.innerHTML = `<div class="hm-head"><h3>Home</h3><button class="hm-x" onclick="closeHomePanel()">✕</button></div>
         <div class="hm-gold">Gold: ${Number(player.gold || 0).toLocaleString()} · Planks: ${countPlanks()}</div>`
         + homeCard('tent', 'Tent', tentLv, HOME_TENT_COST, ['', 'Basic', 'Improved', 'Grand'][tentLv])
-        + homeCard('pet', 'Pet House', houseLv, HOME_PET_COST, ['', 'Basic', 'Cozy', 'Royal'][houseLv]);
+        + homeCard('pet', 'Pet House', houseLv, HOME_PET_COST, ['', 'Basic', 'Cozy', 'Royal'][houseLv])
+        + `<p style="color:#9aa6bd; margin:0;">Total bonus: +${homeBonusPct()}% EXP and gold</p>`;
 }
 function homeUpgrade(kind) {
     if (typeof player === 'undefined' || !player) return;
@@ -7578,7 +7600,8 @@ function homeUpgrade(kind) {
     if (countPlanks() < planks) { showFloatNotice(`Not enough Planks (need ${planks}).`); return; }
     player.gold -= cost;
     removeItemByName(PLANK_ITEM.name, planks);
-    if (kind === 'tent') player.tentLevel = next; else player.petHouseLevel = next;
+    if (kind === 'tent') { player.tentLevel = next; player.tentView = next; }
+    else { player.petHouseLevel = next; player.petView = next; }
     applyHomeArt();
     updateUI();
     if (typeof saveGame === 'function') saveGame();
