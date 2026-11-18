@@ -5368,9 +5368,10 @@ function claimQuestMilestone(count) {
 
 // Chest rewards: a stack of healing potions (count inclusive), then armory gear with a rarity roll per item
 const CHEST_REWARDS = {
-    copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1, diamonds: 1 },
-    silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1, diamonds: 10 },
-    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 50 },
+    // mats: chance (0-1) per chest to drop one refine material: 1 Ingot, 2 Bar, 3 Alloy (see REFINE_MATERIAL_ITEMS)
+    copper: { potion: 'potion_minor', potionMin: 3, potionMax: 5, rarities: [2], items: 1, diamonds: 1, mats: { 1: 0.3 } },
+    silver: { potion: 'potion_med',   potionMin: 3, potionMax: 5, rarities: [3, 4], items: 1, diamonds: 10, mats: { 1: 0.3, 2: 0.1 } },
+    gold:   { potion: 'potion_large', potionMin: 3, potionMax: 5, rarities: [3, 4, 5], items: 2, diamonds: 50, mats: { 1: 0.3, 2: 0.15, 3: 0.05 } },
     costume: { potion: null, rarities: [], items: 0, costume: true } // one random costume from COSTUME_BOX_POOL
 };
 
@@ -5405,6 +5406,14 @@ function takeChestOpenIsTenth() {
     player.chestOpens = (player.chestOpens || 0) + 1;
     return player.chestOpens % 10 === 0;
 }
+function chestGearPool() {
+    const all = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
+    const lv = (typeof player !== 'undefined' && player && player.baseLv) || 1;
+    const inRange = all.filter(t => Math.abs((t.levelReq || 1) - lv) <= 10);
+    if (inRange.length) return inRange;
+    // No gear within 10 levels: use the 10 nearest
+    return all.slice().sort((a, b) => Math.abs((a.levelReq || 1) - lv) - Math.abs((b.levelReq || 1) - lv)).slice(0, 10);
+}
 function openChest(chestType) {
     const cfg = CHEST_REWARDS[chestType] || CHEST_REWARDS.copper;
     const tenth = takeChestOpenIsTenth();
@@ -5421,7 +5430,18 @@ function openChest(chestType) {
         rewardCells.push(diamondCellHTML(cfg.diamonds));
     }
 
-    const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
+    // Refine materials: each one rolls its own chance
+    if (cfg.mats) {
+        Object.keys(cfg.mats).forEach(tier => {
+            if (Math.random() >= cfg.mats[tier]) return;
+            const mat = { ...REFINE_MATERIAL_ITEMS[tier], qty: 1 };
+            addItemToInventory(mat);
+            rewardCells.push(rewardCellHTML(mat));
+        });
+    }
+
+    // Gear level: within 10 levels of the player's base level (closest levels when none is in range)
+    const pool = chestGearPool();
     if (pool.length > 0) {
         for (let i = 0; i < cfg.items; i++) {
             let rarity = cfg.rarities[Math.floor(Math.random() * cfg.rarities.length)];
