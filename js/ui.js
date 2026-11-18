@@ -7905,6 +7905,20 @@ document.addEventListener('click', (e) => {
 const LEVELUP_FX_FRAMES = [4, 1, 2, 3, 3, 2, 1, 4].map(n => `assets/effects/levelup_f${n}_v2_q85.webp`);
 const LEVELUP_FX_STEP_MS = 110;
 let levelUpFxTimers = [];
+// The visible player sprite (combat or town). Null when neither is on screen.
+function levelUpFxAnchor() {
+    const combat = document.getElementById('view-combat');
+    if (combat && !combat.classList.contains('hidden')) {
+        const el = document.getElementById('combat-player-sprite');
+        if (el && el.getBoundingClientRect().width > 0) return el;
+    }
+    const town = document.getElementById('view-town');
+    if (town && !town.classList.contains('hidden')) {
+        const el = document.getElementById('town-hero');
+        if (el && el.getBoundingClientRect().width > 0) return el;
+    }
+    return null;
+}
 function playLevelUpFx() {
     levelUpFxTimers.forEach(clearTimeout);
     levelUpFxTimers = [];
@@ -7914,9 +7928,15 @@ function playLevelUpFx() {
         el.id = 'levelup-fx';
         el.alt = '';
         el.setAttribute('aria-hidden', 'true');
-        el.style.cssText = 'position:fixed; left:50%; top:50%; width:min(38vw, 320px); height:auto; transform:translate(-50%, -50%); opacity:0; pointer-events:none; z-index:9000; transition:opacity 180ms ease-in-out;';
         document.body.appendChild(el);
     }
+    // Sit on the player's feet, at the player's width
+    const anchor = levelUpFxAnchor();
+    const r = anchor ? anchor.getBoundingClientRect() : null;
+    const w = r ? r.width : Math.min(window.innerWidth * 0.38, 320);
+    const cx = r ? r.left + r.width / 2 : window.innerWidth / 2;
+    const feet = r ? r.bottom : window.innerHeight / 2 + w * 0.37;
+    el.style.cssText = `position:fixed; left:${cx}px; top:${feet}px; width:${w}px; height:auto; transform:translate(-50%, -100%); opacity:0; pointer-events:none; z-index:9000; transition:opacity 180ms ease-in-out;`;
     LEVELUP_FX_FRAMES.forEach((src, i) => {
         levelUpFxTimers.push(setTimeout(() => {
             if (el.getAttribute('src') !== src) el.setAttribute('src', src);
