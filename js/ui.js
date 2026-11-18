@@ -2653,6 +2653,16 @@ function vipPriceTagHTML(item) {
 }
 let vipCat = 'all';
 let vipSelected = null;
+// Top-up pack art for the Diamond tab (diamond packs first, then gold packs), shown as a left-to-right row
+const PACK_ART = {
+    topup_usd_1: 'assets/diamond/pack/500diamond_q85.webp',
+    topup_usd_5_9: 'assets/diamond/pack/4000diamond_q85.webp',
+    topup_usd_9_9: 'assets/diamond/pack/8000diamond_q85.webp',
+    topup_usd_19: 'assets/diamond/pack/18000diamond_q85.webp',
+    topup_usd_29: 'assets/diamond/pack/30000diamond_q85.webp',
+    gold_usd_1: 'assets/diamond/pack/30000gold_q85.webp',
+    gold_usd_2_9: 'assets/diamond/pack/100000gold_q85.webp',
+};
 function vipItemsOf(cat) {
     const c = VIP_CATS.find(x => x.key === cat) || VIP_CATS[0];
     if (!c.types) return DIAMOND_SHOP_ITEMS;
@@ -2678,7 +2688,17 @@ function renderVipMenu() {
 function renderVipList() {
     const grid = document.getElementById('vip-grid');
     if (!grid) return;
-    const keepScroll = grid.scrollTop;
+    const keepScroll = grid.scrollTop, keepLeft = grid.scrollLeft;
+    if (vipCat === 'stone') {
+        grid.classList.add('vip-pack-row');
+        grid.innerHTML = vipItemsOf(vipCat).filter(item => PACK_ART[item.id]).map(item => `
+            <button class="vip-pack${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')">
+                <img src="${PACK_ART[item.id]}" alt="${escapeHtml(item.name)}">
+            </button>`).join('');
+        grid.scrollLeft = keepLeft;
+        return;
+    }
+    grid.classList.remove('vip-pack-row');
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
         <div class="vip-cell">
             <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
