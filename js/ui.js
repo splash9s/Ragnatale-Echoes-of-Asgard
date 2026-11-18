@@ -99,9 +99,9 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'stat_reset', name: "Status Reset Service", price: 100, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 100, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
     { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', vipCat: 'vip', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/inventoryexp_q85.webp' },
-    { id: 'pet_box', name: "Pet Box", price: 590, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'pet_box', name: "Pet Box", price: 0, ticket: { name: 'Pet Ticket', qty: 10 }, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
-    { id: 'dchest_costume', name: "Costume Chest", price: 590, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
+    { id: 'dchest_costume', name: "Costume Chest", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
 
@@ -2750,7 +2750,7 @@ function renderDiamondShop() {
                         <span class="text-[10px] text-slate-400 block">${item.desc}</span>
                     </div>
                 </div>
-                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${item.price}</button>
+                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">${item.ticket ? `${item.ticket.qty} ${item.ticket.name}s` : `<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${item.price}`}</button>
             </div>
         `;
     });
@@ -2775,7 +2775,12 @@ function buyDiamondItem(itemId) {
     }
 
     const cost = dsPrice(item);
-    if (player.diamonds < cost) {
+    if (item.ticket) {
+        if (countItemByName(item.ticket.name) < item.ticket.qty) {
+            showModal("Not Enough Tickets", `You need ${item.ticket.qty} ${item.ticket.name}s to buy this.`);
+            return;
+        }
+    } else if (player.diamonds < cost) {
         floatNoticeAt("Not enough Diamonds", window.event);
         return;
     }
@@ -2792,9 +2797,13 @@ function buyDiamondItem(itemId) {
         return;
     }
 
-    player.diamonds -= cost;
+    if (item.ticket) {
+        removeItemByName(item.ticket.name, item.ticket.qty); // paid in tickets, not Diamonds
+    } else {
+        player.diamonds -= cost;
+        player.diamondsSpent = (player.diamondsSpent || 0) + cost; // total diamonds spent in the shop (avatar unlocks)
+    }
     playSfx(SFX.coin);
-    player.diamondsSpent = (player.diamondsSpent || 0) + cost; // total diamonds spent in the shop (avatar unlocks)
     if (item.type === 'resurrection') {
         player.resurrectionPotions = (player.resurrectionPotions || 0) + 1;
         floatSuccessAt("Purchased!");
@@ -3807,7 +3816,7 @@ function showResultItemDetail(index) {
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    const canSell = !NO_GEAR_SLOTS.includes(item.slot);
+    const canSell = !NO_GEAR_SLOTS.includes(item.slot) && !item.noSell;
     ddFill(card, {
         close: 'closeResultItemDetail()',
         icon: itemIconHTML(item, 80),
@@ -3998,7 +4007,7 @@ function showItemDetail(index, refresh = false) {
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    const canSell = !NO_GEAR_SLOTS.includes(item.slot);
+    const canSell = !NO_GEAR_SLOTS.includes(item.slot) && !item.noSell;
     const canSalvage = isEquip && !NO_GEAR_SLOTS.includes(item.slot) && !item.favorite;
     const primary = item.type === 'box'
         ? `<button onclick="openBoxFromDetail(${index})" class="dd-btn primary">Open</button>`
@@ -4302,8 +4311,8 @@ function executeEquipItem(index, targetSlot) {
 }
 
 // Salvaging a pet or costume gives a ticket instead of scraps
-const PET_TICKET_ITEM = { name: 'Pet Ticket', type: 'material', price: 50, maxStack: 99, desc: 'Ticket from a salvaged pet.', lore: 'A worn token from a pet that has gone home. Keep it for a pet to come.' };
-const COSTUME_TICKET_ITEM = { name: 'Costume Ticket', type: 'material', price: 50, maxStack: 99, desc: 'Ticket from a salvaged costume.', lore: 'A folded ticket stitched from an old costume. Keep it for a new outfit.' };
+const PET_TICKET_ITEM = { name: 'Pet Ticket', type: 'material', noSell: true, maxStack: 99, desc: 'Ticket from a salvaged pet.', lore: 'A worn token from a pet that has gone home. Keep it for a pet to come.' };
+const COSTUME_TICKET_ITEM = { name: 'Costume Ticket', type: 'material', noSell: true, maxStack: 99, desc: 'Ticket from a salvaged costume.', lore: 'A folded ticket stitched from an old costume. Keep it for a new outfit.' };
 // What salvaging an item gives: { tpl, qty } where tpl is the bag item to add
 function salvageRewardOf(item) {
     if (item && item.slot === 'pet') return { tpl: PET_TICKET_ITEM, qty: 1 };
