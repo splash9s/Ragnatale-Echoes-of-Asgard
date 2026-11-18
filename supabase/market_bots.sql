@@ -96,11 +96,3 @@ select public.market_bots_refresh();
 create extension if not exists pg_cron;
 do $$ begin perform cron.unschedule('market-bots-daily'); exception when others then null; end $$;
 select cron.schedule('market-bots-daily', '0 0 * * *', $$select public.market_bots_refresh();$$);
-
--- 7) Fix the level of bot listings that are already up: take each item's level from the stock table
-update public.auction_listings l
-   set item = jsonb_set(l.item, '{levelReq}', s.item->'levelReq')
-  from public.auction_bot_stock s
- where l.is_bot
-   and l.status = 'open'
-   and l.item->>'name' = s.item->>'name';
