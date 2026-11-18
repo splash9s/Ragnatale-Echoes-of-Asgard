@@ -3895,7 +3895,7 @@ function itemSourceLines(item) {
     if (!item || !item.name) return [];
     const lines = [];
     if (item.name === SCRAP_ITEM.name) return ['Salvage gear (1-5 Iron Scraps per piece)'];
-    if (item.name === PLANK_ITEM.name) return ['Normal monsters (20% per kill)', 'Used to upgrade the Tent and Pet House'];
+    if (item.name === PLANK_ITEM.name) return ['Normal monsters (20% per kill)', 'Mini boss (40% per kill)', 'Boss (80% per kill)', 'Used to upgrade the Tent and Pet House'];
     if (item.name === REFINE_MATERIAL_ITEMS[1].name) return ['Smelt 20 Iron Scraps', 'Normal monsters (5% per kill)'];
     if (item.name === REFINE_MATERIAL_ITEMS[2].name) return ['Smelt 20 Ingots', 'Mini boss (5% per kill)'];
     if (item.name === REFINE_MATERIAL_ITEMS[3].name) return ['Smelt 10 Bars', 'Boss (2% per kill)'];
