@@ -5055,7 +5055,7 @@ function showMailItemDetail(mailId, idx, refresh = false) {
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
-        compare: '',
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
         primary: '', secondary: []
