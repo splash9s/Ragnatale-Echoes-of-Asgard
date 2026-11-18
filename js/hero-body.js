@@ -2426,4 +2426,4 @@ function combatPose() {
 }
 
 // Keeps the town, character and class-select heroes in step once their art has loaded
-setInterval(() => { if (typeof syncHeroSprites === 'function') syncHeroSprites(); }, 500);
+setInterval(() => { if (!document.hidden && typeof syncHeroSprites === 'function') syncHeroSprites(); }, 500);
