@@ -2981,6 +2981,7 @@ function renderRefiningUI() {
                 <button onclick="smeltRefiningStone()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer">Smelt 1 Refining Stone</button>
             </div>
             <span class="text-[10px] text-slate-400">Combine 100 Iron Scraps to forge 1 Refining Stone.</span>
+            <span class="text-xs text-amber-200">Refining ores: <strong class="text-amber-400">Ore I ${refineOreCount(1)}</strong> (+1 to +4) · <strong class="text-amber-400">Ore II ${refineOreCount(2)}</strong> (+5 to +7) · <strong class="text-amber-400">Ore III ${refineOreCount(3)}</strong> (+8 to +10)</span>
             <span class="text-xs text-amber-200 inline-flex items-center gap-1.5"><img src="assets/shop/diamond/refiningstone.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
         </div>
         <div class="text-[10px] text-slate-400 mb-1">Select gear to refine:</div>
@@ -3001,7 +3002,7 @@ function renderRefiningUI() {
                     <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(gear, 36)} ${gear.name} ${currentRefine > 0 ? '+' + currentRefine : ''}</span>
                     <span class="text-[10px] text-slate-400 block capitalize">Slot: ${slot} | Success Rate: ${isMax ? 'MAX' : successRate + '%'}</span>
                 </div>
-                <span class="text-[10px] text-slate-300 whitespace-nowrap">${isMax ? 'MAX LEVEL' : (refineIsFree() ? 'First refine FREE' : costGold + ' Gold + 1 Stone')}</span>
+                <span class="text-[10px] text-slate-300 whitespace-nowrap">${isMax ? 'MAX LEVEL' : (refineIsFree() ? 'First refine FREE' : costGold + ' Gold + 1 ' + REFINE_ORE_NAMES[refineOreTier(currentRefine + 1)])}</span>
             </div>
         `;
     }
@@ -3124,6 +3125,20 @@ function forgeElementOnWeapon() {
 
 function refineIsFree() { return !(player.guide && player.guide.refine); }
 
+// Refining uses Ores instead of Refining Stones: Ore I for +1..+4, Ore II for +5..+7, Ore III for +8..+10
+const REFINE_ORE_NAMES = { 1: 'Ore I', 2: 'Ore II', 3: 'Ore III' };
+function refineOreTier(target) { return target <= 4 ? 1 : (target <= 7 ? 2 : 3); }
+function refineOreCount(tier) {
+    if (!player.refineOres) player.refineOres = { 1: 0, 2: 0, 3: 0 };
+    return player.refineOres[tier] || 0;
+}
+function addRefineOre(tier, m) {
+    refineOreCount(tier);
+    player.refineOres[tier] += 1;
+    logMessage(`[Ore Drop] ${m.name} dropped ${REFINE_ORE_NAMES[tier]}!`, 'drop');
+    showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">${REFINE_ORE_NAMES[tier]}</span>`);
+}
+
 function refineEquipment(slot) {
     let gear = player.equipped[slot];
     if (!gear) return;
@@ -3134,8 +3149,9 @@ function refineEquipment(slot) {
     let current = gear.refineLevel;
     const free = refineIsFree();
     let costGold = free ? 0 : (current + 1) * 100;
-    if (!free && (player.gold < costGold || (player.refiningStones || 0) < 1)) {
-        showFloatNotice(`Refining needs ${costGold} Gold and 1 Refining Stone.`);
+    const oreTier = refineOreTier(current + 1);
+    if (!free && (player.gold < costGold || refineOreCount(oreTier) < 1)) {
+        showFloatNotice(`Refining +${current + 1} needs ${costGold} Gold and 1 ${REFINE_ORE_NAMES[oreTier]}.`);
         return;
     }
 
@@ -3144,7 +3160,7 @@ function refineEquipment(slot) {
         player.guide.refine = true;
     } else {
         player.gold -= costGold;
-        player.refiningStones = Math.max(0, (player.refiningStones || 0) - 1);
+        player.refineOres[oreTier] = Math.max(0, refineOreCount(oreTier) - 1);
     }
 
     let successRate = refineSuccessRate(current);
