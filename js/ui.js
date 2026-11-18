@@ -79,7 +79,11 @@ function potionHealText(item) {
 
 const DIAMOND_SHOP_ITEMS = [
     // Real-money top-up: opens the Stripe payment link. Diamonds are credited by the server after payment is confirmed.
-    { id: 'topup_4200', name: "4,200 Diamonds", desc: "Top up 4,200 diamonds for 300 THB.", price: 0, type: 'topup', vipCat: 'stone', thb: 300, diamonds: 4200, payLink: 'https://buy.stripe.com/test_28E5kE0x46Zwd2K6Kp0Fi00', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_1', name: "500 Diamonds", desc: "Top up 500 diamonds for $1.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 1, diamonds: 500, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_5_9', name: "3,000 Diamonds", desc: "Top up 3,000 diamonds for $5.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 5.9, diamonds: 3000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_8_9', name: "4,500 Diamonds", desc: "Top up 4,500 diamonds for $8.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 8.9, diamonds: 4500, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_19', name: "10,000 Diamonds", desc: "Top up 10,000 diamonds for $19.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 19, diamonds: 10000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_29', name: "15,000 Diamonds", desc: "Top up 15,000 diamonds for $29.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 29, diamonds: 15000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 4000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
@@ -96,9 +100,9 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'stat_reset', name: "Status Reset Service", price: 100, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 100, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
     { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', vipCat: 'vip', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/inventoryexp_q85.webp' },
-    { id: 'pet_box', name: "Pet Box", price: 500, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'pet_box', name: "Pet Box", price: 590, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
-    { id: 'dchest_costume', name: "Costume Chest", price: 500, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
+    { id: 'dchest_costume', name: "Costume Chest", price: 590, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
 
@@ -2591,7 +2595,7 @@ const VIP_CATS = [
 const DIAMOND_SHOP_DISCOUNT = 20;
 function dsPrice(item) { return item.type === 'topup' ? item.price : Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
 function vipPriceTagHTML(item) {
-    if (item.type === 'topup') return `${item.thb} THB`;
+    if (item.type === 'topup') return item.usd ? `$${item.usd.toFixed(2)}` : `${item.thb} THB`;
     return `<s style="opacity:.6; font-size:.8em;">${item.price}</s> ${dsPrice(item)} <span style="color:#4ade80; font-size:.75em;">-${DIAMOND_SHOP_DISCOUNT}%</span>`;
 }
 let vipCat = 'all';
@@ -3955,6 +3959,7 @@ function useInventoryPotion(index) {
 // Opens the Stripe payment link. client_reference_id carries the player's Supabase user ID so the webhook knows who to credit.
 function openDiamondTopUp(item) {
     const uid = typeof cloudUserId !== 'undefined' ? cloudUserId : null;
+    if (!item.payLink) { showModal("Coming soon", "This diamond pack is not available yet."); return; }
     if (!uid) { showModal("Sign in needed", "Sign in with Google before you top up diamonds."); return; }
     const url = item.payLink + '?client_reference_id=' + encodeURIComponent(uid);
     window.open(url, '_blank', 'noopener');

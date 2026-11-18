@@ -4,6 +4,12 @@ import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 // Diamonds per paid amount. Key: "<currency>:<amount in minor units>".
 const PACKS: Record<string, number> = {
   "thb:30000": 4200, // 300 THB = 4,200 diamonds
+  // USD packs (price in cents)
+  "usd:100": 500,    // $1 = 500 diamonds
+  "usd:590": 3000,   // $5.90 = 3,000 diamonds
+  "usd:890": 4500,   // $8.90 = 4,500 diamonds
+  "usd:1900": 10000, // $19 = 10,000 diamonds
+  "usd:2900": 15000, // $29 = 15,000 diamonds
 };
 
 const enc = new TextEncoder();
