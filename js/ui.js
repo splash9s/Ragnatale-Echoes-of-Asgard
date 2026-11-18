@@ -2546,6 +2546,7 @@ function showArmoryItemDetail(itemIndex) {
     ddFill(panel, {
         close: 'closeShopDetail()',
         icon: itemIconHTML(template, 80),
+        source: itemSourceHTML(template),
         name: title,
         meta: `Shop · ${template.slot || 'Gear'} · Requires Lv ${template.levelReq || 1}`,
         stats: ddStatRows(template.stats),
@@ -3782,6 +3783,7 @@ function showResultItemDetail(index) {
     ddFill(card, {
         close: 'closeResultItemDetail()',
         icon: itemIconHTML(item, 80),
+        source: itemSourceHTML(item),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
@@ -3856,6 +3858,40 @@ function itemDetailBodyHTML(item) {
     return body;
 }
 // Item detail layout shared by inventory, equipped gear and shop (the "Item Details" draft style)
+// "Where it drops from" block for item detail panels
+// Which shop sells this item (matched by id or name), or null
+function itemShopLabel(item) {
+    const hit = (list) => (list || []).some(s => s && (s.id === item.id || s.name === item.name));
+    if (hit(typeof DIAMOND_SHOP_ITEMS !== 'undefined' ? DIAMOND_SHOP_ITEMS : [])) return 'Diamond shop';
+    if (hit(typeof GOLD_SHOP_CONSUMABLES !== 'undefined' ? GOLD_SHOP_CONSUMABLES : []) || hit(typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : [])) return 'Gold shop';
+    return null;
+}
+function itemSourceLines(item) {
+    if (!item || !item.name) return [];
+    const lines = [];
+    if (item.name === SCRAP_ITEM.name) return ['Salvage gear (1-5 Iron Scraps per piece)'];
+    if (item.type === 'estone') {
+        const sh = itemShopLabel(item); if (sh) lines.push(sh);
+        lines.push('Campaign boss drop (5% per kill, matching element)');
+    }
+    else if (item.dropOnly && item.slot === 'hat' && item.boss) {
+        lines.push(`Campaign boss drop, Map Lv. ${item.levelReq || 1} (${Math.round(bossHelmetChance(item.levelReq || 1) * 1000) / 10}% per kill)`);
+    } else if (item.slot && item.levelReq) {
+        const lv = item.levelReq;
+        const sh = itemShopLabel(item); if (sh) lines.push(sh);
+        lines.push(`Normal monsters, Map Lv. ${lv} (1% per kill)`);
+        lines.push(`Mini boss, Map Lv. ${lv} (drop roll 50%)`);
+        lines.push(`Boss, Map Lv. ${lv} (every kill)`);
+    } else {
+        const sh = itemShopLabel(item); if (sh) lines.push(sh);
+    }
+    return lines;
+}
+function itemSourceHTML(item) {
+    const lines = itemSourceLines(item);
+    if (!lines.length) return '';
+    return `<div style="font-size:11px; color:#cbd5e1; margin-top:6px; line-height:1.5;"><b style="color:#fde68a;">Source:</b><br>${lines.map(l => escapeHtml ? escapeHtml(l) : l).join('<br>')}</div>`;
+}
 function ddFill(panel, o) {
     const n = o.secondary ? o.secondary.length : 0;
     const rowStyle = o.rowRight ? `grid-template-columns:repeat(${n},64px); justify-content:end;` : `grid-template-columns:repeat(${n},minmax(0,1fr))`;
@@ -3873,6 +3909,7 @@ function ddFill(panel, o) {
         <div class="dd-body">
             ${o.stats ? `<div class="dd-stats">${o.stats}</div>` : ''}
             ${o.extra || ''}
+            ${o.source || ''}
             ${o.compare || ''}
             ${o.lore ? `<p class="dd-lore">${o.lore}</p>` : ''}
             ${o.price ? `<div class="dd-price">${o.price}</div>` : ''}
@@ -3912,6 +3949,7 @@ function showItemDetail(index, refresh = false) {
     ddFill(panel, {
         close: 'closeInvDetail()',
         icon: itemIconHTML(item, 80),
+        source: itemSourceHTML(item),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
@@ -3952,6 +3990,7 @@ function showEquippedDetail(slot, refresh = false) {
     showEquippedPanelDD(item, {
         close: 'closeInvDetail()',
         icon: itemIconHTML(item, 80),
+        source: itemSourceHTML(item),
         name: title,
         meta: `Equipped · ${slot}${rarity ? ` · ${rarity.name}` : ''}${item.levelReq ? ` · Requires Lv ${item.levelReq}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(item.stats),
@@ -5083,6 +5122,7 @@ function showMailItemDetail(mailId, idx, refresh = false) {
     ddFill(panel, {
         close: 'closeInvDetail()',
         icon: itemIconHTML(item, 80),
+        source: itemSourceHTML(item),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
