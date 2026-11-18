@@ -796,9 +796,11 @@ function setMonsterFrame(img, src) {
 }
 const COMBAT_SLIME_FRAMES = 'assets/combat/slime/slimebase_q85.webp';
 // Floating damage number over a combat sprite: bold white normal, bold orange critical
-function showCombatNumber(selector, amount, crit) {
+// elem: the attacker's element when it has advantage; the number is then big and bold in that element's colour
+function showCombatNumber(selector, amount, crit, elem) {
     if (!(amount > 0)) return;
-    showCombatText(selector, String(Math.round(amount)), crit ? 'crit' : '');
+    const variant = elem ? ['elem-adv', 'elem-' + elem, crit ? 'crit' : ''].filter(Boolean).join(' ') : (crit ? 'crit' : '');
+    showCombatText(selector, String(Math.round(amount)), variant);
 }
 // Floating text above the top border of a combat sprite (damage numbers, MISS)
 // Speech balloon at the top middle of the combat screen (white box, thick black border, big bold black text)
@@ -868,7 +870,7 @@ function showCombatText(selector, text, variant, delayMs = 0) {
             ? (((b.bottom - ib.top) / sc) + 6) + 'px'
             : (((b.top - ib.top) / sc) - slot * COMBAT_TEXT_STEP) + 'px';
         stage.appendChild(d);
-        setTimeout(() => { d.remove(); freeCombatTextSlot(selector, slot); }, variant === 'crit' ? 1400 : 900); // crit numbers stay 0.5s longer
+        setTimeout(() => { d.remove(); freeCombatTextSlot(selector, slot); }, /\bcrit\b|elem-adv/.test(variant || '') ? 1400 : 900); // crit and element-advantage numbers stay 0.5s longer
     };
     if (delayMs > 0) setTimeout(spawn, delayMs);
     else spawn();
@@ -5537,8 +5539,10 @@ function updateUI() {
                 m._hitAt = Date.now();
                 m._flashAt = m._hitAt; // red hit flash (CSS) has its own timestamp
                 const dmgNum = m._prevHp - m.hp, dmgCrit = !!m.lastHitCrit;
+                const dmgElem = m.lastHitElem && ELEMENTS[m.lastHitElem] ? m.lastHitElem : null;
                 m.lastHitCrit = false;
-                setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit), 0);
+                m.lastHitElem = null;
+                setTimeout(() => showCombatNumber(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`, dmgNum, dmgCrit, dmgElem), 0);
                 if (m.hp <= 0) {
                     m._deathAt = Date.now();
                     playSfx(isSlime(m) ? SFX.slimeDead : (monsterSfxOf(m) && monsterSfxOf(m).dead) || SFX.monsterDeath);
