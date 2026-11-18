@@ -3175,7 +3175,7 @@ function addRefineOre(tier, m) {
         return;
     }
     logMessage(`[Refine Drop] ${m.name} dropped ${tpl.name}!`, 'drop');
-    showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">${tpl.name}</span>`);
+    showMonsterGroundDrop(m, itemIconHTML(tpl, 48));
 }
 
 function refineEquipment(slot) {
@@ -7724,7 +7724,7 @@ function addPlank(m, qty = 1) {
         return;
     }
     logMessage(`[Plank Drop] ${m.name} dropped ${qty} Plank${qty > 1 ? 's' : ''}!`, 'drop');
-    showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">Plank</span>`);
+    showMonsterGroundDrop(m, itemIconHTML(PLANK_ITEM, 48));
 }
 
 // Rarity colours (the inner border on gear in the bag)
