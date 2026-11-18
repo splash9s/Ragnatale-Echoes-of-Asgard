@@ -839,7 +839,7 @@
         #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress_q85.webp'); }
         #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion_q85.webp'); }
         /* Damage numbers: white for normal, red for critical */
-        .combat-dmg { --dmg-edge: #9ca3af; position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 39px; font-weight: 900; white-space: nowrap; text-shadow: -2px 0 var(--dmg-edge), 2px 0 var(--dmg-edge), 0 -2px var(--dmg-edge), 0 2px var(--dmg-edge), -2px -2px var(--dmg-edge), 2px -2px var(--dmg-edge), -2px 2px var(--dmg-edge), 2px 2px var(--dmg-edge), 0 4px 5px rgba(0,0,0,.85), 0 0 8px rgba(0,0,0,.6); pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
+        .combat-dmg { --dmg-edge: #9ca3af; position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-family: var(--combat-dmg-font, 'Roboto', 'Noto Sans Thai', sans-serif); font-size: 39px; font-weight: 900; white-space: nowrap; text-shadow: -2px 0 var(--dmg-edge), 2px 0 var(--dmg-edge), 0 -2px var(--dmg-edge), 0 2px var(--dmg-edge), -2px -2px var(--dmg-edge), 2px -2px var(--dmg-edge), -2px 2px var(--dmg-edge), 2px 2px var(--dmg-edge), 0 4px 5px rgba(0,0,0,.85), 0 0 8px rgba(0,0,0,.6); pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
         .combat-dmg.crit { color: #ff9800; --dmg-edge: #9a4a00; font-size: 72px; animation-duration: 1.4s; }
         /* 3D Earth art: slow parallax sway (forest less, sky more), a pan when a stage starts, a push-in on crits */
         #earth-bg.earth3d-far { animation: earth3dSwayFar 11s ease-in-out infinite; }
@@ -1854,6 +1854,12 @@
         <div id="view-combat" class="hidden art-screen">
             <div id="combat-stage" class="town-stage" data-w="1920" data-h="1080" data-fill="1">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <select id="combat-font-test" title="Test only: damage number font" onchange="document.getElementById('combat-stage').style.setProperty('--combat-dmg-font', this.value)" style="position:absolute; left:1600px; top:16px; z-index:50; font-size:20px; padding:4px 8px; border-radius:8px; border:2px solid #b8945a; background:#fff8e7; color:#2a1a0e;">
+                        <option value="'Roboto', 'Noto Sans Thai', sans-serif">Roboto</option>
+                        <option value="'Press Start 2P', monospace">Press Start 2P</option>
+                        <option value="'Outfit', sans-serif">Outfit</option>
+                        <option value="'Noto Sans Thai', sans-serif">Noto Sans Thai</option>
+                    </select>
                     <img id="earth-bg" class="ts-bg" src="assets/combat/earthbg1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;">
                     <img id="earth-base" src="assets/combat/earthbase1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
                     <div id="earth-light" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; background:radial-gradient(ellipse 900px 520px at 420px 80px, rgba(255,226,160,.6), rgba(255,226,160,0) 70%); mix-blend-mode:screen; opacity:.15;"></div>
