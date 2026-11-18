@@ -1987,7 +1987,6 @@ function onStageCleared() {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 logMessage(`[Event] ${activeMap.title} cleared!`, 'levelup');
                 showModal("Event Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
-                playSfx(SFX.mapWin);
                 updateUI();
                 saveGame();
                 return;
@@ -1996,7 +1995,6 @@ function onStageCleared() {
             if ((currentMode === 'voidtest' || currentMode === 'bossmap') && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 showModal(currentMode === 'bossmap' ? "Boss Gauntlet Cleared!" : "Void Test Map Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
-                playSfx(SFX.mapWin);
                 updateUI();
                 saveGame();
                 return;
@@ -2019,7 +2017,6 @@ function onStageCleared() {
                 addItemToInventory(rollSetForDrop(reward));
 
                 showModal("Map Cleared!", '', buildMapSummaryHTML('win'), () => switchView('expeditions'));
-                playSfx(SFX.mapWin);
                 return;
             }
 
@@ -2028,7 +2025,6 @@ function onStageCleared() {
                 getEventState().dailyCleared = true;
                 updateUI();
                 saveGame();
-                playSfx(SFX.mapWin);
                 openChest('gold');
                 switchView('town');
                 return;
@@ -2068,10 +2064,8 @@ function onStageCleared() {
         if (wasBossStage && currentStage < maxStages) {
             // Boss stage completed (not the last stage): show the result right away; closing it moves on
             showModal("Boss Defeated!", '', buildMapSummaryHTML('win', `Continue to Stage ${currentStage + 1}`, false, 'Boss Defeated'), () => continueRun());
-            playSfx(SFX.mapWin);
         } else if (wasBossStage) {
             // Final boss: its result is the map result shown by proceedNext, so only the sound plays here
-            playSfx(SFX.mapWin);
             continueRun();
         } else {
             continueRun();
