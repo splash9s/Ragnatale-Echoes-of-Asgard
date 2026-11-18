@@ -4977,10 +4977,41 @@ function mailAttachmentCells(r) {
     for (const [id, q] of Object.entries(r.potions || {})) {
         if (!(q > 0)) continue;
         const item = GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id };
-        cells.push({ name: item.name, icon: itemIconHTML(item, 64), qty: q });
+        cells.push({ name: item.name, icon: itemIconHTML(item, 64), qty: q, item });
     }
-    for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) cells.push({ name: it.name, icon: itemIconHTML(it, 64), qty: 1 });
+    for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) cells.push({ name: it.name, icon: itemIconHTML(it, 64), qty: 1, item: it });
     return cells;
+}
+// Clicking an item attachment opens the inventory-style detail panel (read only: no equip, sell or lock here)
+function showMailItemDetail(mailId, idx, refresh = false) {
+    const mail = (player.mailBox || []).find(m => m.id === mailId);
+    const item = mail && mailAttachmentCells(mail.rewards || {})[idx] ? mailAttachmentCells(mail.rewards || {})[idx].item : null;
+    if (!item) return;
+    const key = 'mail:' + mailId + ':' + idx;
+    if (!refresh && isDetailOpen(key)) { closeInvDetail(); return; }
+    window.invDetailIndex = null;
+    window.invDetailKey = key;
+    const isEquip = !!item.slot;
+    const isPotion = item.type === 'potion';
+    const rarity = RARITY_INFO[item.rarity];
+    const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
+    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+    const panel = document.getElementById('inv-detail-panel');
+    if (!panel) return;
+    ddFill(panel, {
+        close: 'closeInvDetail()',
+        icon: itemIconHTML(item, 80),
+        name: title,
+        meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
+        compare: '',
+        lore: !isEquip && !isPotion && item.desc ? item.desc : '',
+        price: '',
+        primary: '', secondary: []
+    });
+    panel.style.left = '0px';
+    panel.style.width = '756px';
+    panel.style.display = 'block';
 }
 function selectMail(id) {
     mailSelectedId = id;
@@ -5022,7 +5053,7 @@ function renderMailBox() {
         <div class="ml-d-body">${escapeHtml(sel.message || '')}</div>
         ${cells.length || text ? '<div class="ml-att-label">Attached</div>' : ''}
         ${text ? `<div class="ml-att-text">${escapeHtml(text)}</div>` : ''}
-        <div class="ml-att">${cells.map(c => `<div title="${escapeHtml(c.name)}" class="ml-slot" style="${REWARD_SLOT_BG}">${c.icon}${c.qty > 1 ? `<span class="ml-qty">${c.qty}</span>` : ''}</div>`).join('')}</div>
+        <div class="ml-att">${cells.map((c, i) => `<div title="${escapeHtml(c.name)}"${c.item ? ` onclick="showMailItemDetail(${sel.id}, ${i})"` : ''} class="ml-slot${c.item ? ' cursor-pointer' : ''}" style="${REWARD_SLOT_BG}">${c.icon}${c.qty > 1 ? `<span class="ml-qty">${c.qty}</span>` : ''}</div>`).join('')}</div>
         <div class="ml-foot">
             <button class="ml-del" onclick="deleteMail(${sel.id})">Delete</button>
             ${sel.claimed ? '<span class="ml-claimed">Claimed</span>' : `<button class="ml-claim" onclick="claimMail(${sel.id})">Claim</button>`}
