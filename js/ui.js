@@ -3129,16 +3129,37 @@ function refineIsFree() { return !(player.guide && player.guide.refine); }
 
 // Refining uses refine materials instead of Refining Stones: Ingot for +1..+4, Bar for +5..+7, Alloy for +8..+10
 const REFINE_ORE_NAMES = { 1: 'Ingot', 2: 'Bar', 3: 'Alloy' };
+// Refine materials are bag items (stacks), like Iron Scraps
+const REFINE_MATERIAL_ITEMS = {
+    1: { name: 'Ingot', type: 'material', price: 10, desc: 'Refine material for +1 to +4. 20 Ingots smelt into 1 Bar.' },
+    2: { name: 'Bar', type: 'material', price: 100, desc: 'Refine material for +5 to +7. 10 Bars smelt into 1 Alloy.' },
+    3: { name: 'Alloy', type: 'material', price: 1000, desc: 'Refine material for +8 to +10.' }
+};
 function refineOreTier(target) { return target <= 4 ? 1 : (target <= 7 ? 2 : 3); }
-function refineOreCount(tier) {
-    if (!player.refineOres) player.refineOres = { 1: 0, 2: 0, 3: 0 };
-    return player.refineOres[tier] || 0;
+function countItemByName(name) {
+    return (player.inventory || []).reduce((n, s) => n + (s && s.name === name ? (s.qty || 1) : 0), 0);
 }
+function removeItemByName(name, n) {
+    let left = n;
+    for (let i = 0; i < (player.inventory || []).length && left > 0; i++) {
+        const s = player.inventory[i];
+        if (s && s.name === name) {
+            const take = Math.min(left, s.qty || 1);
+            s.qty = (s.qty || 1) - take;
+            left -= take;
+            if (s.qty <= 0) player.inventory[i] = null;
+        }
+    }
+}
+function refineOreCount(tier) { return countItemByName(REFINE_MATERIAL_ITEMS[tier].name); }
 function addRefineOre(tier, m) {
-    refineOreCount(tier);
-    player.refineOres[tier] += 1;
-    logMessage(`[Refine Drop] ${m.name} dropped ${REFINE_ORE_NAMES[tier]}!`, 'drop');
-    showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">${REFINE_ORE_NAMES[tier]}</span>`);
+    const tpl = REFINE_MATERIAL_ITEMS[tier];
+    if (!placeItemInInventory({ ...tpl, qty: 1 })) {
+        logMessage(`[Bag Full] ${m.name} dropped a ${tpl.name}, but the bag is full.`, 'drop');
+        return;
+    }
+    logMessage(`[Refine Drop] ${m.name} dropped ${tpl.name}!`, 'drop');
+    showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">${tpl.name}</span>`);
 }
 
 function refineEquipment(slot) {
@@ -3162,7 +3183,7 @@ function refineEquipment(slot) {
         player.guide.refine = true;
     } else {
         player.gold -= costGold;
-        player.refineOres[oreTier] = Math.max(0, refineOreCount(oreTier) - 1);
+        removeItemByName(REFINE_MATERIAL_ITEMS[oreTier].name, 1);
     }
 
     let successRate = refineSuccessRate(current);
@@ -3195,24 +3216,25 @@ function refineEquipment(slot) {
 
 // Refine material smelting chain: 20 Iron Scraps -> 1 Ingot, 20 Ingots -> 1 Bar, 10 Bars -> 1 Alloy
 const SMELT_RECIPES = {
-    1: { cost: 20, from: 'scrap', to: 1, label: '20 Iron Scraps', name: 'Ingot' },
-    2: { cost: 20, from: 1, to: 2, label: '20 Ingots', name: 'Bar' },
-    3: { cost: 10, from: 2, to: 3, label: '10 Bars', name: 'Alloy' }
+    1: { cost: 20, input: 'Iron Scraps', inputItem: null, label: '20 Iron Scraps' },
+    2: { cost: 20, input: 'Ingot', label: '20 Ingots' },
+    3: { cost: 10, input: 'Bar', label: '10 Bars' }
 };
 function smeltMaterial(tier) {
     const r = SMELT_RECIPES[tier];
-    if (!r) return;
-    if (r.from === 'scrap') {
-        if (getScrapCount() < r.cost) { showModal("Smelting Failed", `You need ${r.cost} Iron Scraps to smelt 1 ${r.name}.`); return; }
-        removeScraps(r.cost);
-    } else {
-        if (refineOreCount(r.from) < r.cost) { showModal("Smelting Failed", `You need ${r.cost} ${REFINE_ORE_NAMES[r.from]} to smelt 1 ${r.name}.`); return; }
-        player.refineOres[r.from] -= r.cost;
+    const target = REFINE_MATERIAL_ITEMS[tier];
+    if (!r || !target) return;
+    const have = r.input === SCRAP_ITEM.name ? getScrapCount() : countItemByName(r.input);
+    if (have < r.cost) { showModal("Smelting Failed", `You need ${r.cost} ${r.input} to smelt 1 ${target.name}.`); return; }
+    const inputTpl = r.input === SCRAP_ITEM.name ? SCRAP_ITEM : REFINE_MATERIAL_ITEMS[tier - 1];
+    if (r.input === SCRAP_ITEM.name) removeScraps(r.cost); else removeItemByName(r.input, r.cost);
+    if (!placeItemInInventory({ ...target, qty: 1 })) {
+        placeItemInInventory({ ...inputTpl, qty: r.cost }); // refund the inputs
+        showFloatNotice("Inventory is full! Cannot smelt.");
+        return;
     }
-    refineOreCount(r.to);
-    player.refineOres[r.to] += 1;
-    logMessage(`[Forge] Smelted 1 ${r.name} from ${r.label}.`, 'levelup');
-    showModal("Smelting Successful", `Forged 1 ${r.name} from ${r.label}.`);
+    logMessage(`[Forge] Smelted 1 ${target.name} from ${r.label}.`, 'levelup');
+    showModal("Smelting Successful", `Forged 1 ${target.name} from ${r.label}.`);
     updateUI();
     renderRefiningUI();
     saveGame();
@@ -3499,6 +3521,7 @@ const ITEM_ICON_RULES = [
     [/Silver Chest/, 'assets/shop/diamond/silverchest.png'],
     [/Gold Chest/, 'assets/shop/diamond/goldchest.png'],
     [/Refining Stone/, 'mat_refining'],
+    [/^(Ingot|Bar|Alloy)$/, 'mat_refining'],
     [/Iron Scraps/, 'mat_scrap'],
     [/Skill Reset/, 'scroll_skillreset'],
     [/Worn Iron Sword/, 'gear_sword'],
@@ -3870,6 +3893,9 @@ function itemSourceLines(item) {
     if (!item || !item.name) return [];
     const lines = [];
     if (item.name === SCRAP_ITEM.name) return ['Salvage gear (1-5 Iron Scraps per piece)'];
+    if (item.name === REFINE_MATERIAL_ITEMS[1].name) return ['Smelt 20 Iron Scraps', 'Normal monsters (5% per kill)'];
+    if (item.name === REFINE_MATERIAL_ITEMS[2].name) return ['Smelt 20 Ingots', 'Mini boss (5% per kill)'];
+    if (item.name === REFINE_MATERIAL_ITEMS[3].name) return ['Smelt 10 Bars', 'Boss (2% per kill)'];
     if (item.type === 'estone') {
         const sh = itemShopLabel(item); if (sh) lines.push(sh);
         lines.push('Campaign boss drop (5% per kill, matching element)');

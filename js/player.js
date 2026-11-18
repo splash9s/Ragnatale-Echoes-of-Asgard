@@ -26,7 +26,7 @@ let player = {
     jobSp: 0,
     potions: 3,
     resurrectionPotions: 1, resurrectionOn: true, 
-    refiningStones: 5, refineOres: { 1: 0, 2: 0, 3: 0 },
+    refiningStones: 5,
     elementStones: { fire: 0, wind: 0, earth: 0, water: 0 },
     baseMovementSpeed: 3,
     unlockedMaxMapLevel: 1,
@@ -469,6 +469,11 @@ function loadGame() {
                 let left = player.materials.ironScraps;
                 while (left > 0 && addScraps(Math.min(left, 50))) left -= Math.min(left, 50);
                 player.materials.ironScraps = left;
+            }
+            // Refine materials used to be counters: move them into the bag as stacks
+            if (player.refineOres && typeof placeItemInInventory === 'function') {
+                [1, 2, 3].forEach(t => { let n = player.refineOres[t] || 0; while (n > 0) { const k = Math.min(n, 99); placeItemInInventory({ ...REFINE_MATERIAL_ITEMS[t], qty: k }); n -= k; } });
+                delete player.refineOres;
             }
             if (typeof normalizeInventoryStacks === 'function') normalizeInventoryStacks();
             if (typeof grantVipDailyMail === 'function') grantVipDailyMail();
