@@ -14,7 +14,8 @@ const CRIT_SLASH_FRAMES = [
     { src: 'assets/combat/crit/slash24_q85.webp', w: 690, h: 496 },
     { src: 'assets/combat/crit/slash25_q85.webp', w: 664, h: 482 },
 ];
-const CRIT_SLASH_FRAME_MS = 80;  // time each crit frame stays on screen
+const CRIT_SLASH_FRAME_MS = 95;  // time each crit frame stays on screen
+const CRIT_SLASH_TAIL = 3;       // last frames that grow and fade out
 const CRIT_SLASH_SCALE = 0.6;    // frames are drawn at this fraction of their own size (design px)
 const SLASH_LIGHT_SIZE = 1100;   // diameter (design px) of the light a critical slash gives off
 
@@ -26,7 +27,9 @@ const ATK_SLASH_FRAMES = [
     { src: 'assets/combat/atk/atkslay4_q85.webp', w: 800, h: 597 },
     { src: 'assets/combat/atk/atkslay5_q85.webp', w: 800, h: 597 },
 ];
-const ATK_SLASH_FRAME_MS = 60;
+const ATK_SLASH_FRAME_MS = 75;
+const ATK_SLASH_TAIL = 2;       // last frames that grow and fade out
+const SLASH_TAIL_GROW = 0.3;    // the tail frames grow up to this much larger
 const ATK_SLASH_SCALE = 0.4;
 
 let critSlashTimer = null;
@@ -52,7 +55,7 @@ function critFxLayer(stage) {
 
 // Plays a slash frame sequence over the monster at selector.
 // screenFx: also shake the screen and show the flash (critical hits only)
-function playSlashFx(selector, frames, frameMs, scale, screenFx) {
+function playSlashFx(selector, frames, frameMs, scale, screenFx, tail) {
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
     const stage = document.getElementById('combat-stage');
@@ -94,12 +97,21 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
     let f = 0;
     const show = () => {
         const fr = frames[f];
-        const w = fr.w * scale, h = fr.h * scale;
+        // The last frames grow a little and fade out
+        const tailStart = frames.length - tail;
+        let grow = 1, alpha = 1;
+        if (f >= tailStart) {
+            const k = (f - tailStart + 1) / tail; // 0..1 across the tail
+            grow = 1 + SLASH_TAIL_GROW * k;
+            alpha = 1 - k;
+        }
+        const w = fr.w * scale * grow, h = fr.h * scale * grow;
         img.src = fr.src;
         img.style.width = w + 'px';
         img.style.height = h + 'px';
         img.style.left = (cx - w / 2) + 'px';
         img.style.top = (cy - h / 2) + 'px';
+        img.style.opacity = alpha;
         img.style.display = '';
         restartFxClass(img, 'slash-lit'); // lighting pulse on every frame
     };
@@ -117,7 +129,7 @@ function playSlashFx(selector, frames, frameMs, scale, screenFx) {
 
 // Critical hit: crit slash with screen shake and flash
 function playCritFx(selector) {
-    playSlashFx(selector, CRIT_SLASH_FRAMES, CRIT_SLASH_FRAME_MS, CRIT_SLASH_SCALE, true);
+    playSlashFx(selector, CRIT_SLASH_FRAMES, CRIT_SLASH_FRAME_MS, CRIT_SLASH_SCALE, true, CRIT_SLASH_TAIL);
     // 3D Earth art: a quick camera push-in on crits
     const stage = document.getElementById('combat-stage');
     if (stage && document.getElementById('earth-bg')?.classList.contains('earth3d-far')) restartFxClass(stage, 'cam-punch');
@@ -133,5 +145,5 @@ function playHeavyFx() {
 
 // Normal hit: atkslay slash only
 function playAtkFx(selector) {
-    playSlashFx(selector, ATK_SLASH_FRAMES, ATK_SLASH_FRAME_MS, ATK_SLASH_SCALE, false);
+    playSlashFx(selector, ATK_SLASH_FRAMES, ATK_SLASH_FRAME_MS, ATK_SLASH_SCALE, false, ATK_SLASH_TAIL);
 }
