@@ -1207,7 +1207,9 @@ function baseExpNeed(lv) { return Math.max(50, Math.round(EXP_CURVE_K * Math.pow
 function jobExpNeed(lv) { return Math.max(40, Math.round(EXP_CURVE_K * 0.67 * Math.pow(lv, 3))); }
 
 function checkLevelUps() {
+    let leveled = false;
     if (player.baseLv < MAX_BASE_LV && player.baseExp >= player.baseMaxExp) {
+        leveled = true;
         player.baseLv++;
         player.baseExp -= player.baseMaxExp;
         player.baseMaxExp = baseExpNeed(player.baseLv);
@@ -1217,12 +1219,14 @@ function checkLevelUps() {
     }
 
     if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
+        leveled = true;
         player.jobLv++;
         player.jobExp -= player.jobMaxExp;
         player.jobMaxExp = jobExpNeed(player.jobLv);
         player.jobSp += 1;
         logMessage(`[CLASS LEVEL UP!] Reached Class Level ${player.jobLv}! Gained 1 SP`, 'levelup');
     }
+    if (leveled && typeof playLevelUpFx === 'function') playLevelUpFx();
 }
 
 const COIN_DROP_CHANCE_NORMAL = 0.6;
