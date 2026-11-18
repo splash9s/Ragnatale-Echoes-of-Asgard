@@ -5652,8 +5652,11 @@ function updateUI() {
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
             const bulkCls = bulkMode && bulkPick.has(index) ? ' bulk-pick' : '';
+            // Rarity shows as a coloured inner border on gear
+            const rarityFrame = item && item.slot && item.rarity ? `<span class="absolute pointer-events-none" style="left:6px; top:6px; right:6px; bottom:6px; border:2px solid ${RARITY_HEX[item.rarity] || '#94a3b8'}; border-radius:6px; box-shadow: inset 0 0 6px ${RARITY_HEX[item.rarity] || '#94a3b8'}66;"></span>` : '';
             invGrid.innerHTML += `
                 <div data-idx="${index}" onclick="event.stopPropagation(); ${bulkMode ? `bulkTogglePick(${index})` : `showItemDetail(${index})`}" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="${bulkCls.trim()} w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}${window.invDetailIndex === index ? ' inv-selected' : ''}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
+                    ${rarityFrame}
                     <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Locked" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-yellow-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[9px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
@@ -7518,3 +7521,57 @@ function addPlank(m, qty = 1) {
     logMessage(`[Plank Drop] ${m.name} dropped ${qty} Plank${qty > 1 ? 's' : ''}!`, 'drop');
     showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">Plank</span>`);
 }
+
+// Rarity colours (the inner border on gear in the bag)
+const RARITY_HEX = { 1: '#94a3b8', 2: '#34d399', 3: '#60a5fa', 4: '#c084fc', 5: '#fbbf24' };
+
+// Hold a gear cell for 3 seconds (mouse hover) or long-press it (touch) to open its detail window
+const BAG_HOVER_MS = 3000, BAG_LONGPRESS_MS = 500;
+let bagHoverTimer = null, bagPressTimer = null, bagPressStart = null, bagSuppressClick = false;
+function bagCellIndex(target) {
+    const cell = target && target.closest ? target.closest('#inventory-grid > [data-idx]') : null;
+    return cell ? Number(cell.dataset.idx) : null;
+}
+function bagCancelTimers() { clearTimeout(bagHoverTimer); clearTimeout(bagPressTimer); bagHoverTimer = null; bagPressTimer = null; }
+function bagOpenIfGear(index) {
+    if (bulkMode) return; // select mode: taps pick cells, no detail window
+    const it = player.inventory[index];
+    if (!it || !it.slot) return; // gear only
+    showItemDetail(index);
+}
+document.addEventListener('pointerover', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const idx = bagCellIndex(e.target);
+    bagCancelTimers();
+    if (idx === null) return;
+    bagHoverTimer = setTimeout(() => bagOpenIfGear(idx), BAG_HOVER_MS);
+});
+document.addEventListener('pointerout', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const idx = bagCellIndex(e.target);
+    const to = bagCellIndex(e.relatedTarget);
+    if (idx !== null && to !== idx) clearTimeout(bagHoverTimer);
+});
+document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    const idx = bagCellIndex(e.target);
+    if (idx === null) return;
+    bagPressStart = { x: e.clientX, y: e.clientY };
+    clearTimeout(bagPressTimer);
+    bagPressTimer = setTimeout(() => {
+        bagSuppressClick = true; // the tap that ends this press must not toggle the window
+        setTimeout(() => { bagSuppressClick = false; }, 800);
+        bagOpenIfGear(idx);
+    }, BAG_LONGPRESS_MS);
+}, true);
+document.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch' || !bagPressStart) return;
+    if (Math.hypot(e.clientX - bagPressStart.x, e.clientY - bagPressStart.y) > 10) clearTimeout(bagPressTimer);
+});
+document.addEventListener('pointerup', () => { clearTimeout(bagPressTimer); bagPressStart = null; });
+document.addEventListener('pointercancel', () => { clearTimeout(bagPressTimer); bagPressStart = null; });
+document.addEventListener('click', (e) => {
+    if (!bagSuppressClick) return;
+    bagSuppressClick = false;
+    if (bagCellIndex(e.target) !== null) { e.stopPropagation(); e.preventDefault(); }
+}, true);
