@@ -2557,7 +2557,6 @@ function showArmoryItemDetail(itemIndex) {
         name: title,
         meta: `Shop · ${template.slot || 'Gear'} · Requires Lv ${template.levelReq || 1}`,
         stats: ddStatRows(template.stats),
-        price: `Price <b>${price} Gold</b>`,
         primary: `<button onclick="buyArmoryFromDetail(${itemIndex})" class="dd-btn primary">Buy ${price} Gold</button>`
     });
     panel.style.display = 'block';
