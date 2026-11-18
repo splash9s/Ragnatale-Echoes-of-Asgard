@@ -99,9 +99,11 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'stat_reset', name: "Status Reset Service", price: 100, type: 'service', desc: "", icon: 'assets/shop/diamond/resetstat.png' },
     { id: 'skill_reset', name: "Skill Reset Service", price: 100, type: 'skill_reset', desc: "", icon: 'assets/shop/diamond/resetskill.png' },
     { id: 'bag_expand_9', name: "Bag Expansion (+9 slots)", price: 270, type: 'bag', vipCat: 'vip', desc: "Adds 9 more bag slots. The bag holds up to 63.", icon: 'assets/shop/diamond/inventoryexp_q85.webp' },
-    { id: 'pet_box', name: "Pet Box", price: 0, ticket: { name: 'Pet Ticket', qty: 10 }, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'pet_box', name: "Pet Box", price: 590, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
+    { id: 'pet_box_ticket', name: "Pet Box (Ticket)", price: 0, ticket: { name: 'Pet Ticket', qty: 10 }, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet. Costs 10 Pet Tickets.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
-    { id: 'dchest_costume', name: "Costume Chest", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' }
+    { id: 'dchest_costume', name: "Costume Chest", price: 590, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' },
+    { id: 'dchest_costume_ticket', name: "Costume Chest (Ticket)", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "Costs 10 Costume Tickets.", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
 
