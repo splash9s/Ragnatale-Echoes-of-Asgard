@@ -5150,6 +5150,7 @@ function refreshMailGearLevels() {
 
 // In-game mail sender (for testing): writes a mail into the player's own mailbox
 function openSendMailForm() {
+    if (window.isOwnerAccount !== true) return; // developer only
     const opt = (v, l) => `<option value="${v}">${l}</option>`;
     const field = 'px-2 py-1 bg-slate-950 border border-slate-700 rounded text-slate-100 w-full';
     showModal('Send Mail', '', `
