@@ -7598,31 +7598,46 @@ function addPlank(m, qty = 1) {
 const RARITY_HEX = { 1: '#94a3b8', 2: '#34d399', 3: '#60a5fa', 4: '#c084fc', 5: '#fbbf24' };
 
 // Hold a gear cell for 3 seconds (mouse hover) or long-press it (touch) to open its detail window
-const BAG_HOVER_MS = 3000, BAG_LONGPRESS_MS = 500;
+const BAG_HOVER_MS = 500, BAG_LONGPRESS_MS = 500;
 let bagHoverTimer = null, bagPressTimer = null, bagPressStart = null, bagSuppressClick = false;
+let bagHoverOpenedIdx = null; // the window was opened by hovering this cell: it closes when the pointer leaves
 function bagCellIndex(target) {
     const cell = target && target.closest ? target.closest('#inventory-grid > [data-idx]') : null;
     return cell ? Number(cell.dataset.idx) : null;
 }
 function bagCancelTimers() { clearTimeout(bagHoverTimer); clearTimeout(bagPressTimer); bagHoverTimer = null; bagPressTimer = null; }
-function bagOpenIfGear(index) {
+function bagOpenIfGear(index, byHover = false) {
     if (bulkMode) return; // select mode: taps pick cells, no detail window
     const it = player.inventory[index];
     if (!it || !it.slot) return; // gear only
     showItemDetail(index);
+    bagHoverOpenedIdx = byHover ? index : null;
 }
+function bagCloseIfHoverOpened() {
+    if (bagHoverOpenedIdx === null) return;
+    bagHoverOpenedIdx = null;
+    closeInvDetail();
+}
+function inDetailPanel(target) { return !!(target && target.closest && target.closest('#inv-detail-panel')); }
 document.addEventListener('pointerover', (e) => {
     if (e.pointerType !== 'mouse') return;
     const idx = bagCellIndex(e.target);
     bagCancelTimers();
     if (idx === null) return;
-    bagHoverTimer = setTimeout(() => bagOpenIfGear(idx), BAG_HOVER_MS);
+    bagHoverTimer = setTimeout(() => bagOpenIfGear(idx, true), BAG_HOVER_MS);
 });
 document.addEventListener('pointerout', (e) => {
     if (e.pointerType !== 'mouse') return;
     const idx = bagCellIndex(e.target);
-    const to = bagCellIndex(e.relatedTarget);
-    if (idx !== null && to !== idx) clearTimeout(bagHoverTimer);
+    const to = e.relatedTarget;
+    const fromCell = idx !== null;
+    const fromPanel = inDetailPanel(e.target);
+    if (!fromCell && !fromPanel) return;
+    // Moving between the cell and its own window keeps it open
+    if (fromCell && (bagCellIndex(to) === idx || inDetailPanel(to))) return;
+    if (fromPanel && (inDetailPanel(to) || bagCellIndex(to) !== null)) return;
+    if (fromCell) clearTimeout(bagHoverTimer);
+    bagCloseIfHoverOpened();
 });
 document.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'touch') return;
@@ -7647,3 +7662,5 @@ document.addEventListener('click', (e) => {
     bagSuppressClick = false;
     if (bagCellIndex(e.target) !== null) { e.stopPropagation(); e.preventDefault(); }
 }, true);
+// A tap on a cell opens the window for good: leaving the cell no longer closes it
+document.addEventListener('click', (e) => { if (bagCellIndex(e.target) !== null) bagHoverOpenedIdx = null; }, true);
