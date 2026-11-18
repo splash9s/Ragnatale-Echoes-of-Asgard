@@ -3245,6 +3245,7 @@ const MAX_STACK = 99;
 
 function stackLimit(item) {
     if (!isStackable(item)) return 1;
+    if (item.maxStack) return item.maxStack;
     if (item.type === 'potion' || /Potion/.test(item.name || '')) return MAX_STACK;
     if (item.type === 'material') return 50;
     if (item.type === 'chest') return 20;
@@ -3522,6 +3523,7 @@ const ITEM_ICON_RULES = [
     [/Gold Chest/, 'assets/shop/diamond/goldchest.png'],
     [/Refining Stone/, 'mat_refining'],
     [/^(Ingot|Bar|Alloy)$/, 'mat_refining'],
+    [/^Plank$/, 'mat_scrap'],
     [/Iron Scraps/, 'mat_scrap'],
     [/Skill Reset/, 'scroll_skillreset'],
     [/Worn Iron Sword/, 'gear_sword'],
@@ -3893,6 +3895,7 @@ function itemSourceLines(item) {
     if (!item || !item.name) return [];
     const lines = [];
     if (item.name === SCRAP_ITEM.name) return ['Salvage gear (1-5 Iron Scraps per piece)'];
+    if (item.name === PLANK_ITEM.name) return ['Normal monsters (20% per kill)', 'Used to upgrade the Tent and Pet House'];
     if (item.name === REFINE_MATERIAL_ITEMS[1].name) return ['Smelt 20 Iron Scraps', 'Normal monsters (5% per kill)'];
     if (item.name === REFINE_MATERIAL_ITEMS[2].name) return ['Smelt 20 Ingots', 'Mini boss (5% per kill)'];
     if (item.name === REFINE_MATERIAL_ITEMS[3].name) return ['Smelt 10 Bars', 'Boss (2% per kill)'];
@@ -7315,13 +7318,16 @@ function closeRefZoom() {
 }
 
 
-// ---- Home management (tent button): upgrade the tent and the pet house with gold ----
+// ---- Home management (tent button): upgrade the tent and the pet house with gold and Planks ----
+const PLANK_ITEM = { name: 'Plank', type: 'material', price: 20, maxStack: 99, desc: 'Lumber for upgrading your Tent and Pet House.' };
+const HOME_PLANK_COST = { tent: { 2: 30, 3: 100 }, pet: { 2: 10, 3: 30 } };
+function countPlanks() { return countItemByName(PLANK_ITEM.name); }
 const HOME_TENT_ART = {
     1: { off: 'assets/pages/character/tent/tent_off_q85.webp', left: 'assets/pages/character/bg_q85.webp', right: 'assets/pages/character/tent/tent_right_q85.webp', both: 'assets/pages/character/tent/tent_both_q85.webp' },
     2: { off: 'assets/pages/character/tent/v2/off_q85.webp', left: 'assets/pages/character/tent/v2/left_q85.webp', right: 'assets/pages/character/tent/v2/right_q85.webp', both: 'assets/pages/character/tent/v2/both_q85.webp' },
     3: { off: 'assets/pages/character/tent/v3/off_q85.webp', left: 'assets/pages/character/tent/v3/left_q85.webp', right: 'assets/pages/character/tent/v3/right_q85.webp', both: 'assets/pages/character/tent/v3/both_q85.webp' }
 };
-const HOME_TENT_COST = { 2: 20000, 3: 100000 };     // gold to reach each tent level
+const HOME_TENT_COST = { 2: 20000, 3: 100000 };     // gold to reach each tent level (plus Planks, see HOME_PLANK_COST)
 const HOME_PET_ART = { 1: 'assets/town/pethouse_q85.webp', 2: 'assets/town/pethouse2_q85.webp', 3: 'assets/town/pethouse3_q85.webp' };
 const HOME_PET_RATIO = { 1: 271 / 300, 2: 265 / 300, 3: 261 / 300 };
 const HOME_PET_COST = { 2: 10000, 3: 30000 };       // gold to reach each pet house level
@@ -7379,18 +7385,21 @@ function homeCard(kind, title, level, costs, curName) {
     const next = level + 1;
     const max = level >= 3;
     const cost = max ? 0 : costs[next];
+    const planks = max ? 0 : HOME_PLANK_COST[kind][next];
+    const haveEnough = player.gold >= cost && countPlanks() >= planks;
+    const short = countPlanks() < planks ? 'Not enough Planks' : 'Not enough gold';
     let btn;
     if (max) {
         btn = `<button class="hm-btn" disabled>Max level</button>`;
     } else if (homePending === kind) {
-        const ok = player.gold >= cost;
-        btn = `<p>Upgrade to Lv. ${next} for ${cost.toLocaleString()} gold?</p>`
+        btn = `<p>Upgrade to Lv. ${next} for ${cost.toLocaleString()} gold and ${planks} Planks?</p>`
             + `<div style="display:flex; gap:8px;"><button class="hm-btn" style="background:#1e293b; color:#e9edf5;" onclick="homeCancel()">Cancel</button>`
-            + `<button class="hm-btn" onclick="homeConfirm('${kind}')" ${ok ? '' : 'disabled'}>${ok ? 'Confirm' : 'Not enough gold'}</button></div>`;
+            + `<button class="hm-btn" onclick="homeConfirm('${kind}')" ${haveEnough ? '' : 'disabled'}>${haveEnough ? 'Confirm' : short}</button></div>`;
     } else {
-        btn = `<button class="hm-btn" onclick="homeAsk('${kind}')" ${player.gold < cost ? 'disabled' : ''}>Upgrade to Lv. ${next} · ${cost.toLocaleString()} gold</button>`;
+        btn = `<button class="hm-btn" onclick="homeAsk('${kind}')" ${haveEnough ? '' : 'disabled'}>Upgrade to Lv. ${next} · ${cost.toLocaleString()} gold + ${planks} Planks</button>`;
     }
-    return `<div class="hm-card"><h4>${title}</h4><p>Current: Lv. ${level} (${curName})</p>${btn}</div>`;
+    const have = max ? '' : `<p>Planks: ${countPlanks()} / ${planks} needed</p>`;
+    return `<div class="hm-card"><h4>${title}</h4><p>Current: Lv. ${level} (${curName})</p>${have}${btn}</div>`;
 }
 function homeAsk(kind) { homePending = kind; renderHomePanel(); }
 function homeCancel() { homePending = null; renderHomePanel(); }
@@ -7404,7 +7413,7 @@ function renderHomePanel() {
     if (!box || typeof player === 'undefined') return;
     const tentLv = homeTentLevel(), houseLv = homePetHouseLevel();
     box.innerHTML = `<div class="hm-head"><h3>Home</h3><button class="hm-x" onclick="closeHomePanel()">✕</button></div>
-        <div class="hm-gold">Gold: ${Number(player.gold || 0).toLocaleString()}</div>`
+        <div class="hm-gold">Gold: ${Number(player.gold || 0).toLocaleString()} · Planks: ${countPlanks()}</div>`
         + homeCard('tent', 'Tent', tentLv, HOME_TENT_COST, ['', 'Basic', 'Improved', 'Grand'][tentLv])
         + homeCard('pet', 'Pet House', houseLv, HOME_PET_COST, ['', 'Basic', 'Cozy', 'Royal'][houseLv]);
 }
@@ -7414,10 +7423,23 @@ function homeUpgrade(kind) {
     if (lv >= 3) return;
     const next = lv + 1;
     const cost = kind === 'tent' ? HOME_TENT_COST[next] : HOME_PET_COST[next];
+    const planks = HOME_PLANK_COST[kind][next];
     if (player.gold < cost) { showFloatNotice('Not enough gold.'); return; }
+    if (countPlanks() < planks) { showFloatNotice(`Not enough Planks (need ${planks}).`); return; }
     player.gold -= cost;
+    removeItemByName(PLANK_ITEM.name, planks);
     if (kind === 'tent') player.tentLevel = next; else player.petHouseLevel = next;
     applyHomeArt();
     updateUI();
     if (typeof saveGame === 'function') saveGame();
+}
+
+// A normal monster drops a Plank (20%): one bag item, stacks to 99
+function addPlank(m) {
+    if (!placeItemInInventory({ ...PLANK_ITEM, qty: 1 })) {
+        logMessage(`[Bag Full] ${m.name} dropped a Plank, but the bag is full.`, 'drop');
+        return;
+    }
+    logMessage(`[Plank Drop] ${m.name} dropped a Plank!`, 'drop');
+    showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">Plank</span>`);
 }
