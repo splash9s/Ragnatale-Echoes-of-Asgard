@@ -6214,7 +6214,7 @@ function playStrawSlash(crit) {
     if (!dummy || !stage) return;
     const cfg = crit
         ? { frames: CRIT_SLASH_FRAMES, ms: CRIT_SLASH_FRAME_MS, scale: 0.35 }
-        : { frames: ATK_SLASH_FRAMES, ms: ATK_SLASH_FRAME_MS, scale: 0.25 };
+        : { frames: ATK_SLASH_FRAMES, ms: ATK_SLASH_FRAME_MS, scale: 0.65 };
     const ib = stage.getBoundingClientRect(), b = dummy.getBoundingClientRect();
     const sc = (ib.width / stage.offsetWidth) || 1;
     const cx = (b.left + b.width / 2 - ib.left) / sc, cy = (b.top + b.height / 2 - ib.top) / sc;

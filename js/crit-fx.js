@@ -18,13 +18,13 @@ const CRIT_SLASH_FRAME_MS = 95;  // time each crit frame stays on screen
 const CRIT_SLASH_SCALE = 0.6;    // frames are drawn at this fraction of their own size (design px)
 const SLASH_LIGHT_SIZE = 1100;   // diameter (design px) of the light a critical slash gives off
 
-// Normal attack slash frames (atkslay1-5)
+// Normal attack slash frames (sprite sheet animation 1, 2, 3, 6, 7)
 const ATK_SLASH_FRAMES = [
-    { src: 'assets/combat/atk/atkslay1_q85.webp', w: 800, h: 597 },
-    { src: 'assets/combat/atk/atkslay2_q85.webp', w: 800, h: 597 },
-    { src: 'assets/combat/atk/atkslay3_q85.webp', w: 800, h: 597 },
-    { src: 'assets/combat/atk/atkslay4_q85.webp', w: 800, h: 597 },
-    { src: 'assets/combat/atk/atkslay5_q85.webp', w: 800, h: 597 },
+    { src: 'assets/combat/atk/atkslayB1_q85.webp', w: 312, h: 174 },
+    { src: 'assets/combat/atk/atkslayB2_q85.webp', w: 312, h: 174 },
+    { src: 'assets/combat/atk/atkslayB3_q85.webp', w: 312, h: 174 },
+    { src: 'assets/combat/atk/atkslayB4_q85.webp', w: 312, h: 174 },
+    { src: 'assets/combat/atk/atkslayB5_q85.webp', w: 312, h: 174 },
 ];
 const ATK_SLASH_FRAME_MS = 75;
 const SLASH_TAIL_GROW = 0.3;    // the last frame grows up to this much larger
@@ -44,7 +44,7 @@ function setSlashFrame(img, fr, scale, cx, cy, last) {
     img.style.opacity = last ? 0 : 1;
     img.style.display = '';
 }
-const ATK_SLASH_SCALE = 0.4;
+const ATK_SLASH_SCALE = 1.0;
 
 let critSlashTimer = null;
 
