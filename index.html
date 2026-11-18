@@ -1143,7 +1143,7 @@
         </div>
 
         <!-- CHARACTER SELECTION (first play, after sign-in) -->
-        <div id="view-name-select" class="hidden fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+        <div id="view-name-select" class="hidden fixed inset-0 z-50 overflow-y-auto overflow-x-hidden flex flex-col items-center px-4 pt-16 pb-8" style="-webkit-overflow-scrolling:touch;">
             <!-- Same background as the sign-in page and the map select page, blurred -->
             <div aria-hidden="true" class="absolute inset-0" style="background:url(assets/compaign/mapselect02_q85.webp) center/cover no-repeat; filter:blur(8px); transform:scale(1.06);"></div>
             <!-- Login status bar across the top, same as the main page top bar -->
@@ -1152,8 +1152,8 @@
                 <button type="button" onclick="bindGmail()" class="account-link-btn hidden shrink-0 p-0 bg-transparent border-0 cursor-pointer" aria-label="Link Gmail"><img src="assets/cha/page/link_gmail_q85.webp" alt="Link Gmail" style="width:180px; max-width:100%; height:auto; display:block;"></button>
             </div>
             <!-- Game name at the top centre of the page -->
-            <img src="assets/cha/page/rune_thread_logo_v3_q85.webp" alt="Rune Thread" class="absolute left-1/2 -translate-x-1/2 block" style="top:68px; z-index:2; width:240px; max-width:60vw; height:auto;">
-            <div class="relative flex flex-col md:flex-row gap-4 items-stretch justify-center w-full max-w-3xl">
+            <img src="assets/cha/page/rune_thread_logo_v3_q85.webp" alt="Rune Thread" class="block mx-auto mb-3 shrink-0" style="width:220px; max-width:60vw; height:auto;">
+            <div class="relative flex flex-col md:flex-row gap-4 items-stretch justify-center w-full max-w-3xl shrink-0">
             <!-- Stat window: upgrade the starting stats here -->
             <aside id="create-stats" class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-5 w-full md:w-60 flex flex-col gap-3 shadow-2xl">
                 <div class="text-center">
@@ -1171,7 +1171,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="relative flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-amber-400 bg-amber-500/10">
-                        <img id="create-hero-img" alt="" src="assets/cha/page/spin/spin_180_q85.webp" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated;">
+                        <img id="create-hero-img" alt="" src="assets/cha/page/spin/spin_180_q85.webp" class="hero-thumb h-40 object-contain" style="image-rendering:pixelated; max-width:100%; width:auto;">
                         <button type="button" id="create-spin-btn" onclick="spinCreateHero()" class="absolute bg-transparent border-0 p-0 cursor-pointer" style="right:8px; bottom:8px; width:44px; height:44px;" aria-label="Spin character" title="Spin 45°"><img src="assets/cha/page/btn_spin_q85.webp" alt="" style="width:44px; height:44px;"></button>
                         <span class="text-xs font-bold text-amber-300">Vanguard</span>
                     </div>
