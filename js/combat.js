@@ -1303,6 +1303,10 @@ function awardKill(m) {
             showMonsterGroundDrop(m, `<img src="assets/items/elemental/stone_${stoneEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;">`);
         }
     }
+    // Refining ores: Ore I from normal monsters (5%), Ore II from mini bosses (5%), Ore III from bosses (2%)
+    if (!m.isBoss && !m.isMiniBoss && Math.random() < 0.05) addRefineOre(1, m);
+    if (m.isMiniBoss && Math.random() < 0.05) addRefineOre(2, m);
+    if (m.isBoss && Math.random() < 0.02) addRefineOre(3, m);
     // Helmet: only from campaign bosses, chance by the map level (see bossHelmetChance)
     if (m.isBoss && activeMap && Math.random() < (isVoidTest ? 1 : bossHelmetChance(activeMap.levelReq))) {
         const helmLv = BOSS_HELMET_LEVEL_BY_ID[m.id] || bossHelmetLevel(activeMap.levelReq);

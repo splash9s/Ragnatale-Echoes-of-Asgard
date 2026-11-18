@@ -26,7 +26,7 @@ let player = {
     jobSp: 0,
     potions: 3,
     resurrectionPotions: 1, resurrectionOn: true, 
-    refiningStones: 5, 
+    refiningStones: 5, refineOres: { 1: 0, 2: 0, 3: 0 },
     elementStones: { fire: 0, wind: 0, earth: 0, water: 0 },
     baseMovementSpeed: 3,
     unlockedMaxMapLevel: 1,
