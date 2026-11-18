@@ -20,11 +20,11 @@ const SLASH_LIGHT_SIZE = 1100;   // diameter (design px) of the light a critical
 
 // Normal attack slash frames (sprite sheet animation 1, 2, 3, 6, 7)
 const ATK_SLASH_FRAMES = [
-    { src: 'assets/combat/atk/atkslayB1_q85.webp', w: 312, h: 174 },
-    { src: 'assets/combat/atk/atkslayB2_q85.webp', w: 312, h: 174 },
-    { src: 'assets/combat/atk/atkslayB3_q85.webp', w: 312, h: 174 },
-    { src: 'assets/combat/atk/atkslayB4_q85.webp', w: 312, h: 174 },
-    { src: 'assets/combat/atk/atkslayB5_q85.webp', w: 312, h: 174 },
+    { src: 'assets/combat/atk/atkslayB1_q85.webp', w: 304, h: 150 },
+    { src: 'assets/combat/atk/atkslayB2_q85.webp', w: 304, h: 150 },
+    { src: 'assets/combat/atk/atkslayB3_q85.webp', w: 304, h: 150 },
+    { src: 'assets/combat/atk/atkslayB4_q85.webp', w: 304, h: 150 },
+    { src: 'assets/combat/atk/atkslayB5_q85.webp', w: 304, h: 150 },
 ];
 const ATK_SLASH_FRAME_MS = 75;
 const SLASH_TAIL_GROW = 0.3;    // the last frame grows up to this much larger
@@ -44,7 +44,7 @@ function setSlashFrame(img, fr, scale, cx, cy, last) {
     img.style.opacity = last ? 0 : 1;
     img.style.display = '';
 }
-const ATK_SLASH_SCALE = 1.0;
+const ATK_SLASH_SCALE = 0.7;
 
 let critSlashTimer = null;
 
