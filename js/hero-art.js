@@ -9,6 +9,9 @@ const HERO_ART = {"assets/body/base/dbaseleg.png":"data:image/png;base64,iVBORw0
 const HERO_ART_EARLY_BANDS = ['lv0', 'lv1', 'lv10'];
 const HERO_ART_LATER_BANDS = ['lv20', 'lv30', 'lv40', 'lv50', 'lv60', 'lv70', 'lv80', 'lv90', 'lv99'];
 function loadHeroArtBand(band) {
+    // On web pages the gear art is loaded as image files when it is shown (js/hero-art/ is 17 MB of inline data).
+    // Only file:// pages need these data URLs.
+    if (location.protocol !== 'file:') return Promise.resolve();
     return new Promise(resolve => {
         const s = document.createElement('script');
         s.src = 'js/hero-art/' + band + '.js?v=20261112c';
