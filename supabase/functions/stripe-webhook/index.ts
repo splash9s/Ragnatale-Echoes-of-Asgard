@@ -6,10 +6,10 @@ const PACKS: Record<string, number> = {
   "thb:30000": 4200, // 300 THB = 4,200 diamonds
   // USD packs (price in cents)
   "usd:100": 500,    // $1 = 500 diamonds
-  "usd:590": 3000,   // $5.90 = 3,000 diamonds
-  "usd:890": 4500,   // $8.90 = 4,500 diamonds
-  "usd:1900": 10000, // $19 = 10,000 diamonds
-  "usd:2900": 15000, // $29 = 15,000 diamonds
+  "usd:590": 4000,   // $5.90 = 4,000 diamonds
+  "usd:990": 8000,   // $9.90 = 8,000 diamonds
+  "usd:1900": 18000, // $19 = 18,000 diamonds
+  "usd:2900": 30000, // $29 = 30,000 diamonds
 };
 
 const enc = new TextEncoder();

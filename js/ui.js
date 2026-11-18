@@ -79,10 +79,10 @@ function potionHealText(item) {
 const DIAMOND_SHOP_ITEMS = [
     // Real-money top-up: opens the Stripe payment link. Diamonds are credited by the server after payment is confirmed.
     { id: 'topup_usd_1', name: "500 Diamonds", desc: "Top up 500 diamonds for $1.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 1, diamonds: 500, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
-    { id: 'topup_usd_5_9', name: "3,000 Diamonds", desc: "Top up 3,000 diamonds for $5.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 5.9, diamonds: 3000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
-    { id: 'topup_usd_8_9', name: "4,500 Diamonds", desc: "Top up 4,500 diamonds for $8.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 8.9, diamonds: 4500, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
-    { id: 'topup_usd_19', name: "10,000 Diamonds", desc: "Top up 10,000 diamonds for $19.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 19, diamonds: 10000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
-    { id: 'topup_usd_29', name: "15,000 Diamonds", desc: "Top up 15,000 diamonds for $29.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 29, diamonds: 15000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_5_9', name: "4,000 Diamonds", desc: "Top up 4,000 diamonds for $5.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 5.9, diamonds: 4000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_9_9', name: "8,000 Diamonds", desc: "Top up 8,000 diamonds for $9.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 9.9, diamonds: 8000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_19', name: "18,000 Diamonds", desc: "Top up 18,000 diamonds for $19.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 19, diamonds: 18000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_29', name: "30,000 Diamonds", desc: "Top up 30,000 diamonds for $29.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 29, diamonds: 30000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 4000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
