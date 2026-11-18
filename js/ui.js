@@ -7739,7 +7739,7 @@ function bagCellIndex(target) {
 }
 function bagCancelTimers() { clearTimeout(bagHoverTimer); clearTimeout(bagPressTimer); bagHoverTimer = null; bagPressTimer = null; }
 function bagOpenIfGear(index, byHover = false) {
-    if (bulkMode) return; // select mode: taps pick cells, no detail window
+    // select mode too: hover or long-press still opens the detail window; a tap still picks the cell
     const it = player.inventory[index];
     if (!it) return; // any bag item: gear, materials, potions, tickets
     showItemDetail(index);
