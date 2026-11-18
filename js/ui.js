@@ -55,9 +55,9 @@ let currentLanguage = 'en';
 const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).slice().sort((a, b) => (a.levelReq || 1) - (b.levelReq || 1));
 
 const GOLD_SHOP_CONSUMABLES = [
-    { id: 'potion_minor', name: "Minor Healing Potion", price: 100, type: 'potion', heal: 200, desc: "Restores 200 HP" },
-    { id: 'potion_med', name: "Medium Healing Potion", price: 300, type: 'potion', heal: 500, desc: "Restores 500 HP" },
-    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP" },
+    { id: 'potion_minor', name: "Minor Healing Potion", price: 100, type: 'potion', heal: 200, desc: "Restores 200 HP", lore: "A small red tonic from the camp healers. Quick to drink in the middle of a fight." },
+    { id: 'potion_med', name: "Medium Healing Potion", price: 300, type: 'potion', heal: 500, desc: "Restores 500 HP", lore: "A stronger tonic, sharp with mountain herbs. It warms the blood and steadies the hands." },
+    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP", lore: "A deep red elixir brewed by the old alchemists. One sip brings back a fifth of your strength." },
     { id: 'pet_orange_cat_gold', name: "Orange Cat", price: 10000, type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100", icon: 'assets/shop/diamond/ocatpet_q85.webp' }
 ];
 
@@ -88,7 +88,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
     { id: 'pet_loyal_slime', name: "Orange Cat Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 500, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp' },
-    { id: 'res_potion', name: "Resurrection Potion", price: 10, type: 'resurrection', desc: "Auto-revives you with full HP on death.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
+    { id: 'res_potion', name: "Resurrection Potion", price: 10, type: 'resurrection', desc: "Auto-revives you with full HP on death.", lore: "A charm of old magic that glows faintly. It pulls you back from death with full HP.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 80, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 50, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
     { id: 'estone_fire', name: "Fire Elemental Stone", price: 50, type: 'estone', element: 'fire', desc: "Forge Fire onto a weapon at the Blacksmith.", icon: 'assets/items/elemental/stone_fire.webp' },
@@ -3133,9 +3133,9 @@ function refineIsFree() { return !(player.guide && player.guide.refine); }
 const REFINE_ORE_NAMES = { 1: 'Ingot', 2: 'Bar', 3: 'Alloy' };
 // Refine materials are bag items (stacks), like Iron Scraps
 const REFINE_MATERIAL_ITEMS = {
-    1: { name: 'Ingot', type: 'material', price: 10, desc: 'Refine material for +1 to +4. 20 Ingots smelt into 1 Bar.' },
-    2: { name: 'Bar', type: 'material', price: 100, desc: 'Refine material for +5 to +7. 10 Bars smelt into 1 Alloy.' },
-    3: { name: 'Alloy', type: 'material', price: 1000, desc: 'Refine material for +8 to +10.' }
+    1: { name: 'Ingot', type: 'material', price: 10, desc: 'Refine material for +1 to +4. 20 Ingots smelt into 1 Bar.', lore: 'Raw iron cooled from the forge. Refines gear from +1 to +4. Smelt 20 into a Bar.' },
+    2: { name: 'Bar', type: 'material', price: 100, desc: 'Refine material for +5 to +7. 10 Bars smelt into 1 Alloy.', lore: 'Iron tempered until it rings. Refines gear from +5 to +7. Smelt 10 into an Alloy.' },
+    3: { name: 'Alloy', type: 'material', price: 1000, desc: 'Refine material for +8 to +10.', lore: 'A rare blend of metals that holds an edge forever. Refines gear from +8 to +10.' }
 };
 function refineOreTier(target) { return target <= 4 ? 1 : (target <= 7 ? 2 : 3); }
 function countItemByName(name) {
@@ -3311,7 +3311,7 @@ function addItemToInventory(newItem) {
     return true;
 }
 
-const SCRAP_ITEM = { name: "Iron Scraps", type: 'material', price: 2, desc: "Salvaged metal. 20 make an Ingot." };
+const SCRAP_ITEM = { name: "Iron Scraps", type: 'material', price: 2, desc: "Salvaged metal. 20 make an Ingot.", lore: "Bent and broken metal pulled from old gear. Smelt 20 of them into an Ingot at the Blacksmith." };
 
 function getScrapCount() {
     return (player.inventory || []).reduce((n, s) => n + (s && s.name === SCRAP_ITEM.name ? (s.qty || 1) : 0), 0);
@@ -3524,8 +3524,10 @@ const ITEM_ICON_RULES = [
     [/Silver Chest/, 'assets/shop/diamond/silverchest.png'],
     [/Gold Chest/, 'assets/shop/diamond/goldchest.png'],
     [/Refining Stone/, 'mat_refining'],
-    [/^(Ingot|Bar|Alloy)$/, 'mat_refining'],
-    [/^Plank$/, 'mat_scrap'],
+    [/^Ingot$/, 'assets/items/mat_ingot_q85.webp'],
+    [/^Bar$/, 'assets/items/mat_bar_q85.webp'],
+    [/^Alloy$/, 'assets/items/mat_alloy_q85.webp'],
+    [/^Plank$/, 'assets/items/mat_plank_q85.webp'],
     [/Iron Scraps/, 'mat_scrap'],
     [/Skill Reset/, 'scroll_skillreset'],
     [/Worn Iron Sword/, 'gear_sword'],
@@ -3815,7 +3817,7 @@ function showResultItemDetail(index) {
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
-        lore: !isEquip && !isPotion && item.desc ? item.desc : '',
+        lore: !isEquip ? (item.lore || item.desc || '') : '',
         price: '',
         secondary: iconActionButtons(item, isEquip, canSell, `resultSalvageItem(${index})`, `resultSellItem(${index})`),
         rowRight: true
@@ -3871,7 +3873,7 @@ function itemDetailBodyHTML(item) {
         <span>${rarity ? reqLevelHTML(item, isEquip ? item.levelReq : 0) : ''}</span>
         <span class="text-[10px] text-slate-400 capitalize">${item.favorite ? '<span class="text-yellow-300 font-bold">★ Locked</span> · ' : ''}${kind}</span></div>`;
     if (isEquip && item.element) body += `<span class="text-[11px]">${elementDetailHTML(item.element)}</span>`;
-    if (!isEquip && !isPotion && item.desc) body += `<p class="text-[11px] text-slate-400">${item.desc}</p>`;
+    if (!isEquip && (item.lore || item.desc)) body += `<p class="text-[11px] text-slate-400">${item.lore || item.desc}</p>`;
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>`;
     if (item.setName) body += setInfoHTML(item.setName);
     if (isEquip && !NO_GEAR_SLOTS.includes(item.slot)) {
@@ -4016,7 +4018,7 @@ function showItemDetail(index, refresh = false) {
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
-        lore: !isEquip && !isPotion && item.desc ? item.desc : '',
+        lore: !isEquip ? (item.lore || item.desc || '') : '',
         price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
         primary, secondary
     });
@@ -5189,7 +5191,7 @@ function showMailItemDetail(mailId, idx, refresh = false) {
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
-        lore: !isEquip && !isPotion && item.desc ? item.desc : '',
+        lore: !isEquip ? (item.lore || item.desc || '') : '',
         price: '',
         primary: '', secondary: []
     });
@@ -7352,7 +7354,7 @@ function closeRefZoom() {
 
 
 // ---- Home management (tent button): upgrade the tent and the pet house with gold and Planks ----
-const PLANK_ITEM = { name: 'Plank', type: 'material', price: 20, maxStack: 99, desc: 'Lumber for upgrading your Tent and Pet House.' };
+const PLANK_ITEM = { name: 'Plank', type: 'material', price: 20, maxStack: 99, desc: 'Lumber for upgrading your Tent and Pet House.', lore: 'Sawn timber from the forest edge. Use it to upgrade your Tent and Pet House.' };
 const HOME_PLANK_COST = { tent: { 2: 30, 3: 100 }, pet: { 2: 10, 3: 30 } };
 function countPlanks() { return countItemByName(PLANK_ITEM.name); }
 const HOME_TENT_ART = {
@@ -7468,11 +7470,11 @@ function homeUpgrade(kind) {
 }
 
 // A normal monster drops a Plank (20%): one bag item, stacks to 99
-function addPlank(m) {
-    if (!placeItemInInventory({ ...PLANK_ITEM, qty: 1 })) {
-        logMessage(`[Bag Full] ${m.name} dropped a Plank, but the bag is full.`, 'drop');
+function addPlank(m, qty = 1) {
+    if (!placeItemInInventory({ ...PLANK_ITEM, qty })) {
+        logMessage(`[Bag Full] ${m.name} dropped Planks, but the bag is full.`, 'drop');
         return;
     }
-    logMessage(`[Plank Drop] ${m.name} dropped a Plank!`, 'drop');
+    logMessage(`[Plank Drop] ${m.name} dropped ${qty} Plank${qty > 1 ? 's' : ''}!`, 'drop');
     showMonsterGroundDrop(m, `<span style="color:#fde68a; font-weight:bold; font-size:12px;">Plank</span>`);
 }
