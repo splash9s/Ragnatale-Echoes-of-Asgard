@@ -933,6 +933,8 @@
         .combat-dmg.elem-adv.elem-water { color: #38bdf8; --dmg-edge: #0b4a6b; }
         .combat-dmg.elem-adv.elem-wind { color: #5eead4; --dmg-edge: #0f5c52; }
         .combat-dmg.elem-adv.elem-earth { color: #d97706; --dmg-edge: #6b3a00; }
+        /* Combat buttons and alert boxes use Roboto (the floating numbers, dodge and regen text stay Press Start 2P) */
+        #view-combat button, #game-modal button, #game-modal, #game-modal #modal-title { font-family: 'Roboto', 'Noto Sans Thai', sans-serif; }
         /* Forged weapon names (forgedWeaponName in js/ui.js): player green, element colour, base name orange */
         /* :is(...) carries ID weight so these beat the panels' blanket text colours (e.g. #inv-detail-panel *) */
         :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-player { color: #22c55e !important; }
@@ -2043,7 +2045,7 @@
     <script src="js/hero-body.js?v=20261118s"></script>
     <script src="js/combat.js?v=20261119i"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261119am"></script>
+    <script src="js/ui.js?v=20261119an"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
