@@ -2808,11 +2808,11 @@ const FORGE_ELEMENT_COLOR = { fire: '#ef4444', water: '#38bdf8', earth: '#d97706
 function forgeItemLevel(gear) { return Math.max(1, Math.floor(Number(gear && gear.levelReq) || 1)); }
 function elementForgeCost(gear) { return forgeItemLevel(gear) * 100; }
 function elementStoneCost(gear) { return Math.max(1, Math.ceil(forgeItemLevel(gear) / 10)); }
-// The forged weapon's name: "<player name in blue> <Element> <base weapon name>"
+// The forged weapon's name: "<player name in green> <Element> <base weapon name>"
 function forgedWeaponName(gear, el) {
     const esc = (t) => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const color = FORGE_ELEMENT_COLOR[el] || '#ffffff';
-    return `<span style="color:#2563eb; font-weight:900;">${esc((player.name || 'Hero').slice(0, MAX_NAME_LENGTH))}</span> <span style="color:${color}; font-weight:900;">${ELEMENTS[el].name}</span> ${esc(gear.baseName || gear.name)}`;
+    return `<span style="color:#22c55e; font-weight:900;">${esc((player.name || 'Hero').slice(0, MAX_NAME_LENGTH))}</span> <span style="color:${color}; font-weight:900;">${ELEMENTS[el].name}</span> ${esc(gear.baseName || gear.name)}`;
 }
 function blacksmithSetMode(mode) {
     blacksmithMode = mode;
