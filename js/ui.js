@@ -83,6 +83,8 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'topup_usd_9_9', name: "8,000 Diamonds", desc: "Top up 8,000 diamonds for $9.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 9.9, diamonds: 8000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'topup_usd_19', name: "18,000 Diamonds", desc: "Top up 18,000 diamonds for $19.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 19, diamonds: 18000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'topup_usd_29', name: "30,000 Diamonds", desc: "Top up 30,000 diamonds for $29.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 29, diamonds: 30000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'gold_usd_1', name: "30,000 Gold", desc: "Top up 30,000 gold for $1.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 1, gold: 30000, creditTag: 'gold', payLink: '', icon: 'assets/icons/goldpile_q85.webp' },
+    { id: 'gold_usd_2_9', name: "100,000 Gold", desc: "Top up 100,000 gold for $2.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 2.9, gold: 100000, creditTag: 'gold', payLink: '', icon: 'assets/icons/goldpile_q85.webp' },
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 4000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
@@ -4152,10 +4154,11 @@ function openDiamondTopUp(item) {
     const uid = typeof cloudUserId !== 'undefined' ? cloudUserId : null;
     if (!item.payLink) { showModal("Coming soon", "This diamond pack is not available yet."); return; }
     if (!uid) { showModal("Sign in needed", "Sign in with Google before you top up diamonds."); return; }
-    const url = item.payLink + '?client_reference_id=' + encodeURIComponent(uid);
+    const ref = uid + (item.creditTag ? '|' + item.creditTag : ''); // '|gold' tells the webhook to credit gold, not diamonds
+    const url = item.payLink + '?client_reference_id=' + encodeURIComponent(ref);
     window.open(url, '_blank', 'noopener');
     if (typeof startTopUpWatch === 'function') startTopUpWatch();
-    showModal("Top-up", `Complete the payment in the new tab. ${item.diamonds} diamonds are added once Stripe confirms the payment.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
+    showModal("Top-up", `Complete the payment in the new tab. ${item.gold ? item.gold.toLocaleString() + " gold" : item.diamonds + " diamonds"} are added once Stripe confirms the payment.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
 }
 
 function getItemBasePrice(item) {
