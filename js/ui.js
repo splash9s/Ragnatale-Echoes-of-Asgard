@@ -3884,43 +3884,74 @@ function itemDetailBodyHTML(item) {
 }
 // Item detail layout shared by inventory, equipped gear and shop (the "Item Details" draft style)
 // "Where it drops from" block for item detail panels
-// Which shop sells this item (matched by id or name), or null
+// Where an item comes from: short lines shown in a small box when the Source button is tapped
 function itemShopLabel(item) {
     const hit = (list) => (list || []).some(s => s && (s.id === item.id || s.name === item.name));
-    if (hit(typeof DIAMOND_SHOP_ITEMS !== 'undefined' ? DIAMOND_SHOP_ITEMS : [])) return 'Diamond shop';
-    if (hit(typeof GOLD_SHOP_CONSUMABLES !== 'undefined' ? GOLD_SHOP_CONSUMABLES : []) || hit(typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : [])) return 'Gold shop';
-    return null;
+    const shops = [
+        typeof DIAMOND_SHOP_ITEMS !== 'undefined' ? DIAMOND_SHOP_ITEMS : [],
+        typeof GOLD_SHOP_CONSUMABLES !== 'undefined' ? GOLD_SHOP_CONSUMABLES : [],
+        typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []
+    ];
+    return shops.some(hit) ? 'Shop' : null;
 }
 function itemSourceLines(item) {
     if (!item || !item.name) return [];
     const lines = [];
-    if (item.name === SCRAP_ITEM.name) return ['Salvage gear (1-5 Iron Scraps per piece)'];
-    if (item.name === PLANK_ITEM.name) return ['Normal monsters (20% per kill)', 'Mini boss (40% per kill)', 'Boss (80% per kill)', 'Used to upgrade the Tent and Pet House'];
-    if (item.name === REFINE_MATERIAL_ITEMS[1].name) return ['Smelt 20 Iron Scraps', 'Normal monsters (5% per kill)'];
-    if (item.name === REFINE_MATERIAL_ITEMS[2].name) return ['Smelt 20 Ingots', 'Mini boss (5% per kill)'];
-    if (item.name === REFINE_MATERIAL_ITEMS[3].name) return ['Smelt 10 Bars', 'Boss (2% per kill)'];
+    if (item.name === SCRAP_ITEM.name) return ['Salvage gear'];
+    if (item.name === PLANK_ITEM.name) return ['Drop from monster'];
+    if (item.name === REFINE_MATERIAL_ITEMS[1].name) return ['Smelt 20 Iron Scraps', 'Drop from monster'];
+    if (item.name === REFINE_MATERIAL_ITEMS[2].name) return ['Smelt 20 Ingots', 'Drop from monster'];
+    if (item.name === REFINE_MATERIAL_ITEMS[3].name) return ['Smelt 10 Bars', 'Drop from boss'];
     if (item.type === 'estone') {
         const sh = itemShopLabel(item); if (sh) lines.push(sh);
-        lines.push('Campaign boss drop (5% per kill, matching element)');
-    }
-    else if (item.dropOnly && item.slot === 'hat' && item.boss) {
-        lines.push(`Campaign boss drop, Map Lv. ${item.levelReq || 1} (${Math.round(bossHelmetChance(item.levelReq || 1) * 1000) / 10}% per kill)`);
+        lines.push('Drop from boss');
+    } else if (item.dropOnly && item.slot === 'hat' && item.boss) {
+        lines.push('Drop from boss');
     } else if (item.slot && item.levelReq) {
-        const lv = item.levelReq;
         const sh = itemShopLabel(item); if (sh) lines.push(sh);
-        lines.push(`Normal monsters, Map Lv. ${lv} (1% per kill)`);
-        lines.push(`Mini boss, Map Lv. ${lv} (drop roll 50%)`);
-        lines.push(`Boss, Map Lv. ${lv} (every kill)`);
+        lines.push('Drop from monster');
     } else {
         const sh = itemShopLabel(item); if (sh) lines.push(sh);
     }
     return lines;
 }
+// The Source button; its lines go in data-src and the box opens on tap
 function itemSourceHTML(item) {
     const lines = itemSourceLines(item);
     if (!lines.length) return '';
-    return `<div style="font-size:11px; color:#cbd5e1; margin-top:6px; line-height:1.5;"><b style="color:#fde68a;">Source:</b><br>${lines.map(l => escapeHtml ? escapeHtml(l) : l).join('<br>')}</div>`;
+    const data = encodeURIComponent(lines.join('|'));
+    return `<div style="margin-top:8px;"><button type="button" class="src-btn" data-src="${data}" onclick="toggleSourceBox(this)">Source</button></div>`;
 }
+function closeSourceBox() {
+    const pop = document.getElementById('src-pop');
+    if (pop) pop.remove();
+}
+function toggleSourceBox(btn) {
+    const was = document.getElementById('src-pop');
+    closeSourceBox();
+    if (was && was.dataset.owner === btn.dataset.src) return; // same button tapped again: closed
+    const lines = decodeURIComponent(btn.dataset.src).split('|');
+    const pop = document.createElement('div');
+    pop.id = 'src-pop';
+    pop.dataset.owner = btn.dataset.src;
+    pop.style.cssText = 'position:fixed; z-index:400; background:#0b1322; border:1px solid #b8945a; border-radius:8px; padding:6px 10px; font-size:12px; color:#e2e8f0; line-height:1.6; box-shadow:0 4px 14px rgba(0,0,0,.5); white-space:nowrap;';
+    pop.innerHTML = lines.map(l => `<div>- ${escapeHtml(l)}</div>`).join('');
+    document.body.appendChild(pop);
+    const r = btn.getBoundingClientRect();
+    const pr = pop.getBoundingClientRect();
+    let left = r.left, top = r.bottom + 6;
+    if (top + pr.height > window.innerHeight) top = r.top - pr.height - 6;
+    if (left + pr.width > window.innerWidth - 8) left = window.innerWidth - pr.width - 8;
+    pop.style.left = Math.max(8, left) + 'px';
+    pop.style.top = Math.max(8, top) + 'px';
+}
+// Tapping anywhere outside the box (another item, the panel, the page) closes it
+document.addEventListener('pointerdown', (e) => {
+    const pop = document.getElementById('src-pop');
+    if (!pop) return;
+    if (pop.contains(e.target) || (e.target.closest && e.target.closest('.src-btn'))) return;
+    closeSourceBox();
+}, true);
 function ddFill(panel, o) {
     const n = o.secondary ? o.secondary.length : 0;
     const rowStyle = o.rowRight ? `grid-template-columns:repeat(${n},64px); justify-content:end;` : `grid-template-columns:repeat(${n},minmax(0,1fr))`;
