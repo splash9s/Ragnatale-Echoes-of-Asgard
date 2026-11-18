@@ -2981,7 +2981,7 @@ function renderRefiningUI() {
                 <button onclick="smeltRefiningStone()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer">Smelt 1 Refining Stone</button>
             </div>
             <span class="text-[10px] text-slate-400">Combine 100 Iron Scraps to forge 1 Refining Stone.</span>
-            <span class="text-xs text-amber-200">Refine materials: <strong class="text-amber-400">Ref Stone ${refineOreCount(1)}</strong> (+1 to +4) · <strong class="text-amber-400">Ref Shard ${refineOreCount(2)}</strong> (+5 to +7) · <strong class="text-amber-400">Ref Crystal ${refineOreCount(3)}</strong> (+8 to +10)</span>
+            <span class="text-xs text-amber-200">Refine materials: <strong class="text-amber-400">Ingot ${refineOreCount(1)}</strong> (+1 to +4) · <strong class="text-amber-400">Bar ${refineOreCount(2)}</strong> (+5 to +7) · <strong class="text-amber-400">Alloy ${refineOreCount(3)}</strong> (+8 to +10)</span>
             <span class="text-xs text-amber-200 inline-flex items-center gap-1.5"><img src="assets/shop/diamond/refiningstone.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
         </div>
         <div class="text-[10px] text-slate-400 mb-1">Select gear to refine:</div>
@@ -3125,8 +3125,8 @@ function forgeElementOnWeapon() {
 
 function refineIsFree() { return !(player.guide && player.guide.refine); }
 
-// Refining uses refine materials instead of Refining Stones: Ref Stone for +1..+4, Ref Shard for +5..+7, Ref Crystal for +8..+10
-const REFINE_ORE_NAMES = { 1: 'Ref Stone', 2: 'Ref Shard', 3: 'Ref Crystal' };
+// Refining uses refine materials instead of Refining Stones: Ingot for +1..+4, Bar for +5..+7, Alloy for +8..+10
+const REFINE_ORE_NAMES = { 1: 'Ingot', 2: 'Bar', 3: 'Alloy' };
 function refineOreTier(target) { return target <= 4 ? 1 : (target <= 7 ? 2 : 3); }
 function refineOreCount(tier) {
     if (!player.refineOres) player.refineOres = { 1: 0, 2: 0, 3: 0 };
