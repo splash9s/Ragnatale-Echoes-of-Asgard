@@ -1252,6 +1252,9 @@ function awardKill(m) {
     if (isVoidTest) { const em = voidExpMult(currentStage); baseExpGain *= em; jobExpGain *= em; finalGold *= voidGoldMult(currentStage); }
     if (player.baseLv >= MAX_BASE_LV) baseExpGain = 0;
     if (player.jobLv >= MAX_CLASS_LV) jobExpGain = 0;
+    // Home bonus: each owned Tent and Pet House level adds EXP and gold
+    const homeMul = 1 + (typeof homeBonusPct === 'function' ? homeBonusPct() : 0) / 100;
+    if (homeMul > 1) { baseExpGain = Math.floor(baseExpGain * homeMul); jobExpGain = Math.floor(jobExpGain * homeMul); finalGold = Math.floor(finalGold * homeMul); }
     // Bosses and mini bosses always drop at least one coin (100%), even when the event rules zero the gold.
     if (bossKill && finalGold < 1) finalGold = 1;
 
