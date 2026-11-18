@@ -6106,6 +6106,7 @@ const PET_BOX_POOL = [
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
+    { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
 ];
 // Opens a box at once: a random reward from its pool goes into the bag
 function openBoxNow(boxType, title) {
@@ -6490,7 +6491,8 @@ const TENT_POSES = {
 };
 // Costume tent pictures: the worn costume's stand, sit and sleep (same canvas sizes as the gear pictures)
 const COSTUME_TENT = {
-    christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' }
+    christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' },
+    wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_q90.webp' }
 };
 function wornCostumeTentSrc(pose) {
     const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
