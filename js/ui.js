@@ -6294,6 +6294,110 @@ function tentMapClick() {
     confirmAction('Expedition Map', 'Go to the campaign map select?', () => switchView('expeditions'));
 }
 
+// ---- Tent stash: unlock once (50,000 gold + 20 Planks), then 27 slots kept out of the bag ----
+const STASH_SLOTS = 27;
+const STASH_UNLOCK_GOLD = 50000;
+const STASH_UNLOCK_PLANKS = 20;
+function stashState() {
+    if (!player.storage || typeof player.storage !== 'object') player.storage = { unlocked: false, slots: [] };
+    if (!Array.isArray(player.storage.slots)) player.storage.slots = [];
+    while (player.storage.slots.length < STASH_SLOTS) player.storage.slots.push(null);
+    return player.storage;
+}
+function tentStashClick() {
+    if (!isCharClear()) return;
+    const st = stashState();
+    if (st.unlocked) { openStash(); return; }
+    if (player.gold < STASH_UNLOCK_GOLD) { showFloatNotice('Not enough gold.'); return; }
+    if (countPlanks() < STASH_UNLOCK_PLANKS) { showFloatNotice(`Not enough Planks (need ${STASH_UNLOCK_PLANKS}).`); return; }
+    showGameConfirm('Unlock Stash', `Unlock the stash for ${STASH_UNLOCK_GOLD.toLocaleString()} gold and ${STASH_UNLOCK_PLANKS} Planks?`, 'Unlock', () => {
+        if (player.gold < STASH_UNLOCK_GOLD || countPlanks() < STASH_UNLOCK_PLANKS) { showFloatNotice('Not enough gold or Planks.'); return; }
+        player.gold -= STASH_UNLOCK_GOLD;
+        removeItemByName(PLANK_ITEM.name, STASH_UNLOCK_PLANKS);
+        stashState().unlocked = true;
+        updateUI();
+        if (typeof saveGame === 'function') saveGame();
+        openStash();
+    });
+}
+function stashStyles() {
+    if (document.getElementById('stash-style')) return;
+    const st = document.createElement('style');
+    st.id = 'stash-style';
+    st.textContent = '.stash-wrap { display: flex; flex-direction: column; gap: 10px; text-align: left; }'
+        + ' .stash-title { font-size: 13px; font-weight: 800; color: #fbbf24; margin: 0 0 4px; }'
+        + ' .stash-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; }'
+        + ' .stash-grid.bag { max-height: 36vh; overflow-y: auto; }'
+        + ' .stash-cell { position: relative; aspect-ratio: 1; min-width: 0; border: 1px solid #334155; border-radius: 6px; background: #0b1322; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; }'
+        + ' .stash-cell:hover { border-color: #fbbf24; }'
+        + ' .stash-cell.empty { cursor: default; border-style: dashed; }'
+        + ' .stash-cell img { max-width: 100%; max-height: 100%; object-fit: contain; }'
+        + ' .stash-cell b { position: absolute; right: 2px; bottom: 0; font-size: 11px; color: #fff; text-shadow: 0 1px 2px #000; }';
+    document.head.appendChild(st);
+}
+function openStash() {
+    const st = stashState();
+    if (!st.unlocked) return;
+    stashStyles();
+    const cellHTML = (it, onclick) => {
+        if (!it) return `<div class="stash-cell empty"></div>`;
+        return `<button class="stash-cell" onclick="${onclick}" title="${escapeHtml(it.name || '')}">${itemIconHTML(it, 40)}${(it.qty || 1) > 1 ? `<b>${it.qty}</b>` : ''}</button>`;
+    };
+    const stashCells = st.slots.map((it, i) => cellHTML(it, `stashTake(${i})`)).join('');
+    const bagCells = openInventory().map((it, i) => cellHTML(it, `stashPut(${i})`)).join('');
+    const html = `<div class="stash-wrap">
+        <p class="stash-title">Stash · tap an item to take it out</p>
+        <div class="stash-grid">${stashCells}</div>
+        <p class="stash-title">Bag · tap an item to store it</p>
+        <div class="stash-grid bag">${bagCells}</div>
+    </div>`;
+    showModal('Stash', '', html);
+}
+// Bag -> stash: stackables top up existing stacks first, then fill empty slots
+function stashPut(bagIdx) {
+    const st = stashState();
+    const s = player.inventory && player.inventory[bagIdx];
+    if (!s) return;
+    const lim = stackLimit(s);
+    let left = s.qty || 1;
+    const start = left;
+    if (isStackable(s)) {
+        for (const c of st.slots) {
+            if (left <= 0) break;
+            if (c && c.name === s.name) {
+                const add = Math.min(lim - (c.qty || 1), left);
+                if (add > 0) { c.qty = (c.qty || 1) + add; left -= add; }
+            }
+        }
+    }
+    for (let i = 0; i < st.slots.length && left > 0; i++) {
+        if (!st.slots[i]) {
+            const take = Math.min(lim, left);
+            st.slots[i] = { ...s, qty: take };
+            left -= take;
+        }
+    }
+    if (left === start) { showFloatNotice('Stash is full.'); return; }
+    if (left <= 0) player.inventory[bagIdx] = null; else s.qty = left;
+    updateUI();
+    if (typeof saveGame === 'function') saveGame();
+    openStash();
+}
+// Stash -> bag: as many as the bag has room for
+function stashTake(i) {
+    const st = stashState();
+    const c = st.slots[i];
+    if (!c) return;
+    const want = c.qty || 1;
+    const fit = Math.min(want, countFreeCapacity({ ...c, qty: want }));
+    if (fit <= 0) { showFloatNotice('Bag is full.'); return; }
+    if (!placeItemInInventory({ ...c, qty: fit })) { showFloatNotice('Bag is full.'); return; }
+    if (want - fit <= 0) st.slots[i] = null; else c.qty = want - fit;
+    updateUI();
+    if (typeof saveGame === 'function') saveGame();
+    openStash();
+}
+
 // Desk: Rune Thread Lore rolls up from the bottom of the screen; tap to close
 const RUNE_LORE = [
     'Long before the first campfire, the lands of Asgard were held together by a single thread of runes, spun by the Weavers beneath the roots of the world.',
