@@ -57,6 +57,7 @@ alter table public.auction_bot_stock enable row level security;
 revoke all on public.auction_bot_stock from public, anon, authenticated;
 
 -- 4) Refresh: removes open bot listings with no bids, then lists 6 to 9 random items per category for 24 hours.
+-- Each bot listing is rarity 2 or 3 (random).
 -- Bot listings that already have bids are kept until they end.
 create or replace function public.market_bots_refresh() returns int
 language plpgsql security definer set search_path = public as $$
@@ -73,7 +74,7 @@ begin
         for r in select item, start from public.auction_bot_stock where cat = c order by random() limit want loop
             insert into public.auction_listings
                 (seller_id, seller_name, item, category, start_price, current_price, listing_fee, duration_hours, ends_at, is_bot)
-            values (null, 'Traveling Merchant', r.item, c, r.start, r.start, floor(r.start * 5 / 100), 24,
+            values (null, 'Traveling Merchant', jsonb_set(r.item, '{rarity}', to_jsonb(2 + floor(random() * 2)::int)), c, r.start, r.start, floor(r.start * 5 / 100), 24,
                     now() + interval '24 hours', true);
             n := n + 1;
         end loop;
