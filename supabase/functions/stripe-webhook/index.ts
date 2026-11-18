@@ -12,6 +12,12 @@ const PACKS: Record<string, number> = {
   "usd:2900": 30000, // $29 = 30,000 diamonds
 };
 
+// Gold packs use the same prices as diamond packs, so the game marks them: client_reference_id = "<user id>|gold".
+const GOLD_PACKS: Record<string, number> = {
+  "gold:usd:100": 30000,   // $1 = 30,000 gold
+  "gold:usd:290": 100000,  // $2.90 = 100,000 gold
+};
+
 const enc = new TextEncoder();
 const TOLERANCE_SECONDS = 300;
 
@@ -60,11 +66,19 @@ Deno.serve(async (req) => {
   const s = event.data.object;
   if (s.payment_status !== "paid") return new Response("not paid", { status: 200 });
 
-  const uid: string = s.client_reference_id ?? "";
-  if (!/^[0-9a-f-]{36}$/i.test(uid)) return new Response("no player id", { status: 200 });
+  const [uid, tag] = String(s.client_reference_id ?? "").split("|");
+  if (!/^[0-9a-f-]{36}$/i.test(uid ?? "")) return new Response("no player id", { status: 200 });
 
-  const diamonds = PACKS[`${s.currency}:${s.amount_total}`];
-  if (!diamonds) return new Response("unknown pack", { status: 200 });
+  const key = `${s.currency}:${s.amount_total}`;
+  let diamonds = 0;
+  let gold = 0;
+  if (tag === "gold") {
+    gold = GOLD_PACKS[`gold:${key}`] ?? 0;
+    if (!gold) return new Response("unknown pack", { status: 200 });
+  } else {
+    diamonds = PACKS[key] ?? 0;
+    if (!diamonds) return new Response("unknown pack", { status: 200 });
+  }
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
     auth: { persistSession: false },
@@ -73,6 +87,7 @@ Deno.serve(async (req) => {
     payment_id: s.id,
     user_id: uid,
     diamonds,
+    gold,
     amount_total: s.amount_total,
     currency: s.currency,
   });

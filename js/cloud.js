@@ -24,11 +24,16 @@ async function claimDiamondTopups() {
     try {
         const { data, error } = await cloudClient.rpc('claim_diamond_topups');
         if (error) throw error;
-        const n = Number(data) || 0;
+        // data: { diamonds, gold } (or a plain number from the older function)
+        const d = typeof data === 'number' ? (Number(data) || 0) : (Number(data && data.diamonds) || 0);
+        const g = typeof data === 'number' ? 0 : (Number(data && data.gold) || 0);
+        const n = d + g;
         if (n > 0) {
-            player.diamonds = (player.diamonds || 0) + n;
+            if (d > 0) player.diamonds = (player.diamonds || 0) + d;
+            if (g > 0) player.gold = (player.gold || 0) + g;
             saveGame();
-            showModal('Diamonds added', `${n.toLocaleString()} diamonds were added to your account.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
+            const parts = [d > 0 ? `${d.toLocaleString()} diamonds` : '', g > 0 ? `${g.toLocaleString()} gold` : ''].filter(Boolean).join(' and ');
+            showModal('Top-up added', `${parts} ${parts.indexOf(' and ') >= 0 ? 'were' : 'was'} added to your account.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
         }
         return n;
     } catch (e) {
