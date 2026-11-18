@@ -3689,11 +3689,10 @@ function compareHTML(selected, equipped) {
             + `<span class="dd-cmp-delta ${cls}">${diff}</span></div>`;
     }).join('');
     if (!rows) return `<div class="dd-cmp"><div class="dd-cmp-note">No stats to compare</div></div>`;
-    const note = equipped && equipped.name
-        ? `<div class="dd-cmp-note">Compared with <strong>${equipped.name}</strong></div>`
-        : `<div class="dd-cmp-note">Nothing equipped in this slot</div>`;
+    const eqName = equipped && equipped.name ? equipped.name : 'Nothing equipped';
+    const head = `<div class="dd-cmp-head"><span>Stat</span><span>This item</span><span class="dd-cmp-eqhead">Equipped<br><small>${eqName}</small></span><span>Diff</span></div>`;
     return `<div class="dd-cmp">
-        ${rows}${note}
+        ${head}${rows}
     </div>`;
 }
 
@@ -3761,7 +3760,7 @@ function showResultItemDetail(index) {
         icon: itemIconHTML(item, 80),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
-        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
@@ -3888,7 +3887,7 @@ function showItemDetail(index, refresh = false) {
         icon: itemIconHTML(item, 80),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
-        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
@@ -5059,7 +5058,7 @@ function showMailItemDetail(mailId, idx, refresh = false) {
         icon: itemIconHTML(item, 80),
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
-        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
