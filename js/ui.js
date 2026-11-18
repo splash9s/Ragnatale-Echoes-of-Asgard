@@ -2830,11 +2830,9 @@ function buyDiamondItem(itemId) {
         player.bagExpansions = (player.bagExpansions || 0) + 1;
         showModal("Bag Expanded", `Your bag now has ${bagSlotCount()} slots.`);
     } else if (item.type === 'box') {
-        placeItemInInventory({ name: item.name, type: 'box', boxType: item.boxType, desc: item.desc, qty: 1 });
-        floatSuccessAt("Purchased!");
+        openBoxNow(item.boxType, item.name); // opens at once, nothing goes to the bag
     } else if (item.type === 'chest') {
-        placeItemInInventory({ name: item.name, type: 'chest', chestType: item.chestType, desc: item.desc, qty: 1 });
-        floatSuccessAt("Purchased!");
+        openChest(item.chestType); // opens at once, nothing goes to the bag
     } else if (item.type === 'vip') {
         player.vipUntil = Date.now() + item.days * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
@@ -6045,6 +6043,18 @@ const PET_BOX_POOL = [
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
 ];
+// Opens a box at once: a random reward from its pool goes into the bag
+function openBoxNow(boxType, title) {
+    const pool = boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
+    if (!pool.length) { showModal(title || "Box", "Costumes are coming soon."); return false; }
+    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1 };
+    if (countFreeCapacity(reward) < 1) { showModal("Inventory Full", "Make room in your bag first."); return false; }
+    placeItemInInventory(reward);
+    showModal(title || "Box", `You got ${reward.name}!`);
+    updateUI();
+    saveGame();
+    return true;
+}
 function openBoxFromDetail(index) {
     const item = player.inventory[index];
     if (!item || item.type !== 'box') return;
