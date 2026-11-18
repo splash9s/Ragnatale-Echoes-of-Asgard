@@ -1106,7 +1106,7 @@ function syncPagePetSprites(spec) {
     if (!spec) { pet.style.display = 'none'; return; }
     placePetImg(pet, spec, TOWN_DUMMY_FEET.left, TOWN_DUMMY_FEET.top);
 }
-setInterval(syncPetSprite, 100);
+setInterval(() => { if (!document.hidden) syncPetSprite(); }, 100); // skip while minimised
 // Friendship from play: the first play of each day (per pet) adds 1 point and shows a heart. Later plays are animation only.
 function petDayKey(d = new Date()) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -1302,6 +1302,7 @@ let combatEarthMonsterPos = null; // per-position [left, top] for the current la
 // Default lineup position for each of the 6 slots (same as the CSS nth-child rules)
 const LINEUP_DEFAULT_POS = [[914, 784], [1065, 784], [1218, 769], [1358, 721], [1507, 671], [1658, 659]];
 setInterval(() => {
+    if (document.hidden) return; // idle animation pauses while minimised
     const now = Date.now();
     document.querySelectorAll('img.idle-anim').forEach(img => {
         if (img.id === 'combat-player-sprite') {
@@ -2731,7 +2732,7 @@ function runVipShine() {
     for (let f = 1; f <= 9; f++) setTimeout(() => { img.src = `assets/diamond/vip/vip_btn_${f}_q85.webp`; }, (f - 1) * 90);
     setTimeout(() => { img.src = 'assets/diamond/vip/vip_btn_1_q85.webp'; }, 9 * 90);
 }
-setInterval(runVipShine, 5000);
+setInterval(() => { if (!document.hidden) runVipShine(); }, 5000);
 
 function renderDiamondShop() {
     let container = document.getElementById('diamond-shop-items-container');
@@ -6221,7 +6222,7 @@ function spawnTownSparkle() {
     host.appendChild(s);
     setTimeout(() => s.remove(), 2800);
 }
-setInterval(() => { if (Math.random() < 0.8) spawnTownSparkle(); }, 250);
+setInterval(() => { if (!document.hidden && Math.random() < 0.8) spawnTownSparkle(); }, 250);
 
 // Straw man (training dummy) on the main page. Click it: the hero attacks it, it reacts with one of two hurt sets, and it shows the damage from the player's own stats (defence 0, unlimited HP). A hit can be a critical, with the combat crit sound and slash.
 const STRAW_FRAME_MS = 100;
@@ -6976,7 +6977,7 @@ function togglePetWalk(tok) {
     if (!wasOn && tentPetSelection().map(String).includes(key)) playSfx(SFX.move);
     renderPetPanel();
 }
-setInterval(syncTentPets, 1000);
+setInterval(() => { if (!document.hidden) syncTentPets(); }, 1000);
 
 // Detail windows (item, shop, quest, skill, mail, events) can be dragged by their background.
 // Buttons and inputs keep their clicks; the stage scale is divided out so the panel follows the pointer exactly.
