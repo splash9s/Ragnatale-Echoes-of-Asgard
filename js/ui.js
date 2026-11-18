@@ -311,7 +311,7 @@ function setTermsAcceptReady(ready) {
         btn.style.cursor = ready ? 'pointer' : 'not-allowed';
     }
     if (status) {
-        status.textContent = ready ? 'You have read the terms: you can accept' : 'Scroll to the end to accept';
+        status.textContent = ready ? 'Tick Accept when you are ready' : '';
         status.style.color = ready ? '#7dff9e' : '#9aa6bd';
     }
 }
@@ -328,8 +328,7 @@ function showTermsModal() {
     modal.classList.remove('hidden');
     const body = document.getElementById('terms-body');
     if (body) body.scrollTop = 0;
-    setTermsAcceptReady(false);
-    requestAnimationFrame(termsScrolled); // short text fits without scrolling: unlock at once
+    setTermsAcceptReady(true); // no scroll gate: the player ticks the box and can read the terms at any time
 }
 function closeTermsModal() {
     document.getElementById('terms-modal')?.classList.add('hidden');
