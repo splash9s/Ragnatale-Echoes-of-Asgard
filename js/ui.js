@@ -2456,21 +2456,67 @@ function renderShop() {
 }
 
 function buyGoldConsumable(itemId) {
-    let item = GOLD_SHOP_CONSUMABLES.find(i => i.id === itemId);
+    const item = GOLD_SHOP_CONSUMABLES.find(i => i.id === itemId);
     if (!item) return;
+    if (item.type !== 'potion') { buyGoldConsumableQty(item, 1); return; }
 
-    if (player.gold < item.price) {
+    // Potions: pick the amount first. Capped by gold, free bag space and the stack limit.
+    const byGold = Math.floor(player.gold / item.price);
+    const byRoom = countFreeCapacity({ ...item, qty: 1 });
+    const max = Math.min(MAX_STACK, byGold, byRoom);
+    if (max < 1) {
+        if (byGold < 1) floatNoticeAt("Not enough Gold", window.event);
+        else showModal("Purchase Failed", "Inventory is full!");
+        return;
+    }
+    const btn = 'px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-200 font-bold cursor-pointer';
+    showModal(item.name, 'How many do you want to buy?', `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button class="${btn}" onclick="stepBuyQty(-1, ${max}, ${item.price})">−</button>
+                <input id="buy-qty" type="number" min="1" max="${max}" value="1" oninput="stepBuyQty(0, ${max}, ${item.price})" style="width:90px; text-align:center; background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:6px;">
+                <button class="${btn}" onclick="stepBuyQty(1, ${max}, ${item.price})">+</button>
+                <button class="${btn}" onclick="document.getElementById('buy-qty').value = ${max}; stepBuyQty(0, ${max}, ${item.price})">Max</button>
+            </div>
+            <div id="buy-qty-total" style="color:#fbbf24; font-weight:700;">Total: ${item.price} Gold</div>
+            <button class="px-6 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold cursor-pointer" onclick="confirmBuyPotion('${item.id}')">Buy</button>
+        </div>`);
+}
+
+// Quantity picker helpers for potion purchases
+function stepBuyQty(delta, max, price) {
+    const input = document.getElementById('buy-qty');
+    if (!input) return;
+    let v = parseInt(input.value, 10) || 1;
+    v = Math.min(max, Math.max(1, v + delta));
+    input.value = v;
+    const total = document.getElementById('buy-qty-total');
+    if (total) total.textContent = `Total: ${(v * price).toLocaleString()} Gold`;
+}
+
+function confirmBuyPotion(itemId) {
+    const item = GOLD_SHOP_CONSUMABLES.find(i => i.id === itemId);
+    const input = document.getElementById('buy-qty');
+    if (!item || !input) return;
+    const qty = Math.min(MAX_STACK, Math.max(1, parseInt(input.value, 10) || 1));
+    closeModal();
+    buyGoldConsumableQty(item, qty);
+}
+
+function buyGoldConsumableQty(item, qty) {
+    const cost = item.price * qty;
+    if (player.gold < cost) {
         floatNoticeAt("Not enough Gold", window.event);
         return;
     }
-    if (!placeItemInInventory({ ...item, qty: 1 })) {
+    if (!placeItemInInventory({ ...item, qty })) {
         showModal("Purchase Failed", "Inventory is full!");
         return;
     }
 
-    player.gold -= item.price;
+    player.gold -= cost;
     playSfx(SFX.coin);
-    logMessage(`[Shop] Purchased ${item.name}!`, 'drop');
+    logMessage(qty > 1 ? `[Shop] Purchased ${qty}x ${item.name}!` : `[Shop] Purchased ${item.name}!`, 'drop');
     markBeginnerFlag('potion');
     floatSuccessAt("Purchased!");
     updateUI();
@@ -3152,7 +3198,7 @@ const MAX_STACK = 99;
 
 function stackLimit(item) {
     if (!isStackable(item)) return 1;
-    if (item.type === 'potion' || /Potion/.test(item.name || '')) return 5;
+    if (item.type === 'potion' || /Potion/.test(item.name || '')) return MAX_STACK;
     if (item.type === 'material') return 50;
     if (item.type === 'chest') return 20;
     return MAX_STACK;
