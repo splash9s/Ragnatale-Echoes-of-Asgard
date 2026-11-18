@@ -2994,7 +2994,7 @@ function renderElementalUI() {
         html += `
             <div onclick="blacksmithSelect('weapon')" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${selected ? 'bg-amber-900/60 border-amber-400' : 'bg-slate-900 border-slate-700 hover:border-amber-500/50'}">
                 <div>
-                    <span class="font-bold text-green-400 text-xs inline-flex items-center gap-2">${itemIconHTML(weapon, 36)} ${weapon.name}</span>
+                    <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(weapon, 36)} ${weapon.name}</span>
                     <span class="text-[10px] text-slate-400 block">Current: ${current} | Item Lv ${forgeItemLevel(weapon)}</span>
                 </div>
                 <span class="text-[10px] text-slate-300 whitespace-nowrap">${elementForgeCost(weapon)} Gold + ${elementStoneCost(weapon)} Stone</span>
