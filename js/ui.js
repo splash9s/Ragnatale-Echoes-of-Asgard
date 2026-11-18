@@ -57,8 +57,7 @@ const SHOP_ARMORY_ITEMS = (typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : []).
 const GOLD_SHOP_CONSUMABLES = [
     { id: 'potion_minor', name: "Minor Healing Potion", price: 100, type: 'potion', heal: 200, desc: "Restores 200 HP", lore: "A small red tonic from the camp healers. Quick to drink in the middle of a fight." },
     { id: 'potion_med', name: "Medium Healing Potion", price: 300, type: 'potion', heal: 500, desc: "Restores 500 HP", lore: "A stronger tonic, sharp with mountain herbs. It warms the blood and steadies the hands." },
-    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP", lore: "A deep red elixir brewed by the old alchemists. One sip brings back a fifth of your strength." },
-    { id: 'pet_orange_cat_gold', name: "Orange Cat", price: 10000, type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100", icon: 'assets/shop/diamond/ocatpet_q85.webp' }
+    { id: 'potion_large', name: "Large Healing Potion", price: 2000, type: 'potion', healPct: 20, desc: "Restores 20% of max HP", lore: "A deep red elixir brewed by the old alchemists. One sip brings back a fifth of your strength." }
 ];
 
 // Healing potion numbers come from GOLD_SHOP_CONSUMABLES (matched by name), so potions already in a save heal the current amount.
@@ -3835,9 +3834,10 @@ function iconActionButtons(item, isEquip, canSell, salvageCall, sellCall) {
     const out = [];
     const salvageImg = `<img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt="">`;
     const sellImg = `<img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt="">`;
-    if (isEquip && !NO_GEAR_SLOTS.includes(item.slot) && !item.favorite) {
-        const scrap = salvageScrapGain(item);
-        out.push(`<span style="display:inline-flex; flex-direction:column; align-items:center; gap:2px;"><button onclick="${salvageCall}" class="inv-icon-btn" title="Salvage for ${scrap} Iron Scrap" aria-label="Salvage for ${scrap} Iron Scrap">${salvageImg}</button><span style="font-size:10px; font-weight:700; color:#fde68a; white-space:nowrap;">+${scrap} Scrap</span></span>`);
+    if (isEquip && !item.favorite && (!NO_GEAR_SLOTS.includes(item.slot) || (salvageCall && salvageCall.indexOf('salvage') >= 0))) {
+        const rw = salvageRewardOf(item);
+        const short = rw.tpl === SCRAP_ITEM ? `+${rw.qty} Scrap` : `+1 ${rw.tpl.name.replace(' Ticket', '')}`;
+        out.push(`<span style="display:inline-flex; flex-direction:column; align-items:center; gap:2px;"><button onclick="${salvageCall}" class="inv-icon-btn" title="Salvage for ${salvageRewardText(item)}" aria-label="Salvage for ${salvageRewardText(item)}">${salvageImg}</button><span style="font-size:10px; font-weight:700; color:#fde68a; white-space:nowrap;">${short}</span></span>`);
     }
     if (canSell && !item.favorite) out.push(`<button onclick="${sellCall}" class="inv-icon-btn" title="Sell for ${getSellPrice(item)} Gold" aria-label="Sell">${sellImg}</button>`);
     return out;
@@ -4301,6 +4301,19 @@ function executeEquipItem(index, targetSlot) {
     return true;
 }
 
+// Salvaging a pet or costume gives a ticket instead of scraps
+const PET_TICKET_ITEM = { name: 'Pet Ticket', type: 'material', price: 50, maxStack: 99, desc: 'Ticket from a salvaged pet.', lore: 'A worn token from a pet that has gone home. Keep it for a pet to come.' };
+const COSTUME_TICKET_ITEM = { name: 'Costume Ticket', type: 'material', price: 50, maxStack: 99, desc: 'Ticket from a salvaged costume.', lore: 'A folded ticket stitched from an old costume. Keep it for a new outfit.' };
+// What salvaging an item gives: { tpl, qty } where tpl is the bag item to add
+function salvageRewardOf(item) {
+    if (item && item.slot === 'pet') return { tpl: PET_TICKET_ITEM, qty: 1 };
+    if (item && item.slot === 'costume') return { tpl: COSTUME_TICKET_ITEM, qty: 1 };
+    return { tpl: SCRAP_ITEM, qty: salvageScrapGain(item) };
+}
+function salvageRewardText(item) {
+    const r = salvageRewardOf(item);
+    return `${r.qty} ${r.tpl.name}`;
+}
 // Iron Scraps per salvaged gear: 1 base, +0 to +4 from rarity (Common to Legendary), +0 to +5 from refine level (+2 per 2 levels). Range 1-10.
 function salvageScrapGain(item) {
     const rarity = Math.min(5, Math.max(1, Math.floor(Number(item.rarity) || 1)));
@@ -4312,18 +4325,18 @@ function salvageEquipmentItem(index, onDone, onCancel = null) {
     const item = player.inventory[index];
     if (!item || !item.slot) return;
     if (item.favorite) { showFloatNotice("Locked items cannot be salvaged. Unlock it first."); return; }
-    const scrapGain = salvageScrapGain(item);
+    const reward = salvageRewardOf(item);
     // Same confirmation window as Salvage All (always shown for a single item)
-    showBulkConfirm("Salvage", `${scrapGain} Iron Scrap`, [{ it: item, i: index }], "Salvage", () => {
+    showBulkConfirm("Salvage", `${reward.qty} ${reward.tpl.name}`, [{ it: item, i: index }], "Salvage", () => {
         if (player.inventory[index] !== item) return; // the slot changed while the window was open
         player.inventory[index] = null;
-        if (!addScraps(scrapGain)) {
+        if (!placeItemInInventory({ ...reward.tpl, qty: reward.qty })) {
             player.inventory[index] = item;
             showFloatNotice("Inventory is full! Cannot salvage.");
             return;
         }
         playSfx(SFX.salvage);
-        logMessage(`[Salvage] Salvaged ${item.name} for ${scrapGain} Iron Scrap(s)`, 'drop');
+        logMessage(`[Salvage] Salvaged ${item.name} for ${reward.qty} ${reward.tpl.name}`, 'drop');
         updateUI();
         saveGame();
         if (onDone) onDone();
@@ -4377,7 +4390,11 @@ function showBulkConfirm(title, gainText, targets, verb, onConfirm, noun = 'equi
 // Select mode: Salvage or Sell picks equipment in the bag, then Yes / No confirms
 let bulkMode = null;          // null | 'salvage' | 'sell'
 let bulkPick = new Set();     // bag indexes picked in select mode
-function bulkEligible(it) { return !!(it && it.slot && !NO_GEAR_SLOTS.includes(it.slot) && !it.favorite); }
+function bulkEligible(it) {
+    if (!it || !it.slot || it.favorite) return false;
+    if (bulkMode === 'salvage') return true;                 // gear, pets and costumes
+    return !NO_GEAR_SLOTS.includes(it.slot);                  // selling: gear only
+}
 function startBulkSelect(mode) {
     if (bulkMode === mode) { bulkNo(); return; } // same button again: leave select mode
     bulkMode = mode;
@@ -4389,7 +4406,7 @@ function startBulkSelect(mode) {
 function bulkTogglePick(index) {
     const it = player.inventory[index];
     if (!bulkMode) return;
-    if (!bulkEligible(it)) { showFloatNotice(it && it.favorite ? "Locked items are kept." : "Only gear can be picked."); return; }
+    if (!bulkEligible(it)) { showFloatNotice(it && it.favorite ? "Locked items are kept." : (bulkMode === 'sell' ? "Only gear can be sold." : "Only gear, pets and costumes can be picked.")); return; }
     if (bulkPick.has(index)) bulkPick.delete(index); else bulkPick.add(index);
     renderBulkBar();
     updateUI();
@@ -4403,9 +4420,7 @@ function renderBulkBar() {
     if (!bar) return;
     if (!bulkMode) { bar.style.display = 'none'; return; }
     const targets = bulkPickedTargets();
-    const amount = bulkMode === 'salvage'
-        ? `${targets.reduce((n, { it }) => n + salvageScrapGain(it), 0)} Iron Scrap`
-        : `${targets.reduce((n, { it }) => n + getSellPrice(it), 0)} Gold`;
+    const amount = bulkMode === 'salvage' ? salvageTotalsText(targets) : `${targets.reduce((n, { it }) => n + getSellPrice(it), 0)} Gold`;
     const verb = bulkMode === 'salvage' ? 'Salvage' : 'Sell';
     if (label) label.textContent = targets.length ? `${verb} ${targets.length}? +${amount}` : `Pick items to ${verb.toLowerCase()}`;
     bar.style.display = 'flex';
@@ -4420,8 +4435,7 @@ function bulkYes() {
     const targets = bulkPickedTargets();
     if (!targets.length) { showFloatNotice("Pick items first."); return; }
     if (bulkMode === 'salvage') {
-        const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
-        doSalvageAll(targets, gain);
+        doSalvageAll(targets);
     } else {
         const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
         targets.forEach(({ i }) => { player.inventory[i] = null; });
@@ -4433,15 +4447,33 @@ function bulkYes() {
     }
     bulkNo();
 }
-function doSalvageAll(targets, gain) {
+// Totals per reward item, e.g. "6 Iron Scrap, 2 Pet Ticket"
+function salvageTotals(targets) {
+    const out = {};
+    targets.forEach(({ it }) => { const r = salvageRewardOf(it); out[r.tpl.name] = out[r.tpl.name] || { tpl: r.tpl, qty: 0 }; out[r.tpl.name].qty += r.qty; });
+    return Object.values(out);
+}
+function salvageTotalsText(targets) {
+    return salvageTotals(targets).map(t => `${t.qty} ${t.tpl.name}`).join(', ') || '0';
+}
+function doSalvageAll(targets) {
+    const rewards = salvageTotals(targets);
+    const removed = targets.map(({ it, i }) => ({ it, i }));
     targets.forEach(({ i }) => { player.inventory[i] = null; });
-    if (!addScraps(gain)) {
-        targets.forEach(({ it, i }) => { player.inventory[i] = it; });
+    const placed = [];
+    let ok = true;
+    for (const r of rewards) {
+        if (placeItemInInventory({ ...r.tpl, qty: r.qty })) placed.push(r); else { ok = false; break; }
+    }
+    if (!ok) {
+        // Roll back: take back what was added, restore the salvaged items
+        placed.forEach(r => removeItemByName(r.tpl.name, r.qty));
+        removed.forEach(({ it, i }) => { player.inventory[i] = it; });
         showFloatNotice("Inventory is full! Cannot salvage.");
         return;
     }
     playSfx(SFX.salvage);
-    logMessage(`[Salvage] Salvaged ${targets.length} item(s) for ${gain} Iron Scrap(s)`, 'drop');
+    logMessage(`[Salvage] Salvaged ${targets.length} item(s) for ${salvageTotalsText(targets)}`, 'drop');
     updateUI();
     saveGame();
 }
