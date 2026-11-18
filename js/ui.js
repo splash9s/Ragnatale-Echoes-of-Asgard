@@ -6213,8 +6213,8 @@ function playStrawSlash(crit) {
     const stage = document.querySelector('#view-town .ts-inner');
     if (!dummy || !stage) return;
     const cfg = crit
-        ? { frames: CRIT_SLASH_FRAMES, ms: CRIT_SLASH_FRAME_MS, scale: 0.35, tail: CRIT_SLASH_TAIL }
-        : { frames: ATK_SLASH_FRAMES, ms: ATK_SLASH_FRAME_MS, scale: 0.25, tail: ATK_SLASH_TAIL };
+        ? { frames: CRIT_SLASH_FRAMES, ms: CRIT_SLASH_FRAME_MS, scale: 0.35 }
+        : { frames: ATK_SLASH_FRAMES, ms: ATK_SLASH_FRAME_MS, scale: 0.25 };
     const ib = stage.getBoundingClientRect(), b = dummy.getBoundingClientRect();
     const sc = (ib.width / stage.offsetWidth) || 1;
     const cx = (b.left + b.width / 2 - ib.left) / sc, cy = (b.top + b.height / 2 - ib.top) / sc;
@@ -6227,33 +6227,18 @@ function playStrawSlash(crit) {
         img.style.cssText = 'position:absolute; pointer-events:none; z-index:4;';
         stage.appendChild(img);
     }
-    clearInterval(img._slashTimer);
+    clearTimeout(img._slashTimer);
     let f = 0;
-    const show = () => {
-        const fr = cfg.frames[f];
-        // The last frames grow a little and fade out, same as the combat slash
-        const tailStart = cfg.frames.length - cfg.tail;
-        let grow = 1, alpha = 1;
-        if (f >= tailStart) {
-            const k = (f - tailStart + 1) / cfg.tail;
-            grow = 1 + SLASH_TAIL_GROW * k;
-            alpha = 1 - k;
-        }
-        const w = fr.w * cfg.scale * grow, h = fr.h * cfg.scale * grow;
-        img.src = fr.src;
-        img.style.width = w + 'px';
-        img.style.height = h + 'px';
-        img.style.left = (cx - w / 2) + 'px';
-        img.style.top = (cy - h / 2) + 'px';
-        img.style.opacity = alpha;
-        img.style.display = '';
+    const step = () => {
+        const last = f === cfg.frames.length - 1;
+        setSlashFrame(img, cfg.frames[f], cfg.scale, cx, cy, last);
+        img._slashTimer = setTimeout(() => {
+            f++;
+            if (f >= cfg.frames.length) { img.style.display = 'none'; return; }
+            step();
+        }, last ? SLASH_LAST_FRAME_MS : cfg.ms);
     };
-    show();
-    img._slashTimer = setInterval(() => {
-        f++;
-        if (f >= cfg.frames.length) { clearInterval(img._slashTimer); img.style.display = 'none'; return; }
-        show();
-    }, cfg.ms);
+    step();
 }
 // One straw hit: damage number, slash, and the combat hit or crit sound
 function strawHit(hit) {
