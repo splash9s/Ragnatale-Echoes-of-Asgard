@@ -839,8 +839,8 @@
         #combat-potion-btn:not(.no-potion):active { background-image: url('assets/combat/potionslotpress_q85.webp'); }
         #combat-potion-btn.no-potion { background-image: url('assets/combat/nopotion_q85.webp'); }
         /* Damage numbers: white for normal, red for critical */
-        .combat-dmg { position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 39px; font-weight: 900; white-space: nowrap; text-shadow: 0 2px 3px #000, 0 0 6px #000; pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
-        .combat-dmg.crit { color: #ff9800; font-size: 72px; animation-duration: 1.4s; }
+        .combat-dmg { --dmg-edge: #9ca3af; position: absolute; z-index: 6; transform: translate(-50%, -100%); color: #ffffff; font-size: 39px; font-weight: 900; white-space: nowrap; text-shadow: -2px 0 var(--dmg-edge), 2px 0 var(--dmg-edge), 0 -2px var(--dmg-edge), 0 2px var(--dmg-edge), -2px -2px var(--dmg-edge), 2px -2px var(--dmg-edge), -2px 2px var(--dmg-edge), 2px 2px var(--dmg-edge), 0 4px 5px rgba(0,0,0,.85), 0 0 8px rgba(0,0,0,.6); pointer-events: none; animation: combatDmgUp .9s ease-out forwards; }
+        .combat-dmg.crit { color: #ff9800; --dmg-edge: #9a4a00; font-size: 72px; animation-duration: 1.4s; }
         /* 3D Earth art: slow parallax sway (forest less, sky more), a pan when a stage starts, a push-in on crits */
         #earth-bg.earth3d-far { animation: earth3dSwayFar 11s ease-in-out infinite; }
         #earth-fg.earth3d-mid { animation: earth3dSwayMid 11s ease-in-out infinite; }
@@ -913,12 +913,12 @@
         .combat-dmg.miss { color: #ffffff; font-size: 39px; letter-spacing: 1px; }
         /* Item dropped on the ground where a monster fell (js/ui.js showGroundDrop): a soft golden glow */
         .ground-drop { position: absolute; z-index: 3; pointer-events: none; transform: translate(-50%, 0); filter: drop-shadow(0 0 4px #fde68a) drop-shadow(0 0 10px rgba(251,191,36,.8)); line-height: 0; }
-        .combat-dmg.stun { color: #facc15; font-size: 39px; letter-spacing: 1px; }
-        .combat-dmg.heal { color: #4ade80; }
+        .combat-dmg.stun { color: #facc15; --dmg-edge: #8a6a00; font-size: 39px; letter-spacing: 1px; }
+        .combat-dmg.heal { color: #4ade80; --dmg-edge: #14632f; }
         .combat-dmg.below { transform: translate(-50%, 0); } /* under the button, not above it */
         #combat-return-btn.armed .ret-normal { display: none !important; }
         #combat-return-btn.armed .ret-press { display: block !important; }
-        .combat-dmg.resoff { color: #f87171; }
+        .combat-dmg.resoff { color: #f87171; --dmg-edge: #7f1d1d; }
         @keyframes combatDmgUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -70px; } }
         .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
         /* Rune pick card: fixed proportions; text scales with the card (container units), so it stays adaptive on phones */
