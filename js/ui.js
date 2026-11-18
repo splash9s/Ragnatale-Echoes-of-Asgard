@@ -3669,6 +3669,11 @@ function gearCardHTML(item, label) {
     </div>`;
 }
 
+// The gear this item would replace: rings compare with whichever ring slot is worn
+function equippedForCompare(item) {
+    if (item.slot === 'ring') return player.equipped.ringLeft || player.equipped.ringRight;
+    return player.equipped[item.slot];
+}
 function compareHTML(selected, equipped) {
     // Compare table in the Item Details draft style: Stat | This item | Equipped | Diff
     const s = effectiveStats(selected);
@@ -3683,7 +3688,7 @@ function compareHTML(selected, equipped) {
             + `<span class="dd-cmp-now">${fmt(now)}</span><span class="dd-cmp-eq">${equipped ? fmt(eq) : '—'}</span>`
             + `<span class="dd-cmp-delta ${cls}">${diff}</span></div>`;
     }).join('');
-    if (!rows) return '';
+    if (!rows) return `<div class="dd-cmp"><div class="dd-cmp-note">No stats to compare</div></div>`;
     const note = equipped && equipped.name
         ? `<div class="dd-cmp-note">Compared with <strong>${equipped.name}</strong></div>`
         : `<div class="dd-cmp-note">Nothing equipped in this slot</div>`;
@@ -3757,7 +3762,7 @@ function showResultItemDetail(index) {
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
-        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
         secondary: iconActionButtons(item, isEquip, canSell, `resultSalvageItem(${index})`, `resultSellItem(${index})`),
@@ -3815,7 +3820,7 @@ function itemDetailBodyHTML(item) {
     if (isPotion) body += `<span class="text-[11px] text-emerald-300">Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>`;
     if (item.setName) body += setInfoHTML(item.setName);
     if (isEquip && !NO_GEAR_SLOTS.includes(item.slot)) {
-        body += compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]);
+        body += compareHTML(item, equippedForCompare(item));
     } else if (isEquip && item.stats) {
         body += `<div class="p-2 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-0.5">` +
             Object.entries(item.stats).map(([k, v]) => `<span class="text-slate-200">${formatStatLine(k, v)}</span>`).join('') + `</div>`;
@@ -3884,7 +3889,7 @@ function showItemDetail(index, refresh = false) {
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
-        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
         primary, secondary
@@ -5055,7 +5060,7 @@ function showMailItemDetail(mailId, idx, refresh = false) {
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ddStatRows(isEquip ? item.stats : null),
-        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, player.equipped[item.slot === 'ring' ? 'ringLeft' : item.slot]) : '',
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip && !isPotion && item.desc ? item.desc : '',
         price: '',
         primary: '', secondary: []
