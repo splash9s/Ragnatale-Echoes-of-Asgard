@@ -7730,7 +7730,7 @@ function addPlank(m, qty = 1) {
 const RARITY_HEX = { 1: '#94a3b8', 2: '#34d399', 3: '#60a5fa', 4: '#c084fc', 5: '#fbbf24' };
 
 // Hold a bag cell for 0.5 seconds (mouse hover) or long-press it (touch) to open its detail window
-const BAG_HOVER_MS = 500, BAG_LONGPRESS_MS = 500;
+const BAG_HOVER_MS = 1000, BAG_LONGPRESS_MS = 500;
 let bagHoverTimer = null, bagPressTimer = null, bagPressStart = null, bagSuppressClick = false;
 let bagHoverOpenedIdx = null; // the window was opened by hovering this cell: it closes when the pointer leaves
 function bagCellIndex(target) {
@@ -7742,6 +7742,7 @@ function bagOpenIfGear(index, byHover = false) {
     // select mode too: hover or long-press still opens the detail window; a tap still picks the cell
     const it = player.inventory[index];
     if (!it) return; // any bag item: gear, materials, potions, tickets
+    if (isDetailOpen('inv:' + index)) return; // already open (from a tap): leave it, so its menu stays
     showItemDetail(index);
     bagHoverOpenedIdx = byHover ? index : null;
 }
@@ -7795,7 +7796,19 @@ document.addEventListener('click', (e) => {
     if (bagCellIndex(e.target) !== null) { e.stopPropagation(); e.preventDefault(); }
 }, true);
 // A tap on a cell opens the window for good: leaving the cell no longer closes it
-document.addEventListener('click', (e) => { if (bagCellIndex(e.target) !== null) bagHoverOpenedIdx = null; }, true);
+// A tap on a cell cancels a pending hover. If the window is already open from hover, the tap keeps it open
+// (so its Equip / Sell / Salvage menu shows) instead of closing it. Select mode keeps its normal tap.
+document.addEventListener('click', (e) => {
+    const idx = bagCellIndex(e.target);
+    if (idx === null) return;
+    clearTimeout(bagHoverTimer); bagHoverTimer = null;
+    if (!bulkMode && bagHoverOpenedIdx === idx && isDetailOpen('inv:' + idx)) {
+        bagHoverOpenedIdx = null;
+        e.stopPropagation(); e.preventDefault();
+        return;
+    }
+    bagHoverOpenedIdx = null;
+}, true);
 
 // ---- Shop gear rows: same as the bag. Hover 0.5 s (or long-press on touch) opens the detail window; leaving closes it
 // unless the pointer moved into the window; a tap opens it for good ----
