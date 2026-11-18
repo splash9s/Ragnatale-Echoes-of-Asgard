@@ -389,37 +389,37 @@
         .dd-skin button.bg-red-600:hover, .dd-skin button.bg-amber-700:hover { background-color: #101a2e !important; }
         .dd-skin #inv-detail-close { background: #1b2740; color: #e9edf5; border: 2px solid #26344f; border-radius: 10px; }
         .dd-skin div, .dd-skin span, .dd-skin p { color: #e9edf5; }
-        .art-dark .art-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not(button) { color: #e9edf5 !important; }
+        .art-dark .art-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not([class*="fn-"]):not(button) { color: #e9edf5 !important; }
         .art-dark .art-panel.dd-skin .text-slate-400, .art-dark .art-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
         .art-dark .art-panel.dd-skin .text-slate-200 { color: #e9edf5 !important; }
         .art-dark .art-panel.dd-skin button { color: #e9edf5 !important; }
         .art-dark .art-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
         .art-dark .art-panel.dd-skin .font-black { color: #f5a00b !important; }
-        #inv-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not(button), #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not(button) { color: #e9edf5 !important; }
-        #inv-detail-panel.dd-skin .text-slate-400, #inv-detail-panel.dd-skin .text-slate-300, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .text-slate-400, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
-        #inv-detail-panel.dd-skin button, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin button { color: #e9edf5 !important; }
-        #inv-detail-panel.dd-skin [class*="text-slate-9"], #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin [class*="text-slate-9"], #inv-detail-panel.dd-skin [class*="text-slate-2"], #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin [class*="text-slate-2"], #inv-detail-panel.dd-skin [class*="text-black"], #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin [class*="text-black"] { color: #e9edf5 !important; }
-        #inv-detail-panel.dd-skin [class*="text-slate-5"], #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin [class*="text-slate-5"] { color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not([class*="fn-"]):not(button), #shop-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not([class*="fn-"]):not(button) , #result-item-detail-panel.dd-skin *:not([class*="text-"]):not([class*="dd-"]):not([class*="fn-"]):not(button) { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin .text-slate-400, #inv-detail-panel.dd-skin .text-slate-300, #shop-detail-panel.dd-skin .text-slate-400, #result-item-detail-panel.dd-skin .text-slate-400, #shop-detail-panel.dd-skin .text-slate-300 , #result-item-detail-panel.dd-skin .text-slate-300 { color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin button, #shop-detail-panel.dd-skin button , #result-item-detail-panel.dd-skin button { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin [class*="text-slate-9"], #shop-detail-panel.dd-skin [class*="text-slate-9"], #result-item-detail-panel.dd-skin [class*="text-slate-9"], #inv-detail-panel.dd-skin [class*="text-slate-2"], #shop-detail-panel.dd-skin [class*="text-slate-2"], #result-item-detail-panel.dd-skin [class*="text-slate-2"], #inv-detail-panel.dd-skin [class*="text-black"], #shop-detail-panel.dd-skin [class*="text-black"] , #result-item-detail-panel.dd-skin [class*="text-black"] { color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin [class*="text-slate-5"], #shop-detail-panel.dd-skin [class*="text-slate-5"] , #result-item-detail-panel.dd-skin [class*="text-slate-5"] { color: #9aa6bd !important; }
         /* Item Details layout (ddFill in js/ui.js) */
-        #inv-detail-panel.dd-skin .dd-close, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-close { position: absolute; top: 14px; right: 14px; width: 48px; height: 48px; border-radius: 10px; border: 2px solid #26344f; background: #1b2740 !important; color: #e9edf5 !important; font-size: 22px; font-weight: 800; cursor: pointer; }
-        #inv-detail-panel.dd-skin .dd-head, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-head { display: flex; align-items: center; gap: 18px; padding: 0 64px 14px 0; border-bottom: 2px solid #26344f; margin-bottom: 14px; }
-        #inv-detail-panel.dd-skin .dd-icon, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-icon { width: 96px; height: 96px; flex: none; display: flex; align-items: center; justify-content: center; border: 2px solid #f5a00b; border-radius: 12px; background: #0b1322; }
-        #inv-detail-panel.dd-skin .dd-name-wrap, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-name-wrap { display: grid; gap: 4px; min-width: 0; }
-        #inv-detail-panel.dd-skin .dd-name, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-name { font-size: 34px; font-weight: 800; line-height: 1.15; color: #f5a00b !important; text-wrap: balance; }
-        #inv-detail-panel.dd-skin .dd-meta, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-meta { font-size: 24px; color: #9aa6bd !important; }
-        #inv-detail-panel.dd-skin .dd-body, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-body { display: flex; flex-direction: column; gap: 14px; }
-        #inv-detail-panel.dd-skin .dd-stats, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-stats { border: 2px solid #26344f; border-radius: 12px; background: #0b1322; padding: 4px 16px; display: flex; flex-direction: column; font-size: 26px; }
-        #inv-detail-panel.dd-skin .dd-stats > *, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-stats > * { display: block; padding: 10px 0; border-bottom: 2px solid #26344f; color: #e9edf5 !important; }
-        #inv-detail-panel.dd-skin .dd-stats > *:last-child, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-stats > *:last-child { border-bottom: 0; }
-        #inv-detail-panel.dd-skin .dd-lore, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-lore { margin: 0; text-align: center; font-style: italic; font-size: 23px; color: #9aa6bd !important; }
-        #inv-detail-panel.dd-skin .dd-price, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-price { text-align: center; font-size: 23px; color: #e9edf5 !important; }
-        #inv-detail-panel.dd-skin .dd-price b, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-price b { color: #f5a00b !important; }
-        #inv-detail-panel.dd-skin .dd-row, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-row { display: grid; gap: 12px; }
-        #inv-detail-panel.dd-skin .dd-btn, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-btn { width: 100%; font-size: 23px; font-weight: 800; border-radius: 12px; padding: 16px 10px; border: 2px solid #26344f; cursor: pointer; color: #e9edf5 !important; background: #1b2740; min-width: 0; }
-        #inv-detail-panel.dd-skin .dd-btn.primary, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-btn.primary { background: #e8720c; border-color: #e8720c; color: #fff !important; }
-        #inv-detail-panel.dd-skin .dd-btn.primary:hover, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-btn.primary:hover { background: #c45f08; }
-        #inv-detail-panel.dd-skin .dd-btn.ghost:hover, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-btn.ghost:hover { background: #101a2e; }
-        #inv-detail-panel.dd-skin .dd-note, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .dd-note { font-size: 21px; color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin .dd-close, #shop-detail-panel.dd-skin .dd-close , #result-item-detail-panel.dd-skin .dd-close { position: absolute; top: 14px; right: 14px; width: 48px; height: 48px; border-radius: 10px; border: 2px solid #26344f; background: #1b2740 !important; color: #e9edf5 !important; font-size: 22px; font-weight: 800; cursor: pointer; }
+        #inv-detail-panel.dd-skin .dd-head, #shop-detail-panel.dd-skin .dd-head , #result-item-detail-panel.dd-skin .dd-head { display: flex; align-items: center; gap: 18px; padding: 0 64px 14px 0; border-bottom: 2px solid #26344f; margin-bottom: 14px; }
+        #inv-detail-panel.dd-skin .dd-icon, #shop-detail-panel.dd-skin .dd-icon , #result-item-detail-panel.dd-skin .dd-icon { width: 96px; height: 96px; flex: none; display: flex; align-items: center; justify-content: center; border: 2px solid #f5a00b; border-radius: 12px; background: #0b1322; }
+        #inv-detail-panel.dd-skin .dd-name-wrap, #shop-detail-panel.dd-skin .dd-name-wrap , #result-item-detail-panel.dd-skin .dd-name-wrap { display: grid; gap: 4px; min-width: 0; }
+        #inv-detail-panel.dd-skin .dd-name, #shop-detail-panel.dd-skin .dd-name , #result-item-detail-panel.dd-skin .dd-name { font-size: 34px; font-weight: 800; line-height: 1.15; color: #f5a00b !important; text-wrap: balance; }
+        #inv-detail-panel.dd-skin .dd-meta, #shop-detail-panel.dd-skin .dd-meta , #result-item-detail-panel.dd-skin .dd-meta { font-size: 24px; color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin .dd-body, #shop-detail-panel.dd-skin .dd-body , #result-item-detail-panel.dd-skin .dd-body { display: flex; flex-direction: column; gap: 14px; }
+        #inv-detail-panel.dd-skin .dd-stats, #shop-detail-panel.dd-skin .dd-stats , #result-item-detail-panel.dd-skin .dd-stats { border: 2px solid #26344f; border-radius: 12px; background: #0b1322; padding: 4px 16px; display: flex; flex-direction: column; font-size: 26px; }
+        #inv-detail-panel.dd-skin .dd-stats > *, #shop-detail-panel.dd-skin .dd-stats > * , #result-item-detail-panel.dd-skin .dd-stats > * { display: block; padding: 10px 0; border-bottom: 2px solid #26344f; color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin .dd-stats > *:last-child, #shop-detail-panel.dd-skin .dd-stats > *:last-child , #result-item-detail-panel.dd-skin .dd-stats > *:last-child { border-bottom: 0; }
+        #inv-detail-panel.dd-skin .dd-lore, #shop-detail-panel.dd-skin .dd-lore , #result-item-detail-panel.dd-skin .dd-lore { margin: 0; text-align: center; font-style: italic; font-size: 23px; color: #9aa6bd !important; }
+        #inv-detail-panel.dd-skin .dd-price, #shop-detail-panel.dd-skin .dd-price , #result-item-detail-panel.dd-skin .dd-price { text-align: center; font-size: 23px; color: #e9edf5 !important; }
+        #inv-detail-panel.dd-skin .dd-price b, #shop-detail-panel.dd-skin .dd-price b , #result-item-detail-panel.dd-skin .dd-price b { color: #f5a00b !important; }
+        #inv-detail-panel.dd-skin .dd-row, #shop-detail-panel.dd-skin .dd-row , #result-item-detail-panel.dd-skin .dd-row { display: grid; gap: 12px; }
+        #inv-detail-panel.dd-skin .dd-btn, #shop-detail-panel.dd-skin .dd-btn , #result-item-detail-panel.dd-skin .dd-btn { width: 100%; font-size: 23px; font-weight: 800; border-radius: 12px; padding: 16px 10px; border: 2px solid #26344f; cursor: pointer; color: #e9edf5 !important; background: #1b2740; min-width: 0; }
+        #inv-detail-panel.dd-skin .dd-btn.primary, #shop-detail-panel.dd-skin .dd-btn.primary , #result-item-detail-panel.dd-skin .dd-btn.primary { background: #e8720c; border-color: #e8720c; color: #fff !important; }
+        #inv-detail-panel.dd-skin .dd-btn.primary:hover, #shop-detail-panel.dd-skin .dd-btn.primary:hover , #result-item-detail-panel.dd-skin .dd-btn.primary:hover { background: #c45f08; }
+        #inv-detail-panel.dd-skin .dd-btn.ghost:hover, #shop-detail-panel.dd-skin .dd-btn.ghost:hover , #result-item-detail-panel.dd-skin .dd-btn.ghost:hover { background: #101a2e; }
+        #inv-detail-panel.dd-skin .dd-note, #shop-detail-panel.dd-skin .dd-note , #result-item-detail-panel.dd-skin .dd-note { font-size: 21px; color: #9aa6bd !important; }
         /* Compare table (compareHTML): Stat | This item | Equipped | Diff */
         #inv-detail-panel.dd-skin .dd-cmp { border: 2px solid #26344f; border-radius: 12px; background: #0b1322; padding: 6px 16px 10px; font-size: 26px; }
         #result-item-detail-panel.dd-skin .dd-cmp { border: 2px solid #26344f; border-radius: 12px; background: #0b1322; padding: 6px 16px 10px; font-size: 26px; }
@@ -458,8 +458,8 @@
         .dd-cmp-note { padding-top: 10px; font-size: 18px; }
         #inv-detail-panel.dd-skin .dd-cmp-note strong { color: #e9edf5 !important; }
         #result-item-detail-panel.dd-skin .dd-cmp-note strong { color: #e9edf5 !important; }
-        #inv-detail-panel.dd-skin button.bg-amber-600, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
-        #inv-detail-panel.dd-skin .font-black, #shop-detail-panel.dd-skin, #result-item-detail-panel.dd-skin .font-black { color: #f5a00b !important; }
+        #inv-detail-panel.dd-skin button.bg-amber-600, #shop-detail-panel.dd-skin button.bg-amber-600 , #result-item-detail-panel.dd-skin button.bg-amber-600 { color: #fff !important; }
+        #inv-detail-panel.dd-skin .font-black, #shop-detail-panel.dd-skin .font-black , #result-item-detail-panel.dd-skin .font-black { color: #f5a00b !important; }
         .dd-skin .font-black { color: #f5a00b !important; }
         .dd-skin button { color: #e9edf5; }
         .dd-skin button.bg-amber-600 { color: #fff !important; }
@@ -925,13 +925,14 @@
         .combat-dmg.elem-adv.elem-wind { color: #5eead4; --dmg-edge: #0f5c52; }
         .combat-dmg.elem-adv.elem-earth { color: #d97706; --dmg-edge: #6b3a00; }
         /* Forged weapon names (forgedWeaponName in js/ui.js): player green, element colour, base name orange */
-        .fn-player { color: #22c55e !important; }
-        .fn-base { color: #f5a00b !important; }
-        .fn-el-fire { color: #ef4444 !important; }
-        .fn-el-water { color: #38bdf8 !important; }
-        .fn-el-earth { color: #d97706 !important; }
-        .fn-el-wind { color: #5eead4 !important; }
-        .el-line { color: #ffffff !important; }
+        /* :is(...) carries ID weight so these beat the panels' blanket text colours (e.g. #inv-detail-panel *) */
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-player { color: #22c55e !important; }
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-base { color: #f5a00b !important; }
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-el-fire { color: #ef4444 !important; }
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-el-water { color: #38bdf8 !important; }
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-el-earth { color: #d97706 !important; }
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .fn-el-wind { color: #5eead4 !important; }
+        :is(#inv-detail-panel, #shop-detail-panel, #result-item-detail, #result-item-detail-panel, body) .el-line { color: #ffffff !important; }
         @keyframes combatDmgUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -70px; } }
         .combat-rune-slot { flex: none; width: 88px; height: 101px; box-sizing: border-box; padding: 0; font-size: 10px; line-height: 1.25; overflow: hidden; cursor: pointer; text-shadow: 0 1px 2px #000; }
         /* Rune pick card: fixed proportions; text scales with the card (container units), so it stays adaptive on phones */
