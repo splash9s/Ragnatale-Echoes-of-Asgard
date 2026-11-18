@@ -4371,11 +4371,64 @@ function showBulkConfirm(title, gainText, targets, verb, onConfirm, noun = 'equi
     box.querySelector('#bulk-yes').onclick = () => { close(); onConfirm(); };
 }
 
-function salvageAllEquipment() {
-    const targets = bulkEquipTargets();
-    if (targets.length === 0) { showFloatNotice("No equipment to salvage."); return; }
-    const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
-    showBulkConfirm("Salvage All", `${gain} Iron Scrap`, targets, "Salvage", () => doSalvageAll(targets, gain));
+// Select mode: Salvage or Sell picks equipment in the bag, then Yes / No confirms
+let bulkMode = null;          // null | 'salvage' | 'sell'
+let bulkPick = new Set();     // bag indexes picked in select mode
+function bulkEligible(it) { return !!(it && it.slot && !NO_GEAR_SLOTS.includes(it.slot) && !it.favorite); }
+function startBulkSelect(mode) {
+    if (bulkMode === mode) { bulkNo(); return; } // same button again: leave select mode
+    bulkMode = mode;
+    bulkPick = new Set();
+    closeInvDetail();
+    renderBulkBar();
+    updateUI();
+}
+function bulkTogglePick(index) {
+    const it = player.inventory[index];
+    if (!bulkMode) return;
+    if (!bulkEligible(it)) { showFloatNotice(it && it.favorite ? "Locked items are kept." : "Only gear can be picked."); return; }
+    if (bulkPick.has(index)) bulkPick.delete(index); else bulkPick.add(index);
+    renderBulkBar();
+    updateUI();
+}
+function bulkPickedTargets() {
+    return [...bulkPick].filter(i => bulkEligible(player.inventory[i])).map(i => ({ it: player.inventory[i], i }));
+}
+function renderBulkBar() {
+    const bar = document.getElementById('bulk-yesno');
+    const label = document.getElementById('bulk-label');
+    if (!bar) return;
+    if (!bulkMode) { bar.style.display = 'none'; return; }
+    const targets = bulkPickedTargets();
+    const amount = bulkMode === 'salvage'
+        ? `${targets.reduce((n, { it }) => n + salvageScrapGain(it), 0)} Iron Scrap`
+        : `${targets.reduce((n, { it }) => n + getSellPrice(it), 0)} Gold`;
+    const verb = bulkMode === 'salvage' ? 'Salvage' : 'Sell';
+    if (label) label.textContent = targets.length ? `${verb} ${targets.length}? +${amount}` : `Pick items to ${verb.toLowerCase()}`;
+    bar.style.display = 'flex';
+}
+function bulkNo() {
+    bulkMode = null;
+    bulkPick = new Set();
+    renderBulkBar();
+    updateUI();
+}
+function bulkYes() {
+    const targets = bulkPickedTargets();
+    if (!targets.length) { showFloatNotice("Pick items first."); return; }
+    if (bulkMode === 'salvage') {
+        const gain = targets.reduce((n, { it }) => n + salvageScrapGain(it), 0);
+        doSalvageAll(targets, gain);
+    } else {
+        const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
+        targets.forEach(({ i }) => { player.inventory[i] = null; });
+        player.gold += total;
+        playSfx(SFX.coin);
+        logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
+        updateUI();
+        saveGame();
+    }
+    bulkNo();
 }
 function doSalvageAll(targets, gain) {
     targets.forEach(({ i }) => { player.inventory[i] = null; });
@@ -4388,20 +4441,6 @@ function doSalvageAll(targets, gain) {
     logMessage(`[Salvage] Salvaged ${targets.length} item(s) for ${gain} Iron Scrap(s)`, 'drop');
     updateUI();
     saveGame();
-}
-
-function sellAllEquipment() {
-    const targets = bulkEquipTargets(); // Lv 99 gear is sold too (only locked items are kept)
-    if (targets.length === 0) { showFloatNotice("No equipment to sell."); return; }
-    const total = targets.reduce((n, { it }) => n + getSellPrice(it), 0);
-    showBulkConfirm("Sell All", `${total} Gold`, targets, "Sell", () => {
-        targets.forEach(({ i }) => { player.inventory[i] = null; });
-        player.gold += total;
-        playSfx(SFX.coin);
-        logMessage(`[Shop] Sold ${targets.length} item(s) for ${total} Gold`, 'drop');
-        updateUI();
-        saveGame();
-    });
 }
 
 function manualDrinkPotion() {
@@ -5612,8 +5651,9 @@ function updateUI() {
             let refText = item && item.refineLevel > 0 ? ` +${item.refineLevel}` : '';
             let rInfo = item ? RARITY_INFO[item.rarity] : null;
             let rarityColor = rInfo ? `${rInfo.border} ${rInfo.text}` : 'border-slate-700 text-slate-200';
+            const bulkCls = bulkMode && bulkPick.has(index) ? ' bulk-pick' : '';
             invGrid.innerHTML += `
-                <div data-idx="${index}" onclick="event.stopPropagation(); showItemDetail(${index})" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}${window.invDetailIndex === index ? ' inv-selected' : ''}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
+                <div data-idx="${index}" onclick="event.stopPropagation(); ${bulkMode ? `bulkTogglePick(${index})` : `showItemDetail(${index})`}" draggable="${item ? 'true' : 'false'}" ondragstart="invDragStart(event, ${index})" ondragover="invDragOver(event)" ondrop="invDrop(event, ${index})" ondragend="invDragEnd()" class="${bulkCls.trim()} w-[108px] h-[104px] flex flex-col justify-center items-center p-1 text-center cursor-pointer hover:brightness-110 transition relative group ${rInfo ? rInfo.text : 'text-slate-200'}${window.invDetailIndex === index ? ' inv-selected' : ''}" style="background-image:url('assets/pages/character/inventoryslot2.png'); background-size:100% 100%;">
                     <span class="flex items-center justify-center" style="width:70px;height:70px;">${itemIconHTML(item)}</span>
                     ${isGearItem(item) && item.favorite ? `<span title="Locked" class="absolute top-0 right-0.5 text-[11px] leading-none px-0.5 text-yellow-300 pointer-events-none">★</span>` : ''}
                     ${item && item.qty > 1 ? `<span class="absolute bottom-1 right-1.5 text-[9px] font-black leading-tight pointer-events-none" style="color:#fff !important; text-shadow:0 1px 2px #000, 0 0 3px #000;">x${item.qty}</span>` : ''}
