@@ -7879,3 +7879,31 @@ document.addEventListener('click', (e) => {
         shopHoverOpenedIdx = null;
     }
 }, true);
+
+
+// ---- Level up animation: the 2x2 sheet frames play in the order 4, 1, 2, 3, 3, 2, 1, 4, fading in and out ----
+const LEVELUP_FX_FRAMES = [4, 1, 2, 3, 3, 2, 1, 4].map(n => `assets/effects/levelup_f${n}_q85.webp`);
+const LEVELUP_FX_STEP_MS = 110;
+let levelUpFxTimers = [];
+function playLevelUpFx() {
+    levelUpFxTimers.forEach(clearTimeout);
+    levelUpFxTimers = [];
+    let el = document.getElementById('levelup-fx');
+    if (!el) {
+        el = document.createElement('img');
+        el.id = 'levelup-fx';
+        el.alt = '';
+        el.setAttribute('aria-hidden', 'true');
+        el.style.cssText = 'position:fixed; left:50%; top:50%; width:min(38vw, 320px); height:auto; transform:translate(-50%, -50%); opacity:0; pointer-events:none; z-index:9000; transition:opacity 180ms ease-in-out;';
+        document.body.appendChild(el);
+    }
+    LEVELUP_FX_FRAMES.forEach((src, i) => {
+        levelUpFxTimers.push(setTimeout(() => {
+            if (el.getAttribute('src') !== src) el.setAttribute('src', src);
+            if (i === 0) el.style.opacity = '1';
+        }, i * LEVELUP_FX_STEP_MS));
+    });
+    const end = LEVELUP_FX_FRAMES.length * LEVELUP_FX_STEP_MS;
+    levelUpFxTimers.push(setTimeout(() => { el.style.transition = 'opacity 260ms ease-in-out'; el.style.opacity = '0'; }, end));
+    levelUpFxTimers.push(setTimeout(() => { el.remove(); levelUpFxTimers = []; }, end + 300));
+}
