@@ -3536,6 +3536,8 @@ const ITEM_ICON_RULES = [
     [/^Bar$/, 'assets/items/mat_bar_q85.webp'],
     [/^Alloy$/, 'assets/items/mat_alloy_q85.webp'],
     [/^Plank$/, 'assets/items/mat_plank_q85.webp'],
+    [/^Pet Ticket$/, 'assets/items/mat_petticket_q85.webp'],
+    [/^Costume Ticket$/, 'assets/items/mat_costumeticket_q85.webp'],
     [/Iron Scraps/, 'mat_scrap'],
     [/Skill Reset/, 'scroll_skillreset'],
     [/Worn Iron Sword/, 'gear_sword'],
