@@ -1303,7 +1303,7 @@ function awardKill(m) {
             showMonsterGroundDrop(m, `<img src="assets/items/elemental/stone_${stoneEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;">`);
         }
     }
-    // Refining ores: Ore I from normal monsters (5%), Ore II from mini bosses (5%), Ore III from bosses (2%)
+    // Refine materials: Ref Stone from normal monsters (5%), Ref Shard from mini bosses (5%), Ref Crystal from bosses (2%)
     if (!m.isBoss && !m.isMiniBoss && Math.random() < 0.05) addRefineOre(1, m);
     if (m.isMiniBoss && Math.random() < 0.05) addRefineOre(2, m);
     if (m.isBoss && Math.random() < 0.02) addRefineOre(3, m);
