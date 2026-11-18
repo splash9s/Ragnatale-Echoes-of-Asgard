@@ -2977,12 +2977,13 @@ function renderRefiningUI() {
     container.innerHTML = `
         <div class="p-3 bg-slate-950 rounded-xl border border-amber-500/30 mb-3 flex flex-col gap-2">
             <div class="flex justify-between items-center text-xs">
-                <span class="inline-flex items-center gap-1.5"><img src="assets/items/mat_scrap.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Iron Scraps: <strong class="text-slate-200">${scraps} / 100</strong></span>
-                <button onclick="smeltRefiningStone()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer">Smelt 1 Refining Stone</button>
+                <span class="inline-flex items-center gap-1.5"><img src="assets/items/mat_scrap.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Iron Scraps: <strong class="text-slate-200">${scraps}</strong></span>
             </div>
-            <span class="text-[10px] text-slate-400">Combine 100 Iron Scraps to forge 1 Refining Stone.</span>
-            <span class="text-xs text-amber-200">Refine materials: <strong class="text-amber-400">Ingot ${refineOreCount(1)}</strong> (+1 to +4) · <strong class="text-amber-400">Bar ${refineOreCount(2)}</strong> (+5 to +7) · <strong class="text-amber-400">Alloy ${refineOreCount(3)}</strong> (+8 to +10)</span>
-            <span class="text-xs text-amber-200 inline-flex items-center gap-1.5"><img src="assets/shop/diamond/refiningstone.png" alt="" style="width:20px;height:20px;object-fit:contain;"> Available Refining Stones: <strong class="text-amber-400">${player.refiningStones || 0}</strong></span>
+            <div class="flex flex-col gap-1.5 text-xs">
+                <div class="flex justify-between items-center gap-2"><span>20 Iron Scraps → 1 Ingot <span class="text-slate-400">(${refineOreCount(1)})</span></span><button onclick="smeltMaterial(1)" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs cursor-pointer">Smelt</button></div>
+                <div class="flex justify-between items-center gap-2"><span>20 Ingots → 1 Bar <span class="text-slate-400">(${refineOreCount(2)})</span></span><button onclick="smeltMaterial(2)" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs cursor-pointer">Smelt</button></div>
+                <div class="flex justify-between items-center gap-2"><span>10 Bars → 1 Alloy <span class="text-slate-400">(${refineOreCount(3)})</span></span><button onclick="smeltMaterial(3)" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-lg text-xs cursor-pointer">Smelt</button></div>
+            </div>
         </div>
         <div class="text-[10px] text-slate-400 mb-1">Select gear to refine:</div>
     `;
@@ -3191,24 +3192,31 @@ function refineEquipment(slot) {
     saveGame();
 }
 
-function smeltRefiningStone() {
-    if (!player.materials) player.materials = { ironScraps: 0 };
-    let scraps = getScrapCount();
-
-    if (scraps < 100) {
-        showModal("Smelting Failed", "You need at least 100 Iron Scraps to smelt a Refining Stone!");
-        return;
+// Refine material smelting chain: 20 Iron Scraps -> 1 Ingot, 20 Ingots -> 1 Bar, 10 Bars -> 1 Alloy
+const SMELT_RECIPES = {
+    1: { cost: 20, from: 'scrap', to: 1, label: '20 Iron Scraps', name: 'Ingot' },
+    2: { cost: 20, from: 1, to: 2, label: '20 Ingots', name: 'Bar' },
+    3: { cost: 10, from: 2, to: 3, label: '10 Bars', name: 'Alloy' }
+};
+function smeltMaterial(tier) {
+    const r = SMELT_RECIPES[tier];
+    if (!r) return;
+    if (r.from === 'scrap') {
+        if (getScrapCount() < r.cost) { showModal("Smelting Failed", `You need ${r.cost} Iron Scraps to smelt 1 ${r.name}.`); return; }
+        removeScraps(r.cost);
+    } else {
+        if (refineOreCount(r.from) < r.cost) { showModal("Smelting Failed", `You need ${r.cost} ${REFINE_ORE_NAMES[r.from]} to smelt 1 ${r.name}.`); return; }
+        player.refineOres[r.from] -= r.cost;
     }
-
-    removeScraps(100);
-    player.refiningStones = (player.refiningStones || 0) + 1;
-
-    logMessage(`[Forge] Successfully smelted 1x Refining Stone from 100 Iron Scraps!`, 'levelup');
-    showModal("Smelting Successful", "Forged 1x Refining Stone from 100 Iron Scraps!");
+    refineOreCount(r.to);
+    player.refineOres[r.to] += 1;
+    logMessage(`[Forge] Smelted 1 ${r.name} from ${r.label}.`, 'levelup');
+    showModal("Smelting Successful", `Forged 1 ${r.name} from ${r.label}.`);
     updateUI();
     renderRefiningUI();
     saveGame();
 }
+
 
 const MAX_STACK = 99;
 
@@ -3277,7 +3285,7 @@ function addItemToInventory(newItem) {
     return true;
 }
 
-const SCRAP_ITEM = { name: "Iron Scraps", type: 'material', price: 2, desc: "Salvaged metal. 100 make a Refining Stone." };
+const SCRAP_ITEM = { name: "Iron Scraps", type: 'material', price: 2, desc: "Salvaged metal. 20 make an Ingot." };
 
 function getScrapCount() {
     return (player.inventory || []).reduce((n, s) => n + (s && s.name === SCRAP_ITEM.name ? (s.qty || 1) : 0), 0);
