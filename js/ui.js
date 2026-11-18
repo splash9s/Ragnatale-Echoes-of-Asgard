@@ -2754,7 +2754,7 @@ function renderDiamondShop() {
                         <span class="text-[10px] text-slate-400 block">${item.desc}</span>
                     </div>
                 </div>
-                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">${item.ticket ? `${item.ticket.qty} ${item.ticket.name}s` : `<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${item.price}`}</button>
+                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">${item.ticket ? `<img src="${item.ticket.name === 'Pet Ticket' ? 'assets/items/mat_petticket_q85.webp' : 'assets/items/mat_costumeticket_q85.webp'}" alt="${item.ticket.name}" style="width:22px;height:22px;object-fit:contain;display:inline-block;vertical-align:-5px"> ${item.ticket.qty}` : `<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${item.price}`}</button>
             </div>
         `;
     });
@@ -5376,8 +5376,15 @@ function goldCellHTML(amount) {
 
 // Slots that hold no gear stats (pet and costume): no sell, salvage, refine or stat compare
 const NO_GEAR_SLOTS = ['pet', 'costume'];
+// Pet and costume boxes give rarity 1 or 2. Every 10th chest or box opened guarantees rarity 2.
+function boxRarityRoll() { return 1 + Math.floor(Math.random() * 2); }
+function takeChestOpenIsTenth() {
+    player.chestOpens = (player.chestOpens || 0) + 1;
+    return player.chestOpens % 10 === 0;
+}
 function openChest(chestType) {
     const cfg = CHEST_REWARDS[chestType] || CHEST_REWARDS.copper;
+    const tenth = takeChestOpenIsTenth();
     const potionTemplate = GOLD_SHOP_CONSUMABLES.find(i => i.id === cfg.potion);
     const potionQty = cfg.potionMin + Math.floor(Math.random() * (cfg.potionMax - cfg.potionMin + 1));
     const rewardCells = [];
@@ -5394,7 +5401,8 @@ function openChest(chestType) {
     const pool = typeof SHOP_ARMORY_ITEMS !== 'undefined' ? SHOP_ARMORY_ITEMS : [];
     if (pool.length > 0) {
         for (let i = 0; i < cfg.items; i++) {
-            const rarity = cfg.rarities[Math.floor(Math.random() * cfg.rarities.length)];
+            let rarity = cfg.rarities[Math.floor(Math.random() * cfg.rarities.length)];
+            if (tenth && i === 0) rarity = Math.max(rarity, 2); // every 10th chest: at least rarity 2
             const template = pool[Math.floor(Math.random() * pool.length)];
             const gear = generatePoEItem(template, rarity, 1);
             addItemToInventory(gear);
@@ -5403,7 +5411,7 @@ function openChest(chestType) {
     }
 
     if (cfg.costume && COSTUME_BOX_POOL.length) {
-        const costume = { ...COSTUME_BOX_POOL[Math.floor(Math.random() * COSTUME_BOX_POOL.length)], qty: 1 };
+        const costume = { ...COSTUME_BOX_POOL[Math.floor(Math.random() * COSTUME_BOX_POOL.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
         addItemToInventory(costume);
         rewardCells.push(rewardCellHTML(costume));
     }
@@ -6053,7 +6061,8 @@ const COSTUME_BOX_POOL = [
 function openBoxNow(boxType, title) {
     const pool = boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
     if (!pool.length) { showModal(title || "Box", "Costumes are coming soon."); return false; }
-    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1 };
+    const tenth = takeChestOpenIsTenth();
+    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     if (countFreeCapacity(reward) < 1) { showModal("Inventory Full", "Make room in your bag first."); return false; }
     placeItemInInventory(reward);
     showModal(title || "Box", `You got ${reward.name}!`);
@@ -6066,7 +6075,8 @@ function openBoxFromDetail(index) {
     if (!item || item.type !== 'box') return;
     const pool = item.boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
     if (!pool.length) { showModal("Costume Box", "Costumes are coming soon. The box is kept."); return; }
-    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1 };
+    const tenth = takeChestOpenIsTenth();
+    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     // A box that is the last one frees its own slot; a stack needs room for the reward
     if ((item.qty || 1) > 1 && countFreeCapacity(reward) < 1) { showModal("Inventory Full", "Make room in your bag first."); return; }
     closeInvDetail();
