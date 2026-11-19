@@ -1691,6 +1691,7 @@ function monsterTurnTick() {
 
     // Castle Tower: the hero being down is not a defeat while an ally still stands
     if (player.hp <= 0 && !towerAnyAlive()) {
+        sendTowerFriendRewards(); // Castle Tower: the run is over, so the friends get their share
         if (player.runes.angelOfDeath && !player.angelUsedThisRun) {
             player.angelUsedThisRun = true;
             player.hp = derived.maxHp;
@@ -2029,6 +2030,7 @@ function onStageCleared() {
 
             if (currentMode === 'tower' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
+                sendTowerFriendRewards();
                 logMessage(`[Tower] The Castle Tower is cleared!`, 'levelup');
                 showModal("Castle Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
                 updateUI();
@@ -2342,6 +2344,7 @@ function grantTowerFloorReward(f) {
         const chest = { name: "Costume Chest", type: 'chest', chestType: 'costume', qty: 1, icon: 'assets/chest/costume/costumeicon_q85.webp', desc: "" };
         if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); }
     }
+    if (towerParty) towerParty.cleared = Math.max(towerParty.cleared || 0, f);
     logMessage(`[Tower] Floor ${f} cleared! Reward: ${got.join(', ')}`, 'drop');
     updateUI();
     saveGame();
@@ -2369,6 +2372,7 @@ function towerAllyFromSnapshot(snap) {
 }
 let towerPendingAllies = null;
 let towerPendingOrder = null; // formation chosen on the Events page (front first)
+let towerPendingIds = null;   // the two friends' user ids, in pick order
 
 // Starts a Castle Tower run with two friends. One attempt per day.
 async function startTower(friendIds, order) {
@@ -2387,6 +2391,7 @@ async function startTower(friendIds, order) {
     if (bad) { showModal("Castle Tower", bad.error || "Could not load your friends' tents."); return; }
     towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data));
     towerPendingOrder = Array.isArray(order) && order.length === 3 ? order : null;
+    towerPendingIds = ids.slice();
     if (!player.towerCooldowns) player.towerCooldowns = {};
     ids.forEach(id => { player.towerCooldowns[id] = Date.now(); });
     getEventState().plays.tower = (getEventState().plays.tower || 0) + 1;
@@ -2432,6 +2437,19 @@ function towerSetSixMonsters() {
     monstersList = slots.filter(Boolean);
 }
 
+// Castle Tower: each chosen friend gets a mail with their share of the floors cleared (once per run)
+function sendTowerFriendRewards() {
+    if (!towerIsActive() || !towerParty.cleared) return;
+    const floors = towerParty.cleared;
+    towerParty.cleared = 0;
+    Object.values(towerParty.ids || {}).filter(Boolean).forEach(id => {
+        friendApi.towerRewards(id, floors).then(res => {
+            if (res.error) logMessage(`[Tower] Friend rewards not sent: ${res.error}`, 'winlose');
+            else logMessage(`[Tower] Your friend was sent their share of ${floors} floor(s) by mail.`, 'drop');
+        });
+    });
+}
+
 // Set by towerHitEveryone so the hero takes the hit directly, not through the front-ally route
 let towerAllHit = false;
 // A hit that reaches every living party member (Heavy Strike)
@@ -2470,7 +2488,10 @@ function setupTowerParty() {
     towerPendingAllies = null;
     const order = towerPendingOrder || ['hero', 'a1', 'a2'];
     towerPendingOrder = null;
-    towerParty = { order, members: { a1: allies[0], a2: allies[1] } };
+    const ids = towerPendingIds || [];
+    towerPendingIds = null;
+    // cleared: highest floor cleared this run (the friends' mail is sent for it when the run ends)
+    towerParty = { order, members: { a1: allies[0], a2: allies[1] }, ids: { a1: ids[0], a2: ids[1] }, cleared: 0 };
 }
 
 // A hit on the front ally (returns true when the hit went to an ally)
