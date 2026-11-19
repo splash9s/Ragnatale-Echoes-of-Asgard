@@ -3861,7 +3861,10 @@ function itemIconHTML(item, size = 70) {
     // Wanderer Samurai: a true 2px black outline at any display size (the file's own border shrinks when scaled down)
     const outline = item && item.costumeId === 'wanderer_samurai' ? 'filter:drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);' : '';
     if (item && item.type === 'estone' && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
-    if (item && item.costumeId && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;${outline}" />`;
+    // A costume taken from an older save may hold a retired icon path: use the current icon from the costume list
+    const costumeTpl = item && item.costumeId ? COSTUME_BOX_POOL.find(c => c.costumeId === item.costumeId) : null;
+    const costumeSrc = (costumeTpl && costumeTpl.icon) || (item && item.icon);
+    if (item && item.costumeId && costumeSrc) return `<img src="${costumeSrc}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;${outline}" />`;
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
