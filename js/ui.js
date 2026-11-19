@@ -6106,7 +6106,7 @@ const PET_BOX_POOL = [
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
-    { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
+    { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
 ];
 // Opens a box at once: a random reward from its pool goes into the bag
 function openBoxNow(boxType, title) {
