@@ -1719,7 +1719,7 @@ function monsterTurnTick() {
         if (firstDeath) markGuide('death');
         const defeatHtml = buildMapSummaryHTML('lose', undefined, firstDeath);
         playPlayerFallAnim(); // the hero falls first, then the result shows
-        const failReturn = (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
+        const failReturn = currentMode === 'tower' ? 'town' : (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
         setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView(failReturn)), PLAYER_FALL_MS);
     }
     updateUI();
@@ -2032,7 +2032,7 @@ function onStageCleared() {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 sendTowerFriendRewards();
                 logMessage(`[Tower] The Warded Tower is cleared!`, 'levelup');
-                showModal("Warded Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
+                showModal("Warded Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Town'), () => switchView('town'));
                 updateUI();
                 saveGame();
                 return;
