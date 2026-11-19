@@ -16,7 +16,8 @@ const GUIDE_ELEM_LEVEL = 20;
 function guideElemWeapon() { return player && player.equipped ? player.equipped.weapon : null; }
 function guideElemWanted() {
     if (typeof player === 'undefined' || !player) return false;
-    if (guideFlag('elemGuide') || guideFlag('elemForged')) return false;
+    // Only for a player who has never done an elemental forge
+    if (guideFlag('elemGuide') || guideFlag('elemForged') || elementForgeEverDone()) return false;
     if ((player.baseLv || 1) < GUIDE_ELEM_LEVEL) return false;
     return !!guideElemWeapon();
 }
