@@ -3050,7 +3050,13 @@ const FORGE_SUCCESS_RATE = 20;
 const FORGE_ELEMENT_COLOR = { fire: '#ef4444', water: '#38bdf8', earth: '#d97706', wind: '#5eead4' };
 function forgeItemLevel(gear) { return Math.max(1, Math.floor(Number(gear && gear.levelReq) || 1)); }
 // The first elemental forge is free (no Gold, no stone) and always succeeds
-function elementForgeFree() { return !(player.guide && player.guide.elemForged); }
+// True once the player has ever done an elemental forge (the flag, or any weapon that carries a forged base name)
+function elementForgeEverDone() {
+    if (player.guide && player.guide.elemForged) return true;
+    const all = [...Object.values(player.equipped || {}), ...(player.inventory || [])];
+    return all.some(it => it && it.baseName);
+}
+function elementForgeFree() { return !elementForgeEverDone(); }
 function elementForgeCost(gear) { return elementForgeFree() ? 0 : forgeItemLevel(gear) * 100; }
 function elementStoneCost(gear) { return elementForgeFree() ? 0 : Math.max(1, Math.ceil(forgeItemLevel(gear) / 10)); }
 function elementForgeRate() { return elementForgeFree() ? 100 : FORGE_SUCCESS_RATE; }
