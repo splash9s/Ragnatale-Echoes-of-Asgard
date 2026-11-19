@@ -6596,6 +6596,7 @@ function openStash() {
     const stashCells = st.slots.map((it, i) => stashSlotHTML(it, 'stash', i)).join('');
     const bagCells = bag.map((it, i) => stashSlotHTML(it, 'bag', i)).join('');
     const html = `<div class="stash-wrap">
+        <div class="flex justify-end"><button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Return</button></div>
         <div class="stash-cols">
             <div class="stash-col">
                 <p class="stash-title">Stash · ${stashUsed}/${STASH_SLOTS}</p>
