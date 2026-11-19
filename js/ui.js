@@ -2791,7 +2791,8 @@ const VIP_HIGHLIGHT_CARDS = [
 // Highlight card stage (the card's inner area) and the animations played in it
 const VH_STAGE_W = 248, VH_STAGE_H = 240;
 const VH_PET_SCALE = 1.35; // the cat's pixel art is small; this makes it about the same height as the costume figure
-const VH_COSTUME_SEQ = [['base', 600], ['attack', 220], ['attack02', 260], ['base', 400], ['critical', 240], ['critical02', 360]];
+const VH_COOLDOWN_MS = 3000; // rest between one run of the animation and the next
+const VH_COSTUME_SEQ = [['base', VH_COOLDOWN_MS], ['attack', 220], ['attack02', 260], ['base', 400], ['critical', 240], ['critical02', 360]];
 let vhAnimGen = 0; // bumped on every redraw so old loops stop
 function vhPlayAnims(grid) {
     const gen = ++vhAnimGen;
@@ -2836,7 +2837,8 @@ function vhPlayCostume(stage, img, id, gen) {
 // The cat's lick: sit, lick (same frames and timing as the main page cat), sit again
 function vhPlayPet(stage, img, gen) {
     const f = n => ({ src: `assets/combat/ocat/ocat${n}_q85.webp`, w: 100, h: 90, fx: 50, fy: 90 });
-    const seq = [[1, CAT_LICK_IDLE_MS], ...CAT_LICK_SEQ.map(n => [n, CAT_LICK_FRAME_MS]), [1, CAT_LICK_REST_MS]];
+    // Sitting still for the cooldown, then the lick; the sit at the start of the next loop is the cooldown
+    const seq = [[1, VH_COOLDOWN_MS], ...CAT_LICK_SEQ.map(n => [n, CAT_LICK_FRAME_MS])];
     const anchorX = VH_STAGE_W / 2;
     [1, 2, 3, 4].forEach(n => { new Image().src = f(n).src; });
     let i = 0;
