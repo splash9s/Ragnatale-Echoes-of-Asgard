@@ -2353,11 +2353,39 @@ function buildTowerMap() {
 }
 
 // Starts a Castle Tower run. One attempt per day.
-function startTower() {
+const TOWER_FRIEND_COOLDOWN_MS = 3 * 24 * 3600 * 1000; // a friend can join again 3 days after their last run
+function towerFriendCooldownLeft(id) {
+    const at = (player.towerCooldowns || {})[id] || 0;
+    return Math.max(0, at + TOWER_FRIEND_COOLDOWN_MS - Date.now());
+}
+// Ally from a friend's saved tent: HP from base level and VIT, ATK from STR and LUK (gear and skills not counted yet)
+function towerAllyFromSnapshot(snap) {
+    const lv = Number(snap.baseLv) || 1;
+    const st = snap.stats || {};
+    const maxHp = Math.max(1, 100 + (Number(st.vit) || 0) * 15 + lv * 10);
+    const atk = Math.max(1, 10 + (Number(st.str) || 0) * 2 + Math.floor((Number(st.luk) || 0) / 3));
+    return { name: snap.name || 'Friend', hp: maxHp, maxHp, atk };
+}
+let towerPendingAllies = null;
+
+// Starts a Castle Tower run with two friends. One attempt per day.
+async function startTower(friendIds) {
     if (!eventCanPlay('tower')) {
         showModal("Castle Tower", "Already entered today. One attempt per day.");
         return;
     }
+    const ids = friendIds || [];
+    if (ids.length !== 2) { showModal("Castle Tower", "Choose 2 friends to join your party."); return; }
+    if (ids.some(id => towerFriendCooldownLeft(id) > 0)) {
+        showModal("Castle Tower", "A chosen friend is still resting. Each friend can join again 3 days after their last run.");
+        return;
+    }
+    const res = await Promise.all(ids.map(id => friendApi.visitTent(id)));
+    const bad = res.find(r => !r.data);
+    if (bad) { showModal("Castle Tower", bad.error || "Could not load your friends' tents."); return; }
+    towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data));
+    if (!player.towerCooldowns) player.towerCooldowns = {};
+    ids.forEach(id => { player.towerCooldowns[id] = Date.now(); });
     getEventState().plays.tower = (getEventState().plays.tower || 0) + 1;
     saveGame();
     startExpedition('tower');
@@ -2414,14 +2442,13 @@ function towerMemberAlive(id) { return id === 'hero' ? player.hp > 0 : towerPart
 function towerFront() { return towerParty ? towerParty.order.find(towerMemberAlive) || null : null; }
 function towerAnyAlive() { return !!towerParty && towerParty.order.some(towerMemberAlive); }
 
-// Stub allies until the friend party is wired: 70% of the hero's HP and ATK
+// Allies come from the two chosen friends' tents. Fallback (not expected): 70% stubs
 function setupTowerParty() {
     const d = getDerivedStats();
-    const mk = (name, f) => {
-        const maxHp = Math.max(1, Math.floor(d.maxHp * f));
-        return { name, hp: maxHp, maxHp, atk: Math.max(1, Math.floor(d.atk * f)) };
-    };
-    towerParty = { order: ['hero', 'a1', 'a2'], members: { a1: mk('Friend 1', 0.7), a2: mk('Friend 2', 0.7) } };
+    const fallback = i => ({ name: `Friend ${i}`, hp: Math.max(1, Math.floor(d.maxHp * 0.7)), maxHp: Math.max(1, Math.floor(d.maxHp * 0.7)), atk: Math.max(1, Math.floor(d.atk * 0.7)) });
+    const allies = towerPendingAllies || [fallback(1), fallback(2)];
+    towerPendingAllies = null;
+    towerParty = { order: ['hero', 'a1', 'a2'], members: { a1: allies[0], a2: allies[1] } };
 }
 
 // A hit on the front ally (returns true when the hit went to an ally)

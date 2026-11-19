@@ -6259,8 +6259,9 @@ function renderEventsView() {
         start = { can: eventCanPlay(cur), js: `startEvent('${cur}','${pick}')` };
     } else if (cur === 'tower') {
         const left = Math.max(0, 1 - (st.plays.tower || 0));
-        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. You are paid for each floor you clear, and you keep those rewards even if you fall later.</p><p class="ev-status">${left} / 1 attempt left today</p>`;
-        start = { can: eventCanPlay('tower'), js: `startTower()` };
+        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p><p class="ev-status">${left} / 1 attempt left today · ${towerPick.length} / 2 friends chosen</p>${towerFriendsHTML()}`;
+        start = { can: eventCanPlay('tower') && towerPick.length === 2, js: `startTower(towerPick.slice())` };
+        if (towerFriends === null) loadTowerFriends();
     } else if (cur === 'endless') {
         body = `<p>Endless test map. 100x rewards, test only.</p>`;
         start = { can: true, js: `startExpedition('endless')` };
@@ -6278,6 +6279,35 @@ function renderEventsView() {
     if (cur === 'bossmap' && typeof populateBossGauntletPick === 'function') populateBossGauntletPick();
 }
 
+
+// ---------- CASTLE TOWER FRIEND PICK ----------
+let towerFriends = null;       // friend list for the picker (null until loaded)
+let towerFriendsLoading = false;
+let towerPick = [];            // user ids of the two chosen friends
+async function loadTowerFriends() {
+    if (towerFriendsLoading) return;
+    towerFriendsLoading = true;
+    const res = await friendApi.list();
+    towerFriendsLoading = false;
+    towerFriends = res.data || [];
+    if (currentEventsTab === 'tower') renderEventsView();
+}
+function toggleTowerFriend(id) {
+    if (towerPick.includes(id)) towerPick = towerPick.filter(x => x !== id);
+    else if (towerPick.length < 2 && towerFriendCooldownLeft(id) <= 0) towerPick = [...towerPick, id];
+    renderEventsView();
+}
+function towerFriendsHTML() {
+    if (towerFriends === null) return '<p class="ev-status">Loading friends…</p>';
+    if (!towerFriends.length) return '<p class="ev-status">Add a friend first to bring them to the tower.</p>';
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    return `<div class="ev-maps">${towerFriends.map(f => {
+        const on = towerPick.includes(f.user_id);
+        const cd = towerFriendCooldownLeft(f.user_id);
+        const sub = cd > 0 ? `Resting ${Math.ceil(cd / 86400000)} day(s)` : `Lv. ${f.base_lv}`;
+        return `<button class="ev-map${on ? ' ev-map-on' : ''}" ${cd > 0 ? 'disabled' : ''} onclick="toggleTowerFriend('${esc(f.user_id)}')"><b>${esc(f.name)}</b><span>${sub}</span></button>`;
+    }).join('')}</div>`;
+}
 
 // ---------- FAVORITES ----------
 // Gear tier: score = rarity + buff count (1..9). D 1-2, C 3-4, B 5-6, A 7, S 8-9.
