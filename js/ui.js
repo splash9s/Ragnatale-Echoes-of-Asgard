@@ -2821,11 +2821,13 @@ function renderVipList() {
     if (vipCat === 'all') {
         // Highlight: three featured cards on top, six featured items below
         grid.classList.remove('vip-pack-row');
+        grid.style.gridTemplateColumns = '1fr'; // one full-width column for the highlight rows
         vipPackArrows();
         grid.innerHTML = vipHighlightHTML();
         grid.scrollTop = keepScroll;
         return;
     }
+    grid.style.gridTemplateColumns = '';
     grid.classList.remove('vip-pack-row');
     vipPackArrows();
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
