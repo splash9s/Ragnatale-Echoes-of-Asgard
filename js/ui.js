@@ -8574,7 +8574,7 @@ function playLevelUpFx() {
     // Sit on the player's feet, at the player's width (70% bigger than the player)
     const anchor = levelUpFxAnchor();
     const r = anchor ? anchor.getBoundingClientRect() : null;
-    const w = (r ? r.width : Math.min(window.innerWidth * 0.38, 320)) * 1.7;
+    const w = (r ? r.width : Math.min(window.innerWidth * 0.38, 320)) * 1.7 * 1.3; // 30% bigger than before
     const cx = r ? r.left + r.width / 2 : window.innerWidth / 2;
     const feet = (r ? r.bottom : window.innerHeight / 2 + w * 0.37) + 50; // 50px lower
     let pos;
