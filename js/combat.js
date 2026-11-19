@@ -2542,10 +2542,13 @@ function towerAllyAttacks() {
         if (!t) return;
         const dmg = Math.max(1, Math.floor(a.atk * (0.8 + Math.random() * 0.4) * 100 / (100 + (t.def || 0))));
         t.hp -= dmg;
+        a.attackUntil = Date.now() + 330; // friend's attack pose, then back to idle
         const ti = monstersList.indexOf(t);
         if (ti >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${ti + 1}) img`, String(dmg), '');
         logMessage(`[Tower] ${a.name} hits ${t.name} for ${dmg} damage`, 'combat');
     });
+    towerRenderField();
+    setTimeout(towerRenderField, 340);
 }
 
 // A friend's idle combat frame, built from their saved gear and costume (cached once the art has loaded)
@@ -2584,7 +2587,10 @@ function towerRenderField() {
         if (!m) return;
         const alive = m.hp > 0;
         const footX = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - TOWER_FRIEND_GAP_X * (i + 1);
-        const f = alive ? towerFriendFrame(m, 'IDLE') : (towerFriendFrame(m, 'DEAD') || towerFriendFrame(m, 'IDLE'));
+        const attacking = alive && Date.now() < (m.attackUntil || 0);
+        const f = !alive ? (towerFriendFrame(m, 'DEAD') || towerFriendFrame(m, 'IDLE'))
+            : attacking ? (towerFriendFrame(m, 'ATTACK') || towerFriendFrame(m, 'IDLE'))
+            : towerFriendFrame(m, 'IDLE');
         const elId = `tower-field-${id}`;
         keep.add(elId);
         let el = document.getElementById(elId);

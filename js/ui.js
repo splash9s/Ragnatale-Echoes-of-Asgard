@@ -1709,6 +1709,11 @@ function earthNewArt() {
 const EARTH_BOSS_FG = 'assets/combat/earth3d/mgnew3_v2_q90.webp';
 // Warded Tower art: one background and base for the whole tower, and a midground for each band of floors
 const TOWER_ART = { bg: 'assets/combat/castle/bg_q90.webp', base: 'assets/combat/castle/baselayer_q90.webp' };
+// Warded Tower: the hero, friends and all six monsters stand on the 6th monster's ground line
+const TOWER_GROUND_Y = LINEUP_DEFAULT_POS[5][1] + 100; // card top + the card's 100px sprite box = feet
+function towerLayout() {
+    return flatLayout([515.5, TOWER_GROUND_Y], LINEUP_DEFAULT_POS.map(([left]) => [left + 100, TOWER_GROUND_Y]));
+}
 function towerFgForFloor(f) {
     if (f <= 6) return 'assets/combat/castle/mg1_q90.webp';
     if (f <= 15) return 'assets/combat/castle/mg2_q90.webp';
@@ -1935,7 +1940,7 @@ async function changeEarthLayers() {
     if (is3d) [bg, fg].forEach(el => { el.classList.remove('earth3d-pan'); void el.offsetWidth; el.classList.add('earth3d-pan'); });
     else [bg, fg].forEach(el => el.classList.remove('earth3d-pan'));
     const layoutKey = Object.keys(art.layouts).find(k => nextBase.includes(k) || nextBg.includes(k));
-    const layout = layoutKey ? art.layouts[layoutKey] : null;
+    const layout = towerArt ? towerLayout() : (layoutKey ? art.layouts[layoutKey] : null);
     combatPlayerAnchor = layout ? layout.player : { x: 515.5, y: 871, left: 464, top: 657 };
     combatShadowLift = /(windbase|icebase|firebase)/.test(nextBase) ? 50 : 0;
     combatEarthMonsterPos = layout ? layout.monsters : null;
@@ -6269,7 +6274,7 @@ function renderEventsView() {
     } else if (cur === 'tower') {
         const left = Math.max(0, 1 - (st.plays.tower || 0));
         body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p>`;
-        foot = `<div class="ev-tower-pick"><p class="ev-status">Unlimited attempts for now · ${towerPick.length} / 2 friends (optional)</p>${towerFriendsHTML()}</div>`;
+        foot = `<div class="ev-tower-pick"><p class="ev-status">Unlimited attempts for now · ${towerPick.length} / 2 friends</p>${towerFriendsHTML()}</div>`;
         start = { can: eventCanPlay('tower'), js: `towerOpenArrange()` };
         if (towerFriends === null) loadTowerFriends();
     } else if (cur === 'endless') {
@@ -6338,22 +6343,22 @@ function towerRenderArrange() {
     if (!towerArrange) { if (ov) ov.remove(); return; }
     if (!ov) { ov = document.createElement('div'); ov.id = 'tower-arrange'; document.body.appendChild(ov); }
     ov.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;';
-    const btn = 'padding:6px 12px;border-radius:8px;border:1px solid #c9a227;background:#3a2c1a;color:#f5e8c8;font-size:15px;cursor:pointer;';
+    const btn = 'padding:12px 24px;border-radius:8px;border:1px solid #c9a227;background:#3a2c1a;color:#f5e8c8;font-size:30px;cursor:pointer;';
     const last = towerArrange.length - 1;
     const rows = towerArrange.map((id, i) => {
         const place = i === 0 ? 'Front' : i === last ? 'Back' : 'Middle';
-        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin:6px 0;background:#2a2118;border:1px solid #6b5432;border-radius:8px;">
-            <span style="width:62px;color:#ffd45a;font-weight:700;">${place}</span>
+        return `<div style="display:flex;align-items:center;gap:20px;padding:16px 20px;margin:12px 0;background:#2a2118;border:1px solid #6b5432;border-radius:8px;">
+            <span style="width:124px;color:#ffd45a;font-weight:700;">${place}</span>
             <span style="flex:1;color:#fff;">${escapeHtml(towerSlotName(id))}</span>
             <button style="${btn}${i === 0 ? 'opacity:.35;' : ''}" ${i === 0 ? 'disabled' : ''} onclick="towerMoveArrange(${i}, -1)">▲</button>
             <button style="${btn}${i === last ? 'opacity:.35;' : ''}" ${i === last ? 'disabled' : ''} onclick="towerMoveArrange(${i}, 1)">▼</button>
         </div>`;
     }).join('');
-    ov.innerHTML = `<div style="width:min(440px,92vw);background:#1a140e;border:2px solid #c9a227;border-radius:12px;padding:18px;color:#f5e8c8;font-size:16px;">
-        <div style="font-size:22px;font-weight:700;text-align:center;margin-bottom:4px;">Arrange your party</div>
-        <div style="text-align:center;font-size:13px;opacity:.85;margin-bottom:8px;">The front takes the hits first.</div>
+    ov.innerHTML = `<div style="width:min(880px,94vw);background:#1a140e;border:2px solid #c9a227;border-radius:12px;padding:36px;color:#f5e8c8;font-size:32px;">
+        <div style="font-size:44px;font-weight:700;text-align:center;margin-bottom:8px;">Arrange your party</div>
+        <div style="text-align:center;font-size:26px;opacity:.85;margin-bottom:16px;">The front takes the hits first.</div>
         ${rows}
-        <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+        <div style="display:flex;gap:20px;justify-content:center;margin-top:28px;">
             <button style="${btn}" onclick="towerCancelArrange()">Cancel</button>
             <button style="${btn}background:#7a5a1e;font-weight:700;" onclick="towerConfirmArrange()">Enter the Tower</button>
         </div>
