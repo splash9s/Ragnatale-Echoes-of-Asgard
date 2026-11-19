@@ -2358,9 +2358,9 @@ function buildTowerMap() {
 
 // Starts a Warded Tower run. One attempt per day.
 const TOWER_FRIEND_COOLDOWN_MS = 3 * 24 * 3600 * 1000; // a friend can join again 3 days after their last run
+// Friend cooldown is off for now (set to 0). Restore the timer by returning the time left from TOWER_FRIEND_COOLDOWN_MS.
 function towerFriendCooldownLeft(id) {
-    const at = (player.towerCooldowns || {})[id] || 0;
-    return Math.max(0, at + TOWER_FRIEND_COOLDOWN_MS - Date.now());
+    return 0;
 }
 // Ally from a friend's saved tent: HP from base level and VIT, ATK from STR and LUK (gear and skills not counted yet)
 function towerAllyFromSnapshot(snap) {
