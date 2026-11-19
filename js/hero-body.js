@@ -2403,18 +2403,11 @@ const COSTUME_SETS = {
   blue_samurai: {
       attack: { src: 'assets/costume/blue_samurai/attack_v1_q90.webp', w: 358, h: 399, fx: 62.0, fy: 397.0, tx: 184.6 },
       critical: { src: 'assets/costume/blue_samurai/critical_v1_q90.webp', w: 464, h: 385, fx: 272.1, fy: 383.0, tx: 335.2 },
-      base: { src: 'assets/costume/blue_samurai/base_v1_q90.webp', w: 430, h: 409, fx: 344.1, fy: 407.0, tx: 297.4 },
+      base: { src: 'assets/costume/blue_samurai/base3_3_v1_q90.webp', w: 420, h: 408, fx: 334.9, fy: 406.0, tx: 289.5 }, // animation 3 base pose
       block: { src: 'assets/costume/blue_samurai/block_v1_q90.webp', w: 420, h: 367, fx: 113.6, fy: 365.0, tx: 162.7 },
       attack02: { src: 'assets/costume/blue_samurai/attack02_v1_q90.webp', w: 451, h: 384, fx: 114.7, fy: 382.0, tx: 191.7 },
       fall: { src: 'assets/costume/blue_samurai/fall_v1_q90.webp', w: 366, h: 317, fx: 281.2, fy: 315.0, tx: 151.0 },
       critical02: { src: 'assets/costume/blue_samurai/critical02_v1_q90.webp', w: 424, h: 365, fx: 131.0, fy: 363.0, tx: 205.5 },
-      // Animation 3: four base-pose frames (kept for the idle loop; the single base frame above is still the idle pose)
-      base3: [
-        { src: 'assets/costume/blue_samurai/base3_1_v1_q90.webp', w: 358, h: 399, fx: 63.7, fy: 397.0, tx: 185.3 },
-        { src: 'assets/costume/blue_samurai/base3_2_v1_q90.webp', w: 463, h: 388, fx: 271.4, fy: 386.0, tx: 334.0 },
-        { src: 'assets/costume/blue_samurai/base3_3_v1_q90.webp', w: 420, h: 408, fx: 334.9, fy: 406.0, tx: 289.5 },
-        { src: 'assets/costume/blue_samurai/base3_4_v1_q90.webp', w: 424, h: 371, fx: 119.4, fy: 369.0, tx: 164.9 },
-      ],
   },
   wanderer_samurai: {
       attack: { src: 'assets/costume/wanderer_samurai/attack_v2_q90.webp', w: 483, h: 383, fx: 164.2, fy: 381.0, tx: 307.5 },
@@ -2435,24 +2428,12 @@ function heroCostumeFrame(pose) {
 }
 // The battle hero's frames for the current gear. Dodge shows the block frame with the lunge back.
 // An attack shows attack then attack02; a critical shows critical then critical02. A defeat shows the fall (dead) pose.
-// The idle frame. A costume with animation 3 (base3) loops its four base-pose frames; otherwise the single base frame.
-const HERO_IDLE_FRAME_MS = 220; // time each animation 3 frame stays on screen
-function heroIdleFrame(L) {
-    const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
-    const set = c && c.costumeId && COSTUME_SETS[c.costumeId];
-    if (set && Array.isArray(set.base3) && set.base3.length) {
-        return set.base3[Math.floor(Date.now() / HERO_IDLE_FRAME_MS) % set.base3.length];
-    }
-    return heroBodyFrame('base', L);
-}
-// Preload the animation 3 frames so the loop never shows a blank hero
-Object.values(COSTUME_SETS).forEach(set => (set.base3 || []).forEach(f => { new Image().src = f.src; }));
 function combatPose() {
     const L = heroBodyLoadout();
     const block = heroBodyFrame('block', L);
     const attack = heroBodyFrame('attack', L), cri = heroBodyFrame('critical', L);
     return {
-        IDLE: heroIdleFrame(L),
+        IDLE: heroBodyFrame('base', L),
         ATTACK: attack,
         ATTACK2: heroBodyFrame('attack02', L) || attack,
         CRI: cri,
