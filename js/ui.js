@@ -6547,6 +6547,10 @@ function stashState() {
 }
 function tentStashClick() {
     if (!isCharClear()) return;
+    stashOpenOrUnlock();
+}
+// Opens the stash, or offers the one-time unlock (also used by the stash button on the inventory page)
+function stashOpenOrUnlock() {
     const st = stashState();
     if (st.unlocked) { openStash(); return; }
     if (player.gold < STASH_UNLOCK_GOLD) { showFloatNotice('Not enough gold.'); return; }
