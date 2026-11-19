@@ -1442,8 +1442,9 @@ let armorBrokenThisMap = false;
 function takePlayerDamage(dmg, m, ignoreArmor = false) {
     // Castle Tower: while an ally is in front, the hit goes to that ally instead of the hero
     if (towerIsActive() && !towerAllHit) {
-        const front = towerFront();
-        if (front && front !== 'hero') { towerHitAlly(front, dmg, m); return; }
+        // Bosses attack any living member (all-to-all); other monsters hit the front
+        const target = m && m.isBoss ? towerRandomAlive() : towerFront();
+        if (target && target !== 'hero') { towerHitAlly(target, dmg, m); return; }
     }
     playPlayerReactAnim('block');
     flashPlayerHurt();
@@ -2395,7 +2396,9 @@ async function startTower(friendIds) {
 // Every floor has six monsters. These floors have a boss in one of the six.
 const TOWER_BOSS_FLOORS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 21];
 
-// Builds the floor's six monsters: the boss (if any) plus scaled roster units
+// Builds the floor's six monsters in fixed lineup slots (0-5).
+// Slots 1-3 are melee or tank. Boss floors: slot 3 is the boss, slot 4 is any other unit,
+// and slots 5-6 are healers. Other floors: slots 4-6 are ranged or mage.
 function towerSetSixMonsters() {
     const k = towerFloorMult(currentStage);
     const scaledUnit = u => ({
@@ -2404,16 +2407,27 @@ function towerSetSixMonsters() {
         atkMin: Math.floor(u.atkMin * k), atkMax: Math.floor(u.atkMax * k),
         hit: Math.floor(u.hit * k), flee: Math.floor(u.flee * k)
     });
-    const boss = monstersList.filter(m => m.isBoss);
-    const units = [];
+    const pool = activeMap.enemies;
+    const boss = monstersList.find(m => m.isBoss);
+    const plan = isBossStage()
+        ? ['front', 'front', 'boss', 'back', 'healer', 'healer']
+        : ['front', 'front', 'front', 'back', 'back', 'back'];
     let tanks = 0;
-    while (boss.length + units.length < 6) {
-        let picked = activeMap.enemies[Math.floor(Math.random() * activeMap.enemies.length)];
-        if (roleOf(picked) === 'tank' && tanks >= tankCapHere()) picked = pickUnitNoTank(activeMap.enemies);
+    const make = role => {
+        let picked = pickUnit(pool, role);
+        if (roleOf(picked) === 'tank' && tanks >= tankCapHere()) picked = pickUnit(pool, 'melee');
         if (roleOf(picked) === 'tank') tanks++;
-        units.push(scaledUnit(makeUnit(levelScaled(picked, activeMap.levelReq), 1)));
-    }
-    monstersList = [...boss, ...units];
+        return scaledUnit(makeUnit(levelScaled(picked, activeMap.levelReq), 1));
+    };
+    const slots = plan.map((p, i) => {
+        if (p === 'boss') { if (!boss) return null; boss.lineupSlot = i; return boss; }
+        const unit = p === 'front' ? make(Math.random() < 0.5 ? 'melee' : 'tank')
+            : p === 'healer' ? make('healer')
+            : make(Math.random() < 0.5 ? 'range' : 'mage');
+        unit.lineupSlot = i;
+        return unit;
+    });
+    monstersList = slots.filter(Boolean);
 }
 
 // Set by towerHitEveryone so the hero takes the hit directly, not through the front-ally route
@@ -2441,6 +2455,10 @@ function towerIsActive() { return currentMode === 'tower' && !!towerParty; }
 function towerMemberAlive(id) { return id === 'hero' ? player.hp > 0 : towerParty.members[id].hp > 0; }
 function towerFront() { return towerParty ? towerParty.order.find(towerMemberAlive) || null : null; }
 function towerAnyAlive() { return !!towerParty && towerParty.order.some(towerMemberAlive); }
+function towerRandomAlive() {
+    const alive = towerParty ? towerParty.order.filter(towerMemberAlive) : [];
+    return alive[Math.floor(Math.random() * alive.length)] || null;
+}
 
 // Allies come from the two chosen friends' tents. Fallback (not expected): 70% stubs
 function setupTowerParty() {
