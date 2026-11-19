@@ -1306,6 +1306,7 @@ function awardKill(m) {
         if (stoneEl && ELEMENTS[stoneEl] && Math.random() < 0.05) {
             if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
             player.elementStones[stoneEl] = (player.elementStones[stoneEl] || 0) + 1;
+            recordStageDrop({ name: `${ELEMENTS[stoneEl].name} Elemental Stone`, type: 'estone', element: stoneEl, qty: 1, icon: `assets/items/elemental/stone_${stoneEl}.webp`, desc: `Forge ${ELEMENTS[stoneEl].name} onto a weapon at the Blacksmith.` });
             logMessage(`[Elemental Drop] ${m.name} dropped a ${ELEMENTS[stoneEl].name} Elemental Stone!`, 'drop');
             showMonsterGroundDrop(m, `<img src="assets/items/elemental/stone_${stoneEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;">`);
         }

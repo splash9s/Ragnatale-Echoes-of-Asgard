@@ -3330,6 +3330,7 @@ function addRefineOre(tier, m) {
         logMessage(`[Bag Full] ${m.name} dropped a ${tpl.name}, but the bag is full.`, 'drop');
         return;
     }
+    recordStageDrop({ ...tpl, qty: 1 });
     logMessage(`[Refine Drop] ${m.name} dropped ${tpl.name}!`, 'drop');
     showMonsterGroundDrop(m, itemIconHTML(tpl, 48));
 }
@@ -3468,8 +3469,13 @@ function placeItemInInventory(newItem) {
     return true;
 }
 
+// Map result: every drop of the stage is listed (gear, planks, refine materials, elemental stones)
+function recordStageDrop(item) {
+    if (stageSummary) stageSummary.items.push(JSON.parse(JSON.stringify(item))); // full copy: the result page shows its icon and detail
+}
+
 function addItemToInventory(newItem) {
-    if (stageSummary) stageSummary.items.push(JSON.parse(JSON.stringify(newItem))); // full copy: the result page shows its icon and detail
+    recordStageDrop(newItem);
     if (!placeItemInInventory(newItem)) {
         logMessage(`[Inventory Full] ${newItem.name} was discarded.`, 'combat');
         return false;
@@ -3815,6 +3821,7 @@ function itemIconHTML(item, size = 70) {
     if (item && item.type === 'chest' && item.chestType) return chestIconHTML(item.chestType, size);
     // Wanderer Samurai: a true 2px black outline at any display size (the file's own border shrinks when scaled down)
     const outline = item && item.costumeId === 'wanderer_samurai' ? 'filter:drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);' : '';
+    if (item && item.type === 'estone' && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     if (item && item.costumeId && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;${outline}" />`;
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
@@ -7910,6 +7917,7 @@ function addPlank(m, qty = 1) {
         logMessage(`[Bag Full] ${m.name} dropped Planks, but the bag is full.`, 'drop');
         return;
     }
+    recordStageDrop({ ...PLANK_ITEM, qty });
     logMessage(`[Plank Drop] ${m.name} dropped ${qty} Plank${qty > 1 ? 's' : ''}!`, 'drop');
     showMonsterGroundDrop(m, itemIconHTML(PLANK_ITEM, 48));
 }
