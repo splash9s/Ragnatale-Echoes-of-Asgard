@@ -2784,10 +2784,71 @@ function renderVipMenu() {
 }
 // Highlight page: the featured costume and pet cards, and the six featured items
 const VIP_HIGHLIGHT_CARDS = [
-    { id: 'dcostume_wanderer_samurai', title: 'assets/diamond/highlight/wanderer_title_v1_q90.webp', art: 'assets/costume/wanderer_samurai/base_v2_q90.webp', alt: 'Wanderer Samurai' },
-    { id: 'dcostume_yellow_samurai', title: 'assets/diamond/highlight/yellow_title_v1_q90.webp', art: 'assets/costume/yellow_samurai/base_v1_q90.webp', alt: 'Yellow Samurai' },
-    { id: 'pet_loyal_slime', title: 'assets/diamond/highlight/orange_title_v1_q90.webp', art: 'assets/combat/ocat/ocat1_q85.webp', alt: 'Orange Stray Cat' },
+    { id: 'dcostume_wanderer_samurai', title: 'assets/diamond/highlight/wanderer_title_v1_q90.webp', anim: 'costume', costume: 'wanderer_samurai', alt: 'Wanderer Samurai' },
+    { id: 'dcostume_yellow_samurai', title: 'assets/diamond/highlight/yellow_title_v1_q90.webp', anim: 'costume', costume: 'yellow_samurai', alt: 'Yellow Samurai' },
+    { id: 'pet_loyal_slime', title: 'assets/diamond/highlight/orange_title_v1_q90.webp', anim: 'pet', alt: 'Orange Stray Cat' },
 ];
+// Highlight card stage (the card's inner area) and the animations played in it
+const VH_STAGE_W = 248, VH_STAGE_H = 240;
+const VH_PET_SCALE = 1.35; // the cat's pixel art is small; this makes it about the same height as the costume figure
+const VH_COSTUME_SEQ = [['base', 600], ['attack', 220], ['attack02', 260], ['base', 400], ['critical', 240], ['critical02', 360]];
+let vhAnimGen = 0; // bumped on every redraw so old loops stop
+function vhPlayAnims(grid) {
+    const gen = ++vhAnimGen;
+    grid.querySelectorAll('.vh-stage[data-anim]').forEach(stage => {
+        const img = document.createElement('img');
+        img.className = 'vh-anim';
+        img.alt = '';
+        stage.appendChild(img);
+        if (stage.dataset.anim === 'pet') vhPlayPet(stage, img, gen);
+        else vhPlayCostume(stage, img, stage.dataset.costume, gen);
+    });
+}
+// Places one frame with its feet point at the anchor, at scale S, so it never leaves the stage
+function vhPlaceFrame(img, f, S, anchorX) {
+    img.src = f.src;
+    img.style.width = f.w * S + 'px';
+    img.style.height = f.h * S + 'px';
+    img.style.left = (anchorX - f.fx * S) + 'px';
+    img.style.top = (VH_STAGE_H - 6 - f.fy * S) + 'px';
+}
+// Attack set then critical set, the same frames the battle uses. One scale for all frames so the size stays the same.
+function vhPlayCostume(stage, img, id, gen) {
+    const set = typeof COSTUME_SETS !== 'undefined' && COSTUME_SETS[id];
+    if (!set) return;
+    const frames = {};
+    ['base', 'attack', 'attack02', 'critical', 'critical02'].forEach(k => { if (set[k]) frames[k] = set[k]; });
+    const list = Object.values(frames);
+    const maxFx = Math.max(...list.map(f => f.fx)), maxRight = Math.max(...list.map(f => f.w - f.fx));
+    const S = Math.min(VH_STAGE_W / (maxFx + maxRight), VH_STAGE_H / Math.max(...list.map(f => f.h)));
+    const anchorX = maxFx * S;
+    list.forEach(f => { new Image().src = f.src; }); // warm the cache so frames do not blink in
+    let i = 0;
+    const step = () => {
+        if (gen !== vhAnimGen || !stage.isConnected) return;
+        const [key, ms] = VH_COSTUME_SEQ[i];
+        vhPlaceFrame(img, frames[key], S, anchorX);
+        i = (i + 1) % VH_COSTUME_SEQ.length;
+        setTimeout(step, ms);
+    };
+    step();
+}
+// The cat's lick: sit, lick (same frames and timing as the main page cat), sit again
+function vhPlayPet(stage, img, gen) {
+    const f = n => ({ src: `assets/combat/ocat/ocat${n}_q85.webp`, w: 100, h: 90, fx: 50, fy: 90 });
+    const seq = [[1, CAT_LICK_IDLE_MS], ...CAT_LICK_SEQ.map(n => [n, CAT_LICK_FRAME_MS]), [1, CAT_LICK_REST_MS]];
+    const anchorX = VH_STAGE_W / 2;
+    [1, 2, 3, 4].forEach(n => { new Image().src = f(n).src; });
+    let i = 0;
+    const step = () => {
+        if (gen !== vhAnimGen || !stage.isConnected) return;
+        const [n, ms] = seq[i];
+        vhPlaceFrame(img, f(n), VH_PET_SCALE, anchorX);
+        i = (i + 1) % seq.length;
+        setTimeout(step, ms);
+    };
+    step();
+}
 const VIP_HIGHLIGHT_ITEMS = ['dchest_costume', 'pet_box', 'vip_pass', 'vip_7d', 'vip_1d', 'res_potion'];
 function vipCellHTML(item) {
     return `<div class="vip-cell">
@@ -2798,7 +2859,7 @@ function vipCellHTML(item) {
 function vipHighlightHTML() {
     const cards = VIP_HIGHLIGHT_CARDS.map(c => `
         <button class="vh-card${vipSelected === c.id ? ' selected' : ''}" title="${escapeHtml(c.alt)}" onclick="vipSelect('${c.id}')">
-            <span class="vh-stage"><img class="vh-art" src="${c.art}" alt=""></span>
+            <span class="vh-stage" data-anim="${c.anim}" data-costume="${c.costume || ''}"></span>
             <img class="vh-title" src="${c.title}" alt="${escapeHtml(c.alt)}">
         </button>`).join('');
     const cells = VIP_HIGHLIGHT_ITEMS.map(id => DIAMOND_SHOP_ITEMS.find(i => i.id === id)).filter(Boolean).map(vipCellHTML).join('');
@@ -2824,10 +2885,11 @@ function renderVipList() {
         grid.style.gridTemplateColumns = '1fr'; // one full-width column for the highlight rows
         vipPackArrows();
         grid.innerHTML = vipHighlightHTML();
+        vhPlayAnims(grid);
         grid.scrollTop = keepScroll;
         return;
     }
-    grid.style.gridTemplateColumns = '';
+    grid.style.gridTemplateColumns = 'repeat(auto-fill,128px)'; // the shop's own grid columns (the highlight row overrides them)
     grid.classList.remove('vip-pack-row');
     vipPackArrows();
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
