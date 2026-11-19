@@ -777,7 +777,8 @@ function spawnFinalStage() {
 function isBossStage() {
     if (currentMode === 'bossmap') return true;
     if (activeMap && activeMap.finalMap) return currentStage % 2 === 0 || currentStage === maxStages;
-    if (currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
+    if (currentMode === 'tower') return TOWER_BOSS_FLOORS.includes(currentStage);
+    if (currentMode === 'campaign' || currentMode === 'event') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
     if (currentMode === 'daily') return DAILY_BOSS_STAGES.includes(currentStage);
     return false;
 }
@@ -871,11 +872,11 @@ function spawnStageMonsters() {
     } else if (isBossStage()) {
         const boss = makeBoss(getBossTemplate());
         // Level 1 map bosses start at 70% of their max HP
-        const isLevel1Map = (currentMode === 'campaign' || currentMode === 'event') ? (activeMap && activeMap.levelReq === 1) : currentStage < 10;
+        const isLevel1Map = (currentMode === 'campaign' || currentMode === 'event') ? (activeMap && activeMap.levelReq === 1) : currentMode === 'tower' ? false : currentStage < 10;
         if (isLevel1Map) boss.hp = Math.floor(boss.maxHp * 0.7);
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
         monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
-        if (currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') addBossSupport(monstersList[0]);
+        if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
         if (typeof showBossBalloon === 'function') showBossBalloon('Boss appeared!');
         const supportTxt = boss.elemSupport ? 'Elemental Support (element effects x2), ' : '';
         logMessage(`[Boss] ${boss.name} appears! Skills: ${supportTxt}Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
@@ -910,6 +911,7 @@ function spawnStageMonsters() {
             }
         }
     }
+    if (currentMode === 'tower') towerSetSixMonsters();
     // Tanks stand in the first positions (the front) whenever they are in the stage
     monstersList.sort((a, b) => (roleOf(a) === 'tank' ? 0 : 1) - (roleOf(b) === 'tank' ? 0 : 1));
     updateUI();
@@ -1439,7 +1441,7 @@ let armorBrokenThisMap = false;
 
 function takePlayerDamage(dmg, m, ignoreArmor = false) {
     // Castle Tower: while an ally is in front, the hit goes to that ally instead of the hero
-    if (towerIsActive()) {
+    if (towerIsActive() && !towerAllHit) {
         const front = towerFront();
         if (front && front !== 'hero') { towerHitAlly(front, dmg, m); return; }
     }
@@ -1587,7 +1589,9 @@ function monsterAct(m, derived, position = 0) {
     if (Math.random() <= hitChance) {
         let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + derived.def)));
         if (m.isBoss && m.enraged) eDmg = Math.floor(eDmg * 1.5);
+        let heavyStrike = false;
         if (m.isBoss && !m.noHeavyStrike && m.attackCount % 4 === 0) {
+            heavyStrike = true;
             eDmg = Math.floor(eDmg * 2);
             logMessage(`[Boss Skill] ${m.name} uses Heavy Strike!`, 'winlose');
             if (typeof showBossBalloon === 'function') showBossBalloon('Heavy Strike!');
@@ -1606,7 +1610,8 @@ function monsterAct(m, derived, position = 0) {
         if (isSlime(m)) playSfx(SFX.slimeAttack); // slime attacks
         else if (monsterSfxOf(m) && monsterSfxOf(m).attack) playSfx(monsterSfxOf(m).attack); // monster's own attack sound
         else if (rangedFireSfx(m)) playSfx(rangedFireSfx(m)); // ranged monsters fire
-        takePlayerDamage(eDmg, m, ignoreArmor);
+        if (heavyStrike && towerIsActive()) towerHitEveryone(eDmg, m, ignoreArmor); // Castle Tower: Heavy Strike hits the whole party
+        else takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
         if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'swordSweep' && m.attackCount % 3 === 0 && player.hp > 0) {
             logMessage(`[Boss Skill] ${m.name} uses Sword Sweep! It strikes twice`, 'winlose');
@@ -2356,6 +2361,47 @@ function startTower() {
     getEventState().plays.tower = (getEventState().plays.tower || 0) + 1;
     saveGame();
     startExpedition('tower');
+}
+
+// ---------- CASTLE TOWER MONSTERS ----------
+// Every floor has six monsters. These floors have a boss in one of the six.
+const TOWER_BOSS_FLOORS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 21];
+
+// Builds the floor's six monsters: the boss (if any) plus scaled roster units
+function towerSetSixMonsters() {
+    const k = towerFloorMult(currentStage);
+    const scaledUnit = u => ({
+        ...u,
+        hp: Math.floor(u.hp * k), maxHp: Math.floor(u.maxHp * k),
+        atkMin: Math.floor(u.atkMin * k), atkMax: Math.floor(u.atkMax * k),
+        hit: Math.floor(u.hit * k), flee: Math.floor(u.flee * k)
+    });
+    const boss = monstersList.filter(m => m.isBoss);
+    const units = [];
+    let tanks = 0;
+    while (boss.length + units.length < 6) {
+        let picked = activeMap.enemies[Math.floor(Math.random() * activeMap.enemies.length)];
+        if (roleOf(picked) === 'tank' && tanks >= tankCapHere()) picked = pickUnitNoTank(activeMap.enemies);
+        if (roleOf(picked) === 'tank') tanks++;
+        units.push(scaledUnit(makeUnit(levelScaled(picked, activeMap.levelReq), 1)));
+    }
+    monstersList = [...boss, ...units];
+}
+
+// Set by towerHitEveryone so the hero takes the hit directly, not through the front-ally route
+let towerAllHit = false;
+// A hit that reaches every living party member (Heavy Strike)
+function towerHitEveryone(dmg, m, ignoreArmor) {
+    logMessage(`[Tower] ${m.name}'s Heavy Strike hits the whole party!`, 'winlose');
+    towerParty.order.forEach(id => {
+        if (!towerMemberAlive(id)) return;
+        if (id === 'hero') {
+            towerAllHit = true;
+            try { takePlayerDamage(dmg, m, ignoreArmor); } finally { towerAllHit = false; }
+        } else {
+            towerHitAlly(id, dmg, m);
+        }
+    });
 }
 
 // ---------- CASTLE TOWER PARTY ----------
