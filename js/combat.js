@@ -1583,7 +1583,7 @@ function monsterAct(m, derived, position = 0) {
         }
     }
     // Melee and tank units only strike when they are the first monster facing the player
-    if (!m.isBoss && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return;
+    if (!m.isBoss && !towerIsActive() && (roleOf(m) === 'melee' || roleOf(m) === 'tank') && position >= 1) return; // Warded Tower: the front three all strike
 
     startMonsterAttack(m, (monsterOpenerRound ? COMBAT_OPENER_MONSTER_DELAY_MS : 0) + position * COMBAT_MONSTER_STAGGER_MS); // same moment as the player's attack, except the first round of a map
     const hitChance = Math.min(0.95, Math.max(MON_HIT_MIN, (m.hit - derived.flee + 50) / 100));
@@ -2368,7 +2368,7 @@ function towerAllyFromSnapshot(snap) {
     const st = snap.stats || {};
     const maxHp = Math.max(1, 100 + (Number(st.vit) || 0) * 15 + lv * 10);
     const atk = Math.max(1, 10 + (Number(st.str) || 0) * 2 + Math.floor((Number(st.luk) || 0) / 3));
-    return { name: snap.name || 'Friend', hp: maxHp, maxHp, atk };
+    return { name: snap.name || 'Friend', avatar: snap.avatar || '', hp: maxHp, maxHp, atk };
 }
 let towerPendingAllies = null;
 let towerPendingOrder = null; // formation chosen on the Events page (front first)
@@ -2503,6 +2503,9 @@ function towerHitAlly(id, dmg, m) {
     const a = towerParty.members[id];
     a.hp = Math.max(0, a.hp - dmg);
     logMessage(`[Tower] ${m.name} hits ${a.name} for ${dmg} damage`, 'combat');
+    showCombatText(`#tower-ally-${id}`, String(dmg), '');
+    const card = document.getElementById(`tower-ally-${id}`);
+    if (card) { card.classList.add('tp-hit'); setTimeout(() => card.classList.remove('tp-hit'), 220); }
     if (a.hp <= 0) logMessage(`[Tower] ${a.name} falls! The next in line takes the front.`, 'winlose');
 }
 
@@ -2535,13 +2538,24 @@ function towerRenderParty() {
     }
     const d = getDerivedStats();
     const front = towerFront();
-    el.textContent = towerParty.order.map(id => {
+    el.style.display = 'flex';
+    el.style.gap = '8px';
+    el.style.alignItems = 'center';
+    el.innerHTML = towerParty.order.map(id => {
         const alive = towerMemberAlive(id);
-        const name = id === 'hero' ? 'You' : towerParty.members[id].name;
-        const hp = id === 'hero' ? player.hp : towerParty.members[id].hp;
-        const max = id === 'hero' ? d.maxHp : towerParty.members[id].maxHp;
-        return `${id === front ? '▶ ' : ''}${name} ${alive ? `${hp}/${max}` : 'DOWN'}`;
-    }).join('  ·  ');
+        const m = id === 'hero' ? null : towerParty.members[id];
+        const name = id === 'hero' ? 'You' : m.name;
+        const hp = id === 'hero' ? Math.max(0, player.hp) : m.hp;
+        const max = id === 'hero' ? d.maxHp : m.maxHp;
+        const avatar = id === 'hero' ? player.avatar : (m.avatar || '');
+        const pct = max > 0 ? Math.max(0, Math.min(100, Math.round(hp / max * 100))) : 0;
+        return `<div id="tower-ally-${id}" style="display:flex;flex-direction:column;align-items:center;width:64px;opacity:${alive ? 1 : 0.35};filter:${alive ? 'none' : 'grayscale(1)'};${id === front ? 'outline:2px solid #ffd45a;border-radius:6px;' : ''}">
+            <div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:#1d1a14">${friendAvatarHTML(avatar)}</div>
+            <div style="font-size:11px;line-height:1.1;margin-top:2px">${id === front ? '▶ ' : ''}${escapeHtml(name)}</div>
+            <div style="width:56px;height:5px;background:#3a1f1f;border-radius:3px;overflow:hidden;margin-top:2px"><div style="width:${pct}%;height:100%;background:#4ade80"></div></div>
+            <div style="font-size:10px;line-height:1.1">${alive ? `${hp}/${max}` : 'DOWN'}</div>
+        </div>`;
+    }).join('');
 }
 
 // Campaign-style map with the event modifiers applied to every enemy
