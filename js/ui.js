@@ -5838,6 +5838,8 @@ function renderElementStats() {
 
 function updateUI() {
     if (typeof applyHomeArt === 'function') applyHomeArt(); // tent and pet house levels show on screen
+    // Wanderer Samurai: a 2px black outline on every pose (CSS, so it stays 2px at any size)
+    document.body.classList.toggle('samurai-worn', !!(player.equipped && player.equipped.costume && player.equipped.costume.costumeId === 'wanderer_samurai'));
     if (typeof renderCreateStats === 'function') renderCreateStats(); // character select stat window
     syncHeroSprites();
     if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
