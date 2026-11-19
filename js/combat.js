@@ -502,7 +502,7 @@ function toggleRuneAcquired(open) {
 
 function refreshRuneChoices() {
     const cost = runeRefreshCost();
-    if ((player.diamonds || 0) < cost) return;
+    if ((player.diamonds || 0) < cost) { diamondShortPopup(); return; }
     player.diamonds -= cost;
     runeRefreshUsed++;
     updateUI();
