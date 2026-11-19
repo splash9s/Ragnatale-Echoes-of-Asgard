@@ -3026,8 +3026,12 @@ function doRefineTransfer() {
 const FORGE_SUCCESS_RATE = 20;
 const FORGE_ELEMENT_COLOR = { fire: '#ef4444', water: '#38bdf8', earth: '#d97706', wind: '#5eead4' };
 function forgeItemLevel(gear) { return Math.max(1, Math.floor(Number(gear && gear.levelReq) || 1)); }
-function elementForgeCost(gear) { return forgeItemLevel(gear) * 100; }
-function elementStoneCost(gear) { return Math.max(1, Math.ceil(forgeItemLevel(gear) / 10)); }
+// The first elemental forge is free (no Gold, no stone) and always succeeds
+function elementForgeFree() { return !(player.guide && player.guide.elemForged); }
+function elementForgeCost(gear) { return elementForgeFree() ? 0 : forgeItemLevel(gear) * 100; }
+function elementStoneCost(gear) { return elementForgeFree() ? 0 : Math.max(1, Math.ceil(forgeItemLevel(gear) / 10)); }
+function elementForgeRate() { return elementForgeFree() ? 100 : FORGE_SUCCESS_RATE; }
+function elementForgeCostText(gear) { return elementForgeFree() ? 'FREE' : `${elementForgeCost(gear)} Gold + ${elementStoneCost(gear)} Stone`; }
 // The forged weapon's name: "<player name in green> <Element> <base weapon name>"
 function forgedWeaponName(gear, el) {
     const esc = (t) => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -3226,7 +3230,7 @@ function renderElementalUI() {
                     <span class="font-bold text-amber-300 text-xs inline-flex items-center gap-2">${itemIconHTML(weapon, 36)} ${weapon.name}</span>
                     <span class="text-[10px] text-slate-400 block">Current: ${current} | Item Lv ${forgeItemLevel(weapon)}</span>
                 </div>
-                <span class="text-[10px] text-slate-300 whitespace-nowrap">${elementForgeCost(weapon)} Gold + ${elementStoneCost(weapon)} Stone</span>
+                <span class="text-[10px] text-slate-300 whitespace-nowrap">${elementForgeCostText(weapon)}</span>
             </div>`;
     }
     html += '<div class="text-[10px] text-slate-400 mt-3 mb-1">Select an Elemental Stone:</div>';
@@ -3253,7 +3257,7 @@ function renderElementalSlot(slotEl, forgeBtn) {
     }
     const cost = weapon ? elementForgeCost(weapon) : 0;
     const need = weapon ? elementStoneCost(weapon) : 0;
-    if (rateEl) rateEl.textContent = weapon ? `Success: ${FORGE_SUCCESS_RATE}% | ${cost} Gold + ${need} Stone` : '';
+    if (rateEl) rateEl.textContent = weapon ? `Success: ${elementForgeRate()}% | ${elementForgeFree() ? 'FREE' : `${cost} Gold + ${need} Stone`}` : '';
     if (!forgeBtn) return;
     const el = blacksmithForgeEl;
     let blocked = '';
@@ -3264,7 +3268,7 @@ function renderElementalSlot(slotEl, forgeBtn) {
     else if (player.gold < cost) blocked = 'Not enough Gold';
     forgeBtn.disabled = !!blocked;
     forgeBtn.style.opacity = blocked ? '.5' : '1';
-    forgeBtn.innerHTML = blocked ? blocked : `Forge<br>${cost} Gold`;
+    forgeBtn.innerHTML = blocked ? blocked : `Forge<br>${elementForgeFree() ? 'FREE' : cost + ' Gold'}`;
 }
 
 // Forge the picked element stone onto the selected weapon: flat 20% success.
@@ -3281,9 +3285,12 @@ function forgeElementOnWeapon() {
     if ((player.elementStones[el] || 0) < need) { showFloatNotice(`Forging needs ${need} ${ELEMENTS[el].name} Elemental Stone.`); return; }
     if (weapon.element === el) { showFloatNotice(`${baseName} is already ${ELEMENTS[el].name}.`); return; }
     if (player.gold < cost) { showFloatNotice(`Forging needs ${cost} Gold.`); return; }
+    const freeForge = elementForgeFree();
+    const rate = elementForgeRate();
     player.gold -= cost;
     player.elementStones[el] -= need;
-    if (Math.random() * 100 >= FORGE_SUCCESS_RATE) {
+    if (freeForge) markGuide('elemForged'); // the free first forge is used up, win or lose
+    if (Math.random() * 100 >= rate) {
         playSfx(SFX.refineFail);
         floatFailAt("Failed!");
         logMessage(`[Forge Failed] Forging ${baseName} failed. ${need} ${ELEMENTS[el].name} Elemental Stone(s) and ${cost} Gold are lost; the weapon is safe.`, 'combat');
