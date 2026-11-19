@@ -6266,8 +6266,8 @@ function renderEventsView() {
         start = { can: eventCanPlay(cur), js: `startEvent('${cur}','${pick}')` };
     } else if (cur === 'tower') {
         const left = Math.max(0, 1 - (st.plays.tower || 0));
-        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p><p class="ev-status">${left} / 1 attempt left today · ${towerPick.length} / 2 friends chosen</p>${towerFriendsHTML()}${towerFormationHTML()}`;
-        start = { can: eventCanPlay('tower') && towerPick.length === 2, js: `startTower(towerPick.slice(), towerOrder.slice())` };
+        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p><p class="ev-status">${left} / 1 attempt left today · ${towerPick.length} / 2 friends chosen (optional, you can go alone)</p>${towerFriendsHTML()}${towerFormationHTML()}`;
+        start = { can: eventCanPlay('tower'), js: `startTower(towerPick.slice(), towerOrder.slice())` };
         if (towerFriends === null) loadTowerFriends();
     } else if (cur === 'endless') {
         body = `<p>Endless test map. 100x rewards, test only.</p>`;
@@ -6329,7 +6329,7 @@ function toggleTowerFriend(id) {
 }
 function towerFriendsHTML() {
     if (towerFriends === null) return '<p class="ev-status">Loading friends…</p>';
-    if (!towerFriends.length) return '<p class="ev-status">Add a friend first to bring them to the tower.</p>';
+    if (!towerFriends.length) return '<p class="ev-status">No friends yet. You can still go alone, or add friends to bring them along.</p>';
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     return `<div class="ev-maps">${towerFriends.map(f => {
         const on = towerPick.includes(f.user_id);

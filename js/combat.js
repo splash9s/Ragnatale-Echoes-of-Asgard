@@ -2380,8 +2380,8 @@ async function startTower(friendIds, order) {
         showModal("Warded Tower", "Already entered today. One attempt per day.");
         return;
     }
-    const ids = friendIds || [];
-    if (ids.length !== 2) { showModal("Warded Tower", "Choose 2 friends to join your party."); return; }
+    const ids = friendIds || []; // zero, one or two friends (going alone is allowed)
+    if (ids.length > 2) { showModal("Warded Tower", "Choose up to 2 friends to join your party."); return; }
     if (ids.some(id => towerFriendCooldownLeft(id) > 0)) {
         showModal("Warded Tower", "A chosen friend is still resting. Each friend can join again 3 days after their last run.");
         return;
@@ -2389,7 +2389,7 @@ async function startTower(friendIds, order) {
     const res = await Promise.all(ids.map(id => friendApi.visitTent(id)));
     const bad = res.find(r => !r.data);
     if (bad) { showModal("Warded Tower", bad.error || "Could not load your friends' tents."); return; }
-    towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data));
+    towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data)); // empty when going alone
     towerPendingOrder = Array.isArray(order) && order.length === 3 ? order : null;
     towerPendingIds = ids.slice();
     if (!player.towerCooldowns) player.towerCooldowns = {};
@@ -2484,14 +2484,18 @@ function towerRandomAlive() {
 function setupTowerParty() {
     const d = getDerivedStats();
     const fallback = i => ({ name: `Friend ${i}`, hp: Math.max(1, Math.floor(d.maxHp * 0.7)), maxHp: Math.max(1, Math.floor(d.maxHp * 0.7)), atk: Math.max(1, Math.floor(d.atk * 0.7)) });
-    const allies = towerPendingAllies || [fallback(1), fallback(2)];
+    const allies = towerPendingAllies || []; // no friends picked: the hero goes alone
     towerPendingAllies = null;
-    const order = towerPendingOrder || ['hero', 'a1', 'a2'];
+    const members = {};
+    allies.forEach((a, i) => { members['a' + (i + 1)] = a; });
+    // Formation only lists the hero and the friends who came (front first)
+    const present = ['hero', ...Object.keys(members)];
+    const order = (towerPendingOrder || ['hero', 'a1', 'a2']).filter(id => present.includes(id));
     towerPendingOrder = null;
     const ids = towerPendingIds || [];
     towerPendingIds = null;
     // cleared: highest floor cleared this run (the friends' mail is sent for it when the run ends)
-    towerParty = { order, members: { a1: allies[0], a2: allies[1] }, ids: { a1: ids[0], a2: ids[1] }, cleared: 0 };
+    towerParty = { order, members, ids: { a1: ids[0], a2: ids[1] }, cleared: 0 };
 }
 
 // A hit on the front ally (returns true when the hit went to an ally)
