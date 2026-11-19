@@ -105,7 +105,10 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'pet_box', name: "Pet Box", price: 590, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'pet_box_ticket', name: "Pet Box (Ticket)", price: 0, ticket: { name: 'Pet Ticket', qty: 10 }, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet. Costs 10 Pet Tickets.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
-    { id: 'dchest_costume', name: "Costume Chest", price: 590, fixedPrice: 1, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' },
+    { id: 'dchest_costume', name: "Costume Chest", price: 590, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' },
+    { id: 'dcostume_christmas', name: "Christmas Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'christmas', vipCat: 'box', desc: "Festive Santa outfit. Replaces your battle poses while worn.", icon: 'assets/costume/christmas/icon_q85.webp' },
+    { id: 'dcostume_blue_samurai', name: "Blue Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'blue_samurai', vipCat: 'box', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/blue_samurai/icon_v1_q85.webp' },
+    { id: 'dcostume_wanderer_samurai', name: "Wanderer Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'wanderer_samurai', vipCat: 'box', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn.", icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp' },
     { id: 'dchest_costume_ticket', name: "Costume Chest (Ticket)", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "Costs 10 Costume Tickets.", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
@@ -2933,6 +2936,10 @@ function buyDiamondItem(itemId) {
         showModal("Purchase Failed", "Inventory is full!");
         return;
     }
+    if (item.type === 'costume' && countFreeCapacity({ name: item.name, type: 'costume', qty: 1 }) < 1) {
+        showModal("Purchase Failed", "Inventory is full!");
+        return;
+    }
     if (item.type === 'chest' && countFreeCapacity({ name: item.name, type: 'chest', qty: 1 }) < 1) {
         showModal("Purchase Failed", "Inventory is full!");
         return;
@@ -2972,6 +2979,10 @@ function buyDiamondItem(itemId) {
         showModal("Bag Expanded", `Your bag now has ${bagSlotCount()} slots.`);
     } else if (item.type === 'box') {
         openBoxNow(item.boxType, item.name); // opens at once, nothing goes to the bag
+    } else if (item.type === 'costume') {
+        const tpl = COSTUME_BOX_POOL.find(c => c.costumeId === item.costumeId);
+        if (tpl) addItemToInventory({ ...tpl, qty: 1, rarity: 1 }); // the costume goes into the bag
+        floatSuccessAt("Purchased!");
     } else if (item.type === 'chest') {
         openChest(item.chestType); // opens at once, nothing goes to the bag
     } else if (item.type === 'vip') {
