@@ -106,11 +106,6 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'pet_box_ticket', name: "Pet Box (Ticket)", price: 0, ticket: { name: 'Pet Ticket', qty: 10 }, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet. Costs 10 Pet Tickets.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
     { id: 'dchest_costume', name: "Costume Chest", price: 590, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' },
-    { id: 'dcostume_christmas', name: "Christmas Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'christmas', vipCat: 'box', desc: "Festive Santa outfit. Replaces your battle poses while worn.", icon: 'assets/costume/christmas/icon_q85.webp' },
-    { id: 'dcostume_blue_samurai', name: "Blue Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'blue_samurai', vipCat: 'box', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/blue_samurai/icon_v1_q85.webp' },
-    { id: 'dcostume_red_samurai', name: "Red Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'red_samurai', vipCat: 'box', desc: "A red-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/red_samurai/icon_v1_q85.webp' },
-    { id: 'dcostume_yellow_samurai', name: "Yellow Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'yellow_samurai', vipCat: 'box', desc: "A yellow-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/yellow_samurai/icon_v1_q85.webp' },
-    { id: 'dcostume_wanderer_samurai', name: "Wanderer Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'wanderer_samurai', vipCat: 'box', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn.", icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp' },
     { id: 'dchest_costume_ticket', name: "Costume Chest (Ticket)", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "Costs 10 Costume Tickets.", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
@@ -2860,7 +2855,7 @@ function vipCellHTML(item) {
 }
 function vipHighlightHTML() {
     const cards = VIP_HIGHLIGHT_CARDS.map(c => `
-        <button class="vh-card${vipSelected === c.id ? ' selected' : ''}" title="${escapeHtml(c.alt)}" onclick="vipSelect('${c.id}')">
+        <button class="vh-card${vipSelected === c.id ? ' selected' : ''}" title="${escapeHtml(c.alt)}" ${DIAMOND_SHOP_ITEMS.some(i => i.id === c.id) ? `onclick="vipSelect('${c.id}')"` : ''}>
             <span class="vh-stage" data-anim="${c.anim}" data-costume="${c.costume || ''}"></span>
             <img class="vh-title" src="${c.title}" alt="${escapeHtml(c.alt)}">
         </button>`).join('');
