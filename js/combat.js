@@ -2524,8 +2524,26 @@ function towerAllyAttacks() {
     });
 }
 
+// Ally tokens on the battlefield, beside the hero's sprite (stage coordinates)
+function towerRenderField() {
+    document.querySelectorAll('.tower-field-ally').forEach(n => n.remove());
+    const stage = document.querySelector('#combat-stage .ts-inner');
+    if (!towerIsActive() || !stage) return;
+    towerParty.order.filter(id => id !== 'hero').forEach((id, i) => {
+        const m = towerParty.members[id];
+        if (!m) return;
+        const alive = m.hp > 0;
+        const tok = document.createElement('div');
+        tok.className = 'tower-field-ally';
+        tok.style.cssText = `position:absolute;left:${640 + i * 78}px;top:${770 + i * 14}px;width:70px;text-align:center;z-index:6;pointer-events:none;opacity:${alive ? 1 : 0.35};filter:${alive ? 'none' : 'grayscale(1)'}`;
+        tok.innerHTML = `<div style="width:60px;height:60px;margin:0 auto;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14">${friendAvatarHTML(m.avatar || '')}</div><div style="font-size:12px;color:#fff;text-shadow:0 1px 2px #000">${escapeHtml(m.name)}</div>`;
+        stage.appendChild(tok);
+    });
+}
+
 // Party strip above the battle: front member marked, DOWN when fallen
 function towerRenderParty() {
+    towerRenderField();
     let el = document.getElementById('tower-party');
     if (!towerIsActive()) { if (el) el.remove(); return; }
     const host = document.getElementById('view-combat');
