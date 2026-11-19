@@ -2653,6 +2653,39 @@ function vipPriceTagHTML(item) {
 }
 let vipCat = 'all';
 let vipSelected = null;
+// Diamond tab pack row: a mouse wheel scrolls it left and right, and dragging with the mouse scrolls it too.
+// A drag does not count as a tap on a pack.
+let vipDrag = null, vipDragMoved = false;
+document.addEventListener('wheel', (e) => {
+    const row = e.target && e.target.closest ? e.target.closest('#vip-grid.vip-pack-row') : null;
+    if (!row || row.scrollWidth <= row.clientWidth) return;
+    if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+    row.scrollLeft += e.deltaY + e.deltaX;
+    e.preventDefault();
+}, { passive: false });
+document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    const row = e.target && e.target.closest ? e.target.closest('#vip-grid.vip-pack-row') : null;
+    if (!row) return;
+    vipDrag = { row, x: e.clientX, left: row.scrollLeft };
+    vipDragMoved = false;
+});
+document.addEventListener('pointermove', (e) => {
+    if (!vipDrag) return;
+    const dx = e.clientX - vipDrag.x;
+    if (!vipDragMoved && Math.abs(dx) < 5) return;
+    vipDragMoved = true;
+    vipDrag.row.scrollLeft = vipDrag.left - dx;
+});
+const vipEnd = () => { vipDrag = null; };
+document.addEventListener('pointerup', vipEnd);
+document.addEventListener('pointercancel', vipEnd);
+document.addEventListener('click', (e) => {
+    if (!vipDragMoved) return;
+    vipDragMoved = false;
+    if (e.target && e.target.closest && e.target.closest('#vip-grid.vip-pack-row')) { e.stopPropagation(); e.preventDefault(); }
+}, true);
+
 // Top-up pack art for the Diamond tab (diamond packs first, then gold packs), shown as a left-to-right row
 const PACK_ART = {
     topup_usd_1: 'assets/diamond/pack/500diamond_q85.webp',
