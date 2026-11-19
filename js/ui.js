@@ -4419,7 +4419,8 @@ function syncHeroSprites() {
         const src = tentNow ? tentStandSrc() : f.src;
         setHeroSrc(el, src);
         // The main page hero is 10% smaller than the character page hero
-        const s = id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE;
+        const costumeScale = tentNow ? ((costumeTentLayout('stand') || {}).scale || 1) : 1;
+        const s = (id === 'town-hero' ? HERO_PAGE_SCALE * 0.9 : HERO_PAGE_SCALE) * costumeScale;
         el.style.width = spec.w * s + 'px';
         el.style.height = spec.h * s + 'px';
         // The Tailwind base style caps every img at its parent's size: lift the cap so the size stays true
@@ -6759,6 +6760,16 @@ const COSTUME_TENT = {
     christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' },
     wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_v2_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_v2_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_v2_q90.webp' }
 };
+// Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
+// 'scale' resizes the pose (stand 5% smaller, sleep 20% bigger)
+const COSTUME_TENT_LAYOUT = {
+    wanderer_samurai: { stand: { scale: 0.95 }, sit: { aspect: 274 / 228 }, sleep: { scale: 1.2, aspect: 374 / 223 } }
+};
+function costumeTentLayout(pose) {
+    const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
+    const set = c && c.costumeId && COSTUME_TENT_LAYOUT[c.costumeId];
+    return (set && set[pose]) || null;
+}
 function wornCostumeTentSrc(pose) {
     const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
     const set = c && c.costumeId && COSTUME_TENT[c.costumeId];
@@ -6771,11 +6782,18 @@ function tentPoseLayout(el) {
     const P = TENT_POSES[tentPose];
     if (!P) return;
     const nudge = (TENT_POSE_NUDGE[homeTentLevel()] || {})[tentPose] || { dx: 0, dy: 0 };
-    setHeroSrc(el, wornCostumeTentSrc(tentPose) || P.src);
-    el.style.width = P.w + 'px';
-    el.style.height = P.h + 'px';
-    el.style.left = (P.left + nudge.dx) + 'px';
-    el.style.top = (P.top + nudge.dy) + 'px';
+    const cSrc = wornCostumeTentSrc(tentPose);
+    let w = P.w, h = P.h, left = P.left, top = P.top;
+    const lay = cSrc ? costumeTentLayout(tentPose) : null;
+    if (lay && lay.aspect) {
+        if (lay.scale) { const nw = w * lay.scale; left += (w - nw) / 2; w = nw; } // grow/shrink around the centre
+        const nh = w / lay.aspect; top += h - nh; h = nh;                         // keep the feet on the same line
+    }
+    setHeroSrc(el, cSrc || P.src);
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.left = (left + nudge.dx) + 'px';
+    el.style.top = (top + nudge.dy) + 'px';
     el.style.maxWidth = 'none';
     el.style.maxHeight = 'none';
     el.style.animation = P.anim;
