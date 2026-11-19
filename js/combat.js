@@ -2305,8 +2305,8 @@ function eventCanPlay(kind) {
 
 // ---------- CASTLE TOWER ----------
 const TOWER_FLOORS = 21;
-// Monsters get stronger every floor: x1.5 on floor 1, +0.1 per floor (x3.5 on floor 21)
-function towerFloorMult(f) { return 1.5 + 0.1 * (f - 1); }
+// Monsters get stronger every floor: normal stats on floor 1, then x1.6 on floor 2, +0.1 per floor (x3.5 on floor 21)
+function towerFloorMult(f) { return f <= 1 ? 1 : 1.5 + 0.1 * (f - 1); } // floor 1: normal stats
 
 // Floor-clear rewards (draft table). Gold 1,600 per floor number.
 function towerFloorReward(f) {
@@ -2378,14 +2378,14 @@ function towerAllyFromSnapshot(snap) {
     }
     if (d && Number.isFinite(d.maxHp) && Number.isFinite(d.atk)) {
         const maxHp = Math.max(1, Math.floor(d.maxHp));
-        return { name: snap.name || 'Friend', avatar: snap.avatar || '', hp: maxHp, maxHp, atk: Math.max(1, Math.floor(d.atk)) };
+        return { name: snap.name || 'Friend', avatar: snap.avatar || '', snap, hp: maxHp, maxHp, atk: Math.max(1, Math.floor(d.atk)) };
     }
     // Fallback if the friend's data cannot be calculated: a rough estimate from base level and stats
     const lv = Number(snap.baseLv) || 1;
     const st = snap.stats || {};
     const maxHp = Math.max(1, 100 + (Number(st.vit) || 0) * 15 + lv * 10);
     const atk = Math.max(1, 10 + (Number(st.str) || 0) * 2 + Math.floor((Number(st.luk) || 0) / 3));
-    return { name: snap.name || 'Friend', avatar: snap.avatar || '', hp: maxHp, maxHp, atk };
+    return { name: snap.name || 'Friend', avatar: snap.avatar || '', snap, hp: maxHp, maxHp, atk };
 }
 let towerPendingAllies = null;
 let towerPendingOrder = null; // formation chosen on the Events page (front first)
@@ -2520,7 +2520,7 @@ function towerHitAlly(id, dmg, m) {
     const a = towerParty.members[id];
     a.hp = Math.max(0, a.hp - dmg);
     logMessage(`[Tower] ${m.name} hits ${a.name} for ${dmg} damage`, 'combat');
-    showCombatText(`#tower-ally-${id}`, String(dmg), '');
+    showCombatText(document.getElementById(`tower-field-${id}`) ? `#tower-field-${id}` : `#tower-ally-${id}`, String(dmg), '');
     const card = document.getElementById(`tower-ally-${id}`);
     if (card) { card.classList.add('tp-hit'); setTimeout(() => card.classList.remove('tp-hit'), 220); }
     if (a.hp <= 0) logMessage(`[Tower] ${a.name} falls! The next in line takes the front.`, 'winlose');
@@ -2544,41 +2544,87 @@ function towerAllyAttacks() {
     });
 }
 
-// Ally tokens on the battlefield, beside the hero's sprite (stage coordinates)
+// A friend's idle combat frame, built from their saved gear and costume (cached once the art has loaded)
+function towerFriendFrame(m) {
+    if (m.frame) return m.frame;
+    if (!m.snap) return null;
+    const saved = player;
+    let f = null;
+    try {
+        player = { ...saved, ...m.snap };
+        f = combatPose().IDLE;
+    } catch (e) {
+        f = null;
+    } finally {
+        player = saved;
+    }
+    if (f) m.frame = f;
+    return f;
+}
+
+// Friends stand on the battlefield behind the hero, on the same ground line (stage coordinates)
+const TOWER_FRIEND_GAP_X = 190;
 function towerRenderField() {
     document.querySelectorAll('.tower-field-ally').forEach(n => n.remove());
     const stage = document.querySelector('#combat-stage .ts-inner');
     if (!towerIsActive() || !stage) return;
+    const S = COMBAT_PLAYER_SCALE;
+    const footY = combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y;
     towerParty.order.filter(id => id !== 'hero').forEach((id, i) => {
         const m = towerParty.members[id];
         if (!m) return;
         const alive = m.hp > 0;
-        const tok = document.createElement('div');
-        tok.className = 'tower-field-ally';
-        tok.style.cssText = `position:absolute;left:${640 + i * 78}px;top:${770 + i * 14}px;width:70px;text-align:center;z-index:6;pointer-events:none;opacity:${alive ? 1 : 0.35};filter:${alive ? 'none' : 'grayscale(1)'}`;
-        tok.innerHTML = `<div style="width:60px;height:60px;margin:0 auto;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14">${friendAvatarHTML(m.avatar || '')}</div><div style="font-size:12px;color:#fff;text-shadow:0 1px 2px #000">${escapeHtml(m.name)}</div>`;
-        stage.appendChild(tok);
+        const look = `opacity:${alive ? 1 : 0.35};filter:${alive ? 'none' : 'grayscale(1)'};pointer-events:none;`;
+        const footX = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - TOWER_FRIEND_GAP_X * (i + 1);
+        const f = towerFriendFrame(m);
+        if (f) {
+            const img = document.createElement('img');
+            img.className = 'tower-field-ally';
+            img.id = `tower-field-${id}`;
+            img.src = f.src;
+            const fx = f.fx !== undefined ? f.fx : f.w / 2;
+            const fy = f.fy !== undefined ? f.fy : f.h;
+            img.style.cssText = `position:absolute;left:${footX - fx * S}px;top:${footY - fy * S}px;width:${f.w * S}px;height:${f.h * S}px;image-rendering:pixelated;z-index:4;${look}`;
+            stage.appendChild(img);
+        } else {
+            // Art still loading: show the avatar until the sprite is ready
+            const tok = document.createElement('div');
+            tok.className = 'tower-field-ally';
+            tok.id = `tower-field-${id}`;
+            tok.style.cssText = `position:absolute;left:${footX - 32}px;top:${footY - 70}px;width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14;z-index:4;${look}`;
+            tok.innerHTML = friendAvatarHTML(m.avatar || '');
+            stage.appendChild(tok);
+        }
+        const label = document.createElement('div');
+        label.className = 'tower-field-ally';
+        label.textContent = m.name;
+        label.style.cssText = `position:absolute;left:${footX - 60}px;top:${footY + 4}px;width:120px;text-align:center;font-size:14px;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000;z-index:4;${look}`;
+        stage.appendChild(label);
     });
 }
 
-// Party strip above the battle: front member marked, DOWN when fallen
+// Party strip, right after the stage name: front member marked, DOWN when fallen
 function towerRenderParty() {
     towerRenderField();
     let el = document.getElementById('tower-party');
-    if (!towerIsActive()) { if (el) el.remove(); return; }
-    const host = document.getElementById('view-combat');
+    const title = document.getElementById('node-title');
+    if (!towerIsActive()) {
+        if (el) el.remove();
+        if (title) title.style.display = '';
+        return;
+    }
+    const host = title ? title.parentElement : null;
     if (!host) return;
-    if (!el) {
+    if (!el || el.parentElement !== host) {
+        if (el) el.remove();
         el = document.createElement('div');
         el.id = 'tower-party';
-        el.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:20;font-size:13px;color:#fff;background:rgba(0,0,0,.55);padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none';
         host.appendChild(el);
     }
+    title.style.display = 'inline-block';
+    el.style.cssText = 'display:inline-flex;gap:8px;align-items:center;vertical-align:middle;margin-left:14px;font-size:13px;color:#fff;background:rgba(0,0,0,.55);padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none';
     const d = getDerivedStats();
     const front = towerFront();
-    el.style.display = 'flex';
-    el.style.gap = '8px';
-    el.style.alignItems = 'center';
     el.innerHTML = towerParty.order.map(id => {
         const alive = towerMemberAlive(id);
         const m = id === 'hero' ? null : towerParty.members[id];
