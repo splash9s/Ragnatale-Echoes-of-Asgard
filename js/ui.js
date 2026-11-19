@@ -105,7 +105,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'pet_box', name: "Pet Box", price: 590, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'pet_box_ticket', name: "Pet Box (Ticket)", price: 0, ticket: { name: 'Pet Ticket', qty: 10 }, type: 'box', boxType: 'pet', vipCat: 'pet', desc: "Open for a random pet. Costs 10 Pet Tickets.", icon: 'assets/shop/diamond/silverchest.png' },
     { id: 'drop_2x_3h', name: "2x Drop Rate (3 hours)", price: 100, type: 'boost', boost: 'drop', ms: 3 * 60 * 60 * 1000, desc: "Double gold and item drops from kills for 3 hours.", icon: 'assets/shop/diamond/goldmulti.png' },
-    { id: 'dchest_costume', name: "Costume Chest", price: 590, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' },
+    { id: 'dchest_costume', name: "Costume Chest", price: 590, fixedPrice: 1, type: 'chest', chestType: 'costume', desc: "", icon: 'assets/chest/costume/costumeicon_q85.webp' },
     { id: 'dchest_costume_ticket', name: "Costume Chest (Ticket)", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "Costs 10 Costume Tickets.", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
 
@@ -2700,9 +2700,11 @@ const VIP_CATS = [
 ];
 // Diamond shop sale: every item is this percent off
 const DIAMOND_SHOP_DISCOUNT = 20;
-function dsPrice(item) { return item.type === 'topup' ? item.price : Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
+// fixedPrice: a set price in diamonds that ignores the sale discount
+function dsPrice(item) { if (item.fixedPrice) return item.fixedPrice; return item.type === 'topup' ? item.price : Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
 function vipPriceTagHTML(item) {
     if (item.type === 'topup') return item.usd ? `$${item.usd.toFixed(2)}` : `${item.thb} THB`;
+    if (item.fixedPrice) return `${dsPrice(item)}`;
     return `<s style="opacity:.6; font-size:.8em;">${item.price}</s> ${dsPrice(item)} <span style="color:#4ade80; font-size:.75em;">-${DIAMOND_SHOP_DISCOUNT}%</span>`;
 }
 let vipCat = 'all';
@@ -2889,7 +2891,7 @@ function renderDiamondShop() {
                         <span class="text-[10px] text-slate-400 block">${item.desc}</span>
                     </div>
                 </div>
-                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">${item.ticket ? `<img src="${item.ticket.name === 'Pet Ticket' ? 'assets/items/mat_petticket_q85.webp' : 'assets/items/mat_costumeticket_q85.webp'}" alt="${item.ticket.name}" style="width:22px;height:22px;object-fit:contain;display:inline-block;vertical-align:-5px"> ${item.ticket.qty}` : `<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${item.price}`}</button>
+                <button onclick="buyDiamondItem('${item.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold rounded-lg cursor-pointer text-xs transition shadow">${item.ticket ? `<img src="${item.ticket.name === 'Pet Ticket' ? 'assets/items/mat_petticket_q85.webp' : 'assets/items/mat_costumeticket_q85.webp'}" alt="${item.ticket.name}" style="width:22px;height:22px;object-fit:contain;display:inline-block;vertical-align:-5px"> ${item.ticket.qty}` : `<img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> ${dsPrice(item)}`}</button>
             </div>
         `;
     });
