@@ -322,8 +322,9 @@ function balanceToEarth(t, e) {
     if (t.heal && e.heal) out.heal = e.heal;
     return out;
 }
+// Fire, Ice and Wind have their own four monsters (no Slime): each is balanced to the Earth monster in the same role
 ['fire', 'water', 'wind'].forEach(pk => {
-    PATH_ROSTERS[pk] = PATH_ROSTERS[pk].map((t, i) => balanceToEarth(t, PATH_ROSTERS.earth[i]));
+    PATH_ROSTERS[pk] = PATH_ROSTERS[pk].slice(1).map((t, i) => balanceToEarth(t, PATH_ROSTERS.earth[i + 1]));
 });
 
 // Every monster, mini boss and boss on a path takes that path's element
@@ -337,8 +338,8 @@ Object.keys(CAMPAIGN_PATHS).forEach(pk => {
             ...base,
             maxStages: base.campaignStages || CAMPAIGN_STAGES,
             title: `${path.name} · ${base.title}`,
-            // Lv. 1 and Lv. 10 path maps use the same low-level roster as the normal maps (element tinted); higher maps use the path roster
-            enemies: (base.levelReq < 20 ? base.enemies.map(t => (pk === 'earth' && t.id === LEAF_MAGE_LV1.id ? HEL_STONE_MAGE_LV1 : t)) : PATH_ROSTERS[pk]).map(tint),
+            // Every level of a path map uses that path's own monsters only (element tinted)
+            enemies: PATH_ROSTERS[pk].map(tint),
             boss: tint(base.boss),
             miniBoss: tint(base.miniBoss)
         };
