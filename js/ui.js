@@ -2366,7 +2366,7 @@ function updateTownAlerts() {
     const ev = document.getElementById('alert-events');
     const sh = document.getElementById('alert-shop');
     const ml = document.getElementById('alert-mail');
-    const mailOpen = (player.mailBox || []).some(m => !m.claimed);
+    const mailOpen = (player.mailBox || []).some(m => !m.read); // the alert stays until every mail has been read
     if (ev) ev.style.display = questOpen ? 'block' : 'none';
     if (sh) sh.style.display = shopFree ? 'block' : 'none';
     if (ml) ml.style.display = mailOpen ? 'block' : 'none';
@@ -5519,7 +5519,7 @@ function renderMailBox() {
     }
     if (!box.some(m => m.id === mailSelectedId)) mailSelectedId = box[0].id;
     const sel = box.find(m => m.id === mailSelectedId);
-    sel.read = true; // opening a mail marks it read (the light turns green)
+    if (!sel.read) { sel.read = true; updateTownAlerts(); } // opening a mail marks it read (the light turns green); the alert clears once all are read
 
     const meta = m => `${escapeHtml(m.sender || '')}${mailTimeText(m) ? ' · ' + mailTimeText(m) : ''}`;
     menu.innerHTML = box.map(m => `
