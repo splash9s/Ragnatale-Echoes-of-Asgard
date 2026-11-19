@@ -6526,6 +6526,7 @@ const PET_BOX_POOL = [
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
+    { name: "Blue Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'blue_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/blue_samurai/icon_v1_q85.webp', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn." },
     { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
 ];
 // Opens a box at once: a random reward from its pool goes into the bag
@@ -7056,11 +7057,13 @@ const TENT_POSES = {
 // Costume tent pictures: the worn costume's stand, sit and sleep (same canvas sizes as the gear pictures)
 const COSTUME_TENT = {
     christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' },
+    blue_samurai: { stand: 'assets/costume/blue_samurai/tent_stand_v1_q90.webp', sit: 'assets/costume/blue_samurai/tent_sit_v1_q90.webp', sleep: 'assets/costume/blue_samurai/tent_sleep_v1_q90.webp' },
     wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_v2_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_v2_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_v2_q90.webp' }
 };
 // Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
 // 'scale' resizes the pose (each pose is 5% smaller than before this change)
 const COSTUME_TENT_LAYOUT = {
+    blue_samurai: { sit: { scale: 1.1875, aspect: 402 / 416 }, sleep: { scale: 1.14, aspect: 644 / 350 } },
     wanderer_samurai: { stand: { scale: 0.9025 }, sit: { scale: 1.1875, aspect: 274 / 228 }, sleep: { scale: 1.14, aspect: 374 / 223 } }
 };
 function costumeTentLayout(pose) {
