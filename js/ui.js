@@ -6804,9 +6804,9 @@ const COSTUME_TENT = {
     wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_v2_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_v2_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_v2_q90.webp' }
 };
 // Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
-// 'scale' resizes the pose (stand 5% smaller, sleep 20% bigger)
+// 'scale' resizes the pose (stand 5% smaller, sit 25% bigger, sleep 20% bigger)
 const COSTUME_TENT_LAYOUT = {
-    wanderer_samurai: { stand: { scale: 0.95 }, sit: { aspect: 274 / 228 }, sleep: { scale: 1.2, aspect: 374 / 223 } }
+    wanderer_samurai: { stand: { scale: 0.95 }, sit: { scale: 1.25, aspect: 274 / 228 }, sleep: { scale: 1.2, aspect: 374 / 223 } }
 };
 function costumeTentLayout(pose) {
     const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
