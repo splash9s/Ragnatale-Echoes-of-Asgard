@@ -2364,6 +2364,22 @@ function towerFriendCooldownLeft(id) {
 }
 // Ally from a friend's saved tent: HP from base level and VIT, ATK from STR and LUK (gear and skills not counted yet)
 function towerAllyFromSnapshot(snap) {
+    // Run the game's own stat calculation on the friend's saved data (stats, gear, skills, runes)
+    const saved = player;
+    let d = null;
+    try {
+        player = { ...saved, ...snap };
+        d = getDerivedStats();
+    } catch (e) {
+        d = null;
+    } finally {
+        player = saved;
+    }
+    if (d && Number.isFinite(d.maxHp) && Number.isFinite(d.atk)) {
+        const maxHp = Math.max(1, Math.floor(d.maxHp));
+        return { name: snap.name || 'Friend', avatar: snap.avatar || '', hp: maxHp, maxHp, atk: Math.max(1, Math.floor(d.atk)) };
+    }
+    // Fallback if the friend's data cannot be calculated: a rough estimate from base level and stats
     const lv = Number(snap.baseLv) || 1;
     const st = snap.stats || {};
     const maxHp = Math.max(1, 100 + (Number(st.vit) || 0) * 15 + lv * 10);
