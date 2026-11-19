@@ -1539,6 +1539,7 @@ function showRuneDetail(index) {
 }
 
 function showModal(title, message, customHTML = '', onCloseCallback = null) {
+    document.getElementById('stash-return')?.remove(); // the stash's corner button belongs to the stash only
     let titleEl = document.getElementById('modal-title');
     let msgEl = document.getElementById('modal-message');
     let area = document.getElementById('modal-content-area');
@@ -6567,17 +6568,23 @@ function stashStyles() {
     st.textContent = '.stash-wrap { display: flex; flex-direction: column; gap: 8px; text-align: left; }'
         + ' .stash-cols { display: grid; grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr); align-items: start; }'
         + ' .stash-mid { align-self: center; display: flex; justify-content: center; }'
-        + ' .stash-mid svg { width: 30px; height: auto; animation: stashArrowSwing 1.2s ease-in-out infinite; }'
+        + ' .stash-hint { font-size: 18px; color: #94a3b8; margin: 0; }'
+        + ' .stash-ret { position: absolute; top: 6px; right: 6px; z-index: 5; width: 66px; height: 67px; cursor: pointer; }'
+        + ' .stash-ret img { display: block; width: 100%; height: 100%; }'
+        + ' .stash-ret .ret-press { display: none; }'
+        + ' .stash-ret:active .ret-press { display: block; }'
+        + ' .stash-ret:active .ret-normal { display: none; }'
+        + ' .stash-mid svg { width: 40px; height: auto; animation: stashArrowSwing 1.2s ease-in-out infinite; }'
         + ' @keyframes stashArrowSwing { 0%, 100% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }'
         + ' .stash-col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }'
-        + ' .stash-title { font-size: 12px; font-weight: 800; color: #fbbf24; margin: 0; }'
+        + ' .stash-title { font-size: 24px; font-weight: 800; color: #fbbf24; margin: 0; }'
         + ' .stash-grid { display: grid; grid-template-columns: repeat(auto-fill, 65px); justify-content: space-between; gap: 5px; max-height: 52vh; overflow-y: auto; padding: 2px; }'
         // Same slot graphic as the bag, 40% smaller (bag cell is 108 x 104)
         + ' .stash-slot { position: relative; width: 65px; height: 62px; padding: 0; border: 0; background-color: transparent; background-image: url("assets/pages/character/inventoryslot2.png"); background-size: 100% 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }'
         + ' .stash-slot:hover { filter: brightness(1.1); }'
         + ' .stash-slot.sel { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }'
-        + ' .stash-slot .qty { position: absolute; right: 3px; bottom: 2px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px #000, 0 0 3px #000; pointer-events: none; }'
-        + ' #stash-detail { position: fixed; z-index: 90; width: min(340px, 92vw); max-height: 80vh; overflow-y: auto; background-color: #111a2c !important; border: 2px solid #26344f !important; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.6); }';
+        + ' .stash-slot .qty { position: absolute; right: 3px; bottom: 2px; font-size: 15px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px #000, 0 0 3px #000; pointer-events: none; }'
+        + ' #stash-detail { position: fixed; z-index: 90; width: min(460px, 94vw); max-height: 80vh; overflow-y: auto; background-color: #111a2c !important; border: 2px solid #26344f !important; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.6); }';
     document.head.appendChild(st);
 }
 function stashSlotHTML(item, src, idx) {
@@ -6599,7 +6606,6 @@ function openStash() {
     const stashCells = st.slots.map((it, i) => stashSlotHTML(it, 'stash', i)).join('');
     const bagCells = bag.map((it, i) => stashSlotHTML(it, 'bag', i)).join('');
     const html = `<div class="stash-wrap">
-        <div class="flex justify-end"><button onclick="closeModal()" class="shrink-0 whitespace-nowrap px-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Return</button></div>
         <div class="stash-cols">
             <div class="stash-col">
                 <p class="stash-title">Stash · ${stashUsed}/${STASH_SLOTS}</p>
@@ -6611,9 +6617,20 @@ function openStash() {
                 <div class="stash-grid">${bagCells}</div>
             </div>
         </div>
-        <p class="text-[10px] text-slate-500">Tap to move an item. Hold or hover for details.</p>
+        <p class="stash-hint">Tap to move an item. Hold or hover for details.</p>
     </div>`;
     showModal('Stash', '', html);
+    // Return button: the same image button as the inventory page, at the window's top-right corner
+    const panel = document.getElementById('game-modal')?.firstElementChild;
+    if (panel) {
+        const ret = document.createElement('div');
+        ret.id = 'stash-return';
+        ret.className = 'stash-ret';
+        ret.setAttribute('role', 'button');
+        ret.onclick = () => closeModal();
+        ret.innerHTML = '<img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">' + '<img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">';
+        panel.appendChild(ret);
+    }
 }
 // Tap: stash -> bag, bag -> stash (suppressed right after a long press, which opens the details)
 function stashClick(src, idx) {
@@ -6689,11 +6706,12 @@ function stashShowDetail(src, idx, byHover = false) {
     if (p0 && p0.style.display !== 'none' && stashDetailKey === key) { stashHoverOpened = stashHoverOpened && byHover; return; }
     if (!document.getElementById('stash-detail')) stashStyles();
     let p = document.getElementById('stash-detail');
-    if (!p) { p = document.createElement('div'); p.id = 'stash-detail'; document.body.appendChild(p); }
+    if (!p) { p = document.createElement('div'); p.id = 'stash-detail'; p.className = 'art-panel dd-skin'; document.body.appendChild(p); }
     const isEquip = !!item.slot;
+    const isPotion = item.type === 'potion';
     const rarity = RARITY_INFO[item.rarity];
-    const kind = isEquip ? item.slot : (item.type === 'potion' ? 'Consumable' : 'Item');
-    const title = item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
+    const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
+    const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
     const btn = src === 'stash'
         ? `<button onclick="stashTake(${idx})" class="dd-btn primary">Take out</button>`
         : `<button onclick="stashPut(${idx})" class="dd-btn primary">Store</button>`;
@@ -6705,10 +6723,10 @@ function stashShowDetail(src, idx, byHover = false) {
         source: itemSourceHTML(item),
         name: title,
         meta: `${kind}${rarity ? ' · ' + rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
-        stats: (item.qty || 1) > 1 ? `<span>Qty ${item.qty}</span>` : '',
-        compare: '',
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ((item.qty || 1) > 1 ? `<span>Qty ${item.qty}</span>` : ''),
+        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
         lore: !isEquip ? (item.lore || item.desc || '') : '',
-        price: '',
+        price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
         primary: btn,
         secondary: []
     });
