@@ -1707,6 +1707,13 @@ function earthNewArt() {
     };
 }
 const EARTH_BOSS_FG = 'assets/combat/earth3d/mgnew3_v2_q90.webp';
+// Castle Tower art: one background and base for the whole tower, and a midground for each band of floors
+const TOWER_ART = { bg: 'assets/combat/castle/bg_q90.webp', base: 'assets/combat/castle/baselayer_q90.webp' };
+function towerFgForFloor(f) {
+    if (f <= 6) return 'assets/combat/castle/mg1_q90.webp';
+    if (f <= 15) return 'assets/combat/castle/mg2_q90.webp';
+    return 'assets/combat/castle/mg3_q90.webp';
+}
 const COMBAT_ART = {
     earth: EARTH_ART_MODE === '3d' ? earth3dArt() : EARTH_ART_MODE === 'e1' ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
     fire: FIRE_ART_MODE === '3d' ? fire3dArt() : flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
@@ -1868,8 +1875,11 @@ async function changeEarthLayers() {
     const art = COMBAT_ART[artKey];
     const fgList = Array.isArray(art.fg) ? art.fg : [art.fg]; // a null entry means no foreground
     // Earth map mini-boss and boss stages use their own midground (mgnew3) as the foreground
-    const bossFg = artKey === 'earth' && (isBossStage() || isMiniBossStage());
-    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = pick(bossFg ? [EARTH_BOSS_FG] : fgList) || null;
+    const towerArt = currentMode === 'tower';
+    const bossFg = !towerArt && artKey === 'earth' && (isBossStage() || isMiniBossStage());
+    const nextBg = towerArt ? TOWER_ART.bg : pick(art.bg);
+    const nextBase = towerArt ? TOWER_ART.base : pick(art.base);
+    const nextFg = towerArt ? towerFgForFloor(currentStage) : (pick(bossFg ? [EARTH_BOSS_FG] : fgList) || null);
     await Promise.all([nextBg, nextBase, nextFg].filter(Boolean).map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
     // Leaving a boss midground: it fades to black first (the other layers swap as before)
@@ -6186,6 +6196,7 @@ const EVENT_MENU = [
     { key: 'daily',    label: 'Daily Challenge', banner: 'assets/events/banner_daily_q85.webp' },
     { key: 'gold',     label: 'Gold Frenzy',     banner: 'assets/events/banner_gold_q85.webp' },
     { key: 'xp',       label: 'Wisdom Trail',    banner: 'assets/events/banner_xp_q85.webp' },
+    { key: 'tower',    label: 'Castle Tower',    banner: null },
     { key: 'endless',  label: 'Void Tower',      banner: null },
     { key: 'voidtest', label: 'Void Test Map',   banner: null },
     { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
@@ -6210,7 +6221,7 @@ function renderEventsView() {
     // Alert on the top right of an event that still has a play (or an open daily quest)
     const eventHasAttempt = key => {
         if (key === 'quests') return (player.dailyQuests || []).some(q => !q.completed);
-        if (key === 'daily' || key === 'gold' || key === 'xp') return eventCanPlay(key);
+        if (key === 'daily' || key === 'gold' || key === 'xp' || key === 'tower') return eventCanPlay(key);
         return false;
     };
     menuEl.innerHTML = EVENT_MENU.map(m => `
@@ -6245,6 +6256,10 @@ function renderEventsView() {
         body = `<p>${cfg.desc}</p><p class="ev-status">${left} / ${EVENT_LIMIT} plays left today</p>`;
         foot = `<div class="ev-maps">${maps.map(m => `<button class="ev-map${m.mapKey === pick ? ' ev-map-on' : ''}" onclick="selectEventMap('${cur}','${m.mapKey}')"><b>${m.label}</b><span>${m.sub}</span></button>`).join('')}</div>`;
         start = { can: eventCanPlay(cur), js: `startEvent('${cur}','${pick}')` };
+    } else if (cur === 'tower') {
+        const left = Math.max(0, 1 - (st.plays.tower || 0));
+        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. You are paid for each floor you clear, and you keep those rewards even if you fall later.</p><p class="ev-status">${left} / 1 attempt left today</p>`;
+        start = { can: eventCanPlay('tower'), js: `startTower()` };
     } else if (cur === 'endless') {
         body = `<p>Endless test map. 100x rewards, test only.</p>`;
         start = { can: true, js: `startExpedition('endless')` };
