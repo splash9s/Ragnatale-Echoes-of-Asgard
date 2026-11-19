@@ -6207,10 +6207,17 @@ function renderEventsView() {
     const cur = currentEventsTab;
     const item = EVENT_MENU.find(m => m.key === cur);
 
+    // Alert on the top right of an event that still has a play (or an open daily quest)
+    const eventHasAttempt = key => {
+        if (key === 'quests') return (player.dailyQuests || []).some(q => !q.completed);
+        if (key === 'daily' || key === 'gold' || key === 'xp') return eventCanPlay(key);
+        return false;
+    };
     menuEl.innerHTML = EVENT_MENU.map(m => `
         <button class="ev-menu-item${m.key === cur ? ' ev-menu-on' : ''}" onclick="switchEventsTab('${m.key}')">
             <img src="assets/events/leftmenu_q85.webp" alt="">
             <span>${m.label}</span>
+            ${eventHasAttempt(m.key) ? '<img class="ev-alert" src="assets/page01/alert_q85.webp" alt="">' : ''}
         </button>`).join('');
 
     bannerEl.innerHTML = item.banner
