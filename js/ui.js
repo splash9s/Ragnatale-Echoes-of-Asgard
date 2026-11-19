@@ -1705,6 +1705,7 @@ function earthNewArt() {
         layouts: { 'e1base': flatLayout(feet, monsterFeet) }
     };
 }
+const EARTH_BOSS_FG = 'assets/combat/earth3d/mgnew3_q90.webp';
 const COMBAT_ART = {
     earth: EARTH_ART_MODE === '3d' ? earth3dArt() : EARTH_ART_MODE === 'e1' ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
     fire: FIRE_ART_MODE === '3d' ? fire3dArt() : flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
@@ -1852,7 +1853,9 @@ async function changeEarthLayers() {
     const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
     const art = COMBAT_ART[artKey];
     const fgList = Array.isArray(art.fg) ? art.fg : [art.fg]; // a null entry means no foreground
-    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = pick(fgList) || null;
+    // Earth map mini-boss and boss stages use their own midground (mgnew3) as the foreground
+    const bossFg = artKey === 'earth' && (isBossStage() || isMiniBossStage());
+    const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = pick(bossFg ? [EARTH_BOSS_FG] : fgList) || null;
     await Promise.all([nextBg, nextBase, nextFg].filter(Boolean).map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
     bg.src = nextBg;
