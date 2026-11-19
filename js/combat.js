@@ -2407,7 +2407,7 @@ async function startTower(friendIds, order) {
     const bad = res.find(r => !r.data);
     if (bad) { showModal("Warded Tower", bad.error || "Could not load your friends' tents."); return; }
     towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data)); // empty when going alone
-    towerPendingOrder = Array.isArray(order) && order.length === 3 ? order : null;
+    towerPendingOrder = Array.isArray(order) && order.length >= 1 ? order.slice() : null;
     towerPendingIds = ids.slice();
     if (!player.towerCooldowns) player.towerCooldowns = {};
     ids.forEach(id => { player.towerCooldowns[id] = Date.now(); });
@@ -2431,7 +2431,10 @@ function towerSetSixMonsters() {
         atkMin: Math.floor(u.atkMin * k), atkMax: Math.floor(u.atkMax * k),
         hit: Math.floor(u.hit * k), flee: Math.floor(u.flee * k)
     });
-    const pool = activeMap.enemies;
+    // Floor 1 uses the campaign Lv 10 roster at level 10; later floors use the tower roster
+    const lv10 = currentStage === 1 && GAME_DATA.maps.map10;
+    const pool = lv10 ? lv10.enemies : activeMap.enemies;
+    const lvl = lv10 ? lv10.levelReq : activeMap.levelReq;
     const boss = monstersList.find(m => m.isBoss);
     const plan = isBossStage()
         ? ['front', 'front', 'boss', 'back', 'healer', 'healer']
@@ -2441,7 +2444,7 @@ function towerSetSixMonsters() {
         let picked = pickUnit(pool, role);
         if (roleOf(picked) === 'tank' && tanks >= tankCapHere()) picked = pickUnit(pool, 'melee');
         if (roleOf(picked) === 'tank') tanks++;
-        return scaledUnit(makeUnit(levelScaled(picked, activeMap.levelReq), 1));
+        return scaledUnit(makeUnit(levelScaled(picked, lvl), 1));
     };
     const slots = plan.map((p, i) => {
         if (p === 'boss') { if (!boss) return null; boss.lineupSlot = i; return boss; }
@@ -2508,6 +2511,7 @@ function setupTowerParty() {
     // Formation only lists the hero and the friends who came (front first)
     const present = ['hero', ...Object.keys(members)];
     const order = (towerPendingOrder || ['hero', 'a1', 'a2']).filter(id => present.includes(id));
+    present.forEach(id => { if (!order.includes(id)) order.push(id); }); // anyone missing goes to the back
     towerPendingOrder = null;
     const ids = towerPendingIds || [];
     towerPendingIds = null;
@@ -2545,62 +2549,86 @@ function towerAllyAttacks() {
 }
 
 // A friend's idle combat frame, built from their saved gear and costume (cached once the art has loaded)
-function towerFriendFrame(m) {
-    if (m.frame) return m.frame;
+function towerFriendFrame(m, pose = 'IDLE') {
+    if (!m.frames) m.frames = {};
+    if (m.frames[pose]) return m.frames[pose];
     if (!m.snap) return null;
     const saved = player;
     let f = null;
     try {
         player = { ...saved, ...m.snap };
-        f = combatPose().IDLE;
+        f = combatPose()[pose];
     } catch (e) {
         f = null;
     } finally {
         player = saved;
     }
-    if (f) m.frame = f;
+    if (f) m.frames[pose] = f;
     return f;
 }
 
-// Friends stand on the battlefield behind the hero, on the same ground line (stage coordinates)
+// Friends stand on the battlefield behind the hero, on the same ground line (stage coordinates).
+// Elements are kept between renders, so a fallen friend plays the hero's fall animation once.
 const TOWER_FRIEND_GAP_X = 190;
 function towerRenderField() {
-    document.querySelectorAll('.tower-field-ally').forEach(n => n.remove());
     const stage = document.querySelector('#combat-stage .ts-inner');
-    if (!towerIsActive() || !stage) return;
+    if (!towerIsActive() || !stage) {
+        document.querySelectorAll('.tower-field-ally').forEach(n => n.remove());
+        return;
+    }
     const S = COMBAT_PLAYER_SCALE;
     const footY = combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y;
+    const keep = new Set();
     towerParty.order.filter(id => id !== 'hero').forEach((id, i) => {
         const m = towerParty.members[id];
         if (!m) return;
         const alive = m.hp > 0;
-        const look = `opacity:${alive ? 1 : 0.35};filter:${alive ? 'none' : 'grayscale(1)'};pointer-events:none;`;
         const footX = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - TOWER_FRIEND_GAP_X * (i + 1);
-        const f = towerFriendFrame(m);
+        const f = alive ? towerFriendFrame(m, 'IDLE') : (towerFriendFrame(m, 'DEAD') || towerFriendFrame(m, 'IDLE'));
+        const elId = `tower-field-${id}`;
+        keep.add(elId);
+        let el = document.getElementById(elId);
         if (f) {
-            const img = document.createElement('img');
-            img.className = 'tower-field-ally';
-            img.id = `tower-field-${id}`;
-            img.src = f.src;
+            if (!el || el.tagName !== 'IMG') {
+                if (el) el.remove();
+                el = document.createElement('img');
+                el.id = elId;
+                el.className = 'tower-field-ally';
+                stage.appendChild(el);
+            }
+            if (el.dataset.src !== f.src) { el.src = f.src; el.dataset.src = f.src; }
             const fx = f.fx !== undefined ? f.fx : f.w / 2;
             const fy = f.fy !== undefined ? f.fy : f.h;
-            img.style.cssText = `position:absolute;left:${footX - fx * S}px;top:${footY - fy * S}px;width:${f.w * S}px;height:${f.h * S}px;image-rendering:pixelated;z-index:4;${look}`;
-            stage.appendChild(img);
+            el.style.cssText = `position:absolute;left:${footX - fx * S}px;top:${footY - fy * S}px;width:${f.w * S}px;height:${f.h * S}px;image-rendering:pixelated;z-index:4;pointer-events:none;`;
         } else {
             // Art still loading: show the avatar until the sprite is ready
-            const tok = document.createElement('div');
-            tok.className = 'tower-field-ally';
-            tok.id = `tower-field-${id}`;
-            tok.style.cssText = `position:absolute;left:${footX - 32}px;top:${footY - 70}px;width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14;z-index:4;${look}`;
-            tok.innerHTML = friendAvatarHTML(m.avatar || '');
-            stage.appendChild(tok);
+            if (!el || el.tagName !== 'DIV') {
+                if (el) el.remove();
+                el = document.createElement('div');
+                el.id = elId;
+                el.className = 'tower-field-ally';
+                el.innerHTML = friendAvatarHTML(m.avatar || '');
+                stage.appendChild(el);
+            }
+            el.style.cssText = `position:absolute;left:${footX - 32}px;top:${footY - 70}px;width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14;z-index:4;pointer-events:none;`;
         }
-        const label = document.createElement('div');
-        label.className = 'tower-field-ally';
+        // Fall once when the friend goes down (same animation as the hero)
+        if (!alive) el.classList.add('tower-fall');
+        else el.classList.remove('tower-fall');
+
+        const labelId = `tower-label-${id}`;
+        keep.add(labelId);
+        let label = document.getElementById(labelId);
+        if (!label) {
+            label = document.createElement('div');
+            label.id = labelId;
+            label.className = 'tower-field-ally';
+            stage.appendChild(label);
+        }
         label.textContent = m.name;
-        label.style.cssText = `position:absolute;left:${footX - 60}px;top:${footY + 4}px;width:120px;text-align:center;font-size:14px;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000;z-index:4;${look}`;
-        stage.appendChild(label);
+        label.style.cssText = `position:absolute;left:${footX - 60}px;top:${footY + 4}px;width:120px;text-align:center;font-size:14px;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000;z-index:4;pointer-events:none;opacity:${alive ? 1 : 0.35};`;
     });
+    document.querySelectorAll('.tower-field-ally').forEach(n => { if (!keep.has(n.id)) n.remove(); });
 }
 
 // Party strip, right after the stage name: front member marked, DOWN when fallen
