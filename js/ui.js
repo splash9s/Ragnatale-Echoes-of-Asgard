@@ -2989,11 +2989,11 @@ function renderRuneSlot() {
             const e = blacksmithForgeEl && ELEMENTS[blacksmithForgeEl];
             runeEl.innerHTML = e
                 ? `<img src="assets/items/elemental/stone_${blacksmithForgeEl}.webp" alt="" style="width:44px;height:44px;object-fit:contain;">`
-                : '<span style="opacity:.6; font-size:11px;">Pick stone</span>';
+                : '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center;"><span style="opacity:.6; font-size:11px; line-height:1.2;">Pick stone</span></div>';
         }
         if (balEl) {
             const e = blacksmithForgeEl && ELEMENTS[blacksmithForgeEl];
-            balEl.textContent = e ? `${e.name} Elemental Stone: ${stones[blacksmithForgeEl] || 0}` : 'No stone picked';
+            balEl.textContent = e ? `${e.name} Elemental Stone: ${stones[blacksmithForgeEl] || 0}` : '';
         }
         return;
     }
