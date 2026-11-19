@@ -1824,7 +1824,21 @@
                     <div id="bs-rune-balance" style="position:absolute; z-index:4; left:1321px; top:632px; width:181px; height:22px; display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; font-size:12px; font-weight:800; line-height:1; color:#000; text-shadow:0 1px 2px rgba(255,255,255,.7);">Rune Stone: 0</div>
                     <button id="bs-cancel" onclick="blacksmithCancel()" class="pix-btn pix-btn-red cursor-pointer" style="z-index:4; position:absolute; left:1161px; top:568px; width:136px; height:44px; font-size:13px; line-height:1.2;">Return</button>
                     <button id="bs-refine" onclick="blacksmithRefineSelected()" class="pix-btn pix-btn-yellow cursor-pointer" style="z-index:4; position:absolute; left:1527px; top:568px; width:136px; height:44px; font-size:12px; line-height:44px; white-space:nowrap;">Refine</button>
+                    <!-- Refine Transfer (right window): From -> To, shown only in that mode -->
+                    <div id="bs-transfer-from" onclick="transferSelectTarget('from')" class="ui" style="display:none; z-index:4; position:absolute; left:1226px; top:405px; width:90px; height:90px; cursor:pointer; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; align-items:center; justify-content:center; flex-direction:column; color:#f5e6c4; font-size:11px; font-weight:700; text-shadow:0 1px 2px #000;"></div>
+                    <div id="bs-transfer-arrow" style="display:none; z-index:4; position:absolute; left:1322px; top:420px; width:180px; text-align:center; font-size:56px; line-height:1; font-weight:900; color:#22c55e; text-shadow:0 2px 4px #000;">&rarr;</div>
+                    <div id="bs-transfer-to" onclick="transferSelectTarget('to')" class="ui" style="display:none; z-index:4; position:absolute; left:1506px; top:405px; width:90px; height:90px; cursor:pointer; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; align-items:center; justify-content:center; flex-direction:column; color:#f5e6c4; font-size:11px; font-weight:700; text-shadow:0 1px 2px #000;"></div>
                     <div id="blacksmith-panel-right" class="art-panel" style="left:1104px; top:656px; width:595px; height:299px; overflow:auto;">
+                        <div id="bs-rules-transfer" style="display:none;">
+                            <div id="bs-transfer-status" class="text-xs text-slate-200 mb-2"></div>
+                            <h3 class="text-sm font-bold text-amber-400 mb-2">Refine Transfer Rules</h3>
+                            <ul class="flex flex-col gap-1 text-xs list-disc pl-5">
+                                <li>Pick the gear to take refinement from (From), then the gear to move it to (To).</li>
+                                <li>Only gear of the same type. Refinement moves from higher to lower only.</li>
+                                <li>The target takes the source's level; the source resets to +0.</li>
+                                <li>Costs 1 Blacksmith Rune Stone.</li>
+                            </ul>
+                        </div>
                         <div id="bs-rules-elemental" style="display:none;">
                             <h3 class="text-sm font-bold text-amber-400 mb-2">Elemental Forge Rules</h3>
                             <ul class="flex flex-col gap-1 text-xs list-disc pl-5">
@@ -2059,7 +2073,7 @@
     <script src="js/hero-body.js?v=20261119d"></script>
     <script src="js/combat.js?v=20261119zd"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261119ch"></script>
+    <script src="js/ui.js?v=20261119cj"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>

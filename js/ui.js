@@ -2983,54 +2983,82 @@ function transferCandidates() {
     (player.inventory || []).forEach((it, idx) => { if (transferIsGear(it)) out.push({ kind: 'bag', idx, gear: it }); });
     return out;
 }
-function transferPickerOpen(which) {
+let blacksmithTransferTarget = 'from'; // the slot the next gear pick fills: 'from' or 'to'
+function transferPlainName(g) { return String(g && g.name || '').replace(/<[^>]+>/g, ''); }
+function transferRefOf(c) { return c.kind === 'eq' ? { kind: 'eq', slot: c.slot } : { kind: 'bag', idx: c.idx }; }
+function transferSameRef(a, b) { return !!a && !!b && a.kind === b.kind && (a.kind === 'eq' ? a.slot === b.slot : a.idx === b.idx); }
+// Can this gear fill the given slot right now?
+function transferFits(which, gear) {
+    if (!gear) return false;
+    if (which === 'from') return transferLevel(gear) > 0;
     const from = transferGearAt(blacksmithTransfer.from);
-    if (which === 'to' && !from) { showFloatNotice('Pick the gear to take refinement from first.'); return; }
-    let list = transferCandidates();
-    if (which === 'from') list = list.filter(c => transferLevel(c.gear) > 0);
-    else list = list.filter(c => c.gear !== from && c.gear.slot === from.slot && transferLevel(c.gear) < transferLevel(from));
-    const rows = list.map(c => {
-        const key = c.kind === 'eq' ? `'${c.slot}'` : c.idx;
-        return `<button class="cursor-pointer flex items-center gap-3 p-2 rounded-lg bg-slate-950 border border-amber-500/30 text-left w-full" onclick="transferChoose('${which}','${c.kind}',${key})">
-            ${itemIconHTML(c.gear, 40)}
-            <span class="text-xs text-slate-100">${escapeHtml(c.gear.name)} <span class="text-amber-300">+${transferLevel(c.gear)}</span> <span class="text-slate-400">${c.kind === 'eq' ? 'equipped' : 'bag'}</span></span>
-        </button>`;
-    }).join('');
-    const title = which === 'from' ? 'Take refinement from' : 'Move refinement to';
-    showModal(title, '', rows ? `<div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">${rows}</div>` : '<div class="text-xs text-slate-400">No gear fits here.</div>');
+    return !!from && gear !== from && gear.slot === from.slot && transferLevel(gear) < transferLevel(from);
 }
-function transferChoose(which, kind, key) {
-    const ref = kind === 'eq' ? { kind, slot: key } : { kind, idx: key };
-    blacksmithTransfer[which] = ref;
-    // Keep the pair valid when the source changes
-    const from = transferGearAt(blacksmithTransfer.from), to = transferGearAt(blacksmithTransfer.to);
-    if (to && (!from || to.slot !== from.slot || transferLevel(to) >= transferLevel(from))) blacksmithTransfer.to = null;
-    closeModal();
+function transferSelectTarget(which) {
+    blacksmithTransferTarget = which;
     renderRefiningUI();
 }
+// A gear picked from the left list fills the targeted slot, if it fits
+function transferPick(kind, key) {
+    const want = kind === 'eq' ? { kind, slot: key } : { kind, idx: key };
+    const c = transferCandidates().find(x => transferSameRef(transferRefOf(x), want));
+    if (!c) return;
+    const which = blacksmithTransferTarget;
+    if (!transferFits(which, c.gear)) {
+        showFloatNotice(which === 'from' ? 'Pick gear that has refinement to take from.' : 'Pick gear of the same type with lower refinement.');
+        return;
+    }
+    blacksmithTransfer[which] = transferRefOf(c);
+    if (which === 'from') {
+        blacksmithTransferTarget = 'to';
+        // A target that no longer fits the new source is cleared
+        if (blacksmithTransfer.to && !transferFits('to', transferGearAt(blacksmithTransfer.to))) blacksmithTransfer.to = null;
+    }
+    renderRefiningUI();
+}
+// Refine Transfer page: left window = every gear (equipped and bag); right window = From -> To slots
 function renderTransferUI() {
     const container = document.getElementById('refining-slots-container');
     if (!container) return;
-    const slotBox = (label, which) => {
-        const ref = blacksmithTransfer[which];
-        const g = transferGearAt(ref);
-        const body = g
-            ? `${itemIconHTML(g, 48)}<div><div class="font-bold text-slate-100 text-xs">${escapeHtml(g.name)}</div><div class="text-amber-300 text-xs">+${transferLevel(g)} · ${ref.kind === 'eq' ? 'equipped' : 'bag'}</div></div>`
-            : '<span class="text-slate-400 text-xs">Tap to choose</span>';
-        return `<button onclick="transferPickerOpen('${which}')" class="cursor-pointer flex items-center gap-3 p-3 rounded-xl bg-slate-950 border border-amber-500/30 text-left w-full" style="min-height:72px;">
-            <span class="text-[11px] text-slate-400 w-14 shrink-0">${label}</span>${body}</button>`;
-    };
     const from = transferGearAt(blacksmithTransfer.from), to = transferGearAt(blacksmithTransfer.to);
-    let status = 'Pick the gear to take refinement from, then the gear to move it to.';
+    const runes = player.blacksmithRuneStones || 0;
+    const rows = transferCandidates().map(c => {
+        const ref = transferRefOf(c);
+        const role = transferSameRef(ref, blacksmithTransfer.from) ? 'From' : transferSameRef(ref, blacksmithTransfer.to) ? 'To' : '';
+        const fits = transferFits(blacksmithTransferTarget, c.gear);
+        const key = c.kind === 'eq' ? `'${c.slot}'` : c.idx;
+        // Rows are direct children of the container, so the parchment row style from index.html applies
+        return `<div onclick="transferPick('${c.kind}',${key})" class="p-3 rounded border cursor-pointer flex justify-between items-center gap-3 ${role ? 'border-amber-400 border-2' : 'border-slate-700'}" style="${fits ? '' : 'opacity:.45;'}">
+            <span class="font-bold text-xs inline-flex items-center gap-2">${itemIconHTML(c.gear, 36)} ${c.gear.name} <span style="color:#7a4a00;">+${transferLevel(c.gear)}</span> <span style="opacity:.75;">${c.kind === 'eq' ? 'equipped' : 'bag'}</span></span>
+            ${role ? `<span style="font-size:11px; font-weight:800; color:#7a4a00;">${role}</span>` : ''}
+        </div>`;
+    }).join('');
+    container.innerHTML = `<div class="text-[10px] mb-1" style="color:#2a1a0e;">Select gear. A pick fills the ${blacksmithTransferTarget === 'from' ? 'From' : 'To'} slot.</div>${rows || '<div class="text-xs" style="color:#2a1a0e;">No gear to choose from.</div>'}`;
+
+    // Right window: the two slots, left to right
+    const slotBox = (which, g) => {
+        const el = document.getElementById(which === 'from' ? 'bs-transfer-from' : 'bs-transfer-to');
+        if (!el) return;
+        el.style.outline = blacksmithTransferTarget === which ? '3px solid #22c55e' : 'none';
+        el.innerHTML = g
+            ? `<div style="position:relative; z-index:1; display:flex;">${itemIconHTML(g, 60)}</div><span style="position:absolute; z-index:0; left:50%; bottom:2px; transform:translateX(-50%); font-size:16px; font-weight:900; color:#86efac; text-shadow:0 1px 3px #000; white-space:nowrap;">+${transferLevel(g)}</span>`
+            : `<span style="opacity:.6">${which === 'from' ? 'From' : 'To'}</span>`;
+    };
+    slotBox('from', from);
+    slotBox('to', to);
+
+    const ok = !!from && !!to && from.slot === to.slot && transferLevel(from) > transferLevel(to) && runes >= REFINE_TRANSFER_COST;
+    let msg = 'Pick the gear to take refinement from, then the gear to move it to.';
+    if (from && !to) msg = `Now pick the gear to move +${transferLevel(from)} to (same type, lower refinement).`;
     if (from && to) {
-        status = `+${transferLevel(from)} moves to ${escapeHtml(to.name)}. ${escapeHtml(from.name)} resets to +0.`;
+        msg = transferLevel(from) > transferLevel(to)
+            ? `+${transferLevel(from)} moves to ${to.name}, which goes to +${transferLevel(from)}. ${from.name} resets to +0.`
+            : 'Refinement only moves to lower-refined gear. Pick another target.';
     }
-    container.innerHTML = `<div class="flex flex-col gap-3">
-        ${slotBox('From', 'from')}
-        ${slotBox('To', 'to')}
-        <div class="text-xs text-slate-200">${status}</div>
-        <div class="text-[11px] text-slate-400">Only gear of the same type. Refinement moves from higher to lower only. Cost: ${REFINE_TRANSFER_COST} Blacksmith Rune Stone (you have ${player.blacksmithRuneStones || 0}).</div>
-    </div>`;
+    const statusEl = document.getElementById('bs-transfer-status');
+    if (statusEl) statusEl.innerHTML = `${msg}<div class="text-[11px] text-slate-400 mt-1">Costs ${REFINE_TRANSFER_COST} Blacksmith Rune Stone (you have ${runes}).</div>`;
+    const btn = document.getElementById('bs-refine');
+    if (btn) { btn.innerHTML = 'Transfer'; btn.disabled = !ok; btn.style.opacity = ok ? '1' : '.5'; btn.classList.remove('guide-flash-link'); }
 }
 function transferConfirm() {
     const from = transferGearAt(blacksmithTransfer.from), to = transferGearAt(blacksmithTransfer.to);
@@ -3041,21 +3069,24 @@ function transferConfirm() {
         showModal('No Rune Stone', 'Refine Transfer needs 1 Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.');
         return;
     }
-    showGameConfirm('Refine Transfer', `Move +${transferLevel(from)} from ${from.name} to ${to.name}? ${to.name} goes from +${transferLevel(to)} to +${transferLevel(from)}, and ${from.name} resets to +0. Costs 1 Blacksmith Rune Stone.`, 'Transfer', doRefineTransfer);
+    const fromName = transferPlainName(from), toName = transferPlainName(to);
+    showGameConfirm('Refine Transfer', `Move +${transferLevel(from)} from ${fromName} to ${toName}? ${toName} goes from +${transferLevel(to)} to +${transferLevel(from)}, and ${fromName} resets to +0. Costs 1 Blacksmith Rune Stone.`, 'Transfer', doRefineTransfer);
 }
 function doRefineTransfer() {
     const from = transferGearAt(blacksmithTransfer.from), to = transferGearAt(blacksmithTransfer.to);
     if (!from || !to || from.slot !== to.slot || transferLevel(from) <= transferLevel(to) || (player.blacksmithRuneStones || 0) < REFINE_TRANSFER_COST) {
         showFloatNotice('This transfer is no longer possible.');
         blacksmithTransfer = { from: null, to: null };
+        blacksmithTransferTarget = 'from';
         renderRefiningUI();
         return;
     }
     player.blacksmithRuneStones -= REFINE_TRANSFER_COST;
     to.refineLevel = transferLevel(from);
     from.refineLevel = 0;
-    logMessage(`[Refine Transfer] ${to.name} is now +${to.refineLevel}; ${from.name} reset to +0.`, 'levelup');
+    logMessage(`[Refine Transfer] ${transferPlainName(to)} is now +${to.refineLevel}; ${transferPlainName(from)} reset to +0.`, 'levelup');
     blacksmithTransfer = { from: null, to: null };
+    blacksmithTransferTarget = 'from';
     playSfx(SFX.refineSuccess);
     updateUI();
     saveGame();
@@ -3088,6 +3119,7 @@ function forgedWeaponName(gear, el) {
 }
 function blacksmithSetMode(mode) {
     blacksmithMode = mode;
+    blacksmithTransferTarget = 'from';
     blacksmithSelectedSlot = null;
     blacksmithTransfer = { from: null, to: null };
     renderRefiningUI();
@@ -3127,6 +3159,7 @@ function blacksmithSelect(slot) {
 function blacksmithCancel() {
     blacksmithSelectedSlot = null;
     blacksmithTransfer = { from: null, to: null };
+    blacksmithTransferTarget = 'from';
     if (blacksmithMode === 'elemental') blacksmithForgeEl = null;
     renderRefiningUI();
 }
@@ -3247,6 +3280,19 @@ function renderBlacksmithChrome() {
     const re = document.getElementById('bs-rules-elemental');
     if (rr) rr.style.display = blacksmithMode === 'refine' ? '' : 'none';
     if (re) re.style.display = elemental ? '' : 'none';
+    // Refine Transfer lays out its own From -> To slots on the right; the refine and elemental parts are hidden there
+    const transfer = blacksmithMode === 'transfer';
+    const showEl = (id, on, disp) => { const e = document.getElementById(id); if (e) e.style.display = on ? (disp || '') : 'none'; };
+    showEl('bs-transfer-from', transfer, 'flex');
+    showEl('bs-transfer-to', transfer, 'flex');
+    showEl('bs-transfer-arrow', transfer, 'block');
+    showEl('bs-rules-transfer', transfer, 'block');
+    showEl('blacksmith-gear-slot', !transfer, 'flex');
+    showEl('bs-success-rate', !transfer);
+    showEl('blacksmith-rune-slot', !transfer, 'flex');
+    showEl('bs-rune-balance', !transfer, 'flex');
+    const listEl = document.getElementById('refining-slots-container');
+    if (listEl) { listEl.style.maxHeight = transfer ? '680px' : ''; listEl.style.overflowY = transfer ? 'auto' : ''; }
     ['refine', 'elemental', 'transfer'].forEach(m => {
         const b = document.getElementById('bs-tab-' + m);
         if (!b) return;
