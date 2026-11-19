@@ -4574,7 +4574,12 @@ function syncHeroSprites() {
         if (id === 'char-hero' && isCharClear() && tentPose !== 'stand') { tentPoseLayout(el); return; }
         // The tent (clear screen) shows the standing base with its hand animation; the gear page keeps the gear-composed hero
         const tentNow = id === 'char-hero' && isCharClear();
-        const spec = tentNow ? TENT_HERO : f;
+        // A costume stand with its own aspect keeps that shape at the standing height (the feet stay on the same line)
+        const standLay = tentNow ? costumeTentLayout('stand') : null;
+        const spec = !tentNow ? f
+            : (standLay && standLay.aspect)
+                ? { w: TENT_HERO.h * standLay.aspect, h: TENT_HERO.h, fx: TENT_HERO.h * standLay.aspect / 2, fy: TENT_HERO.h }
+                : TENT_HERO;
         const src = tentNow ? tentStandSrc() : f.src;
         setHeroSrc(el, src);
         // The main page hero is 10% smaller than the character page hero
@@ -7076,7 +7081,8 @@ const COSTUME_TENT = {
 // Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
 // 'scale' resizes the pose (each pose is 5% smaller than before this change)
 const COSTUME_TENT_LAYOUT = {
-    blue_samurai: { stand: { scale: 0.9025 }, sit: { scale: 0.955, aspect: 402 / 416 }, sleep: { scale: 1.25, aspect: 644 / 350 } },
+    // Blue stand keeps its own picture's aspect (475 x 539), sized to the standing height; sit and sleep are 20% smaller than before
+    blue_samurai: { stand: { scale: 0.9025, aspect: 475 / 539 }, sit: { scale: 0.764, aspect: 402 / 416 }, sleep: { scale: 1.0, aspect: 644 / 350 } },
     wanderer_samurai: { stand: { scale: 0.9025 }, sit: { scale: 1.1875, aspect: 274 / 228 }, sleep: { scale: 1.14, aspect: 374 / 223 } }
 };
 function costumeTentLayout(pose) {
