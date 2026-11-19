@@ -6571,9 +6571,9 @@ function stashStyles() {
         + ' @keyframes stashArrowSwing { 0%, 100% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }'
         + ' .stash-col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }'
         + ' .stash-title { font-size: 12px; font-weight: 800; color: #fbbf24; margin: 0; }'
-        + ' .stash-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-height: 52vh; overflow-y: auto; padding: 2px; }'
+        + ' .stash-grid { display: grid; grid-template-columns: repeat(auto-fill, 65px); justify-content: space-between; gap: 5px; max-height: 52vh; overflow-y: auto; padding: 2px; }'
         // Same slot graphic as the bag, 40% smaller (bag cell is 108 x 104)
-        + ' .stash-slot { position: relative; width: 100%; aspect-ratio: 108 / 104; padding: 0; border: 0; background-color: transparent; background-image: url("assets/pages/character/inventoryslot2.png"); background-size: 100% 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }'
+        + ' .stash-slot { position: relative; width: 65px; height: 62px; padding: 0; border: 0; background-color: transparent; background-image: url("assets/pages/character/inventoryslot2.png"); background-size: 100% 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }'
         + ' .stash-slot:hover { filter: brightness(1.1); }'
         + ' .stash-slot.sel { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }'
         + ' .stash-slot .qty { position: absolute; right: 3px; bottom: 2px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px #000, 0 0 3px #000; pointer-events: none; }'
