@@ -1,4 +1,4 @@
--- Rune Thread: Castle Tower friend rewards. A friend gets one mail per day with their share of the floors cleared.
+-- Rune Thread: Warded Tower friend rewards. A friend gets one mail per day with their share of the floors cleared.
 -- Run once in the SQL editor of project krtzvossvqddhveozcnb, after friends.sql.
 
 -- One send per (leader, friend, day). Keeps the mail from being spammed.
@@ -62,8 +62,8 @@ begin
 
     select name into sender from public.profiles where user_id = me;
     insert into public.mail (recipient_id, title, sender, message, rewards)
-    values (p_friend, 'Castle Tower', coalesce(sender, 'Friend'),
-            'Your share of the Castle Tower: floors 1 to ' || n || ' cleared with you.', rewards);
+    values (p_friend, 'Warded Tower', coalesce(sender, 'Friend'),
+            'Your share of the Warded Tower: floors 1 to ' || n || ' cleared with you.', rewards);
 
     return rewards;
 end $$;

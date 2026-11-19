@@ -529,7 +529,7 @@ function selectRuneChoice(runeId, callback) {
 // ---------- EXPEDITION SETUP ----------
 function startExpedition(mode, opts = {}) {
     armorBrokenThisMap = false; // a new map gets its first Armor Break again
-    towerParty = null; // only the Castle Tower sets a party
+    towerParty = null; // only the Warded Tower sets a party
     if (mode === 'campaign' && typeof guideIntroDone === 'function') guideIntroDone(); // first campaign run ends the intro guide
     if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
         showModal("World-Eater", "Locked.");
@@ -603,9 +603,9 @@ function startExpedition(mode, opts = {}) {
         setupTowerParty();
         currentStage = 1;
         maxStages = TOWER_FLOORS;
-        if (tagEl) tagEl.innerText = "Castle Tower";
-        if (titleEl) titleEl.innerText = `Castle Tower — Floor ${currentStage} / ${maxStages}`;
-        logMessage(`[Tower] Entering the Castle Tower. Clear each floor to earn its rewards.`, 'winlose');
+        if (tagEl) tagEl.innerText = "Warded Tower";
+        if (titleEl) titleEl.innerText = `Warded Tower — Floor ${currentStage} / ${maxStages}`;
+        logMessage(`[Tower] Entering the Warded Tower. Clear each floor to earn its rewards.`, 'winlose');
     } else if (mode === 'daily') {
         activeMap = { title: "Daily Challenge", dropKey: 'map1', maxStages: DAILY_TOTAL_STAGES, enemies: [], boss: null };
         currentStage = 1;
@@ -1440,7 +1440,7 @@ function onPlayerDodged(m, source) {
 let armorBrokenThisMap = false;
 
 function takePlayerDamage(dmg, m, ignoreArmor = false) {
-    // Castle Tower: while an ally is in front, the hit goes to that ally instead of the hero
+    // Warded Tower: while an ally is in front, the hit goes to that ally instead of the hero
     if (towerIsActive() && !towerAllHit) {
         // Bosses attack any living member (all-to-all); other monsters hit the front
         const target = m && m.isBoss ? towerRandomAlive() : towerFront();
@@ -1611,7 +1611,7 @@ function monsterAct(m, derived, position = 0) {
         if (isSlime(m)) playSfx(SFX.slimeAttack); // slime attacks
         else if (monsterSfxOf(m) && monsterSfxOf(m).attack) playSfx(monsterSfxOf(m).attack); // monster's own attack sound
         else if (rangedFireSfx(m)) playSfx(rangedFireSfx(m)); // ranged monsters fire
-        if (heavyStrike && towerIsActive()) towerHitEveryone(eDmg, m, ignoreArmor); // Castle Tower: Heavy Strike hits the whole party
+        if (heavyStrike && towerIsActive()) towerHitEveryone(eDmg, m, ignoreArmor); // Warded Tower: Heavy Strike hits the whole party
         else takePlayerDamage(eDmg, m, ignoreArmor);
         if (roleOf(m) === 'tank') tankStunPlayer(m);
         if (m.isBoss && BOSS_UNIQUE_SKILL[m.id] === 'swordSweep' && m.attackCount % 3 === 0 && player.hp > 0) {
@@ -1689,9 +1689,9 @@ function monsterTurnTick() {
         return;
     }
 
-    // Castle Tower: the hero being down is not a defeat while an ally still stands
+    // Warded Tower: the hero being down is not a defeat while an ally still stands
     if (player.hp <= 0 && !towerAnyAlive()) {
-        sendTowerFriendRewards(); // Castle Tower: the run is over, so the friends get their share
+        sendTowerFriendRewards(); // Warded Tower: the run is over, so the friends get their share
         if (player.runes.angelOfDeath && !player.angelUsedThisRun) {
             player.angelUsedThisRun = true;
             player.hp = derived.maxHp;
@@ -2031,8 +2031,8 @@ function onStageCleared() {
             if (currentMode === 'tower' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
                 sendTowerFriendRewards();
-                logMessage(`[Tower] The Castle Tower is cleared!`, 'levelup');
-                showModal("Castle Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
+                logMessage(`[Tower] The Warded Tower is cleared!`, 'levelup');
+                showModal("Warded Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
                 updateUI();
                 saveGame();
                 return;
@@ -2298,7 +2298,7 @@ function getEventState() {
 function eventCanPlay(kind) {
     const st = getEventState();
     if (kind === 'daily' && st.dailyCleared) return false;
-    if (kind === 'tower') return (st.plays.tower || 0) < 1; // Castle Tower: one attempt per day
+    if (kind === 'tower') return (st.plays.tower || 0) < 1; // Warded Tower: one attempt per day
     return st.plays[kind] < EVENT_LIMIT;
 }
 
@@ -2353,10 +2353,10 @@ function grantTowerFloorReward(f) {
 // The Tower reuses the Earth monster roster at the top campaign level; each floor scales it (towerFloorMult)
 function buildTowerMap() {
     const base = GAME_DATA.maps.map50;
-    return { ...base, title: "Castle Tower", maxStages: TOWER_FLOORS, miniBoss: null, miniStage: 0 };
+    return { ...base, title: "Warded Tower", maxStages: TOWER_FLOORS, miniBoss: null, miniStage: 0 };
 }
 
-// Starts a Castle Tower run. One attempt per day.
+// Starts a Warded Tower run. One attempt per day.
 const TOWER_FRIEND_COOLDOWN_MS = 3 * 24 * 3600 * 1000; // a friend can join again 3 days after their last run
 function towerFriendCooldownLeft(id) {
     const at = (player.towerCooldowns || {})[id] || 0;
@@ -2374,21 +2374,21 @@ let towerPendingAllies = null;
 let towerPendingOrder = null; // formation chosen on the Events page (front first)
 let towerPendingIds = null;   // the two friends' user ids, in pick order
 
-// Starts a Castle Tower run with two friends. One attempt per day.
+// Starts a Warded Tower run with two friends. One attempt per day.
 async function startTower(friendIds, order) {
     if (!eventCanPlay('tower')) {
-        showModal("Castle Tower", "Already entered today. One attempt per day.");
+        showModal("Warded Tower", "Already entered today. One attempt per day.");
         return;
     }
     const ids = friendIds || [];
-    if (ids.length !== 2) { showModal("Castle Tower", "Choose 2 friends to join your party."); return; }
+    if (ids.length !== 2) { showModal("Warded Tower", "Choose 2 friends to join your party."); return; }
     if (ids.some(id => towerFriendCooldownLeft(id) > 0)) {
-        showModal("Castle Tower", "A chosen friend is still resting. Each friend can join again 3 days after their last run.");
+        showModal("Warded Tower", "A chosen friend is still resting. Each friend can join again 3 days after their last run.");
         return;
     }
     const res = await Promise.all(ids.map(id => friendApi.visitTent(id)));
     const bad = res.find(r => !r.data);
-    if (bad) { showModal("Castle Tower", bad.error || "Could not load your friends' tents."); return; }
+    if (bad) { showModal("Warded Tower", bad.error || "Could not load your friends' tents."); return; }
     towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data));
     towerPendingOrder = Array.isArray(order) && order.length === 3 ? order : null;
     towerPendingIds = ids.slice();
@@ -2437,7 +2437,7 @@ function towerSetSixMonsters() {
     monstersList = slots.filter(Boolean);
 }
 
-// Castle Tower: each chosen friend gets a mail with their share of the floors cleared (once per run)
+// Warded Tower: each chosen friend gets a mail with their share of the floors cleared (once per run)
 function sendTowerFriendRewards() {
     if (!towerIsActive() || !towerParty.cleared) return;
     const floors = towerParty.cleared;
