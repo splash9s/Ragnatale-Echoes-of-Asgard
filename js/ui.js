@@ -5278,7 +5278,7 @@ async function claimMail(mailId) {
     // Auction items (market mail) are full gear objects; each one needs a free bag slot
     const marketItems = Array.isArray(mail.rewards.items) ? mail.rewards.items.filter(it => it && it.name) : [];
     const freeSlots = Array.isArray(player.inventory) ? openInventory().filter(s => s === null).length : 0;
-    const slotsNeeded = (gear ? 1 : 0) + (bossHelm ? 1 : 0) + marketItems.length;
+    const slotsNeeded = (gear ? 1 : 0) + (bossHelm ? 1 : 0) + marketItems.length + (mail.rewards.planks ? 1 : 0) + (mail.rewards.refineOre ? 1 : 0);
     if (slotsNeeded > 0 && freeSlots < slotsNeeded) {
         showModal('Inventory Full', 'Make room in your bag to claim this mail.');
         return;
@@ -5308,6 +5308,13 @@ async function claimMail(mailId) {
     if (gear) addItemToInventory(gear);
     if (bossHelm) addItemToInventory(bossHelm);
     marketItems.forEach(it => addItemToInventory(JSON.parse(JSON.stringify(it))));
+    // Castle Tower share: planks, refine ore and elemental stones
+    if (mail.rewards.planks) addItemToInventory({ ...PLANK_ITEM, qty: mail.rewards.planks });
+    if (mail.rewards.refineOre) addItemToInventory({ ...REFINE_MATERIAL_ITEMS[2], qty: mail.rewards.refineOre });
+    if (mail.rewards.elementStones) {
+        if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
+        Object.entries(mail.rewards.elementStones).forEach(([el, n]) => { player.elementStones[el] = (player.elementStones[el] || 0) + n; });
+    }
     if (mail.rewards.chest) openChest(mail.rewards.chest);
     // Potions (friend gifts, rewards): they stack in the bag like shop potions
     for (const [id, q] of Object.entries(mail.rewards.potions || {})) {

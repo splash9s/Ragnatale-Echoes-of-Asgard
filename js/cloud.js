@@ -240,6 +240,7 @@ const friendApi = {
     sendGift: (userId) => friendRpc('send_friend_gift', { p_friend: userId }),
     restoreStreak: (userId) => friendRpc('restore_friend_streak', { p_friend: userId }),
     visitTent: (userId) => friendRpc('visit_friend_tent', { p_friend: userId }),
+    towerRewards: (userId, floors) => friendRpc('send_tower_rewards', { p_friend: userId, p_floors: floors }),
     visitors: () => friendRpc('my_tent_visitors'),
 };
 
