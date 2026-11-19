@@ -2426,6 +2426,7 @@ let currentEventsTab = 'quests'; // Events page opens on Daily Quests
 function switchEventsTab(tabName) {
     if (!EVENT_MENU.some(m => m.key === tabName)) tabName = 'quests';
     currentEventsTab = tabName;
+    if (tabName === 'tower') towerFriends = null; // reload the friend list each time the tab opens
     renderEventsView();
     updateQuestTabButton();
 }
