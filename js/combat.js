@@ -1558,7 +1558,8 @@ function stunPlayerFor(ms, m, label) {
 }
 
 function monsterAct(m, derived, position = 0) {
-    if (player.hp <= 0 || m.hp <= 0) return;
+    // Warded Tower: monsters keep fighting while a friend still stands, even with the hero down
+    if ((player.hp <= 0 && !towerAnyAlive()) || m.hp <= 0) return;
     if (m.isBoss) { bossTurnStart(m); bossIceShieldTick(m); }
     if (m.status) {
         logMessage(`[${STATUS_DEFS[m.status.kind].label}] ${m.name} cannot attack!`, 'winlose');
@@ -1649,7 +1650,7 @@ function monsterAct(m, derived, position = 0) {
 const MON_HIT_MIN = 0.65;
 const MAGE_SPELL_CAST_CHANCE = 0.10;
 function tryMageSpellCast(m) {
-    if (!m.spell || player.hp <= 0 || m.hp <= 0) return;
+    if (!m.spell || (player.hp <= 0 && !towerAnyAlive()) || m.hp <= 0) return;
     if (Math.random() >= MAGE_SPELL_CAST_CHANCE) return;
     const def = SPELL_DEFS[m.spell];
     let eDmg = Math.max(1, Math.floor((Math.floor(Math.random() * (m.atkMax - m.atkMin + 1)) + m.atkMin) * 100 / (100 + getDerivedStats().def)));
@@ -2532,10 +2533,13 @@ function towerAllyAttacks() {
         if (id === 'hero') return;
         const a = towerParty.members[id];
         if (!a || a.hp <= 0) return;
-        const t = getAliveMonsters()[0];
+        // The front-most monster by lineup slot (slot 1 first), not the internal list order
+        const t = getAliveMonsters().slice().sort((x, y) => (x.lineupSlot ?? 99) - (y.lineupSlot ?? 99))[0];
         if (!t) return;
         const dmg = Math.max(1, Math.floor(a.atk * (0.8 + Math.random() * 0.4) * 100 / (100 + (t.def || 0))));
         t.hp -= dmg;
+        const ti = monstersList.indexOf(t);
+        if (ti >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${ti + 1}) img`, String(dmg), '');
         logMessage(`[Tower] ${a.name} hits ${t.name} for ${dmg} damage`, 'combat');
     });
 }
