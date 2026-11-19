@@ -34,7 +34,8 @@ function guideElemPickTarget() {
 const GUIDE_ELEM_STEPS = [
     {
         text: 'Level 20! Tap the Blacksmith to make your weapon elemental',
-        visible: () => guideViewVisible('view-town'),
+        // The town stays on screen under the floating pages (Blacksmith, Shop...), so wait until none is open
+        visible: () => guideViewVisible('view-town') && !document.querySelector('.float-page:not(.hidden)'),
         targets: () => [document.querySelector('#view-town .ui[data-action="blacksmith"]')]
     },
     {
