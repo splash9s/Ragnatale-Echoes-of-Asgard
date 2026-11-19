@@ -2744,13 +2744,13 @@ document.addEventListener('click', (e) => {
 
 // Top-up pack art for the Diamond tab (diamond packs first, then gold packs), shown as a left-to-right row
 const PACK_ART = {
-    topup_usd_1: 'assets/diamond/pack/500diamond_q85.webp',
-    topup_usd_5_9: 'assets/diamond/pack/4000diamond_q85.webp',
-    topup_usd_9_9: 'assets/diamond/pack/8000diamond_q85.webp',
-    topup_usd_19: 'assets/diamond/pack/18000diamond_q85.webp',
-    topup_usd_29: 'assets/diamond/pack/30000diamond_q85.webp',
-    gold_usd_1: 'assets/diamond/pack/30000gold_q85.webp',
-    gold_usd_2_9: 'assets/diamond/pack/100000gold_q85.webp',
+    topup_usd_1: 'assets/diamond/pack/nomagenta/500diamond_q85.webp',
+    topup_usd_5_9: 'assets/diamond/pack/nomagenta/4000diamond_q85.webp',
+    topup_usd_9_9: 'assets/diamond/pack/nomagenta/8000diamond_q85.webp',
+    topup_usd_19: 'assets/diamond/pack/nomagenta/18000diamond_q85.webp',
+    topup_usd_29: 'assets/diamond/pack/nomagenta/30000diamond_q85.webp',
+    gold_usd_1: 'assets/diamond/pack/nomagenta/30000gold_q85.webp',
+    gold_usd_2_9: 'assets/diamond/pack/nomagenta/100000gold_q85.webp',
 };
 function vipItemsOf(cat) {
     const c = VIP_CATS.find(x => x.key === cat) || VIP_CATS[0];
