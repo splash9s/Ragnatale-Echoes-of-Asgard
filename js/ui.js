@@ -2706,6 +2706,7 @@ document.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
     row.scrollLeft += e.deltaY + e.deltaX;
     e.preventDefault();
+    vipPackArrows();
 }, { passive: false });
 document.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
@@ -2720,6 +2721,7 @@ document.addEventListener('pointermove', (e) => {
     if (!vipDragMoved && Math.abs(dx) < 5) return;
     vipDragMoved = true;
     vipDrag.row.scrollLeft = vipDrag.left - dx;
+    vipPackArrows();
 });
 const vipEnd = () => { vipDrag = null; };
 document.addEventListener('pointerup', vipEnd);
@@ -2773,9 +2775,11 @@ function renderVipList() {
                 <img src="${PACK_ART[item.id]}" alt="${escapeHtml(item.name)}">
             </button>`).join('');
         grid.scrollLeft = keepLeft;
+        vipPackArrows();
         return;
     }
     grid.classList.remove('vip-pack-row');
+    vipPackArrows();
     grid.innerHTML = vipItemsOf(vipCat).map(item => `
         <div class="vip-cell">
             <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
@@ -2813,6 +2817,27 @@ function chestDropRatesHTML(chestType) {
     if (cfg.diamonds) rows.push(`Always: ${cfg.diamonds} diamonds`);
     return `<div class="vd-desc" style="text-align:left; margin-top:8px;"><div style="font-weight:700; margin-bottom:4px;">Drop rates</div>${rows.map(r => `<div>${r}</div>`).join('')}</div>`;
 }
+// Arrow buttons step the pack row by most of its width; they dim at either end
+function vipPackStep(dir) {
+    const row = document.getElementById('vip-grid');
+    if (!row) return;
+    row.scrollBy({ left: dir * Math.round(row.clientWidth * 0.6), behavior: 'smooth' });
+}
+function vipPackArrows() {
+    const row = document.getElementById('vip-grid');
+    const prev = document.getElementById('vip-prev'), next = document.getElementById('vip-next');
+    if (!row || !prev || !next) return;
+    // The window may still be hidden or laying out: measure again shortly
+    if (row.classList.contains('vip-pack-row') && !row.clientWidth) { setTimeout(vipPackArrows, 150); return; }
+    const show = row.classList.contains('vip-pack-row') && row.scrollWidth > row.clientWidth + 2;
+    prev.style.display = show ? 'flex' : 'none';
+    next.style.display = show ? 'flex' : 'none';
+    prev.disabled = row.scrollLeft <= 2;
+    next.disabled = row.scrollLeft >= row.scrollWidth - row.clientWidth - 2;
+}
+document.addEventListener('scroll', (e) => { if (e.target && e.target.id === 'vip-grid') vipPackArrows(); }, true);
+// The row only gets wider once its pack images have loaded, so re-check as each one arrives
+document.addEventListener('load', (e) => { if (e.target && e.target.closest && e.target.closest('#vip-grid')) vipPackArrows(); }, true);
 function vipSetCat(key) {
     vipCat = key;
     renderVipMenu();
