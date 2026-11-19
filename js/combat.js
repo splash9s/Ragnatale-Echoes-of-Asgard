@@ -597,6 +597,13 @@ function startExpedition(mode, opts = {}) {
         if (tagEl) tagEl.innerText = cfg.name;
         if (titleEl) titleEl.innerText = `${activeMap.title} — Stage ${currentStage} / ${maxStages}`;
         logMessage(`[Event] ${cfg.name}: entering ${activeMap.title}.`, 'winlose');
+    } else if (mode === 'tower') {
+        activeMap = buildTowerMap();
+        currentStage = 1;
+        maxStages = TOWER_FLOORS;
+        if (tagEl) tagEl.innerText = "Castle Tower";
+        if (titleEl) titleEl.innerText = `Castle Tower — Floor ${currentStage} / ${maxStages}`;
+        logMessage(`[Tower] Entering the Castle Tower. Clear each floor to earn its rewards.`, 'winlose');
     } else if (mode === 'daily') {
         activeMap = { title: "Daily Challenge", dropKey: 'map1', maxStages: DAILY_TOTAL_STAGES, enemies: [], boss: null };
         currentStage = 1;
@@ -671,7 +678,7 @@ function isRuneStage(stage) {
 function isRuneDueAfter(stage) {
     if (currentMode === 'daily') return stage % 5 === 0;
     if (currentMode === 'endless') return stage % 4 === 0;
-    return (currentMode === 'campaign' || currentMode === 'event') && isRuneStage(stage);
+    return (currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') && isRuneStage(stage);
 }
 
 // Progress toward the next rune pick. Computed from the current stage, so it resets every map.
@@ -768,7 +775,7 @@ function spawnFinalStage() {
 function isBossStage() {
     if (currentMode === 'bossmap') return true;
     if (activeMap && activeMap.finalMap) return currentStage % 2 === 0 || currentStage === maxStages;
-    if (currentMode === 'campaign' || currentMode === 'event') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
+    if (currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') return !!(activeMap && activeMap.boss) && currentStage === maxStages;
     if (currentMode === 'daily') return DAILY_BOSS_STAGES.includes(currentStage);
     return false;
 }
@@ -781,7 +788,7 @@ function getBossTemplate() {
         const pool = Object.values(GAME_DATA.maps).map(m => m.boss).filter(Boolean);
         return curveBoss(pool[(currentStage - 1) % pool.length], currentStage);
     }
-    if (currentMode === 'campaign' || currentMode === 'event') return activeMap.boss;
+    if (currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') return activeMap.boss;
     const key = ['map1', 'map10', 'map20'][Math.floor(currentStage / 10) - 1];
     return GAME_DATA.maps[key].boss;
 }
@@ -841,7 +848,7 @@ function spawnStageMonsters() {
     playerAspdToggle = false;
     const derived = getDerivedStats();
     monstersList = [];
-    const dailyScale = currentMode === 'daily' ? 0.7 : 1;
+    const dailyScale = currentMode === 'daily' ? 0.7 : currentMode === 'tower' ? towerFloorMult(currentStage) : 1;
     const scaled = (m) => ({
         ...m,
         hp: Math.floor(m.hp * dailyScale),
@@ -866,7 +873,7 @@ function spawnStageMonsters() {
         if (isLevel1Map) boss.hp = Math.floor(boss.maxHp * 0.7);
         monstersList.push(dailyScale === 1 ? boss : scaled(boss));
         monstersList[0].lineupSlot = BOSS_LINEUP_SLOT; // boss stands in the 3rd lineup slot
-        if (currentMode === 'campaign' || currentMode === 'event') addBossSupport(monstersList[0]);
+        if (currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') addBossSupport(monstersList[0]);
         if (typeof showBossBalloon === 'function') showBossBalloon('Boss appeared!');
         const supportTxt = boss.elemSupport ? 'Elemental Support (element effects x2), ' : '';
         logMessage(`[Boss] ${boss.name} appears! Skills: ${supportTxt}Enrage (below 35% HP, +50% ATK), ${boss.noHeavyStrike ? '' : 'Heavy Strike (every 4th attack, x2 damage), '}Regeneration (1.5% HP per turn).`, 'winlose');
@@ -874,7 +881,7 @@ function spawnStageMonsters() {
             logMessage(`[Boss Skill] ${boss.name} casts Elemental Support! Element effects are doubled for its hits and when it is hit, until the map ends.`, 'winlose');
             setTimeout(() => { if (typeof showBossBalloon === 'function' && monstersList[0] === boss) showBossBalloon('Elemental Support! Element effects x2'); }, 3200);
         }
-    } else if ((currentMode === 'campaign' || currentMode === 'event') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
+    } else if ((currentMode === 'campaign' || currentMode === 'event' || currentMode === 'tower') && activeMap && activeMap.enemies && activeMap.enemies.length > 0) {
         spawnWaveFromSet(dailyScale, scaled);
     } else {
         const pool = currentMode === 'daily' ? getDailyEnemyPool() : currentMode === 'endless' ? [MONSTERS_DATA.slime] : (activeMap && activeMap.enemies) || [];
@@ -1998,7 +2005,17 @@ function onStageCleared() {
             showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.add('hidden');
+            if (currentMode === 'tower') grantTowerFloorReward(currentStage);
             currentStage++;
+
+            if (currentMode === 'tower' && currentStage > maxStages) {
+                if (typeof resetMapRunes === 'function') resetMapRunes();
+                logMessage(`[Tower] The Castle Tower is cleared!`, 'levelup');
+                showModal("Castle Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Events'), () => switchView('events'));
+                updateUI();
+                saveGame();
+                return;
+            }
 
             if (currentMode === 'event' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
@@ -2252,7 +2269,7 @@ function todayKey() {
 // Resets the play counters when the date changes
 function getEventState() {
     if (!player.events || player.events.date !== todayKey()) {
-        player.events = { date: todayKey(), plays: { daily: 0, gold: 0, xp: 0 }, dailyCleared: false };
+        player.events = { date: todayKey(), plays: { daily: 0, gold: 0, xp: 0, tower: 0 }, dailyCleared: false };
     }
     return player.events;
 }
@@ -2260,7 +2277,72 @@ function getEventState() {
 function eventCanPlay(kind) {
     const st = getEventState();
     if (kind === 'daily' && st.dailyCleared) return false;
+    if (kind === 'tower') return (st.plays.tower || 0) < 1; // Castle Tower: one attempt per day
     return st.plays[kind] < EVENT_LIMIT;
+}
+
+// ---------- CASTLE TOWER ----------
+const TOWER_FLOORS = 21;
+// Monsters get stronger every floor: x1.5 on floor 1, +0.1 per floor (x3.5 on floor 21)
+function towerFloorMult(f) { return 1.5 + 0.1 * (f - 1); }
+
+// Floor-clear rewards (draft table). Gold 1,600 per floor number.
+function towerFloorReward(f) {
+    return {
+        gold: 1600 * f,
+        diamonds: f <= 6 ? 10 : f <= 15 ? 20 : f <= 20 ? 30 : 100,
+        planks: f <= 6 ? 1 : f <= 15 ? 2 : f <= 20 ? 3 : 5,
+        ore: f <= 6 ? 2 : f <= 15 ? 4 : f <= 20 ? 6 : 10,
+        stones: f <= 6 ? 0 : f <= 15 ? (Math.random() < 0.5 ? 1 : 0) : f === 21 ? 2 : 1, // Elemental stones; floors 7-15 are a 50% chance
+        costume: f === 21 // Costume Chest on the top floor
+    };
+}
+
+function grantTowerFloorReward(f) {
+    const r = towerFloorReward(f);
+    player.gold += r.gold;
+    player.diamonds = (player.diamonds || 0) + r.diamonds;
+    const got = [`${r.gold} Gold`, `${r.diamonds} Diamond`];
+    if (r.planks > 0) {
+        const plank = { ...PLANK_ITEM, qty: r.planks };
+        if (placeItemInInventory(plank)) { recordStageDrop(plank); got.push(`${r.planks} Plank`); }
+    }
+    if (r.ore > 0) {
+        const ore = { ...REFINE_MATERIAL_ITEMS[2], qty: r.ore };
+        if (placeItemInInventory(ore)) { recordStageDrop(ore); got.push(`${r.ore} Refine Ore`); }
+    }
+    for (let i = 0; i < r.stones; i++) {
+        const els = Object.keys(ELEMENTS);
+        const el = els[Math.floor(Math.random() * els.length)];
+        if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
+        player.elementStones[el] = (player.elementStones[el] || 0) + 1;
+        recordStageDrop({ name: `${ELEMENTS[el].name} Elemental Stone`, type: 'estone', element: el, qty: 1, icon: `assets/items/elemental/stone_${el}.webp`, desc: `Forge ${ELEMENTS[el].name} onto a weapon at the Blacksmith.` });
+        got.push(`${ELEMENTS[el].name} Elemental Stone`);
+    }
+    if (r.costume) {
+        const chest = { name: "Costume Chest", type: 'chest', chestType: 'costume', qty: 1, icon: 'assets/chest/costume/costumeicon_q85.webp', desc: "" };
+        if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); }
+    }
+    logMessage(`[Tower] Floor ${f} cleared! Reward: ${got.join(', ')}`, 'drop');
+    updateUI();
+    saveGame();
+}
+
+// The Tower reuses the Earth monster roster at the top campaign level; each floor scales it (towerFloorMult)
+function buildTowerMap() {
+    const base = GAME_DATA.maps.map50;
+    return { ...base, title: "Castle Tower", maxStages: TOWER_FLOORS, miniBoss: null, miniStage: 0 };
+}
+
+// Starts a Castle Tower run. One attempt per day.
+function startTower() {
+    if (!eventCanPlay('tower')) {
+        showModal("Castle Tower", "Already entered today. One attempt per day.");
+        return;
+    }
+    getEventState().plays.tower = (getEventState().plays.tower || 0) + 1;
+    saveGame();
+    startExpedition('tower');
 }
 
 // Campaign-style map with the event modifiers applied to every enemy
