@@ -199,7 +199,7 @@ const LOADING_IMAGES = [
     "assets/combat/earth1/e1mg.webp",
     "assets/combat/earth3d/sky.webp",
     "assets/combat/earth3d/forest.webp",
-    "assets/combat/earth3d/mgnew3_q90.webp",
+    "assets/combat/earth3d/mgnew3_v2_q90.webp",
     "assets/combat/earth3d/base.webp",
     "assets/combat/elixirslot_q85.webp",
     "assets/combat/elixirslotpress_q85.webp",
