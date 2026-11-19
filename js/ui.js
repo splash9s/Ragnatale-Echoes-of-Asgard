@@ -6269,8 +6269,8 @@ function renderEventsView() {
     } else if (cur === 'tower') {
         const left = Math.max(0, 1 - (st.plays.tower || 0));
         body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p>`;
-        foot = `<div class="ev-tower-pick"><p class="ev-status">Unlimited attempts for now · ${towerPick.length} / 2 friends (optional)</p>${towerFriendsHTML()}${towerFormationHTML()}</div>`;
-        start = { can: eventCanPlay('tower'), js: `startTower(towerPick.slice(), towerOrder.slice())` };
+        foot = `<div class="ev-tower-pick"><p class="ev-status">Unlimited attempts for now · ${towerPick.length} / 2 friends (optional)</p>${towerFriendsHTML()}</div>`;
+        start = { can: eventCanPlay('tower'), js: `towerOpenArrange()` };
         if (towerFriends === null) loadTowerFriends();
     } else if (cur === 'endless') {
         body = `<p>Endless test map. 100x rewards, test only.</p>`;
@@ -6311,6 +6311,53 @@ function towerSlotName(id) {
     if (id === 'hero') return 'You';
     const friend = (towerFriends || []).find(f => f.user_id === towerPick[id === 'a1' ? 0 : 1]);
     return friend ? friend.name : 'Friend';
+}
+// After START: arrange who stands in front (the front takes the hits first). Going alone skips this step.
+let towerArrange = null; // ids front first, while the arrange window is open
+function towerOpenArrange() {
+    if (!eventCanPlay('tower')) return;
+    if (!towerPick.length) { startTower([], null); return; }
+    towerArrange = ['hero', ...towerPick.map((_, i) => 'a' + (i + 1))];
+    towerRenderArrange();
+}
+function towerMoveArrange(i, dir) {
+    const j = i + dir;
+    if (!towerArrange || j < 0 || j >= towerArrange.length) return;
+    [towerArrange[i], towerArrange[j]] = [towerArrange[j], towerArrange[i]];
+    towerRenderArrange();
+}
+function towerCancelArrange() { towerArrange = null; towerRenderArrange(); }
+function towerConfirmArrange() {
+    const order = towerArrange ? towerArrange.slice() : null;
+    towerArrange = null;
+    towerRenderArrange();
+    startTower(towerPick.slice(), order);
+}
+function towerRenderArrange() {
+    let ov = document.getElementById('tower-arrange');
+    if (!towerArrange) { if (ov) ov.remove(); return; }
+    if (!ov) { ov = document.createElement('div'); ov.id = 'tower-arrange'; document.body.appendChild(ov); }
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;';
+    const btn = 'padding:6px 12px;border-radius:8px;border:1px solid #c9a227;background:#3a2c1a;color:#f5e8c8;font-size:15px;cursor:pointer;';
+    const last = towerArrange.length - 1;
+    const rows = towerArrange.map((id, i) => {
+        const place = i === 0 ? 'Front' : i === last ? 'Back' : 'Middle';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin:6px 0;background:#2a2118;border:1px solid #6b5432;border-radius:8px;">
+            <span style="width:62px;color:#ffd45a;font-weight:700;">${place}</span>
+            <span style="flex:1;color:#fff;">${escapeHtml(towerSlotName(id))}</span>
+            <button style="${btn}${i === 0 ? 'opacity:.35;' : ''}" ${i === 0 ? 'disabled' : ''} onclick="towerMoveArrange(${i}, -1)">▲</button>
+            <button style="${btn}${i === last ? 'opacity:.35;' : ''}" ${i === last ? 'disabled' : ''} onclick="towerMoveArrange(${i}, 1)">▼</button>
+        </div>`;
+    }).join('');
+    ov.innerHTML = `<div style="width:min(440px,92vw);background:#1a140e;border:2px solid #c9a227;border-radius:12px;padding:18px;color:#f5e8c8;font-size:16px;">
+        <div style="font-size:22px;font-weight:700;text-align:center;margin-bottom:4px;">Arrange your party</div>
+        <div style="text-align:center;font-size:13px;opacity:.85;margin-bottom:8px;">The front takes the hits first.</div>
+        ${rows}
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+            <button style="${btn}" onclick="towerCancelArrange()">Cancel</button>
+            <button style="${btn}background:#7a5a1e;font-weight:700;" onclick="towerConfirmArrange()">Enter the Tower</button>
+        </div>
+    </div>`;
 }
 function towerFormationHTML() {
     if (towerPick.length !== 2) return '';
