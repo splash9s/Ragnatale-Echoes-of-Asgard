@@ -1887,8 +1887,16 @@ async function changeEarthLayers() {
     const nextFg = towerArt ? towerFgForFloor(currentStage) : (pick(bossFg ? [EARTH_BOSS_FG] : fgList) || null);
     await Promise.all([nextBg, nextBase, nextFg].filter(Boolean).map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
+    // Transitions into and out of a mini boss or boss midground go through black
+    const enteringBoss = bossFg && fg.dataset.bossMg !== '1';
+    const leavingBoss = fg.dataset.bossMg === '1' && !bossFg;
+    // Entering: the stage before the mini boss or boss fades its midground out to black first
+    if (enteringBoss) {
+        await earthMgFade(fg, fg.dataset.blur || '', 1, 0, 500);
+        if (token !== earthLayerToken) return;
+    }
     // Leaving a boss midground: it fades to black first (the other layers swap as before)
-    if (fg.dataset.bossMg === '1' && !bossFg) {
+    if (leavingBoss) {
         await earthMgFade(fg, fg.dataset.blur || '', 1, 0, 500);
         if (token !== earthLayerToken) return;
     }
@@ -1910,6 +1918,8 @@ async function changeEarthLayers() {
     // Boss midground fades in from black; the other midgrounds keep their plain filter
     fg.style.filter = bossFg ? [fgBlur, 'brightness(0)'].filter(Boolean).join(' ') : fgBlur;
     if (bossFg) earthMgFade(fg, fgBlur, 0, 1, 1200);
+    // Leaving: the stage after the mini boss or boss fades its midground in from black
+    if (leavingBoss) earthMgFade(fg, fgBlur, 0, 1, 1200);
     // Sunlight only on the forest (Earth) map: the glow and both shaft layers
     const isForest = nextBase.includes('/earth3d/');
     const light = document.getElementById('earth-light');
