@@ -8238,25 +8238,37 @@ function levelUpFxAnchor() {
 function playLevelUpFx() {
     levelUpFxTimers.forEach(clearTimeout);
     levelUpFxTimers = [];
-    let el = document.getElementById('levelup-fx');
-    if (!el) {
-        el = document.createElement('img');
-        el.id = 'levelup-fx';
-        el.alt = '';
-        el.setAttribute('aria-hidden', 'true');
-        document.body.appendChild(el);
-    }
-    // Sit on the player's feet, at the player's width
+    const old = document.getElementById('levelup-fx');
+    if (old) old.remove();
+    const el = document.createElement('img');
+    el.id = 'levelup-fx';
+    el.alt = '';
+    el.setAttribute('aria-hidden', 'true');
+    // Sit on the player's feet, at the player's width (70% bigger than the player)
     const anchor = levelUpFxAnchor();
     const r = anchor ? anchor.getBoundingClientRect() : null;
-    const w = (r ? r.width : Math.min(window.innerWidth * 0.38, 320)) * 1.7; // 70% bigger than the player
+    const w = (r ? r.width : Math.min(window.innerWidth * 0.38, 320)) * 1.7;
     const cx = r ? r.left + r.width / 2 : window.innerWidth / 2;
     const feet = (r ? r.bottom : window.innerHeight / 2 + w * 0.37) + 50; // 50px lower
-    el.style.cssText = `position:fixed; left:${cx}px; top:${feet}px; width:${w}px; height:auto; transform:translate(-50%, -100%); opacity:0; pointer-events:none; z-index:9000; transition:opacity 180ms ease-in-out;`;
+    let pos;
+    if (anchor) {
+        // Put it in the player's own layer, just before the sprite, so the player is drawn in front of it
+        anchor.parentElement.insertBefore(el, anchor);
+        el.style.position = 'absolute';
+        const op = el.offsetParent || document.body;
+        const orr = op.getBoundingClientRect();
+        const sc = (orr.width / (op.offsetWidth || orr.width)) || 1; // the stage may be scaled to fit the screen
+        pos = { position: 'absolute', left: (cx - orr.left) / sc, top: (feet - orr.top) / sc, w: w / sc, z: '' };
+    } else {
+        document.body.appendChild(el);
+        pos = { position: 'fixed', left: cx, top: feet, w, z: 'z-index:9000;' };
+    }
+    el.style.cssText = `position:${pos.position}; left:${pos.left}px; top:${pos.top}px; width:${pos.w}px; height:auto; transform:translate(-50%, -100%); opacity:0; pointer-events:none; ${pos.z} transition:opacity 180ms ease-in-out;`;
+    const LEVELUP_FX_OPACITY = 0.8;
     LEVELUP_FX_FRAMES.forEach((src, i) => {
         levelUpFxTimers.push(setTimeout(() => {
             if (el.getAttribute('src') !== src) el.setAttribute('src', src);
-            if (i === 0) el.style.opacity = '0.5'; // 50% opacity
+            if (i === 0) el.style.opacity = String(LEVELUP_FX_OPACITY);
         }, i * LEVELUP_FX_STEP_MS));
     });
     const end = LEVELUP_FX_FRAMES.length * LEVELUP_FX_STEP_MS;
