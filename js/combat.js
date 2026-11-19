@@ -2368,9 +2368,10 @@ function towerAllyFromSnapshot(snap) {
     return { name: snap.name || 'Friend', hp: maxHp, maxHp, atk };
 }
 let towerPendingAllies = null;
+let towerPendingOrder = null; // formation chosen on the Events page (front first)
 
 // Starts a Castle Tower run with two friends. One attempt per day.
-async function startTower(friendIds) {
+async function startTower(friendIds, order) {
     if (!eventCanPlay('tower')) {
         showModal("Castle Tower", "Already entered today. One attempt per day.");
         return;
@@ -2385,6 +2386,7 @@ async function startTower(friendIds) {
     const bad = res.find(r => !r.data);
     if (bad) { showModal("Castle Tower", bad.error || "Could not load your friends' tents."); return; }
     towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data));
+    towerPendingOrder = Array.isArray(order) && order.length === 3 ? order : null;
     if (!player.towerCooldowns) player.towerCooldowns = {};
     ids.forEach(id => { player.towerCooldowns[id] = Date.now(); });
     getEventState().plays.tower = (getEventState().plays.tower || 0) + 1;
@@ -2466,7 +2468,9 @@ function setupTowerParty() {
     const fallback = i => ({ name: `Friend ${i}`, hp: Math.max(1, Math.floor(d.maxHp * 0.7)), maxHp: Math.max(1, Math.floor(d.maxHp * 0.7)), atk: Math.max(1, Math.floor(d.atk * 0.7)) });
     const allies = towerPendingAllies || [fallback(1), fallback(2)];
     towerPendingAllies = null;
-    towerParty = { order: ['hero', 'a1', 'a2'], members: { a1: allies[0], a2: allies[1] } };
+    const order = towerPendingOrder || ['hero', 'a1', 'a2'];
+    towerPendingOrder = null;
+    towerParty = { order, members: { a1: allies[0], a2: allies[1] } };
 }
 
 // A hit on the front ally (returns true when the hit went to an ally)

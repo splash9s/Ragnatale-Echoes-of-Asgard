@@ -6259,8 +6259,8 @@ function renderEventsView() {
         start = { can: eventCanPlay(cur), js: `startEvent('${cur}','${pick}')` };
     } else if (cur === 'tower') {
         const left = Math.max(0, 1 - (st.plays.tower || 0));
-        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p><p class="ev-status">${left} / 1 attempt left today · ${towerPick.length} / 2 friends chosen</p>${towerFriendsHTML()}`;
-        start = { can: eventCanPlay('tower') && towerPick.length === 2, js: `startTower(towerPick.slice())` };
+        body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p><p class="ev-status">${left} / 1 attempt left today · ${towerPick.length} / 2 friends chosen</p>${towerFriendsHTML()}${towerFormationHTML()}`;
+        start = { can: eventCanPlay('tower') && towerPick.length === 2, js: `startTower(towerPick.slice(), towerOrder.slice())` };
         if (towerFriends === null) loadTowerFriends();
     } else if (cur === 'endless') {
         body = `<p>Endless test map. 100x rewards, test only.</p>`;
@@ -6284,6 +6284,29 @@ function renderEventsView() {
 let towerFriends = null;       // friend list for the picker (null until loaded)
 let towerFriendsLoading = false;
 let towerPick = [];            // user ids of the two chosen friends
+// Formation: who stands in front first. Ids: 'hero' is you, 'a1' and 'a2' are the chosen friends in pick order.
+const TOWER_ORDERS = [
+    ['hero', 'a1', 'a2'], ['hero', 'a2', 'a1'], ['a1', 'hero', 'a2'],
+    ['a1', 'a2', 'hero'], ['a2', 'hero', 'a1'], ['a2', 'a1', 'hero']
+];
+let towerOrder = ['hero', 'a1', 'a2'];
+function cycleTowerOrder() {
+    const i = TOWER_ORDERS.findIndex(p => p.join() === towerOrder.join());
+    towerOrder = TOWER_ORDERS[(i + 1) % TOWER_ORDERS.length].slice();
+    renderEventsView();
+}
+// Name of a formation slot for the picker label
+function towerSlotName(id) {
+    if (id === 'hero') return 'You';
+    const friend = (towerFriends || []).find(f => f.user_id === towerPick[id === 'a1' ? 0 : 1]);
+    return friend ? friend.name : 'Friend';
+}
+function towerFormationHTML() {
+    if (towerPick.length !== 2) return '';
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const label = towerOrder.map(id => esc(towerSlotName(id))).join(' → ');
+    return `<div class="ev-maps"><button class="ev-map" onclick="cycleTowerOrder()"><b>Formation (front first)</b><span>${label}</span></button></div>`;
+}
 async function loadTowerFriends() {
     if (towerFriendsLoading) return;
     towerFriendsLoading = true;
