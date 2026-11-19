@@ -89,7 +89,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'vip_pass', name: "VIP Pass (30 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 4000, type: 'vip', days: 30, icon: 'assets/shop/diamond/vip31.png' },
     { id: 'vip_7d', name: "VIP Pass (7 days)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 1200, type: 'vip', days: 7, icon: 'assets/shop/diamond/vip7.png' },
     { id: 'vip_1d', name: "VIP Pass (1 day)", desc: "Auto stage, 2x battle speed, Get Resurrection Potion everyday.", price: 200, type: 'vip', days: 1, icon: 'assets/shop/diamond/vip1.png' },
-    { id: 'pet_loyal_slime', name: "Orange Cat Pet", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 500, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp' },
+    { id: 'pet_loyal_slime', name: "Orange Stray Cat", desc: "ATK +2%, HP +100 (Thank you for your support!)", price: 500, type: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp' },
     { id: 'res_potion', name: "Resurrection Potion", price: 10, type: 'resurrection', desc: "Auto-revives you with full HP on death.", lore: "A charm of old magic that glows faintly. It pulls you back from death with full HP.", icon: 'assets/shop/diamond/resurrectionpotion.png' },
     { id: 'ref_stone_bundle', name: "Refining Stone Bundle (x5)", price: 80, type: 'material', qty: 5, desc: "Gain 5 Refining Stones for upgrading equipment.", icon: 'assets/shop/diamond/refiningstone.png' },
     { id: 'bs_rune_stone', name: "Blacksmith Rune Stone", price: 50, type: 'bs_rune', desc: "If a refine fails, the gear keeps its level. Used up when it saves a gear.", icon: 'assets/shop/diamond/blacksmithrunestone.png' },
@@ -1074,6 +1074,7 @@ function applyPlayerFrame(img, f, dy = 0) {
 const PET_SPRITES = {
     'Orange Cat Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Support Slime Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
+    'Orange Stray Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Orange Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
 };
 const COMBAT_PET_GAP_X = 120;
@@ -2781,6 +2782,28 @@ function renderVipMenu() {
             <img class="vm-press" src="assets/diamond/vip/ui/menu${c.plate}_p_q85.webp" alt="">
         </button>`).join('');
 }
+// Highlight page: the featured costume and pet cards, and the six featured items
+const VIP_HIGHLIGHT_CARDS = [
+    { id: 'dcostume_wanderer_samurai', title: 'assets/diamond/highlight/wanderer_title_v1_q90.webp', art: 'assets/costume/wanderer_samurai/base_v2_q90.webp', alt: 'Wanderer Samurai' },
+    { id: 'dcostume_yellow_samurai', title: 'assets/diamond/highlight/yellow_title_v1_q90.webp', art: 'assets/costume/yellow_samurai/base_v1_q90.webp', alt: 'Yellow Samurai' },
+    { id: 'pet_loyal_slime', title: 'assets/diamond/highlight/orange_title_v1_q90.webp', art: 'assets/combat/ocat/ocat1_q85.webp', alt: 'Orange Stray Cat' },
+];
+const VIP_HIGHLIGHT_ITEMS = ['dchest_costume', 'pet_box', 'vip_pass', 'vip_7d', 'vip_1d', 'res_potion'];
+function vipCellHTML(item) {
+    return `<div class="vip-cell">
+            <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
+            <div class="vip-price">${vipPriceTagHTML(item)}</div>
+        </div>`;
+}
+function vipHighlightHTML() {
+    const cards = VIP_HIGHLIGHT_CARDS.map(c => `
+        <button class="vh-card${vipSelected === c.id ? ' selected' : ''}" title="${escapeHtml(c.alt)}" onclick="vipSelect('${c.id}')">
+            <span class="vh-stage"><img class="vh-art" src="${c.art}" alt=""></span>
+            <img class="vh-title" src="${c.title}" alt="${escapeHtml(c.alt)}">
+        </button>`).join('');
+    const cells = VIP_HIGHLIGHT_ITEMS.map(id => DIAMOND_SHOP_ITEMS.find(i => i.id === id)).filter(Boolean).map(vipCellHTML).join('');
+    return `<div class="vh-wrap"><div class="vh-top">${cards}</div><div class="vh-bottom">${cells}</div></div>`;
+}
 function renderVipList() {
     const grid = document.getElementById('vip-grid');
     if (!grid) return;
@@ -2793,6 +2816,14 @@ function renderVipList() {
             </button>`).join('');
         grid.scrollLeft = keepLeft;
         vipPackArrows();
+        return;
+    }
+    if (vipCat === 'all') {
+        // Highlight: three featured cards on top, six featured items below
+        grid.classList.remove('vip-pack-row');
+        vipPackArrows();
+        grid.innerHTML = vipHighlightHTML();
+        grid.scrollTop = keepScroll;
         return;
     }
     grid.classList.remove('vip-pack-row');
@@ -2927,7 +2958,7 @@ function buyDiamondItem(itemId) {
             return;
         }
     } else if (player.diamonds < cost) {
-        floatNoticeAt("Not enough Diamonds", window.event);
+        diamondShortPopup();
         return;
     }
     if (item.type === 'bag' && bagSlotCount() >= BAG_MAX_SLOTS) {
@@ -3851,7 +3882,7 @@ const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: 
 const ITEM_ICON_RULES = [
     [/Pet Box/, 'assets/shop/diamond/silverchest.png'],
     [/Costume Box/, 'assets/shop/diamond/copperchest.png'],
-    [/Orange Cat( Pet)?|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
+    [/Orange (Stray )?Cat( Pet)?|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
@@ -4710,6 +4741,14 @@ function showGameConfirm(title, message, confirmLabel, onConfirm) {
     showModal(title, '', html, null);
     const yes = document.getElementById('game-confirm-yes');
     if (yes) yes.onclick = () => { closeModal(); onConfirm(); };
+}
+
+// Any action that needs more diamonds than the player has: offer the top-up page at its special price
+function diamondShortPopup() {
+    showGameConfirm('Not enough Diamonds', 'Do you want to top up now for special price?', 'Top up', () => {
+        vipCat = 'stone';
+        switchView('vip'); // opens the VIP shop on its Diamond tab
+    });
 }
 
 // Salvage All / Sell All confirm: a plain pop-up box (no dim background, no blur), item icons, bold text
@@ -6542,7 +6581,7 @@ function toggleEquippedFavorite(slot) {
 
 // Boxes: a random reward from the box's pool. A costume box with no costumes yet stays unopened.
 const PET_BOX_POOL = [
-    { name: "Orange Cat Pet", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100" },
+    { name: "Orange Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, desc: "ATK +2%, HP +100" },
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },

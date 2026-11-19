@@ -269,7 +269,7 @@ async function sendFriendGift(idx) {
 async function restoreFriendStreak(idx) {
     const f = friendState.friends[idx];
     if (!f) return;
-    if ((player.diamonds || 0) < 1) { setFriendStatus('You need 1 diamond to continue this streak.', true); return; }
+    if ((player.diamonds || 0) < 1) { diamondShortPopup(); return; }
     const res = await friendApi.restoreStreak(f.user_id);
     if (res.error) { setFriendStatus(res.error, true); return; }
     player.diamonds -= 1;
