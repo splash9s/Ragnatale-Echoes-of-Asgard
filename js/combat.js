@@ -2434,8 +2434,11 @@ function towerSetSixMonsters() {
     // Floor 1 uses the campaign Lv 10 roster at level 10; later floors use the tower roster
     const lv10 = currentStage === 1 && GAME_DATA.maps.map10;
     const pool = lv10 ? lv10.enemies : activeMap.enemies;
-    const lvl = lv10 ? lv10.levelReq : activeMap.levelReq;
-    const boss = monstersList.find(m => m.isBoss);
+    // Floors 2+: regular monsters use the level 1 curve, times the floor factor
+    const lvl = lv10 ? lv10.levelReq : 1;
+    // Boss: the boss curve from level 1 (floor 2) up to level 99 (floor 21), spread evenly over the boss floors
+    const bossIdx = Math.max(0, TOWER_BOSS_FLOORS.indexOf(currentStage));
+    const bossLvl = Math.round(1 + bossIdx * 98 / (TOWER_BOSS_FLOORS.length - 1));
     const plan = isBossStage()
         ? ['front', 'front', 'boss', 'back', 'healer', 'healer']
         : ['front', 'front', 'front', 'back', 'back', 'back'];
@@ -2447,7 +2450,7 @@ function towerSetSixMonsters() {
         return scaledUnit(makeUnit(levelScaled(picked, lvl), 1));
     };
     const slots = plan.map((p, i) => {
-        if (p === 'boss') { if (!boss) return null; boss.lineupSlot = i; return boss; }
+        if (p === 'boss') { if (!activeMap.boss) return null; const boss = makeBoss(curveBoss(activeMap.boss, bossLvl)); boss.lineupSlot = i; return boss; }
         const unit = p === 'front' ? make(Math.random() < 0.5 ? 'melee' : 'tank')
             : p === 'healer' ? make('healer')
             : make(Math.random() < 0.5 ? 'range' : 'mage');
