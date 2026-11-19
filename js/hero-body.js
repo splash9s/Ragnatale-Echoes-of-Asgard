@@ -2408,6 +2408,13 @@ const COSTUME_SETS = {
       attack02: { src: 'assets/costume/blue_samurai/attack02_v1_q90.webp', w: 451, h: 384, fx: 114.7, fy: 382.0, tx: 191.7 },
       fall: { src: 'assets/costume/blue_samurai/fall_v1_q90.webp', w: 366, h: 317, fx: 281.2, fy: 315.0, tx: 151.0 },
       critical02: { src: 'assets/costume/blue_samurai/critical02_v1_q90.webp', w: 424, h: 365, fx: 131.0, fy: 363.0, tx: 205.5 },
+      // Animation 3: four base-pose frames (kept for the idle loop; the single base frame above is still the idle pose)
+      base3: [
+        { src: 'assets/costume/blue_samurai/base3_1_v1_q90.webp', w: 358, h: 399, fx: 63.7, fy: 397.0, tx: 185.3 },
+        { src: 'assets/costume/blue_samurai/base3_2_v1_q90.webp', w: 463, h: 388, fx: 271.4, fy: 386.0, tx: 334.0 },
+        { src: 'assets/costume/blue_samurai/base3_3_v1_q90.webp', w: 420, h: 408, fx: 334.9, fy: 406.0, tx: 289.5 },
+        { src: 'assets/costume/blue_samurai/base3_4_v1_q90.webp', w: 424, h: 371, fx: 119.4, fy: 369.0, tx: 164.9 },
+      ],
   },
   wanderer_samurai: {
       attack: { src: 'assets/costume/wanderer_samurai/attack_v2_q90.webp', w: 483, h: 383, fx: 164.2, fy: 381.0, tx: 307.5 },
