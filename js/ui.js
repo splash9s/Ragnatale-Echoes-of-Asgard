@@ -6562,13 +6562,15 @@ function stashStyles() {
     const st = document.createElement('style');
     st.id = 'stash-style';
     st.textContent = '.stash-wrap { display: flex; flex-direction: column; gap: 8px; text-align: left; }'
-        + ' .stash-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: start; }'
+        + ' .stash-cols { display: grid; grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr); align-items: start; }'
+        + ' .stash-mid { align-self: center; display: flex; justify-content: center; }'
+        + ' .stash-mid svg { width: 30px; height: auto; animation: stashArrowSwing 1.2s ease-in-out infinite; }'
+        + ' @keyframes stashArrowSwing { 0%, 100% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }'
         + ' .stash-col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }'
         + ' .stash-title { font-size: 12px; font-weight: 800; color: #fbbf24; margin: 0; }'
-        + ' .stash-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; justify-items: center; }'
-        + ' .stash-grid.bag { max-height: 52vh; overflow-y: auto; padding: 2px; }'
+        + ' .stash-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-height: 52vh; overflow-y: auto; padding: 2px; }'
         // Same slot graphic as the bag, 40% smaller (bag cell is 108 x 104)
-        + ' .stash-slot { position: relative; width: 100%; max-width: 65px; aspect-ratio: 108 / 104; padding: 0; border: 0; background-color: transparent; background-image: url("assets/pages/character/inventoryslot2.png"); background-size: 100% 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }'
+        + ' .stash-slot { position: relative; width: 100%; aspect-ratio: 108 / 104; padding: 0; border: 0; background-color: transparent; background-image: url("assets/pages/character/inventoryslot2.png"); background-size: 100% 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; }'
         + ' .stash-slot:hover { filter: brightness(1.1); }'
         + ' .stash-slot.sel { box-shadow: inset 0 0 0 3px #e6b422, 0 0 8px #f5c542; }'
         + ' .stash-slot .qty { position: absolute; right: 3px; bottom: 2px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px #000, 0 0 3px #000; pointer-events: none; }'
@@ -6599,9 +6601,10 @@ function openStash() {
                 <p class="stash-title">Stash · ${stashUsed}/${STASH_SLOTS}</p>
                 <div class="stash-grid">${stashCells}</div>
             </div>
+            <div class="stash-mid" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 12 H38 M2 12 L10 4 M2 12 L10 20 M38 12 L30 4 M38 12 L30 20" stroke="#fbbf24" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             <div class="stash-col">
                 <p class="stash-title">Bag · ${bagUsed}/${bagSlotCount()}</p>
-                <div class="stash-grid bag">${bagCells}</div>
+                <div class="stash-grid">${bagCells}</div>
             </div>
         </div>
         <p class="text-[10px] text-slate-500">Tap to move an item. Hold or hover for details.</p>
