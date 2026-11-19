@@ -1707,7 +1707,7 @@ function earthNewArt() {
     };
 }
 const EARTH_BOSS_FG = 'assets/combat/earth3d/mgnew3_v2_q90.webp';
-// Castle Tower art: one background and base for the whole tower, and a midground for each band of floors
+// Warded Tower art: one background and base for the whole tower, and a midground for each band of floors
 const TOWER_ART = { bg: 'assets/combat/castle/bg_q90.webp', base: 'assets/combat/castle/baselayer_q90.webp' };
 function towerFgForFloor(f) {
     if (f <= 6) return 'assets/combat/castle/mg1_q90.webp';
@@ -5308,7 +5308,7 @@ async function claimMail(mailId) {
     if (gear) addItemToInventory(gear);
     if (bossHelm) addItemToInventory(bossHelm);
     marketItems.forEach(it => addItemToInventory(JSON.parse(JSON.stringify(it))));
-    // Castle Tower share: planks, refine ore and elemental stones
+    // Warded Tower share: planks, refine ore and elemental stones
     if (mail.rewards.planks) addItemToInventory({ ...PLANK_ITEM, qty: mail.rewards.planks });
     if (mail.rewards.refineOre) addItemToInventory({ ...REFINE_MATERIAL_ITEMS[2], qty: mail.rewards.refineOre });
     if (mail.rewards.elementStones) {
@@ -5857,7 +5857,7 @@ function updateUI() {
     if (typeof applyHomeArt === 'function') applyHomeArt(); // tent and pet house levels show on screen
     // Wanderer Samurai: a 2px black outline on every pose (CSS, so it stays 2px at any size)
     document.body.classList.toggle('samurai-worn', !!(player.equipped && player.equipped.costume && player.equipped.costume.costumeId === 'wanderer_samurai'));
-    if (typeof towerRenderParty === 'function') towerRenderParty(); // Castle Tower party strip
+    if (typeof towerRenderParty === 'function') towerRenderParty(); // Warded Tower party strip
     if (typeof renderCreateStats === 'function') renderCreateStats(); // character select stat window
     syncHeroSprites();
     if (typeof updateQuestTabButton === 'function') updateQuestTabButton();
@@ -6204,7 +6204,7 @@ const EVENT_MENU = [
     { key: 'daily',    label: 'Daily Challenge', banner: 'assets/events/banner_daily_q85.webp' },
     { key: 'gold',     label: 'Gold Frenzy',     banner: 'assets/events/banner_gold_q85.webp' },
     { key: 'xp',       label: 'Wisdom Trail',    banner: 'assets/events/banner_xp_q85.webp' },
-    { key: 'tower',    label: 'Castle Tower',    banner: null },
+    { key: 'tower',    label: 'Warded Tower',    banner: null },
     { key: 'endless',  label: 'Void Tower',      banner: null },
     { key: 'voidtest', label: 'Void Test Map',   banner: null },
     { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
