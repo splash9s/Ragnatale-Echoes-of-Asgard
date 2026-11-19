@@ -3964,13 +3964,11 @@ function itemIconHTML(item, size = 70) {
         return `<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     }
     if (item && item.type === 'chest' && item.chestType) return chestIconHTML(item.chestType, size);
-    // Wanderer Samurai: a true 2px black outline at any display size (the file's own border shrinks when scaled down)
-    const outline = item && item.costumeId === 'wanderer_samurai' ? 'filter:drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);' : '';
     if (item && item.type === 'estone' && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     // A costume taken from an older save may hold a retired icon path: use the current icon from the costume list
     const costumeTpl = item && item.costumeId ? COSTUME_BOX_POOL.find(c => c.costumeId === item.costumeId) : null;
     const costumeSrc = (costumeTpl && costumeTpl.icon) || (item && item.icon);
-    if (item && item.costumeId && costumeSrc) return `<img src="${costumeSrc}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;${outline}" />`;
+    if (item && item.costumeId && costumeSrc) return `<img src="${costumeSrc}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
@@ -7061,9 +7059,9 @@ const COSTUME_TENT = {
     wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_v2_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_v2_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_v2_q90.webp' }
 };
 // Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
-// 'scale' resizes the pose (stand 5% smaller, sit 25% bigger, sleep 20% bigger)
+// 'scale' resizes the pose (each pose is 5% smaller than before this change)
 const COSTUME_TENT_LAYOUT = {
-    wanderer_samurai: { stand: { scale: 0.95 }, sit: { scale: 1.25, aspect: 274 / 228 }, sleep: { scale: 1.2, aspect: 374 / 223 } }
+    wanderer_samurai: { stand: { scale: 0.9025 }, sit: { scale: 1.1875, aspect: 274 / 228 }, sleep: { scale: 1.14, aspect: 374 / 223 } }
 };
 function costumeTentLayout(pose) {
     const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
