@@ -2298,7 +2298,7 @@ function getEventState() {
 function eventCanPlay(kind) {
     const st = getEventState();
     if (kind === 'daily' && st.dailyCleared) return false;
-    if (kind === 'tower') return (st.plays.tower || 0) < 1; // Warded Tower: one attempt per day
+    if (kind === 'tower') return true; // Warded Tower: unlimited attempts for now
     return st.plays[kind] < EVENT_LIMIT;
 }
 

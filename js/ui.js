@@ -1895,8 +1895,9 @@ async function changeEarthLayers() {
     // New Earth art: the front trees sit between the far mountains and the ground, and the far mountains get a live blur
     const is3d = nextBase.includes('/earth3d/') || nextBase.includes('/fire3d/') || nextBase.includes('/ice3d/') || nextBase.includes('/wind3d/') || nextBase.includes('/yggdrasil3d/');
     const isNewEarth = is3d || nextBase.includes('/earth1/');
-    base.style.zIndex = isNewEarth ? '2' : '';
-    fg.style.zIndex = isNewEarth ? '1' : '';
+    // Castle Tower: the base (pillars and arches) sits above its opaque midground
+    base.style.zIndex = isNewEarth || towerArt ? '2' : '';
+    fg.style.zIndex = isNewEarth || towerArt ? '1' : '';
     bg.style.filter = is3d ? 'blur(2.5px)' : isNewEarth ? 'blur(3px)' : '';
     const fgBlur = is3d ? 'blur(1px)' : '';
     fg.dataset.blur = fgBlur;
@@ -6268,7 +6269,7 @@ function renderEventsView() {
     } else if (cur === 'tower') {
         const left = Math.max(0, 1 - (st.plays.tower || 0));
         body = `<p>${TOWER_FLOORS} floors in the castle. Monsters grow stronger on every floor. Bring two friends. Each friend can join again 3 days after a run. You are paid for each floor you clear.</p>`;
-        foot = `<div class="ev-tower-pick"><p class="ev-status">${left} / 1 attempt left today · ${towerPick.length} / 2 friends chosen (optional, you can go alone)</p>${towerFriendsHTML()}${towerFormationHTML()}</div>`;
+        foot = `<div class="ev-tower-pick"><p class="ev-status">Unlimited attempts for now · ${towerPick.length} / 2 friends (optional)</p>${towerFriendsHTML()}${towerFormationHTML()}</div>`;
         start = { can: eventCanPlay('tower'), js: `startTower(towerPick.slice(), towerOrder.slice())` };
         if (towerFriends === null) loadTowerFriends();
     } else if (cur === 'endless') {
@@ -6331,7 +6332,7 @@ function toggleTowerFriend(id) {
 }
 function towerFriendsHTML() {
     if (towerFriends === null) return '<p class="ev-status">Loading friends…</p>';
-    if (!towerFriends.length) return '<p class="ev-status">No friends yet. You can still go alone, or add friends to bring them along.</p>';
+    if (!towerFriends.length) return '<p class="ev-status">No friends yet. Go alone, or add friends.</p>';
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     return `<div class="ev-maps">${towerFriends.map(f => {
         const on = towerPick.includes(f.user_id);
