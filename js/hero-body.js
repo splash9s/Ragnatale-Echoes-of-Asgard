@@ -2400,6 +2400,15 @@ const COSTUME_SETS = {
       fall: { src: 'assets/costume/christmas/fall_v4_q90.webp', w: 430, h: 291, fx: 339, fy: 289, tx: 255.5 },
       critical02: { src: 'assets/costume/christmas/critical02_v4_q90.webp', w: 460, h: 359, fx: 134, fy: 357, tx: 253 },
   },
+  blue_samurai: {
+      attack: { src: 'assets/costume/blue_samurai/attack_v1_q90.webp', w: 358, h: 399, fx: 62.0, fy: 397.0, tx: 184.6 },
+      critical: { src: 'assets/costume/blue_samurai/critical_v1_q90.webp', w: 464, h: 385, fx: 272.1, fy: 383.0, tx: 335.2 },
+      base: { src: 'assets/costume/blue_samurai/base_v1_q90.webp', w: 430, h: 409, fx: 344.1, fy: 407.0, tx: 297.4 },
+      block: { src: 'assets/costume/blue_samurai/block_v1_q90.webp', w: 420, h: 367, fx: 113.6, fy: 365.0, tx: 162.7 },
+      attack02: { src: 'assets/costume/blue_samurai/attack02_v1_q90.webp', w: 451, h: 384, fx: 114.7, fy: 382.0, tx: 191.7 },
+      fall: { src: 'assets/costume/blue_samurai/fall_v1_q90.webp', w: 366, h: 317, fx: 281.2, fy: 315.0, tx: 151.0 },
+      critical02: { src: 'assets/costume/blue_samurai/critical02_v1_q90.webp', w: 424, h: 365, fx: 131.0, fy: 363.0, tx: 205.5 },
+  },
   wanderer_samurai: {
       attack: { src: 'assets/costume/wanderer_samurai/attack_v2_q90.webp', w: 483, h: 383, fx: 164.2, fy: 381.0, tx: 307.5 },
       critical: { src: 'assets/costume/wanderer_samurai/critical_v2_q90.webp', w: 380, h: 382, fx: 108.1, fy: 380.0, tx: 237.0 },
