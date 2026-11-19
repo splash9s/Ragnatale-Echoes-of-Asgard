@@ -3058,7 +3058,8 @@ function renderTransferUI() {
     const statusEl = document.getElementById('bs-transfer-status');
     if (statusEl) statusEl.innerHTML = `${msg}<div class="text-[11px] text-slate-400 mt-1">Costs ${REFINE_TRANSFER_COST} Blacksmith Rune Stone (you have ${runes}).</div>`;
     const btn = document.getElementById('bs-refine');
-    if (btn) { btn.innerHTML = 'Transfer'; btn.disabled = !ok; btn.style.opacity = ok ? '1' : '.5'; btn.classList.remove('guide-flash-link'); }
+    if (btn) { btn.innerHTML = 'Transfer'; btn.style.fontSize = '24px'; btn.disabled = !ok; btn.style.opacity = ok ? '1' : '.5'; btn.classList.remove('guide-flash-link'); }
+    renderRuneSlot();
 }
 function transferConfirm() {
     const from = transferGearAt(blacksmithTransfer.from), to = transferGearAt(blacksmithTransfer.to);
@@ -3135,7 +3136,7 @@ function refineSuccessRate(lv) {
 }
 // Rune Stone slot works like an equip slot: click to equip one stone from stock (it leaves the stock), click again to unequip it back to stock
 function blacksmithToggleRune() {
-    if (blacksmithMode === 'elemental') return; // the rune slot shows the picked element stone here
+    if (blacksmithMode !== 'refine') return; // elemental and transfer modes use this slot for display only
     if (!player.blacksmithRuneEquipped) {
         if ((player.blacksmithRuneStones || 0) < 1) {
             showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
@@ -3172,6 +3173,11 @@ function blacksmithRefineSelected() {
 function renderRuneSlot() {
     const runeEl = document.getElementById('blacksmith-rune-slot');
     const balEl = document.getElementById('bs-rune-balance');
+    if (blacksmithMode === 'transfer') {
+        // Refine Transfer: the stone held, shown in the middle on an inventory slot (not clickable here)
+        if (runeEl) runeEl.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; color:#f5e6c4; text-shadow:0 1px 2px #000;"><img src="assets/shop/diamond/blacksmithrunestone.png" alt="" style="width:38px;height:38px;object-fit:contain;"><span style="font-size:12px; font-weight:800; line-height:1.1;">x${player.blacksmithRuneStones || 0}</span></div>`;
+        return;
+    }
     if (blacksmithMode === 'elemental') {
         // Elemental mode: this slot shows the picked element stone and how many are held
         const stones = player.elementStones || {};
@@ -3221,6 +3227,7 @@ function renderBlacksmithSlot() {
         refineBtn.disabled = isMax;
         refineBtn.style.opacity = isMax ? '.5' : '1';
         refineBtn.innerHTML = isMax ? 'MAX LEVEL' : (refineIsFree() ? 'Refine FREE' : `Refine ${cost} Gold`);
+        refineBtn.style.fontSize = '12px';
         refineBtn.classList.toggle('guide-flash-link', !isMax && refineIsFree());
     }
 }
@@ -3289,8 +3296,8 @@ function renderBlacksmithChrome() {
     showEl('bs-rules-transfer', transfer, 'block');
     showEl('blacksmith-gear-slot', !transfer, 'flex');
     showEl('bs-success-rate', !transfer);
-    showEl('blacksmith-rune-slot', !transfer, 'flex');
-    showEl('bs-rune-balance', !transfer, 'flex');
+    showEl('blacksmith-rune-slot', true, 'flex');
+    showEl('bs-rune-balance', false);
     const listEl = document.getElementById('refining-slots-container');
     if (listEl) { listEl.style.maxHeight = transfer ? '680px' : ''; listEl.style.overflowY = transfer ? 'auto' : ''; }
     ['refine', 'elemental', 'transfer'].forEach(m => {
