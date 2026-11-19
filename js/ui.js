@@ -7076,7 +7076,7 @@ const COSTUME_TENT = {
 // Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
 // 'scale' resizes the pose (each pose is 5% smaller than before this change)
 const COSTUME_TENT_LAYOUT = {
-    blue_samurai: { sit: { scale: 1.1875, aspect: 402 / 416 }, sleep: { scale: 1.14, aspect: 644 / 350 } },
+    blue_samurai: { stand: { scale: 0.9025 }, sit: { scale: 0.955, aspect: 402 / 416 }, sleep: { scale: 1.25, aspect: 644 / 350 } },
     wanderer_samurai: { stand: { scale: 0.9025 }, sit: { scale: 1.1875, aspect: 274 / 228 }, sleep: { scale: 1.14, aspect: 374 / 223 } }
 };
 function costumeTentLayout(pose) {
