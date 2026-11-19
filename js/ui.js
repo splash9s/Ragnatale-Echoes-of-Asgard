@@ -1705,7 +1705,7 @@ function earthNewArt() {
         layouts: { 'e1base': flatLayout(feet, monsterFeet) }
     };
 }
-const EARTH_BOSS_FG = 'assets/combat/earth3d/mgnew3_q90.webp';
+const EARTH_BOSS_FG = 'assets/combat/earth3d/mgnew3_v2_q90.webp';
 const COMBAT_ART = {
     earth: EARTH_ART_MODE === '3d' ? earth3dArt() : EARTH_ART_MODE === 'e1' ? earthNewArt() : flatArt('earth', [500, 650], [[800, 680], [950, 680], [1150, 670], [1350, 670], [1550, 670], [1750, 650]]),
     fire: FIRE_ART_MODE === '3d' ? fire3dArt() : flatArt('fire', [500, 650], [[800, 650], [950, 650], [1150, 670], [1350, 670], [1550, 620], [1700, 620]]),
@@ -1844,6 +1844,19 @@ function scheduleSpiritMotes() {
     }, 700 + Math.random() * 2800); // random gap between 0.7 and 3.5 s
 }
 scheduleSpiritMotes();
+// Fades only the midground (foreground) layer's brightness, keeping its blur: from -> to (1 = normal, 0 = black)
+function earthMgFade(el, blur, from, to, ms) {
+    return new Promise(resolve => {
+        const t0 = performance.now();
+        const step = now => {
+            const k = Math.min(1, (now - t0) / ms);
+            const b = (from + (to - from) * k).toFixed(3);
+            el.style.filter = [blur, `brightness(${b})`].filter(Boolean).join(' ');
+            if (k < 1) requestAnimationFrame(step); else resolve();
+        };
+        requestAnimationFrame(step);
+    });
+}
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
     if (!bg || !base || !fg) { document.getElementById('view-combat')?.classList.remove('art-loading'); return; }
@@ -1858,6 +1871,11 @@ async function changeEarthLayers() {
     const nextBg = pick(art.bg), nextBase = pick(art.base), nextFg = pick(bossFg ? [EARTH_BOSS_FG] : fgList) || null;
     await Promise.all([nextBg, nextBase, nextFg].filter(Boolean).map(preloadCombatImage));
     if (token !== earthLayerToken) return; // a newer stage has started
+    // Leaving a boss midground: it fades to black first (the other layers swap as before)
+    if (fg.dataset.bossMg === '1' && !bossFg) {
+        await earthMgFade(fg, fg.dataset.blur || '', 1, 0, 500);
+        if (token !== earthLayerToken) return;
+    }
     bg.src = nextBg;
     base.src = nextBase;
     // No foreground: keep a valid 1x1 transparent image (an empty src fires an error) and hide it
@@ -1869,7 +1887,12 @@ async function changeEarthLayers() {
     base.style.zIndex = isNewEarth ? '2' : '';
     fg.style.zIndex = isNewEarth ? '1' : '';
     bg.style.filter = is3d ? 'blur(2.5px)' : isNewEarth ? 'blur(3px)' : '';
-    fg.style.filter = is3d ? 'blur(1px)' : '';
+    const fgBlur = is3d ? 'blur(1px)' : '';
+    fg.dataset.blur = fgBlur;
+    fg.dataset.bossMg = bossFg ? '1' : '0';
+    // Boss midground fades in from black; the other midgrounds keep their plain filter
+    fg.style.filter = bossFg ? [fgBlur, 'brightness(0)'].filter(Boolean).join(' ') : fgBlur;
+    if (bossFg) earthMgFade(fg, fgBlur, 0, 1, 1200);
     // Sunlight only on the forest (Earth) map: the glow and both shaft layers
     const isForest = nextBase.includes('/earth3d/');
     const light = document.getElementById('earth-light');
