@@ -529,6 +529,7 @@ function selectRuneChoice(runeId, callback) {
 // ---------- EXPEDITION SETUP ----------
 function startExpedition(mode, opts = {}) {
     armorBrokenThisMap = false; // a new map gets its first Armor Break again
+    towerParty = null; // only the Castle Tower sets a party
     if (mode === 'campaign' && typeof guideIntroDone === 'function') guideIntroDone(); // first campaign run ends the intro guide
     if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
         showModal("World-Eater", "Locked.");
@@ -599,6 +600,7 @@ function startExpedition(mode, opts = {}) {
         logMessage(`[Event] ${cfg.name}: entering ${activeMap.title}.`, 'winlose');
     } else if (mode === 'tower') {
         activeMap = buildTowerMap();
+        setupTowerParty();
         currentStage = 1;
         maxStages = TOWER_FLOORS;
         if (tagEl) tagEl.innerText = "Castle Tower";
@@ -1436,6 +1438,11 @@ function onPlayerDodged(m, source) {
 let armorBrokenThisMap = false;
 
 function takePlayerDamage(dmg, m, ignoreArmor = false) {
+    // Castle Tower: while an ally is in front, the hit goes to that ally instead of the hero
+    if (towerIsActive()) {
+        const front = towerFront();
+        if (front && front !== 'hero') { towerHitAlly(front, dmg, m); return; }
+    }
     playPlayerReactAnim('block');
     flashPlayerHurt();
     lastHitBy = m.name;
@@ -1664,7 +1671,7 @@ function monsterTurnTick() {
     if (combatPaused) return;
     const derived = getDerivedStats();
     let alive = getAliveMonsters();
-    if (alive.length === 0 || player.hp <= 0) return;
+    if (alive.length === 0 || (player.hp <= 0 && !towerAnyAlive())) return;
     // ---- Monster turn (every living monster attacks) ----
     tickPlayerDebuffs();
     alive.forEach((m, i) => monsterAct(m, derived, i));
@@ -1676,7 +1683,8 @@ function monsterTurnTick() {
         return;
     }
 
-    if (player.hp <= 0) {
+    // Castle Tower: the hero being down is not a defeat while an ally still stands
+    if (player.hp <= 0 && !towerAnyAlive()) {
         if (player.runes.angelOfDeath && !player.angelUsedThisRun) {
             player.angelUsedThisRun = true;
             player.hp = derived.maxHp;
@@ -1757,9 +1765,14 @@ function runCombatTick() {
         if (monstersList.length > 0) onStageCleared();
         return;
     }
-    if (player.hp <= 0) return;
+    if (player.hp <= 0) { if (towerIsActive()) towerAllyAttacks(); return; }
 
     attackCount++;
+    if (towerIsActive()) {
+        towerAllyAttacks();
+        alive = getAliveMonsters(); // allies may have finished the stage's last monster
+        if (alive.length === 0) return;
+    }
     tickEnemyStatuses(combatTickMs(derived));
 
     // ---- Player attack ----
@@ -2343,6 +2356,72 @@ function startTower() {
     getEventState().plays.tower = (getEventState().plays.tower || 0) + 1;
     saveGame();
     startExpedition('tower');
+}
+
+// ---------- CASTLE TOWER PARTY ----------
+// The party is the hero plus two allies. Each has its own HP. order[0] is the front:
+// monsters hit the first living member in order, and every living ally attacks each combat tick.
+// The hero is down when player.hp is 0; the run ends only when the whole party is down.
+let towerParty = null; // { order: ['hero','a1','a2'], members: { a1: {name,hp,maxHp,atk}, a2: {...} } }
+function towerIsActive() { return currentMode === 'tower' && !!towerParty; }
+function towerMemberAlive(id) { return id === 'hero' ? player.hp > 0 : towerParty.members[id].hp > 0; }
+function towerFront() { return towerParty ? towerParty.order.find(towerMemberAlive) || null : null; }
+function towerAnyAlive() { return !!towerParty && towerParty.order.some(towerMemberAlive); }
+
+// Stub allies until the friend party is wired: 70% of the hero's HP and ATK
+function setupTowerParty() {
+    const d = getDerivedStats();
+    const mk = (name, f) => {
+        const maxHp = Math.max(1, Math.floor(d.maxHp * f));
+        return { name, hp: maxHp, maxHp, atk: Math.max(1, Math.floor(d.atk * f)) };
+    };
+    towerParty = { order: ['hero', 'a1', 'a2'], members: { a1: mk('Friend 1', 0.7), a2: mk('Friend 2', 0.7) } };
+}
+
+// A hit on the front ally (returns true when the hit went to an ally)
+function towerHitAlly(id, dmg, m) {
+    const a = towerParty.members[id];
+    a.hp = Math.max(0, a.hp - dmg);
+    logMessage(`[Tower] ${m.name} hits ${a.name} for ${dmg} damage`, 'combat');
+    if (a.hp <= 0) logMessage(`[Tower] ${a.name} falls! The next in line takes the front.`, 'winlose');
+}
+
+// Each living ally attacks the first living monster on a combat tick
+function towerAllyAttacks() {
+    if (!towerIsActive()) return;
+    towerParty.order.forEach(id => {
+        if (id === 'hero') return;
+        const a = towerParty.members[id];
+        if (!a || a.hp <= 0) return;
+        const t = getAliveMonsters()[0];
+        if (!t) return;
+        const dmg = Math.max(1, Math.floor(a.atk * (0.8 + Math.random() * 0.4) * 100 / (100 + (t.def || 0))));
+        t.hp -= dmg;
+        logMessage(`[Tower] ${a.name} hits ${t.name} for ${dmg} damage`, 'combat');
+    });
+}
+
+// Party strip above the battle: front member marked, DOWN when fallen
+function towerRenderParty() {
+    let el = document.getElementById('tower-party');
+    if (!towerIsActive()) { if (el) el.remove(); return; }
+    const host = document.getElementById('view-combat');
+    if (!host) return;
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'tower-party';
+        el.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:20;font-size:13px;color:#fff;background:rgba(0,0,0,.55);padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none';
+        host.appendChild(el);
+    }
+    const d = getDerivedStats();
+    const front = towerFront();
+    el.textContent = towerParty.order.map(id => {
+        const alive = towerMemberAlive(id);
+        const name = id === 'hero' ? 'You' : towerParty.members[id].name;
+        const hp = id === 'hero' ? player.hp : towerParty.members[id].hp;
+        const max = id === 'hero' ? d.maxHp : towerParty.members[id].maxHp;
+        return `${id === front ? '▶ ' : ''}${name} ${alive ? `${hp}/${max}` : 'DOWN'}`;
+    }).join('  ·  ');
 }
 
 // Campaign-style map with the event modifiers applied to every enemy
