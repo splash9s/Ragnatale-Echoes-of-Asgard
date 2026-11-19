@@ -2401,13 +2401,13 @@ const COSTUME_SETS = {
       critical02: { src: 'assets/costume/christmas/critical02_v4_q90.webp', w: 460, h: 359, fx: 134, fy: 357, tx: 253 },
   },
   wanderer_samurai: {
-      attack: { src: 'assets/costume/wanderer_samurai/attack_q90.webp', w: 483, h: 383, fx: 164.2, fy: 381.0, tx: 307.5 },
-      critical: { src: 'assets/costume/wanderer_samurai/critical_q90.webp', w: 380, h: 382, fx: 108.1, fy: 380.0, tx: 237.0 },
-      base: { src: 'assets/costume/wanderer_samurai/base_q90.webp', w: 376, h: 409, fx: 311.8, fy: 407.0, tx: 231.1 },
-      block: { src: 'assets/costume/wanderer_samurai/block_q90.webp', w: 329, h: 364, fx: 80.9, fy: 362.0, tx: 182.6 },
-      attack02: { src: 'assets/costume/wanderer_samurai/critical02_q90.webp', w: 488, h: 352, fx: 153.7, fy: 350.0, tx: 192.4 },
-      fall: { src: 'assets/costume/wanderer_samurai/fall_q90.webp', w: 377, h: 316, fx: 160.3, fy: 314.0, tx: 196.6 },
-      critical02: { src: 'assets/costume/wanderer_samurai/attack02_q90.webp', w: 488, h: 388, fx: 117.5, fy: 386.0, tx: 222.2 },
+      attack: { src: 'assets/costume/wanderer_samurai/attack_v2_q90.webp', w: 483, h: 383, fx: 164.2, fy: 381.0, tx: 307.5 },
+      critical: { src: 'assets/costume/wanderer_samurai/critical_v2_q90.webp', w: 380, h: 382, fx: 108.1, fy: 380.0, tx: 237.0 },
+      base: { src: 'assets/costume/wanderer_samurai/base_v2_q90.webp', w: 376, h: 409, fx: 311.8, fy: 407.0, tx: 231.1 },
+      block: { src: 'assets/costume/wanderer_samurai/block_v2_q90.webp', w: 329, h: 364, fx: 80.9, fy: 362.0, tx: 182.6 },
+      attack02: { src: 'assets/costume/wanderer_samurai/critical02_v2_q90.webp', w: 488, h: 352, fx: 153.7, fy: 350.0, tx: 192.4 },
+      fall: { src: 'assets/costume/wanderer_samurai/fall_v2_q90.webp', w: 377, h: 316, fx: 160.3, fy: 314.0, tx: 196.6 },
+      critical02: { src: 'assets/costume/wanderer_samurai/attack02_v2_q90.webp', w: 488, h: 388, fx: 117.5, fy: 386.0, tx: 222.2 },
   },
 };
 // The worn costume's frame for a pose, or null when no costume is worn (gear shows)

@@ -6631,7 +6631,7 @@ const TENT_POSES = {
 // Costume tent pictures: the worn costume's stand, sit and sleep (same canvas sizes as the gear pictures)
 const COSTUME_TENT = {
     christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' },
-    wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_q90.webp' }
+    wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_v2_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_v2_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_v2_q90.webp' }
 };
 function wornCostumeTentSrc(pose) {
     const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
