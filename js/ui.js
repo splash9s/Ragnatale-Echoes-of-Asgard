@@ -6293,6 +6293,7 @@ function renderEventsView() {
 // ---------- CASTLE TOWER FRIEND PICK ----------
 let towerFriends = null;       // friend list for the picker (null until loaded)
 let towerFriendsLoading = false;
+let towerFriendsError = '';
 let towerPick = [];            // user ids of the two chosen friends
 // Formation: who stands in front first. Ids: 'hero' is you, 'a1' and 'a2' are the chosen friends in pick order.
 const TOWER_ORDERS = [
@@ -6322,7 +6323,9 @@ async function loadTowerFriends() {
     towerFriendsLoading = true;
     const res = await friendApi.list();
     towerFriendsLoading = false;
-    towerFriends = res.data || [];
+    // list_friends returns { friends: [...] } alongside today and my_code
+    towerFriendsError = res.error || '';
+    towerFriends = (res.data && res.data.friends) || [];
     if (currentEventsTab === 'tower') renderEventsView();
 }
 function toggleTowerFriend(id) {
@@ -6332,6 +6335,7 @@ function toggleTowerFriend(id) {
 }
 function towerFriendsHTML() {
     if (towerFriends === null) return '<p class="ev-status">Loading friends…</p>';
+    if (towerFriendsError) return `<p class="ev-status">${towerFriendsError.replace(/[<>&]/g, '')}</p>`;
     if (!towerFriends.length) return '<p class="ev-status">No friends yet. Go alone, or add friends.</p>';
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     return `<div class="ev-maps">${towerFriends.map(f => {
