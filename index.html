@@ -720,8 +720,8 @@
         .vh-card { position: relative; display: flex; flex-direction: column; align-items: center; width: 288px; height: 442px; padding: 28px 20px 20px; border: 0; background: url(assets/diamond/highlight/card_frame_single2_v1_q90.webp) 0 0 / 100% 100% no-repeat; cursor: pointer; }
         .vh-card:hover { filter: brightness(1.15); }
         .vh-card.selected { box-shadow: 0 0 14px 3px rgba(250,204,21,.8); border-radius: 6px; }
-        .vh-stage { display: flex; align-items: center; justify-content: center; width: 100%; height: 240px; }
-        .vh-art { width: 168px; max-height: 189px; height: auto; object-fit: contain; animation: vhBob 1.8s ease-in-out infinite; }
+        .vh-stage { position: relative; overflow: hidden; width: 100%; height: 240px; }
+        .vh-anim { position: absolute; display: block; max-width: none; pointer-events: none; }
         .vh-title { width: 230px; max-width: 100%; height: auto; margin-top: 12px; pointer-events: none; }
         .vh-bottom { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
         @keyframes vhBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
@@ -2091,7 +2091,7 @@
     <script src="js/hero-body.js?v=20261119j"></script>
     <script src="js/combat.js?v=20261119ze"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261119de"></script>
+    <script src="js/ui.js?v=20261119dg"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
