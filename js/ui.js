@@ -8103,7 +8103,7 @@ function playLevelUpFx() {
     const r = anchor ? anchor.getBoundingClientRect() : null;
     const w = (r ? r.width : Math.min(window.innerWidth * 0.38, 320)) * 1.7; // 70% bigger than the player
     const cx = r ? r.left + r.width / 2 : window.innerWidth / 2;
-    const feet = r ? r.bottom : window.innerHeight / 2 + w * 0.37;
+    const feet = (r ? r.bottom : window.innerHeight / 2 + w * 0.37) + 50; // 50px lower
     el.style.cssText = `position:fixed; left:${cx}px; top:${feet}px; width:${w}px; height:auto; transform:translate(-50%, -100%); opacity:0; pointer-events:none; z-index:9000; transition:opacity 180ms ease-in-out;`;
     LEVELUP_FX_FRAMES.forEach((src, i) => {
         levelUpFxTimers.push(setTimeout(() => {
