@@ -2405,9 +2405,9 @@ const COSTUME_SETS = {
       critical: { src: 'assets/costume/wanderer_samurai/critical_q90.webp', w: 380, h: 382, fx: 108.1, fy: 380.0, tx: 237.0 },
       base: { src: 'assets/costume/wanderer_samurai/base_q90.webp', w: 376, h: 409, fx: 311.8, fy: 407.0, tx: 231.1 },
       block: { src: 'assets/costume/wanderer_samurai/block_q90.webp', w: 329, h: 364, fx: 80.9, fy: 362.0, tx: 182.6 },
-      attack02: { src: 'assets/costume/wanderer_samurai/attack02_q90.webp', w: 488, h: 388, fx: 117.5, fy: 386.0, tx: 222.2 },
+      attack02: { src: 'assets/costume/wanderer_samurai/critical02_q90.webp', w: 488, h: 352, fx: 153.7, fy: 350.0, tx: 192.4 },
       fall: { src: 'assets/costume/wanderer_samurai/fall_q90.webp', w: 377, h: 316, fx: 160.3, fy: 314.0, tx: 196.6 },
-      critical02: { src: 'assets/costume/wanderer_samurai/critical02_q90.webp', w: 488, h: 352, fx: 153.7, fy: 350.0, tx: 192.4 },
+      critical02: { src: 'assets/costume/wanderer_samurai/attack02_q90.webp', w: 488, h: 388, fx: 117.5, fy: 386.0, tx: 222.2 },
   },
 };
 // The worn costume's frame for a pose, or null when no costume is worn (gear shows)
