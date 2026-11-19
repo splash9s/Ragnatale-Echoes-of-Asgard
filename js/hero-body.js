@@ -2435,12 +2435,24 @@ function heroCostumeFrame(pose) {
 }
 // The battle hero's frames for the current gear. Dodge shows the block frame with the lunge back.
 // An attack shows attack then attack02; a critical shows critical then critical02. A defeat shows the fall (dead) pose.
+// The idle frame. A costume with animation 3 (base3) loops its four base-pose frames; otherwise the single base frame.
+const HERO_IDLE_FRAME_MS = 220; // time each animation 3 frame stays on screen
+function heroIdleFrame(L) {
+    const c = typeof player !== 'undefined' && player.equipped && player.equipped.costume;
+    const set = c && c.costumeId && COSTUME_SETS[c.costumeId];
+    if (set && Array.isArray(set.base3) && set.base3.length) {
+        return set.base3[Math.floor(Date.now() / HERO_IDLE_FRAME_MS) % set.base3.length];
+    }
+    return heroBodyFrame('base', L);
+}
+// Preload the animation 3 frames so the loop never shows a blank hero
+Object.values(COSTUME_SETS).forEach(set => (set.base3 || []).forEach(f => { new Image().src = f.src; }));
 function combatPose() {
     const L = heroBodyLoadout();
     const block = heroBodyFrame('block', L);
     const attack = heroBodyFrame('attack', L), cri = heroBodyFrame('critical', L);
     return {
-        IDLE: heroBodyFrame('base', L),
+        IDLE: heroIdleFrame(L),
         ATTACK: attack,
         ATTACK2: heroBodyFrame('attack02', L) || attack,
         CRI: cri,
