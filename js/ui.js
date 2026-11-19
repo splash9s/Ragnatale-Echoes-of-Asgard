@@ -3676,7 +3676,9 @@ function itemIconHTML(item, size = 70) {
         return `<img src="${src}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
     }
     if (item && item.type === 'chest' && item.chestType) return chestIconHTML(item.chestType, size);
-    if (item && item.costumeId && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;" />`;
+    // Wanderer Samurai: a true 2px black outline at any display size (the file's own border shrinks when scaled down)
+    const outline = item && item.costumeId === 'wanderer_samurai' ? 'filter:drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);' : '';
+    if (item && item.costumeId && item.icon) return `<img src="${item.icon}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;${outline}" />`;
     return `<span style="font-size:${Math.round(size * 0.63)}px;line-height:1;">${itemEmoji(item)}</span>`;
 }
 function itemEmoji(item) {
