@@ -986,9 +986,9 @@ function combatCriFrame(attack) {
 }
 // An attack: a short wind-up (attack pose, the hero draws back), then the strike (attack02 pose, lunges forward and holds).
 // A critical does the same with critical and critical02, and holds the strike longer.
-const COMBAT_PLAYER_WINDUP_MS = 100;  // wind-up: first pose, drawing back
-const COMBAT_PLAYER_ATTACK_MS = 350;  // whole attack: wind-up + attack02 (250 ms)
-const COMBAT_PLAYER_CRIT_MS = 520;    // whole critical: wind-up + critical02 (420 ms)
+const COMBAT_PLAYER_WINDUP_MS = 170;  // wind-up: first pose (attack / critical), drawing back; long enough to see
+const COMBAT_PLAYER_ATTACK_MS = 420;  // whole attack: wind-up + attack02 (250 ms)
+const COMBAT_PLAYER_CRIT_MS = 590;    // whole critical: wind-up + critical02 (420 ms)
 const COMBAT_PLAYER_WINDUP_PX = -12;  // wind-up draws back this far
 const COMBAT_PLAYER_LUNGE_PX = 40;    // the strike lunges forward this far and back
 let combatPlayerAttack = { at: 0, crit: false };
