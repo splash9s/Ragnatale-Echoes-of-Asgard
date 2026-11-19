@@ -43,6 +43,10 @@ begin
         'equipped', snap->'equipped',
         'runes', snap->'runes',
         'tentPets', coalesce(snap->'tentPets', '[]'::jsonb),
+        'tentLevel', snap->'tentLevel',
+        'tentView', snap->'tentView',
+        'petHouseLevel', snap->'petHouseLevel',
+        'petView', snap->'petView',
         'inventory', (
             select coalesce(jsonb_agg(case when e->>'slot' = 'pet' then e else 'null'::jsonb end order by ord), '[]'::jsonb)
             from jsonb_array_elements(coalesce(snap->'inventory', '[]'::jsonb)) with ordinality as t(e, ord)
