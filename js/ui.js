@@ -109,6 +109,7 @@ const DIAMOND_SHOP_ITEMS = [
     { id: 'dcostume_christmas', name: "Christmas Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'christmas', vipCat: 'box', desc: "Festive Santa outfit. Replaces your battle poses while worn.", icon: 'assets/costume/christmas/icon_q85.webp' },
     { id: 'dcostume_blue_samurai', name: "Blue Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'blue_samurai', vipCat: 'box', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/blue_samurai/icon_v1_q85.webp' },
     { id: 'dcostume_red_samurai', name: "Red Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'red_samurai', vipCat: 'box', desc: "A red-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/red_samurai/icon_v1_q85.webp' },
+    { id: 'dcostume_yellow_samurai', name: "Yellow Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'yellow_samurai', vipCat: 'box', desc: "A yellow-armoured samurai outfit. Replaces your battle poses while worn.", icon: 'assets/costume/yellow_samurai/icon_v1_q85.webp' },
     { id: 'dcostume_wanderer_samurai', name: "Wanderer Samurai Costume", price: 1, fixedPrice: 1, type: 'costume', costumeId: 'wanderer_samurai', vipCat: 'box', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn.", icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp' },
     { id: 'dchest_costume_ticket', name: "Costume Chest (Ticket)", price: 0, ticket: { name: 'Costume Ticket', qty: 10 }, type: 'chest', chestType: 'costume', desc: "Costs 10 Costume Tickets.", icon: 'assets/chest/costume/costumeicon_q85.webp' }
 ];
@@ -6547,6 +6548,7 @@ const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
     { name: "Blue Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'blue_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/blue_samurai/icon_v1_q85.webp', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn." },
     { name: "Red Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'red_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/red_samurai/icon_v1_q85.webp', desc: "A red-armoured samurai outfit. Replaces your battle poses while worn." },
+    { name: "Yellow Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'yellow_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/yellow_samurai/icon_v1_q85.webp', desc: "A yellow-armoured samurai outfit. Replaces your battle poses while worn." },
     { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
 ];
 // Opens a box at once: a random reward from its pool goes into the bag
@@ -7079,6 +7081,7 @@ const COSTUME_TENT = {
     christmas: { stand: 'assets/costume/christmas/tent_stand_q90.webp', sit: 'assets/costume/christmas/tent_sit_q90.webp', sleep: 'assets/costume/christmas/tent_sleep_q90.webp' },
     blue_samurai: { stand: 'assets/costume/blue_samurai/tent_stand_v1_q90.webp', sit: 'assets/costume/blue_samurai/tent_sit_v1_q90.webp', sleep: 'assets/costume/blue_samurai/tent_sleep_v1_q90.webp' },
     red_samurai: { stand: 'assets/costume/red_samurai/tent_stand_v1_q90.webp', sit: 'assets/costume/red_samurai/tent_sit_v1_q90.webp', sleep: 'assets/costume/red_samurai/tent_sleep_v1_q90.webp' },
+    yellow_samurai: { stand: 'assets/costume/yellow_samurai/tent_stand_v1_q90.webp', sit: 'assets/costume/yellow_samurai/tent_sit_v1_q90.webp', sleep: 'assets/costume/yellow_samurai/tent_sleep_v1_q90.webp' },
     wanderer_samurai: { stand: 'assets/costume/wanderer_samurai/tent_stand_v2_q90.webp', sit: 'assets/costume/wanderer_samurai/tent_sit_v2_q90.webp', sleep: 'assets/costume/wanderer_samurai/tent_sleep_v2_q90.webp' }
 };
 // Per-costume tent layout: 'aspect' is the picture's width / height (keeps the pose from stretching);
@@ -7088,6 +7091,8 @@ const COSTUME_TENT_LAYOUT = {
     blue_samurai: { stand: { scale: 0.9025, aspect: 475 / 539 }, sit: { scale: 0.8786, aspect: 402 / 416 }, sleep: { scale: 1.15, aspect: 644 / 350 } },
     // Red: same sizes as blue; each picture keeps its own aspect (stand 352 x 703, sit 358 x 391, sleep 568 x 327)
     red_samurai: { stand: { scale: 0.9025, aspect: 352 / 703 }, sit: { scale: 0.8786, aspect: 358 / 391 }, sleep: { scale: 1.035, aspect: 568 / 327 } },
+    // Yellow: same sizes as red; each picture keeps its own aspect (stand 451 x 794, sit 388 x 406, sleep 576 x 385)
+    yellow_samurai: { stand: { scale: 0.9025, aspect: 451 / 794 }, sit: { scale: 0.8786, aspect: 388 / 406 }, sleep: { scale: 1.035, aspect: 576 / 385 } },
     wanderer_samurai: { stand: { scale: 0.9025 }, sit: { scale: 1.1875, aspect: 274 / 228 }, sleep: { scale: 1.14, aspect: 374 / 223 } }
 };
 function costumeTentLayout(pose) {
