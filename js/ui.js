@@ -4188,10 +4188,10 @@ function setInfoHTML(setKey, activeOnly = false) {
         const on = bn === best;
         const sub = !on && have >= bn.pieces ? ' (replaced)' : '';
         // Activated tier is green; tiers not reached (or replaced by a higher tier) stay neutral
-        return `<div class="${on ? 'font-semibold set-green' : 'text-slate-400'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
+        return `<div class="${on ? 'font-semibold set-green' : 'text-slate-400'}" ${on ? 'style="color:#4ade80 !important"' : ''}>(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
     }).join('');
     return `<div class="p-2 rounded-lg border ${have > 0 ? 'border-amber-500/40' : 'border-slate-800'} bg-slate-950/60 flex flex-col gap-1 text-[10px]">
-        <span class="font-bold ${have > 0 ? 'set-green' : 'text-slate-400'}">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
+        <span class="font-bold ${have > 0 ? 'set-green' : 'text-slate-400'}" ${have > 0 ? 'style="color:#4ade80 !important"' : ''}>${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
 }
 
 function renderSetBonusPanel() {
