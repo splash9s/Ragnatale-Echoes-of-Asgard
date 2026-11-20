@@ -1412,7 +1412,7 @@
                     </div>
                     <div class="art-panel" style="left:441px; top:182px; width:1038px; height:707px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 gap-3">
-                <button onclick="switchView('library')" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">📚 Library</button>
+                <button onclick="toggleLanguage()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
                 <button onclick="manualSaveGame()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">💾 Save Game</button>
                 <div class="px-5 py-3 bg-slate-800 rounded-xl text-slate-200 flex items-center gap-4">
                     <button id="music-toggle-btn" onclick="toggleMusicOn()" class="w-56 py-2 px-3 bg-slate-700 hover:bg-slate-600 font-bold rounded-lg text-left cursor-pointer text-xl">🎵 Music: On</button>
@@ -1424,7 +1424,6 @@
                     <input id="sfx-volume" type="range" min="0" max="100" step="5" value="20" class="flex-1 cursor-pointer" oninput="setSfxVolume(this.value)" onchange="saveAudioSettings()">
                     <span id="sfx-volume-text" class="w-12 text-right font-mono text-xl">20</span>
                 </div>
-                <button onclick="toggleLanguage()" class="px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">🌐 Language (EN/TH)</button>
                 <button id="send-mail-btn" onclick="openSendMailForm()" class="hidden px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Send Mail</button>
                 <div id="account-status" class="px-5 py-4 bg-slate-800 rounded-xl text-slate-200 text-lg leading-relaxed"></div>
                 <button id="bind-email-btn" onclick="bindGmail()" class="hidden p-0 bg-transparent border-0 cursor-pointer self-start" aria-label="Bind Gmail"><img src="assets/cha/page/link_gmail_q85.webp" alt="Bind Gmail" style="width:280px; max-width:100%; height:auto; display:block;"></button>
