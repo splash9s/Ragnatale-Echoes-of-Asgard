@@ -6491,7 +6491,7 @@ function toggleBattleLog(btn) {
     const box = btn.closest('.combat-box');
     if (!box) return;
     const collapsed = box.classList.toggle('minimized');
-    btn.textContent = collapsed ? '▸ Expand' : '▾ Minimize';
+    btn.textContent = collapsed ? (currentLanguage === 'th' ? '▸ ขยาย' : '▸ Expand') : (currentLanguage === 'th' ? '▾ ย่อ' : '▾ Minimize');
     if (!collapsed) {
         const log = document.getElementById('combat-activity-log');
         if (log) log.scrollTop = log.scrollHeight;
@@ -6504,7 +6504,7 @@ function logMessage(msg, type = 'combat') {
         const box = document.getElementById(id);
         if (box) {
             const div = document.createElement('div');
-            div.innerHTML = msg;
+            div.innerHTML = thLog(msg);
             div.className = type === 'combat' ? "text-red-400" : (type === 'winlose' ? "text-blue-400 font-bold" : (type === 'drop' ? "text-yellow-400 font-bold" : (type === 'levelup' ? "text-purple-400 font-bold" : "text-slate-300")));
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;

@@ -35,6 +35,11 @@ const NAMES_TH = {
     "Giant's Bane": 'ขวัญของยักษ์', 'Ragnarok Strike': 'การโจมตีแห่งรากนารก',
     'Shieldwall': 'กำแพงโล่', "Tyr's Resolve": 'ความมุ่งมั่นของไทร์', "Valkyrie's Swiftness": 'ความว่องไวของวาลคิรี',
     'Breath of Ymir': 'ลมหายใจของอิมิร์', "Fenrir's Hide": 'หนังของเฟนริร์', "Asgard's Bulwark": 'ป้อมปราการแห่งแอสการ์ด',
+    // Combat screen labels
+    'Battle Log': 'บันทึกการต่อสู้', '▸ Expand': '▸ ขยาย', '▾ Minimize': '▾ ย่อ', 'Next Rune': 'รูนถัดไป',
+    'Resurrection': 'ฟื้นคืนชีพ', 'ON': 'เปิด', '1 left': 'เหลือ 1', 'Potion': 'ยา', 'Next Stage': 'ด่านถัดไป',
+    '[Combat] Battle started...': '[การต่อสู้] เริ่มการต่อสู้...', 'Base Lv.': 'เลเวลฐาน', 'Base EXP': 'EXP ฐาน',
+    'Class Lv.': 'เลเวลอาชีพ', 'Class EXP': 'EXP อาชีพ', 'Hero': 'ฮีโร่', '0 Gold': '0 ทอง',
     // Monsters
     'Abyss Lord (Boss)': 'ลอร์ดเหวลึก (บอส)',
     'Battle Storm Mage': 'จอมเวทพายุศึก',

@@ -283,6 +283,7 @@ const DOM_TH = {
 };
 
 const DOM_TH_PATTERNS = [
+    { re: /^(.+) — Stage (\d+) \/ (\d+)$/, f: m => `${localGameName(m[1])} — ด่านที่ ${m[2]} / ${m[3]}` },
     { re: /^(\d+) \/ (\d+) plays left today$/, f: m => `เหลือ ${m[1]} / ${m[2]} ครั้งวันนี้` },
     { re: /^Unlimited attempts for now · (\d+) \/ 2 friends$/, f: m => `ไม่จำกัดจำนวนครั้งตอนนี้ · ${m[1]} / 2 เพื่อน` },
     { re: /^Success Rate: (.+)$/, f: m => `อัตราสำเร็จ: ${m[1]}` },
@@ -320,7 +321,7 @@ function startDomTranslation() {
         pending = true;
         requestAnimationFrame(() => {
             pending = false;
-            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market'].forEach(id => translateDomIn(document.getElementById(id)));
+            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market', 'view-combat'].forEach(id => translateDomIn(document.getElementById(id)));
         });
     });
     ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => {
@@ -361,3 +362,47 @@ function saveLanguage() {
 loadSavedLanguage();
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyLanguage);
 else applyLanguage();
+
+// Combat and town log lines are built from many template strings. thLog() translates the
+// bracket tags, common combat phrases and gear/monster names inside each finished line.
+const LOG_TH_TAGS = {
+    '[Combat]': '[การต่อสู้]', '[Victory]': '[ชัยชนะ]', '[Miss]': '[พลาด]', '[Heal]': '[ฟื้นฟู]',
+    '[Poison]': '[พิษ]', '[Stun]': '[สตัน]', '[Stun Burst]': '[สตันพร้อมกัน]', '[Shop]': '[ร้านค้า]',
+    '[Inventory]': '[กระเป๋า]', '[Inventory Full]': '[กระเป๋าเต็ม]', '[Mail]': '[จดหมาย]', '[Market]': '[ตลาด]',
+    '[System]': '[ระบบ]', '[Stage Cleared]': '[ผ่านด่าน]', '[Plank Drop]': '[ดรอปแผ่นไม้]', '[Monster Drop]': '[ดรอป]',
+    '[Mini Boss]': '[มินิบอส]', '[Mini Boss Drop!]': '[มินิบอสดรอป!]', '[Helmet Drop!]': '[หมวกดรอป!]',
+    '[Refine Success]': '[ปรับปรุงสำเร็จ]', '[Refine Failed]': '[ปรับปรุงล้มเหลว]', '[Refine Drop]': '[ดรอปจากการปรับปรุง]',
+    '[Wave]': '[คลื่นศัตรู]', '[Tower]': '[หอ]', '[Potion]': '[ยา]', '[Rune]': '[รูน]', '[Rune Blessing]': '[พรรูน]',
+    '[Resurrection]': '[ฟื้นคืนชีพ]', '[Status]': '[สถานะ]', '[Split]': '[แตกตัว]', '[Splash]': '[กระเด็น]',
+    '[Spell]': '[เวท]', '[Ignite]': '[ลุกไหม้]', '[Ice Shield]': '[โล่น้ำแข็ง]', '[Thorn]': '[หนาม]',
+    '[Salvage]': '[แยกชิ้นส่วน]', '[Free]': '[ฟรี]', '[Guide]': '[แนะนำ]', '[Support]': '[สนับสนุน]',
+    '[Shockwave]': '[คลื่นกระแทก]', '[Overflow]': '[เกินพลัง]', '[Undertow]': '[ดูดกลับ]', '[Void Pull]': '[ดึงความว่าง]',
+    '[Shared Pain]': '[แบ่งความเจ็บปวด]', '[Retribution]': '[การตอบโต้]', '[Inherit]': '[ถ่ายทอด]',
+    '[Daily Quest Completed!]': '[ภารกิจรายวันสำเร็จ!]', 'Battle started...': 'เริ่มการต่อสู้...',
+};
+const LOG_TH_PHRASES = [
+    [' damage to ', ' ความเสียหายต่อ '], [' damage', ' ความเสียหาย'], [' hits ', ' โจมตี '], [' for ', ' เป็นจำนวน '],
+    [' heals ', ' ฟื้นฟู '], [' restores ', ' ฟื้นฟู '], [' stuns ', ' สตัน '], [' stun ', ' สตัน '],
+    ['dropped ', 'ดรอป '], ['Defeated ', 'ปราบ '], ['Gained ', 'ได้รับ '], ['Obtained ', 'ได้รับ '],
+    [' missed!', ' พลาด!'], [' appears!', ' ปรากฏตัว!'], [' blocks ', ' กัน '], [' of your hit', ' ของการโจมตีคุณ'],
+    [' Base EXP', ' Base EXP'], [' Class EXP', ' Class EXP'], [' Gold', ' ทอง'], [' gold', ' ทอง'],
+    [' HP', ' HP'], ['Purchased ', 'ซื้อ '], ['Sold ', 'ขาย '], ['Salvaged ', 'แยก '], ['Listed ', 'ประกาศ '],
+    ['Claimed rewards from', 'รับรางวัลจาก'], ['is now ', 'ตอนนี้เป็น '], ['reset to', 'รีเซ็ตเป็น'],
+    [' splits into ', ' แตกเป็น '], [' slimes!', ' สไลม์!'], ['Sorted by ', 'เรียงตาม '],
+    ['Could not fit', 'ใส่ไม่ได้'], [' was discarded.', ' ถูกทิ้ง'], ['was added to your potion slot.', 'ถูกเพิ่มในช่องยาแล้ว'],
+    [' and ', ' และ '], ['Attack on ', 'การโจมตี '], ['(Rarity ', '(ความหายาก '], ['Welcome to Haven of Dawn,', 'ยินดีต้อนรับสู่ Haven of Dawn,'], [' falls! The next in line takes the front.', ' ล้มลง! คนถัดไปขึ้นหน้า'],
+];
+function thLog(msg) {
+    if (currentLanguage !== 'th') return msg;
+    let s = String(msg);
+    Object.keys(LOG_TH_TAGS).forEach(k => { if (s.includes(k)) s = s.split(k).join(LOG_TH_TAGS[k]); });
+    if (typeof NAMES_TH !== 'undefined') {
+        Object.keys(NAMES_TH).sort((a, b) => b.length - a.length).forEach(k => {
+            if (!s.includes(k)) return;
+            const re = new RegExp('(?<![A-Za-z])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'g');
+            s = s.replace(re, NAMES_TH[k]);
+        });
+    }
+    LOG_TH_PHRASES.forEach(([en, th]) => { if (s.includes(en)) s = s.split(en).join(th); });
+    return s;
+}
