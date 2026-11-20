@@ -109,6 +109,8 @@ async function refreshFriendAlert() {
 }
 setTimeout(refreshFriendAlert, 3000);
 setInterval(() => { if (!document.hidden) refreshFriendAlert(); }, 60000);
+setTimeout(refreshGuestBookAlert, 3000);
+setInterval(() => { if (!document.hidden) refreshGuestBookAlert(); }, 60000);
 
 // Switches between the Friends and Requests tabs
 function setFriendTab(tab) {
@@ -348,6 +350,7 @@ function exitFriendTent() {
     Object.assign(player, backup);
     window.friendVisit = null;
     document.body.classList.remove('friend-visiting');
+    refreshGuestBookAlert();
     if (isCharClear()) toggleCharClear();
     switchView('friend');
 }
@@ -414,6 +417,18 @@ function closeGuestBook() {
     guestBookStatus = null;
     const box = document.getElementById('guestbook-panel');
     if (box) box.remove();
+    refreshGuestBookAlert();
+}
+
+// Red alert on the Guest Book icon (and the menu button) while the owner has unread messages. Owner's own tent only.
+async function refreshGuestBookAlert() {
+    const show = (on) => ['alert-tent-diary', 'alert-tent-menu'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = on ? '' : 'none';
+    });
+    if (friendTentVisiting() || typeof cloudUserId === 'undefined' || !cloudUserId) { show(false); return; }
+    const res = await friendApi.guestbookUnread();
+    show(!res.error && Number(res.data) > 0);
 }
 
 async function loadGuestBook() {
