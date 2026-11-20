@@ -17,8 +17,14 @@ const DAILY_QUEST_POOL = {
     crit:     { id: 'q_crit', title: "Precision Striker", tpl: "Land {n} Critical hits in combat.", tiers: [{ t: 40, c: 'copper' }, { t: 60, c: 'silver' }, { t: 80, c: 'gold' }] },
     gold:     { id: 'q_gold', title: "Treasure Hunter", tpl: "Collect {n} Gold from expeditions.", tiers: [{ t: 5000, c: 'copper' }, { t: 10000, c: 'silver' }, { t: 15000, c: 'gold' }] },
     refine:   { id: 'q_refine', title: "Refiner", tpl: "Refine equipment {n} times.", tiers: [{ t: 5, c: 'copper' }, { t: 10, c: 'silver' }, { t: 15, c: 'gold' }] },
-    elemref:  { id: 'q_elemref', title: "Elemental Smith", tpl: "Forge an Elemental Stone onto a weapon {n} times.", tiers: [{ t: 3, c: 'copper' }, { t: 5, c: 'silver' }, { t: 8, c: 'gold' }] },
+    elemref:  { id: 'q_elemref', title: "Elemental Smith", tpl: "Forge an elemental weapon {n} time.", tiers: [{ t: 1, c: 'silver' }] },
     puzzle:   { id: 'q_puzzle', title: "Puzzle Master", tpl: "Solve {n} pet puzzle.", tiers: [{ t: 1, c: 'silver' }] },
+    plank:    { id: 'q_plank', title: "Plank Collector", tpl: "Collect {n} Planks.", tiers: [{ t: 20, c: 'copper' }] },
+    alloy:    { id: 'q_alloy', title: "Alloy Smelter", tpl: "Smelt {n} Alloy.", tiers: [{ t: 1, c: 'silver' }] },
+    bar:      { id: 'q_bar', title: "Bar Smelter", tpl: "Smelt {n} Bar.", tiers: [{ t: 1, c: 'copper' }] },
+    scrap:    { id: 'q_scrap', title: "Scrapper", tpl: "Scrap {n} gear.", tiers: [{ t: 10, c: 'copper' }] },
+    potion:   { id: 'q_potion', title: "Potion Buyer", tpl: "Buy {n} potions.", tiers: [{ t: 5, c: 'copper' }] },
+    visit:    { id: 'q_visit', title: "Friend Visitor", tpl: "Visit {n} friend tents.", tiers: [{ t: 5, c: 'copper' }] },
     bosslv10: { id: 'q_bosslv10', title: "Boss Hunter Lv. 10", tpl: "Defeat the Lv. 10 boss {n} time.", tiers: [{ t: 1, c: 'gold' }] },
 };
 

@@ -2347,7 +2347,7 @@ function grantTowerRunReward() {
     const got = [`${r.gold} Gold`, `${r.diamonds} Diamond`];
     if (r.planks > 0) {
         const plank = { ...PLANK_ITEM, qty: r.planks };
-        if (placeItemInInventory(plank)) { recordStageDrop(plank); got.push(`${r.planks} Plank`); if (tally) tally.planks += r.planks; }
+        if (placeItemInInventory(plank)) { updateQuestProgress('plank', r.planks || 1); recordStageDrop(plank); got.push(`${r.planks} Plank`); if (tally) tally.planks += r.planks; }
     }
     if (r.ore > 0) {
         const ore = { ...REFINE_MATERIAL_ITEMS[2], qty: r.ore };

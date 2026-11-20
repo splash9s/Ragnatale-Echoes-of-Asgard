@@ -2636,6 +2636,7 @@ function buyGoldConsumableQty(item, qty) {
     }
 
     player.gold -= cost;
+    if (potionTemplateOf(item)) updateQuestProgress('potion', qty);
     playSfx(SFX.coin);
     logMessage(qty > 1 ? `[Shop] Purchased ${qty}x ${item.name}!` : `[Shop] Purchased ${item.name}!`, 'drop');
     markBeginnerFlag('potion');
@@ -3735,6 +3736,7 @@ function smeltMaterial(tier) {
         return;
     }
     logMessage(`[Forge] Smelted 1 ${target.name} from ${r.label}.`, 'levelup');
+    updateQuestProgress(/Alloy/i.test(target.name) ? 'alloy' : (/Bar/i.test(target.name) ? 'bar' : 'ingot'), 1);
     showModal("Smelting Successful", `Forged 1 ${target.name} from ${r.label}.`);
     updateUI();
     renderRefiningUI();
@@ -4857,6 +4859,7 @@ function salvageEquipmentItem(index, onDone, onCancel = null) {
         }
         playSfx(SFX.salvage);
         logMessage(`[Salvage] Salvaged ${item.name} for ${reward.qty} ${reward.tpl.name}`, 'drop');
+        updateQuestProgress('scrap', 1);
         updateUI();
         saveGame();
         if (onDone) onDone();
@@ -8592,6 +8595,7 @@ function addPlank(m, qty = 1) {
         return;
     }
     recordStageDrop({ ...PLANK_ITEM, qty });
+    updateQuestProgress('plank', qty);
     logMessage(`[Plank Drop] ${m.name} dropped ${qty} Plank${qty > 1 ? 's' : ''}!`, 'drop');
     showMonsterGroundDrop(m, itemIconHTML(PLANK_ITEM, 48));
 }

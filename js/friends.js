@@ -333,6 +333,7 @@ async function visitFriendTent(idx) {
 
 function enterFriendTent(name, snap, ownerId) {
     if (friendTentVisiting()) return;
+    updateQuestProgress('visit', 1); // before the swap, so the visit counts on the real player
     const backup = JSON.parse(JSON.stringify(player));
     const copy = JSON.parse(JSON.stringify(snap));
     if (typeof removeTentPetWalker === 'function' && typeof tentPetWalkers !== 'undefined') [...tentPetWalkers.keys()].forEach(removeTentPetWalker);
