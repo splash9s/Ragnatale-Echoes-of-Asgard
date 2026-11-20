@@ -10,17 +10,22 @@ const BAG_EXPAND_STEP = 9;  // each Bag Expansion adds one row of 9
 // Open bag slots for this player: base + expansions, never beyond the grid
 function bagSlotCount() { return Math.min(BAG_MAX_SLOTS, BAG_BASE_SLOTS + BAG_EXPAND_STEP * ((typeof player !== 'undefined' && player.bagExpansions) || 0)); }
 
-// Daily quest pool: each day the game picks one target tier per quest type at random.
-// Easier tiers give a copper chest, harder ones a gold chest. Progress types are the ones combat.js already tracks.
+// Daily quest pool. Each day three different types are picked at random; each gets a random tier.
+// Easier tiers give a copper chest, harder ones a gold chest.
 const DAILY_QUEST_POOL = {
-    slimes: { id: 'q_slimes', title: "Slime Exterminator", tpl: "Defeat {n} monsters during expeditions.", tiers: [{ t: 30, c: 'copper' }, { t: 45, c: 'silver' }, { t: 60, c: 'gold' }] },
-    crit:   { id: 'q_crit', title: "Precision Striker", tpl: "Land {n} Critical hits in combat.", tiers: [{ t: 40, c: 'copper' }, { t: 60, c: 'silver' }, { t: 80, c: 'gold' }] },
-    gold:   { id: 'q_gold', title: "Treasure Hunter", tpl: "Collect {n} Gold from expeditions.", tiers: [{ t: 5000, c: 'copper' }, { t: 10000, c: 'silver' }, { t: 15000, c: 'gold' }] },
+    slimes:   { id: 'q_slimes', title: "Slime Exterminator", tpl: "Defeat {n} monsters during expeditions.", tiers: [{ t: 30, c: 'copper' }, { t: 45, c: 'silver' }, { t: 60, c: 'gold' }] },
+    crit:     { id: 'q_crit', title: "Precision Striker", tpl: "Land {n} Critical hits in combat.", tiers: [{ t: 40, c: 'copper' }, { t: 60, c: 'silver' }, { t: 80, c: 'gold' }] },
+    gold:     { id: 'q_gold', title: "Treasure Hunter", tpl: "Collect {n} Gold from expeditions.", tiers: [{ t: 5000, c: 'copper' }, { t: 10000, c: 'silver' }, { t: 15000, c: 'gold' }] },
+    refine:   { id: 'q_refine', title: "Refiner", tpl: "Refine equipment {n} times.", tiers: [{ t: 5, c: 'copper' }, { t: 10, c: 'silver' }, { t: 15, c: 'gold' }] },
+    elemref:  { id: 'q_elemref', title: "Elemental Smith", tpl: "Forge an Elemental Stone onto a weapon {n} times.", tiers: [{ t: 3, c: 'copper' }, { t: 5, c: 'silver' }, { t: 8, c: 'gold' }] },
+    puzzle:   { id: 'q_puzzle', title: "Puzzle Master", tpl: "Solve {n} pet puzzle.", tiers: [{ t: 1, c: 'silver' }] },
+    bosslv10: { id: 'q_bosslv10', title: "Boss Hunter Lv. 10", tpl: "Defeat the Lv. 10 boss {n} time.", tiers: [{ t: 1, c: 'gold' }] },
 };
 
-// Picks today's three quests, one per type, each at a random tier
+// Picks today's three quests: three different types, each at a random tier
 function rollDailyQuests() {
-    return Object.keys(DAILY_QUEST_POOL).map(type => {
+    const types = Object.keys(DAILY_QUEST_POOL).sort(() => Math.random() - 0.5).slice(0, 3);
+    return types.map(type => {
         const def = DAILY_QUEST_POOL[type];
         const tier = def.tiers[Math.floor(Math.random() * def.tiers.length)];
         return {

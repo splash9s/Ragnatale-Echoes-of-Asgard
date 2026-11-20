@@ -3605,6 +3605,7 @@ function forgeElementOnWeapon() {
     const rate = elementForgeRate();
     player.gold -= cost;
     player.elementStones[el] -= need;
+    updateQuestProgress('elemref', 1);
     if (freeForge) markGuide('elemForged'); // the free first forge is used up, win or lose
     if (Math.random() * 100 >= rate) {
         playSfx(SFX.refineFail);
@@ -3685,6 +3686,7 @@ function refineEquipment(slot) {
         removeItemByName(REFINE_MATERIAL_ITEMS[oreTier].name, 1);
     }
 
+    updateQuestProgress('refine', 1);
     let successRate = refineSuccessRate(current);
     if (Math.random() * 100 <= successRate) {
         gear.refineLevel = current + 1;
@@ -8377,7 +8379,7 @@ function puzzleGameMove(i) {
     puzzleGame.tiles[b] = puzzleGame.tiles[i];
     puzzleGame.tiles[i] = 0;
     puzzleGame.moves++;
-    if (puzzleIsSolved(puzzleGame.tiles)) { puzzleGame.solved = true; puzzleGame.reward = puzzleRewardPet(); }
+    if (puzzleIsSolved(puzzleGame.tiles)) { puzzleGame.solved = true; puzzleGame.reward = puzzleRewardPet(); updateQuestProgress('puzzle', 1); }
     renderPuzzleGame();
 }
 function renderPuzzleGame() {

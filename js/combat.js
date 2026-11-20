@@ -1196,9 +1196,7 @@ function updateQuestProgress(type, amount) {
     if (!player.dailyQuests) return;
     player.dailyQuests.forEach(q => {
         if (!q.completed) {
-            if ((type === 'slimes' && q.id === 'q_slimes') ||
-                (type === 'crit' && q.id === 'q_crit') ||
-                (type === 'gold' && q.id === 'q_gold')) {
+            if (q.id === 'q_' + type) {
                 q.current = Math.min(q.target, q.current + amount);
                 if (q.current >= q.target) {
                     q.completed = true;
@@ -1243,6 +1241,7 @@ const COIN_DROP_CHANCE_NORMAL = 0.6;
 
 function awardKill(m) {
     m.rewarded = true;
+    if (m.isBoss && activeMap && activeMap.levelReq === 10) updateQuestProgress('bosslv10', 1);
     player.runes.killCount = (player.runes.killCount || 0) + 1;
     if (runeN('reaper') > 0) healPlayer(Math.floor(getDerivedStats().maxHp * runeN('reaper') / 100), 'Reaper');
     const isEvent = currentMode === 'event';
