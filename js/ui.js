@@ -1871,9 +1871,38 @@ function earthMgFade(el, blur, from, to, ms) {
         requestAnimationFrame(step);
     });
 }
+// First time on a map: a black cover hides the loading, then fades out once the battle art is in place
+function firstVisitToCombatMap() {
+    const key = 'ragnatale_seen_map_' + (window.combatMapKey || 'other');
+    try {
+        if (localStorage.getItem(key)) return false;
+        localStorage.setItem(key, '1');
+        return true;
+    } catch (e) { return false; }
+}
+let mapCoverTimer = null;
+function showMapCover() {
+    let cover = document.getElementById('map-cover');
+    if (!cover) {
+        cover = document.createElement('div');
+        cover.id = 'map-cover';
+        document.body.appendChild(cover);
+    }
+    cover.classList.add('show');
+    clearTimeout(mapCoverTimer);
+    mapCoverTimer = setTimeout(hideMapCover, 5000); // never stuck black if the art never reports ready
+}
+function hideMapCover() {
+    clearTimeout(mapCoverTimer);
+    document.getElementById('map-cover')?.classList.remove('show');
+}
+function finishCombatArtLoad() {
+    document.getElementById('view-combat')?.classList.remove('art-loading');
+    hideMapCover();
+}
 async function changeEarthLayers() {
     const bg = document.getElementById('earth-bg'), base = document.getElementById('earth-base'), fg = document.getElementById('earth-fg');
-    if (!bg || !base || !fg) { document.getElementById('view-combat')?.classList.remove('art-loading'); return; }
+    if (!bg || !base || !fg) { finishCombatArtLoad(); return; }
     const token = ++earthLayerToken;
     const hud = document.getElementById('combat-hp-under');
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -1961,7 +1990,7 @@ async function changeEarthLayers() {
         hud.style.top = h.top + 'px';
     }
     applyCombatEarthPositions();
-    document.getElementById('view-combat')?.classList.remove('art-loading'); // first layers are in place
+    finishCombatArtLoad(); // first layers are in place
 }
 
 // Town and character page heroes: the base frame, with its feet where the base body's feet were before
@@ -2105,6 +2134,7 @@ function switchView(viewName) {
     if (viewName === 'combat') {
         const combatView = document.getElementById('view-combat');
         if (combatView) { combatView.classList.remove('hidden'); combatView.classList.add('art-loading'); }
+        if (firstVisitToCombatMap()) showMapCover();
         changeEarthLayers();
     }
 
