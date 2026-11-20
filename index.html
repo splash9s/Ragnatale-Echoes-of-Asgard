@@ -1380,12 +1380,12 @@
                     </div>
                     <div class="friend-window">
                         <div class="friend-top">
-                            <div class="friend-myid">My ID: <strong id="friend-my-code">--------</strong>
-                                <button class="friend-btn copy" onclick="copyFriendCode()">Copy</button>
+                            <div class="friend-myid"><span data-i18n="friend.myid">My ID:</span> <strong id="friend-my-code">--------</strong>
+                                <button class="friend-btn copy" data-i18n="friend.copy" onclick="copyFriendCode()">Copy</button>
                             </div>
                             <div class="friend-add">
                                 <input id="friend-add-input" type="text" maxlength="20" placeholder="Player name or ID" onkeydown="if (event.key === 'Enter') addFriendFromInput()">
-                                <button id="friend-add-btn" class="friend-btn add" onclick="addFriendFromInput()">Add Friend</button>
+                                <button id="friend-add-btn" class="friend-btn add" data-i18n="friend.add" onclick="addFriendFromInput()">Add Friend</button>
                             </div>
                             <div id="friend-status" class="friend-status"></div>
                         </div>
@@ -2141,13 +2141,13 @@
     <script src="js/combat.js?v=20261120mc"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
     <script src="js/ui.js?v=20261121i3"></script>
-    <script src="js/i18n.js?v=20261121i3"></script>
+    <script src="js/i18n.js?v=20261121i4"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
     <script src="js/guide-elem.js?v=20261119c"></script>
     <script src="js/beginner-quest.js?v=20261114x"></script>
-    <script src="js/friends.js?v=20261120dl"></script>
+    <script src="js/friends.js?v=20261121i4"></script>
     <script src="js/town.js?v=20261116b"></script>
     <script src="js/loader.js?v=20261120ld"></script>
 

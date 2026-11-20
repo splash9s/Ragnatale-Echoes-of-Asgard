@@ -225,11 +225,11 @@ function renderFriendPage() {
     const tabFriends = document.getElementById('friend-tab-friends');
     const tabRequests = document.getElementById('friend-tab-requests');
     if (tabFriends) {
-        tabFriends.textContent = `Friends (${friendState.friends.length})`;
+        tabFriends.textContent = `${tr('friend.friends')} (${friendState.friends.length})`;
         tabFriends.classList.toggle('active', friendState.tab === 'friends');
     }
     if (tabRequests) {
-        tabRequests.textContent = friendState.incoming.length ? `Requests (${friendState.incoming.length})` : 'Requests';
+        tabRequests.textContent = friendState.incoming.length ? `${tr('friend.requests')} (${friendState.incoming.length})` : tr('friend.requests');
         tabRequests.classList.toggle('active', friendState.tab === 'requests');
     }
 
