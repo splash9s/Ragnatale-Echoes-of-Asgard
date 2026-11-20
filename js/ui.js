@@ -4168,7 +4168,7 @@ function elementDetailHTML(el) {
 function buffsDetailHTML(buffs, debuffs) {
     const up = (buffs || []).map(b => {
         const tier = RARITY_INFO[b.tier] || RARITY_INFO[1];
-        return `<div class="${tier.text}">• ${b.desc} <span class="text-[9px] opacity-70">[Tier ${b.tier} ${tier.name}]</span></div>`;
+        return `<div>• ${b.desc} <span class="text-[9px] ${tier.text}">[Tier ${b.tier} ${tier.name}]</span></div>`;
     }).join('');
     const down = (debuffs || []).map(d => `<div class="text-red-400">▾ ${d.desc}</div>`).join('');
     if (!up && !down) return '<span class="text-slate-500">No buffs</span>';
@@ -4185,11 +4185,11 @@ function setInfoHTML(setKey, activeOnly = false) {
     const rows = def.bonuses.filter(bn => !activeOnly || bn === best).map(bn => {
         const on = bn === best;
         const sub = !on && have >= bn.pieces ? ' (replaced)' : '';
-        // Active tier is green; tiers not reached (or replaced by a higher tier) are red
-        return `<div class="${on ? 'font-semibold stat-better' : 'stat-worse'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
+        // Activated tier is green; tiers not reached (or replaced by a higher tier) stay neutral
+        return `<div class="${on ? 'font-semibold set-green' : 'text-slate-400'}">(${bn.pieces} pcs) ${bn.desc}${sub}</div>`;
     }).join('');
     return `<div class="p-2 rounded-lg border ${have > 0 ? 'border-amber-500/40' : 'border-slate-800'} bg-slate-950/60 flex flex-col gap-1 text-[10px]">
-        <span class="font-bold ${have > 0 ? 'text-amber-300' : 'text-slate-400'}">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
+        <span class="font-bold ${have > 0 ? 'set-green' : 'text-slate-400'}">${def.name}: ${have} / ${def.pieces} equipped</span>${rows}</div>`;
 }
 
 function renderSetBonusPanel() {
