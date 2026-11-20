@@ -2856,12 +2856,13 @@ function vipCellHTML(item) {
         </div>`;
 }
 function vipHighlightHTML() {
-    // A costume card opens the Costume Chest (Ticket) it drops from; the pet card opens its own item
+    // A costume card opens the diamond Costume Chest it drops from; the pet card opens its own item.
+    // Only the card that was clicked is highlighted.
     const cards = VIP_HIGHLIGHT_CARDS.map(c => {
-        const target = c.anim === 'costume' ? 'dchest_costume_ticket' : c.id;
+        const target = c.anim === 'costume' ? 'dchest_costume' : c.id;
         const hasTarget = DIAMOND_SHOP_ITEMS.some(i => i.id === target);
         return `
-        <button class="vh-card${vipSelected === target ? ' selected' : ''}" title="${escapeHtml(c.alt)}" ${hasTarget ? `onclick="vipSelect('${target}')"` : ''}>
+        <button class="vh-card${vhPick === c.id ? ' selected' : ''}" title="${escapeHtml(c.alt)}" ${hasTarget ? `onclick="vipSelect('${target}','${c.id}')"` : ''}>
             <span class="vh-stage" data-anim="${c.anim}" data-costume="${c.costume || ''}"></span>
             <img class="vh-title" src="${c.title}" alt="${escapeHtml(c.alt)}">
         </button>`;
@@ -2959,8 +2960,11 @@ function vipSetCat(key) {
     renderVipMenu();
     renderVipList();
 }
-function vipSelect(id) {
+// vhCard: the highlight card that was clicked (null when a grid item was picked)
+let vhPick = null;
+function vipSelect(id, vhCard) {
     vipSelected = id;
+    vhPick = vhCard || null;
     renderVipList();
     renderVipDetail();
 }
