@@ -375,14 +375,19 @@ async function loadTentVisitors() {
 }
 
 // ==========================================
-// GUEST BOOK (Diary button in the tent menu)
-// A visitor writes a message (up to 100 characters) on a friend's tent. The owner reads and deletes
-// the messages on their own tent. The server keeps the writer's name and the time (supabase/guestbook.sql).
+// GUEST BOOK (Diary button in the tent menu): a pager between friends.
+// A visitor writes on a friend's tent; the owner replies and the reply goes back to the visitor.
+// Messages are up to 32 characters and kept for 7 days (supabase/tent_messages.sql).
+// On your own tent the book opens to your conversations; on a friend's tent it opens to that friend.
 // ==========================================
-let guestBookRows = null;       // owner view: messages on this tent, newest first (null while loading)
-let guestBookPendingId = null;  // message waiting for a yes/no before it is deleted
+const GB_MAX = 32;
+let guestBookView = 'inbox';     // 'inbox' (list of conversations) or 'thread' (one friend)
+let guestBookPartner = null;     // { id, name } of the friend in the open thread
+let guestBookInbox = null;       // conversations, newest first (null while loading)
+let guestBookThread = null;      // messages with the open friend, newest first (null while loading)
+let guestBookPendingId = null;   // received message waiting for a yes/no before it is deleted
 let guestBookBusy = false;
-let guestBookStatus = null;     // { msg, err } shown under the panel
+let guestBookStatus = null;      // { msg, err } shown under the panel
 
 function gbEsc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -408,9 +413,15 @@ function openGuestBook() {
     }
     guestBookPendingId = null;
     guestBookStatus = null;
-    guestBookRows = null;
-    renderGuestBook();
-    if (!friendTentVisiting()) loadGuestBook();
+    if (friendTentVisiting()) {
+        guestBookView = 'thread';
+        guestBookPartner = { id: window.friendVisit.ownerId, name: window.friendVisit.name };
+        loadGuestBookThread();
+    } else {
+        guestBookView = 'inbox';
+        guestBookPartner = null;
+        loadGuestBookInbox();
+    }
 }
 function closeGuestBook() {
     guestBookPendingId = null;
@@ -420,22 +431,48 @@ function closeGuestBook() {
     refreshGuestBookAlert();
 }
 
-// Red alert on the Guest Book icon (and the menu button) while the owner has unread messages. Owner's own tent only.
+// Red mark on the Guest Book icon and the menu button while messages sent to you are unread
 async function refreshGuestBookAlert() {
     const show = (on) => ['alert-tent-diary', 'alert-tent-menu'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = on ? '' : 'none';
     });
-    if (friendTentVisiting() || typeof cloudUserId === 'undefined' || !cloudUserId) { show(false); return; }
-    const res = await friendApi.guestbookUnread();
+    if (typeof cloudUserId === 'undefined' || !cloudUserId) { show(false); return; }
+    const res = await friendApi.pagerUnread();
     show(!res.error && Number(res.data) > 0);
 }
 
-async function loadGuestBook() {
-    const res = await friendApi.guestbookList();
-    if (res.error) { guestBookStatus = { msg: res.error, err: true }; guestBookRows = []; }
-    else guestBookRows = res.data || [];
+async function loadGuestBookInbox() {
+    guestBookInbox = null;
     renderGuestBook();
+    const res = await friendApi.pagerInbox();
+    if (res.error) { guestBookStatus = { msg: res.error, err: true }; guestBookInbox = []; }
+    else guestBookInbox = res.data || [];
+    renderGuestBook();
+    refreshGuestBookAlert();
+}
+async function loadGuestBookThread() {
+    guestBookThread = null;
+    renderGuestBook();
+    const res = await friendApi.pagerThread(guestBookPartner.id);
+    if (res.error) { guestBookStatus = { msg: res.error, err: true }; guestBookThread = []; }
+    else guestBookThread = res.data || [];
+    renderGuestBook();
+    refreshGuestBookAlert();
+}
+function guestBookOpenThread(id, name) {
+    guestBookView = 'thread';
+    guestBookPartner = { id, name };
+    guestBookStatus = null;
+    guestBookPendingId = null;
+    loadGuestBookThread();
+}
+function guestBookBack() {
+    guestBookView = 'inbox';
+    guestBookPartner = null;
+    guestBookStatus = null;
+    guestBookPendingId = null;
+    loadGuestBookInbox();
 }
 
 // Updates only the status line, so text typed in the message box is kept
@@ -447,76 +484,92 @@ function setGuestBookStatus(msg, isErr) {
 function gbCount() {
     const ta = document.getElementById('gb-text');
     const c = document.getElementById('gb-count');
-    if (ta && c) c.textContent = `${ta.value.length} / 100`;
+    if (ta && c) c.textContent = `${ta.value.length} / ${GB_MAX}`;
+}
+
+function gbInboxHTML() {
+    if (guestBookInbox === null) return `<p class="gb-sub">Loading...</p>`;
+    if (!guestBookInbox.length) return `<p class="gb-sub">No messages in the last 7 days.</p>`;
+    return `<div class="gb-list">` + guestBookInbox.map(c => {
+        const badge = c.unread > 0 ? `<span class="gb-unread">${Number(c.unread)}</span>` : '';
+        return `<button class="gb-row gb-thread" onclick="guestBookOpenThread('${gbEsc(c.partner_id)}', '${gbEsc(String(c.partner_name).replace(/'/g, ''))}')">`
+            + `<div class="gb-meta"><b>${gbEsc(c.partner_name)}</b><span>${badge}${gbStamp(c.last_at)}</span></div>`
+            + `<div class="gb-body">${c.last_mine ? 'You: ' : ''}${gbEsc(c.last_body)}</div></button>`;
+    }).join('') + `</div>`;
+}
+
+function gbThreadHTML() {
+    if (guestBookThread === null) return `<p class="gb-sub">Loading...</p>`;
+    if (!guestBookThread.length) return `<p class="gb-sub">No messages yet. Say hello.</p>`;
+    // Oldest first, so the newest message is at the bottom
+    const msgs = guestBookThread.slice().reverse().map(m => {
+        const id = Number(m.id);
+        if (m.mine) {
+            return `<div class="gb-msg mine"><div class="gb-body">${gbEsc(m.body)}</div><div class="gb-meta"><span>${gbStamp(m.created_at)}</span></div></div>`;
+        }
+        const action = guestBookPendingId === id
+            ? `<div class="gb-confirm"><span>Delete?</span><button class="gb-del" onclick="guestBookDelete(${id})" ${guestBookBusy ? 'disabled' : ''}>Yes</button><button class="gb-del" onclick="guestBookCancel()">No</button></div>`
+            : `<button class="gb-del" onclick="guestBookAsk(${id})">Delete</button>`;
+        return `<div class="gb-msg theirs"><div class="gb-meta"><b>${gbEsc(m.sender_name || 'Hero')}</b><span>${gbStamp(m.created_at)}</span></div>`
+            + `<div class="gb-body">${gbEsc(m.body)}</div>${action}</div>`;
+    }).join('');
+    return `<div class="gb-chat" id="gb-chat">${msgs}</div>`;
 }
 
 function renderGuestBook() {
     const box = document.getElementById('guestbook-panel');
     if (!box) return;
-    const visiting = friendTentVisiting();
-    const who = visiting ? window.friendVisit.name : '';
+    const inThread = guestBookView === 'thread' && guestBookPartner;
+    const canBack = !friendTentVisiting() && inThread;
+    const title = friendTentVisiting() ? `${gbEsc(window.friendVisit.name)}'s Guest Book` : (inThread ? gbEsc(guestBookPartner.name) : 'Guest Book');
+    const head = `<div class="gb-head">${canBack ? '<button class="gb-x" onclick="guestBookBack()">←</button>' : ''}<h3>${title}</h3><button class="gb-x" onclick="closeGuestBook()">✕</button></div>`;
     let body;
-    if (visiting) {
-        body = `<p class="gb-sub">Leave a message for ${gbEsc(who)} (up to 100 characters). Your name and the time are saved with it.</p>
-            <textarea id="gb-text" maxlength="100" placeholder="Write a message..." oninput="gbCount()"></textarea>
-            <div class="gb-foot"><span class="gb-count" id="gb-count">0 / 100</span>`
-            + `<button class="gb-btn" id="gb-send" onclick="guestBookSend()" ${guestBookBusy ? 'disabled' : ''}>Send</button></div>`;
-    } else if (guestBookRows === null) {
-        body = `<p class="gb-sub">Loading...</p>`;
-    } else if (!guestBookRows.length) {
-        body = `<p class="gb-sub">No messages yet.</p>`;
+    if (inThread) {
+        body = gbThreadHTML()
+            + `<div class="gb-foot"><input type="text" id="gb-text" maxlength="${GB_MAX}" placeholder="Write a message..." oninput="gbCount()" onkeydown="if(event.key==='Enter')guestBookSend()">`
+            + `<button class="gb-btn" id="gb-send" onclick="guestBookSend()" ${guestBookBusy ? 'disabled' : ''}>Send</button></div>`
+            + `<div class="gb-foot"><span class="gb-count" id="gb-count">0 / ${GB_MAX}</span><span></span></div>`;
     } else {
-        const rows = guestBookRows.map(r => {
-            const id = Number(r.id);
-            const action = guestBookPendingId === id
-                ? `<div class="gb-confirm"><span>Delete this message?</span>`
-                  + `<button class="gb-del" onclick="guestBookDelete(${id})" ${guestBookBusy ? 'disabled' : ''}>Yes</button>`
-                  + `<button class="gb-del" onclick="guestBookCancel()">No</button></div>`
-                : `<div class="gb-foot"><span></span><button class="gb-del" onclick="guestBookAsk(${id})">Delete</button></div>`;
-            return `<div class="gb-row"><div class="gb-meta"><b>${gbEsc(r.writer_name || 'Hero')}</b><span>${gbStamp(r.created_at)}</span></div>`
-                + `<div class="gb-body">${gbEsc(r.body)}</div>${action}</div>`;
-        }).join('');
-        body = `<p class="gb-sub">${guestBookRows.length} message${guestBookRows.length === 1 ? '' : 's'}</p><div class="gb-list">${rows}</div>`;
+        body = gbInboxHTML();
     }
     const st = guestBookStatus ? guestBookStatus.msg : '';
     const stErr = guestBookStatus && guestBookStatus.err ? ' err' : '';
-    const title = visiting ? `${gbEsc(who)}'s Guest Book` : 'Guest Book';
-    box.innerHTML = `<div class="gb-head"><h3>${title}</h3><button class="gb-x" onclick="closeGuestBook()">✕</button></div>`
-        + body + `<p class="gb-status${stErr}" id="gb-status">${gbEsc(st)}</p>`;
-    if (visiting) gbCount();
+    box.innerHTML = head + body + `<p class="gb-status${stErr}" id="gb-status">${gbEsc(st)}</p>`;
+    const chat = document.getElementById('gb-chat');
+    if (chat) chat.scrollTop = chat.scrollHeight;
+    if (inThread) gbCount();
 }
 
-// Visitor: send the message to the friend's guest book
+// Send to the friend in the open thread (a visitor's message, or the owner's reply)
 async function guestBookSend() {
-    if (guestBookBusy || !friendTentVisiting()) return;
+    if (guestBookBusy || !guestBookPartner) return;
     const ta = document.getElementById('gb-text');
     const body = (ta ? ta.value : '').trim();
     if (!body) { setGuestBookStatus('Write a message first.', true); return; }
-    if (body.length > 100) { setGuestBookStatus('Messages can be up to 100 characters.', true); return; }
+    if (body.length > GB_MAX) { setGuestBookStatus(`Messages can be up to ${GB_MAX} characters.`, true); return; }
     guestBookBusy = true;
     const btn = document.getElementById('gb-send');
     if (btn) btn.disabled = true;
-    const res = await friendApi.guestbookWrite(window.friendVisit.ownerId, body);
+    const res = await friendApi.pagerSend(guestBookPartner.id, body);
     guestBookBusy = false;
     if (btn) btn.disabled = false;
     if (res.error) { setGuestBookStatus(res.error, true); return; }
     if (ta) ta.value = '';
-    gbCount();
-    setGuestBookStatus('Message sent.', false);
+    setGuestBookStatus('', false);
+    loadGuestBookThread();
 }
 
-// Owner: read and delete messages
 function guestBookAsk(id) { guestBookPendingId = id; renderGuestBook(); }
 function guestBookCancel() { guestBookPendingId = null; renderGuestBook(); }
 async function guestBookDelete(id) {
     if (guestBookBusy) return;
     guestBookBusy = true;
     renderGuestBook();
-    const res = await friendApi.guestbookDelete(id);
+    const res = await friendApi.pagerDelete(id);
     guestBookBusy = false;
     guestBookPendingId = null;
     if (res.error) { guestBookStatus = { msg: res.error, err: true }; renderGuestBook(); return; }
-    guestBookRows = (guestBookRows || []).filter(r => Number(r.id) !== Number(id));
+    guestBookThread = (guestBookThread || []).filter(m => Number(m.id) !== Number(id));
     guestBookStatus = null;
     renderGuestBook();
 }
