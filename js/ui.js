@@ -1043,10 +1043,22 @@ function combatDeadFrame() {
     const P = combatPose();
     return alignTorso(P.DEAD, P.IDLE);
 }
-function playPlayerAttackAnim(isCrit) {
+// How far the hero hops to stand 50px in front of the target monster (local px, measured from the lineup now)
+const COMBAT_PLAYER_FRONT_GAP_PX = 50;
+function playerLungeDistance(target) {
+    const el = document.getElementById('combat-player-sprite');
+    const idx = target ? monstersList.indexOf(target) : -1;
+    const mImg = idx >= 0 ? document.querySelector(`#monsters-lineup-container > div:nth-child(${idx + 1}) img`) : null;
+    if (!el || !mImg || !el.offsetWidth) return COMBAT_PLAYER_LUNGE_PX;
+    const pr = el.getBoundingClientRect(), mr = mImg.getBoundingClientRect();
+    const scale = pr.width / el.offsetWidth;
+    const gap = (mr.left - pr.right) / scale; // space between the hero's right edge and the monster's left edge
+    return Math.max(0, gap - COMBAT_PLAYER_FRONT_GAP_PX);
+}
+function playPlayerAttackAnim(isCrit, target) {
     const cri = combatPose().CRI;
     const criCount = Array.isArray(cri) ? cri.length : 1;
-    combatPlayerAttack = { at: Date.now(), crit: !!isCrit, criIdx: Math.floor(Math.random() * criCount) };
+    combatPlayerAttack = { at: Date.now(), crit: !!isCrit, criIdx: Math.floor(Math.random() * criCount), lungePx: playerLungeDistance(target) };
     const el = document.getElementById('combat-player-sprite');
     if (!el) return;
     el.dataset.lungeAt = String(combatPlayerAttack.at);
@@ -1222,11 +1234,12 @@ function playPlayerAttackLunge(el, crit) {
     const peak = (COMBAT_PLAYER_WINDUP_MS + 90) / T; // the strike reaches its furthest point 90 ms after the wind-up
     // The body hops forward over the strike: up in the air mid-way, then lands 50px in front of the monster
     const air = (w + peak) / 2;
+    const dx = combatPlayerAttack.lungePx || COMBAT_PLAYER_LUNGE_PX;
     const frames = [
         { transform: 'translate(0px, 0px)', offset: 0, easing: 'ease-out' },
         { transform: `translate(${COMBAT_PLAYER_WINDUP_PX}px, 0px)`, offset: w, easing: 'ease-in-out' },
-        { transform: `translate(${COMBAT_PLAYER_LUNGE_PX / 2}px, -${COMBAT_PLAYER_JUMP_PX}px)`, offset: air, easing: 'ease-in-out' },
-        { transform: `translate(${COMBAT_PLAYER_LUNGE_PX}px, 0px)`, offset: peak, easing: 'ease-in' },
+        { transform: `translate(${dx / 2}px, -${COMBAT_PLAYER_JUMP_PX}px)`, offset: air, easing: 'ease-in-out' },
+        { transform: `translate(${dx}px, 0px)`, offset: peak, easing: 'ease-in' },
         { transform: 'translate(0px, 0px)', offset: 1 }
     ];
     el.animate(frames, { duration: T });
