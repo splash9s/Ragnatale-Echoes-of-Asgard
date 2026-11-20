@@ -2285,13 +2285,15 @@ function dailyFreeCardHTML(key) {
         </div>
     `;
     }
+    // The gold gift shows the free-reward alert on its Claim button (only while unclaimed)
+    const alert = key === 'gold' ? '<img id="alert-free-gold" src="assets/page01/alert_q85.webp" alt="" style="position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;">' : '';
     return `
-        <div class="free-reward-card p-3 rounded border flex justify-between items-center">
+        <div class="free-reward-card p-3 rounded border flex justify-between items-center" style="position:relative;">
             <div>
                 <span class="font-bold block text-xs">${item.name}</span>
                 <span class="text-[10px]">${item.desc}</span>
             </div>
-            <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>
+            <button onclick="claimDailyFree('${key}')" class="px-3 py-1.5 bg-white hover:bg-red-100 text-red-700 font-bold rounded-lg cursor-pointer text-xs transition">Claim</button>${alert}
         </div>
     `;
 }
@@ -2400,7 +2402,7 @@ function updateTownAlerts() {
     // Friend button alert: set by friends.js (only when another player's friend request is waiting for a reply)
     // Tab badges: Diamond tab (free diamond unclaimed), Shop tab (free gold unclaimed), Events > Daily Quests (quest open)
     const tabDia = document.getElementById('alert-tab-diamond');
-    const tabShop = document.getElementById('alert-tab-shop');
+    const tabShop = document.getElementById('alert-free-gold'); // on the free gold Claim card
     const tabQuest = document.getElementById('alert-tab-quests');
     if (tabDia) tabDia.style.display = isFreeDiamondAvailable() ? 'block' : 'none';
     if (tabShop) tabShop.style.display = isFreeGoldAvailable() ? 'block' : 'none';
