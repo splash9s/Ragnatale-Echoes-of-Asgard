@@ -6032,8 +6032,8 @@ function renderQuestsView() {
     if (!player.dailyQuests || player.dailyQuests.length === 0) {
         player.dailyQuests = [
             { id: 'q_slimes', title: "Slime Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
-            { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
-            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Gold from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
+            { id: 'q_crit', title: "Precision Striker", desc: "Land 60 Critical hits in combat.", target: 60, current: 0, rewardChest: "silver", completed: false },
+            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 10,000 Gold from expeditions.", target: 10000, current: 0, rewardChest: "gold", completed: false }
         ];
     }
 

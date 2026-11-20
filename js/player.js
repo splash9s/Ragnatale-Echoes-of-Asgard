@@ -36,8 +36,8 @@ let player = {
     mailBox: createWelcomeMail(),
     dailyQuests: [
         { id: 'q_slimes', title: "Slime Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
-        { id: 'q_crit', title: "Precision Striker", desc: "Land 175 Critical hits in combat.", target: 175, current: 0, rewardChest: "silver", completed: false },
-        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 30,000 Gold from expeditions.", target: 30000, current: 0, rewardChest: "gold", completed: false }
+        { id: 'q_crit', title: "Precision Striker", desc: "Land 60 Critical hits in combat.", target: 60, current: 0, rewardChest: "silver", completed: false },
+        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 10,000 Gold from expeditions.", target: 10000, current: 0, rewardChest: "gold", completed: false }
     ],
     questMilestoneClaimed: { 1: false, 2: false, 3: false },
     dailyFree: {},
@@ -424,7 +424,7 @@ function loadGame() {
                 player.mailBox = createWelcomeMail();
             }
             if (!player.dailyQuests) player.dailyQuests = [];
-            const QUEST_TARGETS = { q_slimes: 45, q_crit: 175, q_gold: 30000 };
+            const QUEST_TARGETS = { q_slimes: 45, q_crit: 60, q_gold: 10000 };
             player.dailyQuests.forEach(q => { if (QUEST_TARGETS[q.id]) q.target = QUEST_TARGETS[q.id]; });
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (typeof ensureDailyQuestsToday === 'function') ensureDailyQuestsToday();
