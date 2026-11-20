@@ -8716,7 +8716,9 @@ function playLevelUpFx() {
         const op = el.offsetParent || document.body;
         const orr = op.getBoundingClientRect();
         const sc = (orr.width / (op.offsetWidth || orr.width)) || 1; // the stage may be scaled to fit the screen
-        pos = { position: 'absolute', left: (cx - orr.left) / sc, top: (feet - orr.top) / sc, w: w / sc, z: '' };
+        // Same layer as the player (drawn just before it, so the player stays in front); above the stage base layers
+        const az = parseInt(getComputedStyle(anchor).zIndex, 10);
+        pos = { position: 'absolute', left: (cx - orr.left) / sc, top: (feet - orr.top) / sc, w: w / sc, z: Number.isNaN(az) ? '' : `z-index:${az};` };
     } else {
         document.body.appendChild(el);
         pos = { position: 'fixed', left: cx, top: feet, w, z: 'z-index:9000;' };
