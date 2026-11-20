@@ -2264,7 +2264,19 @@ function claimDailyFree(key) {
     if (item.reward.gold) player.gold += item.reward.gold;
     if (item.reward.diamonds) player.diamonds += item.reward.diamonds;
     logMessage(`[Free] Received ${item.name}!`, 'levelup');
-    showModal("Free Reward", '', rewardPopupHTML('You received:', rewardCellHTML(item), '<div class="text-slate-400 text-xs">Come back tomorrow for another.</div>'));
+    // The free diamond shows green bold text instead of the item box
+    const claimedText = key === 'diamond'
+        ? `<div style="color:#4ade80; font-weight:bold; font-size:26px; padding:18px 0;">Claimed ${item.reward.diamonds} Diamond</div>`
+        : rewardCellHTML(item);
+    const claimedHTML = key === 'diamond'
+        ? `<div class="flex flex-col items-center gap-3 text-center">
+        <div class="text-slate-300 text-sm">You received:</div>
+        ${claimedText}
+        <div class="text-slate-400 text-xs">Come back tomorrow for another.</div>
+        <button onclick="closeModal()" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl">Confirm</button>
+    </div>`
+        : rewardPopupHTML('You received:', claimedText, '<div class="text-slate-400 text-xs">Come back tomorrow for another.</div>');
+    showModal("Free Reward", '', claimedHTML);
     updateUI();
     renderShop();
     renderDiamondShop();
