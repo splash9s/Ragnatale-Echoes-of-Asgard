@@ -7147,8 +7147,9 @@ document.addEventListener('pointerout', (e) => {
     }
     if (inStashDetail(e.target) && stashHoverOpened && !inStashDetail(to) && !stashCellRef(to)) closeStashDetail();
 });
+// Press and hold (0.5 s) opens the detail: touch, pen or the left mouse button
 document.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'touch') return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     const r = stashCellRef(e.target);
     if (!r) return;
     stashPressStart = { x: e.clientX, y: e.clientY };
@@ -7160,7 +7161,7 @@ document.addEventListener('pointerdown', (e) => {
     }, BAG_LONGPRESS_MS);
 });
 document.addEventListener('pointermove', (e) => {
-    if (e.pointerType !== 'touch' || !stashPressStart) return;
+    if (!stashPressStart) return;
     if (Math.hypot(e.clientX - stashPressStart.x, e.clientY - stashPressStart.y) > 10) clearTimeout(stashPressTimer);
 });
 document.addEventListener('pointerup', () => { clearTimeout(stashPressTimer); stashPressStart = null; });
