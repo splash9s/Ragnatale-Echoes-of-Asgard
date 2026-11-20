@@ -217,8 +217,8 @@ function statText(stats) {
     return Object.keys(stats).map(k => `${STAT_TEXT[k] || k} +${stats[k]}`).join(', ');
 }
 
-// Shop: only these four helmets are sold
-const SHOP_HAT_LEVELS = [10, 30, 50];
+// Shop: these helmets are sold
+const SHOP_HAT_LEVELS = [10, 20, 30, 40, 50, 60, 70, 80, 90];
 Object.keys(HAT_BY_LEVEL).forEach(lv => {
     const h = HAT_BY_LEVEL[lv];
     if (!h.price || !SHOP_HAT_LEVELS.includes(Number(lv))) return;
