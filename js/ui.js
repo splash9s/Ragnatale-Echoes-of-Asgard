@@ -8177,7 +8177,8 @@ setInterval(() => { if (!document.hidden) syncTentPets(); }, 1000);
 (function () {
     const visible = (id) => { const el = document.getElementById(id); return !!el && el.style.display !== 'none' && !!el.innerHTML; };
     const POPUPS = [
-        { open: () => { const m = document.getElementById('game-modal'); return !!m && !m.classList.contains('hidden'); },
+        // The combat rune pick cannot be closed by an outside press: a rune must be chosen
+        { open: () => { const m = document.getElementById('game-modal'); return !!m && !m.classList.contains('hidden') && !document.getElementById('rune-pick-root'); },
           el: () => document.querySelector('#game-modal > div'), close: () => closeModal() },
         { open: () => visible('inv-detail-panel'), el: () => document.getElementById('inv-detail-panel'), close: () => closeInvDetail() },
         { open: () => visible('shop-detail-panel'), el: () => document.getElementById('shop-detail-panel'), close: () => closeShopDetail() },
