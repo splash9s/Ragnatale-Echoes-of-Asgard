@@ -59,6 +59,9 @@ const I18N = {
         'quest.q_potion.desc': 'Buy {n} potions.',
         'quest.q_visit.title': 'Friend Visitor',
         'quest.q_visit.desc': 'Visit {n} friend tents.',
+        'exp.cleared': 'Cleared',
+        'exp.selected': 'Selected',
+        'exp.available': 'Available',
     },
     th: {
         'set.save': '💾 บันทึกเกม',
@@ -118,6 +121,9 @@ const I18N = {
         'quest.q_potion.desc': 'ซื้อยา {n} ขวด',
         'quest.q_visit.title': 'นักเยี่ยมเพื่อน',
         'quest.q_visit.desc': 'เยี่ยมเต็นท์เพื่อน {n} ครั้ง',
+        'exp.cleared': 'ผ่านแล้ว',
+        'exp.selected': 'เลือกอยู่',
+        'exp.available': 'เปิดให้เล่น',
     },
 };
 
@@ -141,6 +147,17 @@ function questDesc(q) {
     return v.replace('{n}', Number(q.target).toLocaleString());
 }
 
+// Map and path names come from game data in English; this turns them into Thai when Thai is on
+function localGameName(text) {
+    if (currentLanguage !== 'th') return text;
+    const paths = { 'Fire Path': 'เส้นทางไฟ', 'Ice Path': 'เส้นทางน้ำแข็ง', 'Earth Path': 'เส้นทางดิน', 'Wind Path': 'เส้นทางลม' };
+    if (paths[text]) return paths[text];
+    if (String(text).indexOf(' · ') >= 0) return String(text).split(' · ').map(localGameName).join(' · ');
+    return String(text)
+        .replace(/^Final Map Lv\. (\d+)$/, 'แผนที่สุดท้าย Lv. $1')
+        .replace(/^Map Lv\. (\d+)$/, 'แผนที่ Lv. $1');
+}
+
 function applyLanguage() {
     document.documentElement.lang = currentLanguage === 'th' ? 'th' : 'en';
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -149,6 +166,7 @@ function applyLanguage() {
     });
     if (typeof refreshAudioUI === 'function') refreshAudioUI();
     if (typeof renderQuestsView === 'function' && document.getElementById('quests-container')) renderQuestsView();
+    if (typeof renderMapGateUI === 'function' && document.getElementById('campaign-map-select')) renderMapGateUI();
 }
 
 // Remember the choice on this device only

@@ -2173,11 +2173,11 @@ function renderMapGateUI() {
         pathEl.innerHTML = Object.keys(GAME_DATA.paths).map(k => {
             const p = GAME_DATA.paths[k];
             const on = k === pk;
-            return `<button onclick="selectCampaignPath('${k}')" class="p-2 rounded-xl border text-xs font-bold transition cursor-pointer ${on ? 'bg-amber-500/20 border-amber-400 text-amber-300' : 'bg-slate-950 border-slate-700 text-slate-300 hover:border-amber-400'}">${p.icon} ${p.name}</button>`;
+            return `<button onclick="selectCampaignPath('${k}')" class="p-2 rounded-xl border text-xs font-bold transition cursor-pointer ${on ? 'bg-amber-500/20 border-amber-400 text-amber-300' : 'bg-slate-950 border-slate-700 text-slate-300 hover:border-amber-400'}">${p.icon} ${localGameName(p.name)}</button>`;
         }).join('');
     }
 
-    selectEl.innerHTML = order.map(m => `<option value="${pk}:${m}">${GAME_DATA.paths[pk].maps[m].title}</option>`).join('');
+    selectEl.innerHTML = order.map(m => `<option value="${pk}:${m}">${localGameName(GAME_DATA.paths[pk].maps[m].title)}</option>`).join('');
     const unlockedKeys = order.filter(m => isMapUnlocked(`${pk}:${m}`));
     const current = (mk && isMapUnlocked(`${pk}:${mk}`)) ? mk : unlockedKeys[unlockedKeys.length - 1];
     selectEl.value = `${pk}:${current}`;
@@ -2198,15 +2198,15 @@ function renderMapGateUI() {
             diamond = true;
         } else if (selected) {
             cls = 'bg-amber-500/20 border-amber-400 text-amber-300 cursor-pointer';
-            sub = cleared ? '✔ Cleared · Selected' : 'Selected';
+            sub = cleared ? '✔ ' + tr('exp.cleared') + ' · ' + tr('exp.selected') : tr('exp.selected');
         } else {
             cls = 'bg-slate-950 border-slate-700 text-slate-200 hover:border-amber-400 cursor-pointer';
-            sub = cleared ? '✔ Cleared' : 'Available';
+            sub = cleared ? '✔ ' + tr('exp.cleared') : tr('exp.available');
         }
         const bg = '';
         return `<button ${unlocked ? '' : 'disabled'} onclick="selectCampaignMap('${key}')" class="relative overflow-hidden p-3 pl-12 rounded-xl border text-left text-xs transition ${cls}">
             ${unlocked ? '' : '<span class="absolute left-2 top-2 text-base leading-none pointer-events-none">🔒</span>'}
-            ${bg}<span class="relative block font-bold">${GAME_DATA.paths[pk].maps[m].title}</span>
+            ${bg}<span class="relative block font-bold">${localGameName(GAME_DATA.paths[pk].maps[m].title)}</span>
             ${sub ? `<span class="relative block text-[10px] mt-0.5">${sub}</span>` : ''}
         </button>`;
     }).join('');
