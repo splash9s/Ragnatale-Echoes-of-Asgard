@@ -2709,7 +2709,7 @@ function towerRenderField() {
             el.style.cssText = `position:absolute;left:${footX - 32}px;top:${footY - 70}px;width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14;z-index:4;pointer-events:none;`;
         }
         // Fall once when the friend goes down (same animation as the hero)
-        if (!alive) el.classList.add('tower-fall');
+        if (!alive) { el.classList.add('tower-fall'); m.attackUntil = 0; } // down: the fall plays once, no swing continues
         else el.classList.remove('tower-fall');
 
         const labelId = `tower-label-${id}`;
