@@ -2848,7 +2848,7 @@ function vhPlayPet(stage, img, gen) {
     };
     step();
 }
-const VIP_HIGHLIGHT_ITEMS = ['dchest_costume_ticket', 'pet_box_ticket', 'vip_pass', 'vip_7d', 'vip_1d', 'res_potion'];
+const VIP_HIGHLIGHT_ITEMS = ['dchest_costume', 'pet_box_ticket', 'vip_pass', 'vip_7d', 'vip_1d', 'res_potion'];
 function vipCellHTML(item) {
     return `<div class="vip-cell">
             <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
