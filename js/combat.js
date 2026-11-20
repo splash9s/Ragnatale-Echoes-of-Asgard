@@ -1857,7 +1857,7 @@ function runCombatTick() {
         const surgeBonus = player.runes.surgeReady ? runeN('surgeFocus') : 0;
         player.runes.surgeReady = false;
         const isCrit = (isFirstHitOfBattle && player.runes.alwaysCritFirst) || runeN('relentless') > 0 || riposteCrit || (Math.random() * 100 < derived.crit + surgeBonus);
-        playPlayerAttackAnim(isCrit, targetEnemy);
+        playPlayerAttackAnim(isCrit);
         targetEnemy.lastHitCrit = !!isCrit;
         targetEnemy.lastHitElem = (elemMult > 1 && !player.runes.elementIgnore) ? (player.equipped.weapon?.element || null) : null; // element advantage shows the number in that element's colour
         if (isCrit) {
@@ -1952,7 +1952,7 @@ function runCombatTick() {
         }
     } else {
         critStreak = 0;
-        if (!attackBlocked) playPlayerAttackAnim(false, targetEnemy); // the swing plays on a miss too
+        if (!attackBlocked) playPlayerAttackAnim(false); // the swing plays on a miss too
         if (!attackBlocked) {
             const di = monstersList.indexOf(targetEnemy);
             if (di >= 0) setTimeout(() => showCombatText(`#monsters-lineup-container > div:nth-child(${di + 1}) img`, 'DODGE', 'miss'), 0);
