@@ -109,8 +109,13 @@ async function refreshFriendAlert() {
 }
 setTimeout(refreshFriendAlert, 3000);
 setInterval(() => { if (!document.hidden) refreshFriendAlert(); }, 60000);
+// Guest Book alert: checked every 15 seconds, only while the tent is on screen
+function tentOnScreen() {
+    const v = document.getElementById('view-character');
+    return !!v && !v.classList.contains('hidden');
+}
 setTimeout(refreshGuestBookAlert, 3000);
-setInterval(() => { if (!document.hidden) refreshGuestBookAlert(); }, 60000);
+setInterval(() => { if (!document.hidden && tentOnScreen()) refreshGuestBookAlert(); }, 15000);
 
 // Switches between the Friends and Requests tabs
 function setFriendTab(tab) {
