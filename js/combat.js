@@ -2010,6 +2010,7 @@ function onStageCleared() {
     if (stageClearing) return;
     stageClearing = true;
     stopCombatTimers(); combatRunId++;
+    updateUI(); // draws the last kills so their death animations start (the lineup only starts a death when it is drawn)
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     const sid = combatSessionId;
     const wasBossStage = isBossStage(); // read before the stage number moves on
@@ -2613,17 +2614,21 @@ function towerAllyAttacks() {
         if (!t) return;
         const dmg = Math.max(1, Math.floor(a.atk * (0.8 + Math.random() * 0.4) * 100 / (100 + (t.def || 0))));
         t.hp -= dmg;
-        a.attackUntil = Date.now() + 330; // friend's attack pose, then back to idle
-        // Friends alternate both attack poses; every third swing uses the critical poses (damage unchanged)
+        // One swing plays two poses in order (attack then attack02); every third swing plays the critical pair (damage unchanged)
         const swing = (a.swings = (a.swings || 0) + 1);
-        a.attackPose = swing % 3 === 0 ? (Math.floor(swing / 3) % 2 ? 'CRI2' : 'CRI') : (swing % 2 ? 'ATTACK' : 'ATTACK2');
+        a.attackPair = swing % 3 === 0 ? ['CRI', 'CRI2'] : ['ATTACK', 'ATTACK2'];
+        a.attackAt = Date.now();
+        a.attackUntil = a.attackAt + TOWER_ALLY_SWING_MS; // then back to idle
         const ti = monstersList.indexOf(t);
         if (ti >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${ti + 1}) img`, String(dmg), '');
         logMessage(`[Tower] ${a.name} hits ${t.name} for ${dmg} damage`, 'combat');
     });
     towerRenderField();
-    setTimeout(towerRenderField, 340);
+    setTimeout(towerRenderField, TOWER_ALLY_STEP_MS + 5); // switch to the second pose
+    setTimeout(towerRenderField, TOWER_ALLY_SWING_MS + 5); // back to idle
 }
+const TOWER_ALLY_STEP_MS = 220; // first pose of a friend's swing
+const TOWER_ALLY_SWING_MS = 460; // whole swing (both poses)
 
 // A friend's idle combat frame, built from their saved gear and costume (cached once the art has loaded)
 function towerFriendFrame(m, pose = 'IDLE') {
@@ -2675,8 +2680,10 @@ function towerRenderField() {
         const footX = towerSlotFeet(id).x;
         const footY = towerSlotFeet(id).y;
         const attacking = alive && Date.now() < (m.attackUntil || 0);
+        const step = Date.now() - (m.attackAt || 0) < TOWER_ALLY_STEP_MS ? 0 : 1;
+        const pose = (m.attackPair || ['ATTACK'])[step];
         const f = !alive ? (towerFriendFrame(m, 'DEAD') || towerFriendFrame(m, 'IDLE'))
-            : attacking ? (towerFriendFrame(m, m.attackPose || 'ATTACK') || towerFriendFrame(m, 'IDLE'))
+            : attacking ? (towerFriendFrame(m, pose) || towerFriendFrame(m, 'IDLE'))
             : towerFriendFrame(m, 'IDLE');
         const elId = `tower-field-${id}`;
         keep.add(elId);
