@@ -245,6 +245,7 @@ const friendApi = {
     guestbookWrite: (ownerId, body) => friendRpc('guestbook_write', { p_owner: ownerId, p_body: body }),
     guestbookList: () => friendRpc('guestbook_list'),
     guestbookDelete: (id) => friendRpc('guestbook_delete', { p_id: id }),
+    guestbookUnread: () => friendRpc('guestbook_unread'),
 };
 
 // Copies unclaimed server mail (friend gifts) into the mailbox once. Negative ids keep them apart from local mail.
