@@ -112,10 +112,10 @@ function refreshAudioUI() {
     const a = audioSettings();
     const setText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
     const setVal = (id, val) => { const el = document.getElementById(id); if (el && el.value !== String(val)) el.value = val; };
-    setText('music-toggle-btn', a.musicOn ? '🎵 Music: On' : '🎵 Music: Off');
+    setText('music-toggle-btn', '🎵 ' + tr('set.music') + ' ' + tr(a.musicOn ? 'on' : 'off'));
     setVal('music-volume', a.musicVol);
     setText('music-volume-text', a.musicVol);
-    setText('sfx-toggle-btn', a.sfxOn ? '🔊 Effects: On' : '🔊 Effects: Off');
+    setText('sfx-toggle-btn', tr('set.sfx') + ' ' + tr(a.sfxOn ? 'on' : 'off'));
     setVal('sfx-volume', a.sfxVol);
     setText('sfx-volume-text', a.sfxVol);
     updateSoundButton();

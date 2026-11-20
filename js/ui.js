@@ -120,6 +120,8 @@ const DIAMOND_SHOP_ITEMS = [
 
 function toggleLanguage() {
     currentLanguage = (currentLanguage === 'en') ? 'th' : 'en';
+    saveLanguage();
+    applyLanguage();
 }
 
 function manualSaveGame() {
