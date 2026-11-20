@@ -21,21 +21,21 @@ create or replace function public.guestbook_write(p_owner uuid, p_body text) ret
 language plpgsql security definer set search_path = public as $$
 declare
     me uuid := auth.uid();
-    body text := btrim(coalesce(p_body, ''));
+    v_body text := btrim(coalesce(p_body, ''));
     my_name text;
     row_data jsonb;
 begin
     if me is null then raise exception 'Sign in first'; end if;
     if p_owner = me then raise exception 'You cannot write in your own guest book'; end if;
-    if char_length(body) < 1 then raise exception 'Write a message first'; end if;
-    if char_length(body) > 100 then raise exception 'Messages can be up to 100 characters'; end if;
+    if char_length(v_body) < 1 then raise exception 'Write a message first'; end if;
+    if char_length(v_body) > 100 then raise exception 'Messages can be up to 100 characters'; end if;
     if not exists (select 1 from public.friendships where owner_id = me and friend_id = p_owner) then
         raise exception 'Not in your friend list';
     end if;
 
     select coalesce(p.name, 'Hero') into my_name from public.profiles p where p.user_id = me;
     insert into public.tent_guestbook (owner_id, writer_id, writer_name, body)
-    values (p_owner, me, coalesce(my_name, 'Hero'), body)
+    values (p_owner, me, coalesce(my_name, 'Hero'), v_body)
     returning jsonb_build_object('id', id, 'writer_name', writer_name, 'body', body, 'created_at', created_at)
     into row_data;
 
