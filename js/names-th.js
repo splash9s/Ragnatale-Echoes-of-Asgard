@@ -161,6 +161,13 @@ const NAMES_TH = {
     'Shared Pain Rune': 'รูนความเจ็บปวดร่วม',
     'Phantom Veil Rune': 'รูนม่านเงา',
     'No rune acquired yet': 'ยังไม่มีรูนที่ได้รับ',
+    // Costumes, build names and set/class names
+    'Blue Samurai Costume': 'ชุดซามูไรสีน้ำเงิน', 'Red Samurai Costume': 'ชุดซามูไรสีแดง',
+    'Yellow Samurai Costume': 'ชุดซามูไรสีเหลือง', 'Wanderer Samurai Costume': 'ชุดซามูไรนักพเนจร',
+    'Christmas Costume': 'ชุดคริสต์มาส', 'Cat on Grass': 'แมวบนทุ่งหญ้า',
+    'Freyr (Gold Build)': 'เฟรย์ (สายทอง)', 'Hel': 'เฮล', 'Tyr': 'ทีร์', 'Valkyrie': 'วาลคิรี', 'Ravens': 'อีกา',
+    'Giant': 'ยักษ์', 'Dragon': 'มังกร', 'Hunter': 'นักล่า', 'Explorer': 'นักสำรวจ', 'Alchemist': 'นักเล่นแร่แปรธาตุ',
+    'Pharaoh': 'ฟาโรห์', 'Brisingamen': 'บริซิงกาเมน', "Explorer's Blade": 'ดาบนักสำรวจ',
     // Monsters
     'Abyss Lord (Boss)': 'ลอร์ดเหวลึก (บอส)',
     'Battle Storm Mage': 'จอมเวทพายุศึก',
