@@ -1111,6 +1111,9 @@
         .tint-wind  { filter: saturate(0) brightness(0.9); }
         .tint-gold  { filter: sepia(1) saturate(4.5) hue-rotate(-12deg) brightness(1.12) contrast(1.05); }
         /* Entering combat: hide default (earth) art, HUD and monsters until the chosen map's layers are swapped in */
+        /* First visit to a map: black cover, faded out once the battle art is in place (js/ui.js) */
+        #map-cover { position: fixed; inset: 0; background: #000; z-index: 900; opacity: 0; pointer-events: none; transition: opacity .4s; }
+        #map-cover.show { opacity: 1; pointer-events: auto; }
         #view-combat.art-loading #earth-bg, #view-combat.art-loading #earth-base, #view-combat.art-loading #earth-fg,
         #view-combat.art-loading #combat-hp-under, #view-combat.art-loading #monsters-lineup-container, #view-combat.art-loading #combat-player-shadow, #view-combat.art-loading #combat-player-sprite, #view-combat.art-loading #combat-pet-sprite { visibility: hidden; }
         /* Item detail text: a little bigger for the other text in the window */
@@ -2133,9 +2136,9 @@
     <script src="js/cloud.js?v=20261120pg"></script>
     <script src="js/hero-art.js?v=20261118t"></script>
     <script src="js/hero-body.js?v=20261119j"></script>
-    <script src="js/combat.js?v=20261120rp"></script>
+    <script src="js/combat.js?v=20261120mc"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261120ih"></script>
+    <script src="js/ui.js?v=20261120mc"></script>
     <script src="js/market.js?v=20261113c"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>

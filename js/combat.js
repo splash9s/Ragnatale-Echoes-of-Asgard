@@ -527,6 +527,8 @@ function selectRuneChoice(runeId, callback) {
 function startExpedition(mode, opts = {}) {
     armorBrokenThisMap = false; // a new map gets its first Armor Break again
     towerParty = null; // only the Warded Tower sets a party
+    // Which map this run is on (used to show the first-visit cover once per map)
+    window.combatMapKey = mode === 'campaign' ? (opts.final ? 'final' : (document.getElementById('campaign-map-select')?.value || 'campaign')) : mode;
     if (mode === 'campaign' && typeof guideIntroDone === 'function') guideIntroDone(); // first campaign run ends the intro guide
     if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
         showModal("World-Eater", "Locked.");
