@@ -3251,11 +3251,11 @@ function transferConfirm() {
     if (from.slot !== to.slot) { showFloatNotice('Only gear of the same type can share refinement.'); return; }
     if (transferLevel(from) <= transferLevel(to)) { showFloatNotice('Refinement only moves to lower-refined gear.'); return; }
     if ((player.blacksmithRuneStones || 0) < REFINE_TRANSFER_COST) {
-        showModal('No Rune Stone', 'Refine Transfer needs 1 Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.');
+        showModal('No Rune Stone', 'Inherit needs 1 Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.');
         return;
     }
     const fromName = transferPlainName(from), toName = transferPlainName(to);
-    showGameConfirm('Refine Transfer', `Move +${transferLevel(from)} from ${fromName} to ${toName}? ${toName} goes from +${transferLevel(to)} to +${transferLevel(from)}, and ${fromName} resets to +0. Costs 1 Blacksmith Rune Stone.`, 'Transfer', doRefineTransfer);
+    showGameConfirm('Inherit', `Move +${transferLevel(from)} from ${fromName} to ${toName}? ${toName} goes from +${transferLevel(to)} to +${transferLevel(from)}, and ${fromName} resets to +0. Costs 1 Blacksmith Rune Stone.`, 'Transfer', doRefineTransfer);
 }
 function doRefineTransfer() {
     const from = transferGearAt(blacksmithTransfer.from), to = transferGearAt(blacksmithTransfer.to);
@@ -3269,7 +3269,7 @@ function doRefineTransfer() {
     player.blacksmithRuneStones -= REFINE_TRANSFER_COST;
     to.refineLevel = transferLevel(from);
     from.refineLevel = 0;
-    logMessage(`[Refine Transfer] ${transferPlainName(to)} is now +${to.refineLevel}; ${transferPlainName(from)} reset to +0.`, 'levelup');
+    logMessage(`[Inherit] ${transferPlainName(to)} is now +${to.refineLevel}; ${transferPlainName(from)} reset to +0.`, 'levelup');
     blacksmithTransfer = { from: null, to: null };
     blacksmithTransferTarget = 'from';
     playSfx(SFX.refineSuccess);
