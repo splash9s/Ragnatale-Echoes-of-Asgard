@@ -6947,7 +6947,8 @@ function syncTentLights() {
 }
 // Keep every lit sprite's glow on the sprite each frame (the cat and any other moving sprite).
 function tentLightLoop() {
-    if (tentLightSprites.size) syncTentLights();
+    // Only while the character page is on screen: the lights are not seen anywhere else, and measuring the sprites every frame cost a lot in battle
+    if (tentLightSprites.size && !document.getElementById('view-character')?.classList.contains('hidden')) syncTentLights();
     requestAnimationFrame(tentLightLoop);
 }
 document.addEventListener('DOMContentLoaded', () => {
