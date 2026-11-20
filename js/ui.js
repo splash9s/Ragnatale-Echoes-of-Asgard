@@ -3067,6 +3067,7 @@ function renderDiamondShop() {
             </div>
         `;
     });
+    translateDomIn(container);
 }
 
 // Timed boosts (real time): player.boosts[kind] = timestamp when the boost ends

@@ -316,6 +316,8 @@ const DOM_TH_PATTERNS = [
     { re: /^(\d+) floors in the castle\. Monsters grow stronger on every floor\. Bring two friends\. Each friend can join again 3 days after a run\. You are paid for each floor you clear\.$/, f: m => `มี ${m[1]} ชั้นในปราสาท มอนสเตอร์แข็งแกร่งขึ้นทุกชั้น พาเพื่อนได้ 2 คน เพื่อนแต่ละคนเข้าร่วมได้อีกครั้งหลังผ่านไป 3 วัน คุณได้รับรางวัลทุกชั้นที่ผ่าน` },
     { re: /^([\d,]+) Gold$/, f: m => `${m[1]} ทอง` },
     { re: /^(.+) x(\d+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1]]) ? `${NAMES_TH[m[1]]} x${m[2]}` : m[0] },
+    { re: /^(Heavy|Light) (.+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${NAMES_TH[m[2]]} (${m[1] === 'Heavy' ? 'หนัก' : 'เบา'})` : m[0] },
+    { re: /^Top up ([\d,]+) (diamonds|gold) for \$([\d.]+)\.$/, f: m => `เติม ${m[1]} ${m[2] === 'diamonds' ? 'เพชร' : 'ทอง'} ราคา $${m[3]}` },
     { re: /^(★ )?(.+?)( \+(\d+))?$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${m[1] || ''}${NAMES_TH[m[2]]}${m[3] || ''}` : m[0] },];
 
 // Replaces the English text pieces under root with Thai (Thai mode only)
