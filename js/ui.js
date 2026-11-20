@@ -7096,6 +7096,7 @@ function stashShowDetail(src, idx, byHover = false) {
     if (!p) { p = document.createElement('div'); p.id = 'stash-detail'; p.className = 'art-panel dd-skin'; document.body.appendChild(p); }
     const isEquip = !!item.slot;
     const isPotion = item.type === 'potion';
+    const canSell = !NO_GEAR_SLOTS.includes(item.slot) && !item.noSell; // defined here: the detail's price line uses it
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
