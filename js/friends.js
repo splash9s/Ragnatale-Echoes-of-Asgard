@@ -86,9 +86,29 @@ async function refreshFriends() {
         friendState.incoming = reqs.data.incoming || [];
         friendState.outgoing = reqs.data.outgoing || [];
     }
+    updateFriendAlert();
     renderFriendPage();
     loadTentVisitors();
 }
+
+// Friend button alert: shown only while another player's friend request is waiting for an accept or decline
+function updateFriendAlert() {
+    const el = document.getElementById('alert-friend');
+    if (el) el.style.display = friendState.incoming.length > 0 ? 'block' : 'none';
+}
+// Checks for new requests without opening the page (at startup, then once a minute while signed in)
+async function refreshFriendAlert() {
+    if (typeof cloudUserId === 'undefined' || !cloudUserId) return;
+    try {
+        const reqs = await friendApi.requests();
+        if (reqs.error || !reqs.data) return;
+        friendState.incoming = reqs.data.incoming || [];
+        friendState.outgoing = reqs.data.outgoing || [];
+        updateFriendAlert();
+    } catch (e) { /* offline or signed out: no alert */ }
+}
+setTimeout(refreshFriendAlert, 3000);
+setInterval(() => { if (!document.hidden) refreshFriendAlert(); }, 60000);
 
 // Switches between the Friends and Requests tabs
 function setFriendTab(tab) {
