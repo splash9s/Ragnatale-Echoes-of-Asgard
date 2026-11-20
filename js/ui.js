@@ -2245,7 +2245,7 @@ function renderArmoryFilterBar(slots, levels) {
 // ---------- DAILY FREE REWARDS (refresh every day) ----------
 const DAILY_FREE_ITEMS = {
     gold: { name: "Free 3000 Gold", desc: "Daily free gift. Refreshes every day.", reward: { gold: 3000 } },
-    diamond: { name: "Free 1 Diamond", desc: "Daily free gift. Refreshes every day.", reward: { diamonds: 1 } }
+    diamond: { name: "Free 20 Diamond", desc: "Daily free gift. Refreshes every day.", reward: { diamonds: 20 } }
 };
 
 function todayKey() {
@@ -2271,7 +2271,17 @@ function claimDailyFree(key) {
     saveGame();
 }
 
+// Free 20 Diamond: the card image with a Claim button (red alert while unclaimed); "Claimed" in green after
+function freeDiamondCardHTML() {
+    const claimed = isDailyFreeClaimed('diamond');
+    const overlay = claimed
+        ? '<span style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); color:#4ade80; font-weight:bold; font-size:14px; background:rgba(0,0,0,.55); padding:4px 14px; border-radius:8px; white-space:nowrap;">Claimed</span>'
+        : `<button onclick="claimDailyFree('diamond')" style="position:absolute; left:50%; bottom:12px; transform:translateX(-50%); padding:6px 22px; background:#fff; color:#b91c1c; font-weight:bold; border-radius:8px; border:0; cursor:pointer; white-space:nowrap;">Claim</button>`
+          + '<img id="alert-free-diamond" src="assets/page01/alert_q85.webp" alt="" style="position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;">';
+    return `<div class="shrink-0" style="position:relative; margin-right:12px;"><img src="assets/diamond/free/free_diamond_card_q85.webp" alt="Free 20 Diamond" style="height:200px; width:auto; display:block; border-radius:10px;">${overlay}</div>`;
+}
 function dailyFreeCardHTML(key) {
+    if (key === 'diamond') return freeDiamondCardHTML();
     const item = DAILY_FREE_ITEMS[key];
     // Unclaimed: red card with a Claim button. Claimed today: grey card, button disabled.
     if (isDailyFreeClaimed(key)) {
@@ -2405,6 +2415,12 @@ function updateTownAlerts() {
     const tabShop = document.getElementById('alert-free-gold'); // on the free gold Claim card
     const tabQuest = document.getElementById('alert-tab-quests');
     if (tabDia) tabDia.style.display = isFreeDiamondAvailable() ? 'block' : 'none';
+    // VIP shop: the Diamond category button and the main-screen VIP Shop button show while the free diamond is unclaimed
+    const freeDia = isFreeDiamondAvailable();
+    const vipCatAlert = document.getElementById('alert-vip-diamond-cat');
+    if (vipCatAlert) vipCatAlert.style.display = freeDia ? 'block' : 'none';
+    const vipMainAlert = document.getElementById('alert-vip-main');
+    if (vipMainAlert) vipMainAlert.style.display = freeDia ? 'block' : 'none';
     if (tabShop) tabShop.style.display = isFreeGoldAvailable() ? 'block' : 'none';
     if (tabQuest) tabQuest.style.display = questOpen ? 'block' : 'none';
     // Stat and skill points waiting to be spent: Character button, stat points and skill points
@@ -2779,6 +2795,7 @@ function renderVipMenu() {
         <button class="vip-menu-btn${c.key === vipCat ? ' sel' : ''}" title="${escapeHtml(c.label)}" onclick="vipSetCat('${c.key}')">
             <img class="vm-normal" src="assets/diamond/vip/ui/menu${c.plate}_n_q85.webp" alt="">
             <img class="vm-press" src="assets/diamond/vip/ui/menu${c.plate}_p_q85.webp" alt="">
+            ${c.key === 'stone' ? `<img id="alert-vip-diamond-cat" src="assets/page01/alert_q85.webp" alt="" style="display:${isFreeDiamondAvailable() ? 'block' : 'none'}; position:absolute; right:-6px; top:-6px; width:30px; height:30px; pointer-events:none;">` : ''}
         </button>`).join('');
 }
 // Highlight page: the featured costume and pet cards, and the six featured items
@@ -2878,7 +2895,7 @@ function renderVipList() {
     const keepScroll = grid.scrollTop, keepLeft = grid.scrollLeft;
     if (vipCat === 'stone') {
         grid.classList.add('vip-pack-row');
-        grid.innerHTML = vipItemsOf(vipCat).filter(item => PACK_ART[item.id]).map(item => `
+        grid.innerHTML = dailyFreeCardHTML('diamond') + vipItemsOf(vipCat).filter(item => PACK_ART[item.id]).map(item => `
             <button class="vip-pack${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')">
                 <img src="${PACK_ART[item.id]}" alt="${escapeHtml(item.name)}">
             </button>`).join('');
