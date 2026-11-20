@@ -5670,6 +5670,30 @@ function refreshMailGearLevels() {
 }
 
 // In-game mail sender (for testing): writes a mail into the player's own mailbox
+// Settings > Send Feedback: writes to the feedback table (signed-in players only)
+function openFeedbackForm() {
+    showModal('Send Feedback', 'Tell us what you think, or what is broken. Max 1,000 characters.', `
+        <textarea id="feedback-text" maxlength="1000" rows="5" style="width:100%; padding:10px; border-radius:8px; color:#e9edf5; background:#0b1322; border:1px solid #26344f; font-size:18px;"></textarea>
+        <p id="feedback-status" style="color:#fca5a5; margin:8px 0 0; font-size:16px; min-height:20px;"></p>
+        <button onclick="sendFeedback()" style="margin-top:8px; padding:10px 20px; border-radius:10px; background:#7c3aed; color:#fff; font-weight:700; font-size:18px; cursor:pointer;">Send</button>`);
+}
+
+async function sendFeedback() {
+    const box = document.getElementById('feedback-text');
+    const status = document.getElementById('feedback-status');
+    const msg = (box?.value || '').trim();
+    if (!msg) { if (status) status.textContent = 'Please write a message first.'; return; }
+    if (!cloudClient || !cloudUserId) { if (status) status.textContent = 'Sign in to send feedback.'; return; }
+    try {
+        const { error } = await cloudClient.from('feedback').insert({ player_name: (player && player.name) || '', message: msg.slice(0, 1000) });
+        if (error) throw error;
+        showModal('Thank you', 'Your feedback was sent.');
+    } catch (e) {
+        console.warn('Feedback failed:', e);
+        if (status) status.textContent = 'Could not send. Please try again later.';
+    }
+}
+
 function openSendMailForm() {
     if (window.isOwnerAccount !== true) return; // developer only
     const opt = (v, l) => `<option value="${v}">${l}</option>`;
