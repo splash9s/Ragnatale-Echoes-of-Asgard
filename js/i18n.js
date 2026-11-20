@@ -284,13 +284,20 @@ const DOM_TH = {
 
 
 // Stat lines such as "ATK +5", "Fire Res +10%" and "(2 pcs) DEF +5"
-const STAT_LABEL_TH = { ATK: 'โจมตี', DEF: 'ป้องกัน', HP: 'HP', FLEE: 'หลบหลีก', HIT: 'HIT', ASPD: 'ASPD', CRIT: 'คริติคอล',
+const STAT_LABEL_TH = { Atk: 'โจมตี', 'Max HP': 'HP สูงสุด', 'Max armor': 'เกราะสูงสุด', 'Crit damage': 'ดาเมจคริติคอล', 'CRIT rate': 'อัตราคริติคอล', CRIT: 'คริติคอล', Gold: 'ทอง', 'Sell price': 'ราคาขาย', 'Damage taken': 'ดาเมจที่รับ', ATK: 'โจมตี', DEF: 'ป้องกัน', HP: 'HP', FLEE: 'หลบหลีก', HIT: 'HIT', ASPD: 'ASPD', CRIT: 'คริติคอล',
     Block: 'บล็อก', MDEF: 'MDEF', ARMOR: 'เกราะ', 'ATK%': 'โจมตี%', 'Fire Res': 'ต้านทานไฟ', 'Wind Res': 'ต้านทานลม',
     'Earth Res': 'ต้านทานดิน', 'Ice Res': 'ต้านทานน้ำแข็ง' };
 function thStatText(s) {
     const m = String(s).match(/^(.+?) ([+-]?\d+%?)$/);
     if (m && STAT_LABEL_TH[m[1]]) return `${STAT_LABEL_TH[m[1]]} ${m[2]}`;
     return s;
+}
+
+// One "LABEL +N" stat token from item and skill descriptions
+function thStatTok(tok) {
+    const m = String(tok).match(/^(.+?) ([+-]?[\d.]+%?)$/);
+    if (m && STAT_LABEL_TH[m[1]]) return `${STAT_LABEL_TH[m[1]]} ${m[2]}`;
+    return tok;
 }
 function thHealText(s) {
     return String(s).replace('% of max HP', '% ของ HP สูงสุด');
@@ -315,6 +322,10 @@ const DOM_TH_PATTERNS = [
     { re: /^Campaign Lv\. (\d+)$/, f: m => `ด่าน Lv. ${m[1]}` },
     { re: /^(\d+) floors in the castle\. Monsters grow stronger on every floor\. Bring two friends\. Each friend can join again 3 days after a run\. You are paid for each floor you clear\.$/, f: m => `มี ${m[1]} ชั้นในปราสาท มอนสเตอร์แข็งแกร่งขึ้นทุกชั้น พาเพื่อนได้ 2 คน เพื่อนแต่ละคนเข้าร่วมได้อีกครั้งหลังผ่านไป 3 วัน คุณได้รับรางวัลทุกชั้นที่ผ่าน` },
     { re: /^([\d,]+) Gold$/, f: m => `${m[1]} ทอง` },
+    { re: /^([A-Za-z][A-Za-z% ]*? [+-]?[\d.]+%?(?:, [A-Za-z][A-Za-z% ]*? [+-]?[\d.]+%?)*)$/, f: m => m[1].split(', ').map(tok => thStatTok(tok)).join(', ') },
+    { re: /^([+-]?[\d.]+%?) (Gold)$/, f: m => `${m[1]} ทอง` },
+    { re: /^Slot: (.+?) \| Success Rate: (.+)$/, f: m => `ช่อง: ${(typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1]]) || m[1]} | อัตราสำเร็จ: ${m[2]}` },
+    { re: /^(.+) Elemental Stone: (\d+)$/, f: m => `${(typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1] + ' Elemental Stone']) || m[1]} หินธาตุ: ${m[2]}` },
     { re: /^(.+) x(\d+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1]]) ? `${NAMES_TH[m[1]]} x${m[2]}` : m[0] },
     { re: /^(Heavy|Light) (.+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${NAMES_TH[m[2]]} (${m[1] === 'Heavy' ? 'หนัก' : 'เบา'})` : m[0] },
     { re: /^Top up ([\d,]+) (diamonds|gold) for \$([\d.]+)\.$/, f: m => `เติม ${m[1]} ${m[2] === 'diamonds' ? 'เพชร' : 'ทอง'} ราคา $${m[3]}` },
