@@ -991,6 +991,7 @@ const COMBAT_PLAYER_ATTACK_MS = 420;  // whole attack: wind-up + attack02 (250 m
 const COMBAT_PLAYER_CRIT_MS = 590;    // whole critical: wind-up + critical02 (420 ms)
 const COMBAT_PLAYER_WINDUP_PX = -12;  // wind-up draws back this far
 const COMBAT_PLAYER_LUNGE_PX = 50;    // the strike jumps forward this far (in front of the monster) and back
+const COMBAT_PLAYER_JUMP_PX = 34;     // height of the hop during the strike
 let combatPlayerAttack = { at: 0, crit: false };
 // The hero dies at the end of a lost battle: the fall pose drops slowly onto the floor (PLAYER_FALL_MS), then rests there until the result.
 const PLAYER_FALL_MS = 1500;
@@ -1231,13 +1232,13 @@ function playPlayerAttackLunge(el, crit) {
     const T = crit ? COMBAT_PLAYER_CRIT_MS : COMBAT_PLAYER_ATTACK_MS;
     const w = COMBAT_PLAYER_WINDUP_MS / T;
     const peak = (COMBAT_PLAYER_WINDUP_MS + 90) / T; // the strike reaches its furthest point 90 ms after the wind-up
-    // The body lunges straight forward to the spot 50px in front of the monster, then returns
+    // The body hops forward over the strike: up in the air mid-way, then lands 50px in front of the monster
     const air = (w + peak) / 2;
     const dx = combatPlayerAttack.lungePx || COMBAT_PLAYER_LUNGE_PX;
     const frames = [
         { transform: 'translate(0px, 0px)', offset: 0, easing: 'ease-out' },
         { transform: `translate(${COMBAT_PLAYER_WINDUP_PX}px, 0px)`, offset: w, easing: 'ease-in-out' },
-        { transform: `translate(${dx / 2}px, 0px)`, offset: air, easing: 'ease-in-out' },
+        { transform: `translate(${dx / 2}px, -${COMBAT_PLAYER_JUMP_PX}px)`, offset: air, easing: 'ease-in-out' },
         { transform: `translate(${dx}px, 0px)`, offset: peak, easing: 'ease-in' },
         { transform: 'translate(0px, 0px)', offset: 1 }
     ];
