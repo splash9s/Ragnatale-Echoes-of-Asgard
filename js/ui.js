@@ -7334,6 +7334,7 @@ function toggleCharClear() {
     const view = document.getElementById('view-character');
     if (!view) return;
     view.classList.toggle('screen-clear');
+    closeTentMenu();
     if (!view.classList.contains('screen-clear')) { view.classList.remove('ui-off'); closePetPanel(); }
     updateTentTopLabels();
     syncHeroSprites();
@@ -7981,8 +7982,15 @@ function toggleTentUi() {
     const view = document.getElementById('view-character');
     if (!view) return;
     view.classList.toggle('ui-off');
-    if (view.classList.contains('ui-off')) closePetPanel();
+    if (view.classList.contains('ui-off')) { closePetPanel(); closeTentMenu(); }
     updateTentTopLabels();
+}
+// Tent menu (bottom right): shows or hides the column of Guest Book, Home, Puzzle and Pets above the menu button
+function toggleTentMenu() {
+    document.getElementById('tent-menu-list')?.classList.toggle('open');
+}
+function closeTentMenu() {
+    document.getElementById('tent-menu-list')?.classList.remove('open');
 }
 function updateTentTopLabels() {
     const view = document.getElementById('view-character');

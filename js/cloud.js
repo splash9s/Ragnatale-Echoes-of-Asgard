@@ -242,6 +242,9 @@ const friendApi = {
     visitTent: (userId) => friendRpc('visit_friend_tent', { p_friend: userId }),
     towerRewards: (userId, floors) => friendRpc('send_tower_rewards', { p_friend: userId, p_floors: floors }),
     visitors: () => friendRpc('my_tent_visitors'),
+    guestbookWrite: (ownerId, body) => friendRpc('guestbook_write', { p_owner: ownerId, p_body: body }),
+    guestbookList: () => friendRpc('guestbook_list'),
+    guestbookDelete: (id) => friendRpc('guestbook_delete', { p_id: id }),
 };
 
 // Copies unclaimed server mail (friend gifts) into the mailbox once. Negative ids keep them apart from local mail.

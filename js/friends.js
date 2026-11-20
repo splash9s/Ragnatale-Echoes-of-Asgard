@@ -321,17 +321,17 @@ async function visitFriendTent(idx) {
     const res = await friendApi.visitTent(f.user_id);
     if (res.error) { setFriendStatus(res.error, true); return; }
     setFriendStatus('', false);
-    enterFriendTent(f.name || 'Hero', res.data);
+    enterFriendTent(f.name || 'Hero', res.data, f.user_id);
 }
 
-function enterFriendTent(name, snap) {
+function enterFriendTent(name, snap, ownerId) {
     if (friendTentVisiting()) return;
     const backup = JSON.parse(JSON.stringify(player));
     const copy = JSON.parse(JSON.stringify(snap));
     if (typeof removeTentPetWalker === 'function' && typeof tentPetWalkers !== 'undefined') [...tentPetWalkers.keys()].forEach(removeTentPetWalker);
     Object.keys(player).forEach(k => { delete player[k]; });
     Object.assign(player, copy);
-    window.friendVisit = { name, backup };
+    window.friendVisit = { name, backup, ownerId };
     document.body.classList.add('friend-visiting');
     const nameEl = document.getElementById('friend-visit-name');
     if (nameEl) nameEl.textContent = `${name}'s Tent`;
@@ -341,6 +341,7 @@ function enterFriendTent(name, snap) {
 
 function exitFriendTent() {
     if (!friendTentVisiting()) return;
+    closeGuestBook();
     const backup = window.friendVisit.backup;
     if (typeof removeTentPetWalker === 'function' && typeof tentPetWalkers !== 'undefined') [...tentPetWalkers.keys()].forEach(removeTentPetWalker);
     Object.keys(player).forEach(k => { delete player[k]; });
@@ -368,4 +369,139 @@ async function loadTentVisitors() {
     box.style.display = 'none';
     if (res.error) { box.style.display = ''; box.textContent = res.error; return; }
     renderFriendPage();
+}
+
+// ==========================================
+// GUEST BOOK (Diary button in the tent menu)
+// A visitor writes a message (up to 100 characters) on a friend's tent. The owner reads and deletes
+// the messages on their own tent. The server keeps the writer's name and the time (supabase/guestbook.sql).
+// ==========================================
+let guestBookRows = null;       // owner view: messages on this tent, newest first (null while loading)
+let guestBookPendingId = null;  // message waiting for a yes/no before it is deleted
+let guestBookBusy = false;
+let guestBookStatus = null;     // { msg, err } shown under the panel
+
+function gbEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+// Local date and time, e.g. 2026-11-20 12:44
+function gbStamp(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function openGuestBook() {
+    let box = document.getElementById('guestbook-panel');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'guestbook-panel';
+        box.setAttribute('data-drag-panel', '');
+        box.style.left = (window.innerWidth / 2) + 'px';
+        box.style.top = (window.innerHeight / 2) + 'px';
+        document.body.appendChild(box);
+        box.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
+    }
+    guestBookPendingId = null;
+    guestBookStatus = null;
+    guestBookRows = null;
+    renderGuestBook();
+    if (!friendTentVisiting()) loadGuestBook();
+}
+function closeGuestBook() {
+    guestBookPendingId = null;
+    guestBookStatus = null;
+    const box = document.getElementById('guestbook-panel');
+    if (box) box.remove();
+}
+
+async function loadGuestBook() {
+    const res = await friendApi.guestbookList();
+    if (res.error) { guestBookStatus = { msg: res.error, err: true }; guestBookRows = []; }
+    else guestBookRows = res.data || [];
+    renderGuestBook();
+}
+
+// Updates only the status line, so text typed in the message box is kept
+function setGuestBookStatus(msg, isErr) {
+    guestBookStatus = msg ? { msg, err: !!isErr } : null;
+    const el = document.getElementById('gb-status');
+    if (el) { el.textContent = msg || ''; el.classList.toggle('err', !!isErr); }
+}
+function gbCount() {
+    const ta = document.getElementById('gb-text');
+    const c = document.getElementById('gb-count');
+    if (ta && c) c.textContent = `${ta.value.length} / 100`;
+}
+
+function renderGuestBook() {
+    const box = document.getElementById('guestbook-panel');
+    if (!box) return;
+    const visiting = friendTentVisiting();
+    const who = visiting ? window.friendVisit.name : '';
+    let body;
+    if (visiting) {
+        body = `<p class="gb-sub">Leave a message for ${gbEsc(who)} (up to 100 characters). Your name and the time are saved with it.</p>
+            <textarea id="gb-text" maxlength="100" placeholder="Write a message..." oninput="gbCount()"></textarea>
+            <div class="gb-foot"><span class="gb-count" id="gb-count">0 / 100</span>`
+            + `<button class="gb-btn" id="gb-send" onclick="guestBookSend()" ${guestBookBusy ? 'disabled' : ''}>Send</button></div>`;
+    } else if (guestBookRows === null) {
+        body = `<p class="gb-sub">Loading...</p>`;
+    } else if (!guestBookRows.length) {
+        body = `<p class="gb-sub">No messages yet.</p>`;
+    } else {
+        const rows = guestBookRows.map(r => {
+            const id = Number(r.id);
+            const action = guestBookPendingId === id
+                ? `<div class="gb-confirm"><span>Delete this message?</span>`
+                  + `<button class="gb-del" onclick="guestBookDelete(${id})" ${guestBookBusy ? 'disabled' : ''}>Yes</button>`
+                  + `<button class="gb-del" onclick="guestBookCancel()">No</button></div>`
+                : `<div class="gb-foot"><span></span><button class="gb-del" onclick="guestBookAsk(${id})">Delete</button></div>`;
+            return `<div class="gb-row"><div class="gb-meta"><b>${gbEsc(r.writer_name || 'Hero')}</b><span>${gbStamp(r.created_at)}</span></div>`
+                + `<div class="gb-body">${gbEsc(r.body)}</div>${action}</div>`;
+        }).join('');
+        body = `<p class="gb-sub">${guestBookRows.length} message${guestBookRows.length === 1 ? '' : 's'}</p><div class="gb-list">${rows}</div>`;
+    }
+    const st = guestBookStatus ? guestBookStatus.msg : '';
+    const stErr = guestBookStatus && guestBookStatus.err ? ' err' : '';
+    const title = visiting ? `${gbEsc(who)}'s Guest Book` : 'Guest Book';
+    box.innerHTML = `<div class="gb-head"><h3>${title}</h3><button class="gb-x" onclick="closeGuestBook()">✕</button></div>`
+        + body + `<p class="gb-status${stErr}" id="gb-status">${gbEsc(st)}</p>`;
+    if (visiting) gbCount();
+}
+
+// Visitor: send the message to the friend's guest book
+async function guestBookSend() {
+    if (guestBookBusy || !friendTentVisiting()) return;
+    const ta = document.getElementById('gb-text');
+    const body = (ta ? ta.value : '').trim();
+    if (!body) { setGuestBookStatus('Write a message first.', true); return; }
+    if (body.length > 100) { setGuestBookStatus('Messages can be up to 100 characters.', true); return; }
+    guestBookBusy = true;
+    const btn = document.getElementById('gb-send');
+    if (btn) btn.disabled = true;
+    const res = await friendApi.guestbookWrite(window.friendVisit.ownerId, body);
+    guestBookBusy = false;
+    if (btn) btn.disabled = false;
+    if (res.error) { setGuestBookStatus(res.error, true); return; }
+    if (ta) ta.value = '';
+    gbCount();
+    setGuestBookStatus('Message sent.', false);
+}
+
+// Owner: read and delete messages
+function guestBookAsk(id) { guestBookPendingId = id; renderGuestBook(); }
+function guestBookCancel() { guestBookPendingId = null; renderGuestBook(); }
+async function guestBookDelete(id) {
+    if (guestBookBusy) return;
+    guestBookBusy = true;
+    renderGuestBook();
+    const res = await friendApi.guestbookDelete(id);
+    guestBookBusy = false;
+    guestBookPendingId = null;
+    if (res.error) { guestBookStatus = { msg: res.error, err: true }; renderGuestBook(); return; }
+    guestBookRows = (guestBookRows || []).filter(r => Number(r.id) !== Number(id));
+    guestBookStatus = null;
+    renderGuestBook();
 }
