@@ -2676,7 +2676,11 @@ function towerSlotFeet(id) { return TOWER_SLOT_FEET[id] || TOWER_SLOT_FEET.a2; }
 function combatHeroFeet() {
     return towerIsActive() ? towerSlotFeet('hero') : { x: combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x, y: combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y };
 }
+// Warded Tower: your own sprite is drawn over the friends (they keep their order among themselves)
+const TOWER_HERO_LAYER = 6;
 function towerRenderField() {
+    const heroSprite = document.getElementById('combat-player-sprite');
+    if (heroSprite) heroSprite.style.zIndex = towerIsActive() ? String(TOWER_HERO_LAYER) : '';
     const stage = document.querySelector('#combat-stage .ts-inner');
     if (!towerIsActive() || !stage) {
         document.querySelectorAll('.tower-field-ally').forEach(n => n.remove());
