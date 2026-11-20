@@ -7109,7 +7109,6 @@ function stashShowDetail(src, idx, byHover = false) {
     if (!p) { p = document.createElement('div'); p.id = 'stash-detail'; p.className = 'art-panel dd-skin'; document.body.appendChild(p); }
     const isEquip = !!item.slot;
     const isPotion = item.type === 'potion';
-    const canSell = !NO_GEAR_SLOTS.includes(item.slot) && !item.noSell; // defined here: the detail's price line uses it
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
@@ -7124,12 +7123,9 @@ function stashShowDetail(src, idx, byHover = false) {
         source: itemSourceHTML(item),
         name: title,
         meta: `${kind}${rarity ? ' · ' + rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
-        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ((item.qty || 1) > 1 ? `<span>Qty ${item.qty}</span>` : ''),
-        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
-        lore: !isEquip ? (item.lore || item.desc || '') : '',
-        price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
-        primary: btn,
-        secondary: []
+        // Same layout as the shop item detail: item stats only, no compare
+        stats: isEquip ? ddStatRows(item.stats) : (isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : ((item.qty || 1) > 1 ? `<span>Qty ${item.qty}</span>` : '')),
+        primary: btn
     });
     p.style.display = 'block';
     // Centered on screen, above the stash window
