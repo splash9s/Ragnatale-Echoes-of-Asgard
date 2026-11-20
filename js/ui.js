@@ -2859,11 +2859,16 @@ function vipCellHTML(item) {
         </div>`;
 }
 function vipHighlightHTML() {
-    const cards = VIP_HIGHLIGHT_CARDS.map(c => `
-        <button class="vh-card${vipSelected === c.id ? ' selected' : ''}" title="${escapeHtml(c.alt)}" ${DIAMOND_SHOP_ITEMS.some(i => i.id === c.id) ? `onclick="vipSelect('${c.id}')"` : ''}>
+    // A costume card opens the Costume Chest (Ticket) it drops from; the pet card opens its own item
+    const cards = VIP_HIGHLIGHT_CARDS.map(c => {
+        const target = c.anim === 'costume' ? 'dchest_costume_ticket' : c.id;
+        const hasTarget = DIAMOND_SHOP_ITEMS.some(i => i.id === target);
+        return `
+        <button class="vh-card${vipSelected === target ? ' selected' : ''}" title="${escapeHtml(c.alt)}" ${hasTarget ? `onclick="vipSelect('${target}')"` : ''}>
             <span class="vh-stage" data-anim="${c.anim}" data-costume="${c.costume || ''}"></span>
             <img class="vh-title" src="${c.title}" alt="${escapeHtml(c.alt)}">
-        </button>`).join('');
+        </button>`;
+    }).join('');
     const cells = VIP_HIGHLIGHT_ITEMS.map(id => DIAMOND_SHOP_ITEMS.find(i => i.id === id)).filter(Boolean).map(vipCellHTML).join('');
     return `<div class="vh-wrap"><div class="vh-top">${cards}</div><div class="vh-bottom">${cells}</div></div>`;
 }
