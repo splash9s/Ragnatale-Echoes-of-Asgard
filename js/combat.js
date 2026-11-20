@@ -2172,6 +2172,8 @@ function returnToTown() {
     if (typeof resetMapRunes === 'function') resetMapRunes();
     const nextBtn = document.getElementById('next-stage-btn');
     if (nextBtn) nextBtn.classList.add('hidden');
+    // Warded Tower: leaving partway still pays the highest floor cleared (once) and the friends' share
+    if (currentMode === 'tower' && towerParty) { grantTowerRunReward(); sendTowerFriendRewards(); }
     switchView('town');
     logMessage(`[System] Safely returned to Haven of Dawn`, 'winlose');
 }
