@@ -282,8 +282,30 @@ const DOM_TH = {
     'Friends need the cloud. Sign in to use them.': 'เพื่อนต้องใช้บัญชีออนไลน์ กรุณาเข้าสู่ระบบก่อน',
 };
 
+
+// Stat lines such as "ATK +5", "Fire Res +10%" and "(2 pcs) DEF +5"
+const STAT_LABEL_TH = { ATK: 'โจมตี', DEF: 'ป้องกัน', HP: 'HP', FLEE: 'หลบหลีก', HIT: 'HIT', ASPD: 'ASPD', CRIT: 'คริติคอล',
+    Block: 'บล็อก', MDEF: 'MDEF', ARMOR: 'เกราะ', 'ATK%': 'โจมตี%', 'Fire Res': 'ต้านทานไฟ', 'Wind Res': 'ต้านทานลม',
+    'Earth Res': 'ต้านทานดิน', 'Ice Res': 'ต้านทานน้ำแข็ง' };
+function thStatText(s) {
+    const m = String(s).match(/^(.+?) ([+-]?\d+%?)$/);
+    if (m && STAT_LABEL_TH[m[1]]) return `${STAT_LABEL_TH[m[1]]} ${m[2]}`;
+    return s;
+}
+function thHealText(s) {
+    return String(s).replace('% of max HP', '% ของ HP สูงสุด');
+}
+
 const DOM_TH_PATTERNS = [
     { re: /^(.+)'s Guest Book$/, f: m => `สมุดเยี่ยมของ ${m[1]}` },
+    { re: /^Restores (.+) · Qty (\d+)$/, f: m => `ฟื้นฟู ${thHealText(m[1])} · จำนวน ${m[2]}` },
+    { re: /^(.+) · Requires Lv (\d+)$/, f: m => `${thExactPart(m[1])} · ต้องการเลเวล ${m[2]}` },
+    { re: /^(.+) · (Common|Uncommon|Rare|Epic|Legendary)$/, f: m => `${thExactPart(m[1])} · ${thExactPart(m[2])}` },
+    { re: /^, Requires Base Lv\. (\d+)$/, f: m => `, ต้องการเลเวลฐาน ${m[1]}` },
+    { re: /^\((\d+) pcs\) (.+)$/, f: m => `(${m[1]} ชิ้น) ${thStatText(m[2])}` },
+    { re: /^Smelt (\d+) (.+)$/, f: m => `หลอม ${thExactPart(m[2])} ${m[1]} ชิ้น` },
+    { re: /^Sells for (.+)$/, f: m => `ขายได้ ${m[1].replace('Gold', 'ทอง')}` },
+    { re: /^(ATK|DEF|HP|FLEE|HIT|ASPD|CRIT|Block|MDEF|ARMOR|ATK%|Fire Res|Wind Res|Earth Res|Ice Res) ([+-]?\d+%?)$/, f: m => thStatText(m[0]) },
     { re: /^Messages can be up to (\d+) characters\.$/, f: m => `ข้อความยาวได้สูงสุด ${m[1]} ตัวอักษร` },
     { re: /^(.+) — Stage (\d+) \/ (\d+)$/, f: m => `${localGameName(m[1])} — ด่านที่ ${m[2]} / ${m[3]}` },
     { re: /^(\d+) \/ (\d+) plays left today$/, f: m => `เหลือ ${m[1]} / ${m[2]} ครั้งวันนี้` },
@@ -292,7 +314,9 @@ const DOM_TH_PATTERNS = [
     { re: /^Rune Stone: (\d+)$/, f: m => `หินรูน: ${m[1]}` },
     { re: /^Campaign Lv\. (\d+)$/, f: m => `ด่าน Lv. ${m[1]}` },
     { re: /^(\d+) floors in the castle\. Monsters grow stronger on every floor\. Bring two friends\. Each friend can join again 3 days after a run\. You are paid for each floor you clear\.$/, f: m => `มี ${m[1]} ชั้นในปราสาท มอนสเตอร์แข็งแกร่งขึ้นทุกชั้น พาเพื่อนได้ 2 คน เพื่อนแต่ละคนเข้าร่วมได้อีกครั้งหลังผ่านไป 3 วัน คุณได้รับรางวัลทุกชั้นที่ผ่าน` },
-];
+    { re: /^([\d,]+) Gold$/, f: m => `${m[1]} ทอง` },
+    { re: /^(.+) x(\d+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1]]) ? `${NAMES_TH[m[1]]} x${m[2]}` : m[0] },
+    { re: /^(★ )?(.+?)( \+(\d+))?$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${m[1] || ''}${NAMES_TH[m[2]]}${m[3] || ''}` : m[0] },];
 
 // Replaces the English text pieces under root with Thai (Thai mode only)
 function translateDomIn(root) {
@@ -316,6 +340,12 @@ function translateDomIn(root) {
         const out = thExact(el.getAttribute('placeholder'));
         if (out !== el.getAttribute('placeholder')) el.setAttribute('placeholder', out);
     });
+}
+
+// Splits "weapon · Rare" style text into translated parts
+function thExactPart(text) {
+    const t = String(text).trim();
+    return (typeof DOM_TH !== 'undefined' && DOM_TH[t]) || (typeof NAMES_TH !== 'undefined' && NAMES_TH[t]) || t;
 }
 
 // Exact lookup for text that scripts set after render (status lines and the like)

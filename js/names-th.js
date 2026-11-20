@@ -3,7 +3,7 @@ const NAMES_TH = {
     // Character, shop, skills, VIP and market labels
     'Skills': 'สกิล', 'STATS': 'ค่าสถานะ', 'Attributes': 'คุณลักษณะ', 'Pts:': 'แต้ม:',
     'STR:': 'STR:', 'AGI:': 'AGI:', 'VIT:': 'VIT:', 'WIS:': 'WIS:', 'DEX:': 'DEX:', 'LUK:': 'LUK:',
-    'Combat Stats': 'ค่าการต่อสู้', 'ATK': 'ATK', 'DEF': 'DEF', 'HIT': 'HIT', 'EVASION': 'หลบหลีก',
+    'Combat Stats': 'ค่าการต่อสู้', 'ATK': 'โจมตี', 'DEF': 'ป้องกัน', 'HIT': 'HIT', 'EVASION': 'หลบหลีก',
     'CRIT Rate': 'อัตราคริติคอล', 'ASPD': 'ASPD', 'Armor': 'เกราะ', 'Element Resistance': 'ความต้านทานธาตุ',
     'Fire': 'ไฟ', 'Wind': 'ลม', 'Earth': 'ดิน', 'Ice': 'น้ำแข็ง', 'Health': 'พลังชีวิต',
     'No set bonus active.': 'ยังไม่มีโบนัสชุด', 'Inventory Bag': 'กระเป๋าสัมภาระ',
@@ -45,6 +45,17 @@ const NAMES_TH = {
     'No messages in the last 7 days.': 'ไม่มีข้อความใน 7 วันที่ผ่านมา', 'No messages yet. Say hello.': 'ยังไม่มีข้อความ ทักทายกันเลย',
     'Delete this conversation?': 'ลบการสนทนานี้ใช่ไหม?', 'Delete': 'ลบ', 'Yes': 'ใช่', 'No': 'ไม่',
     'You:': 'คุณ:', 'Hero': 'ฮีโร่', 'Write a message first.': 'กรุณาเขียนข้อความก่อน',
+    // Item detail panels
+    'Consumable': 'ยาใช้', 'Item': 'ไอเทม', 'Nothing equipped': 'ยังไม่ได้สวมใส่', 'Selected': 'เลือกแล้ว',
+    'Stat': 'ค่า', 'This item': 'ไอเทมนี้', 'Equipped': 'สวมใส่อยู่', 'Diff': 'ต่าง', 'No stats to compare': 'ไม่มีค่าให้เปรียบเทียบ',
+    'Source': 'แหล่งที่มา', 'Equip': 'สวมใส่', 'Open': 'เปิด', 'Sell': 'ขาย', 'Salvage': 'แยกชิ้นส่วน', 'Close': 'ปิด',
+    '☆ Lock': '☆ ล็อก', '★ Unlock': '★ ปลดล็อก', '★ Locked': '★ ล็อกอยู่', 'Sells for': 'ขายได้', 'Gold': 'ทอง',
+    'Common': 'ธรรมดา', 'Uncommon': 'ไม่ธรรมดา', 'Rare': 'หายาก', 'Epic': 'มหากาพย์', 'Legendary': 'ตำนาน',
+    'Shop': 'ร้านค้า', 'Drop from monster': 'ดรอปจากมอนสเตอร์', 'Drop from boss': 'ดรอปจากบอส', 'Salvage gear': 'แยกอุปกรณ์',
+    'Smelt 20 Iron Scraps': 'หลอมเศษเหล็ก 20 ชิ้น', 'Smelt 20 Ingots': 'หลอมแท่งเหล็ก 20 ชิ้น', 'Smelt 10 Bars': 'หลอมแท่ง 10 ชิ้น',
+    'Fire': 'ไฟ', 'Wind': 'ลม', 'Earth': 'ดิน', 'Ice': 'น้ำแข็ง',
+    // Equipment slot names (lowercase in detail headers)
+    'weapon': 'อาวุธ', 'shield': 'โล่', 'hat': 'หมวก', 'mid head': 'หมวกกลาง', 'mouth': 'หน้ากาก', 'garment': 'เสื้อผ้า', 'armor': 'เกราะ', 'boots': 'รองเท้า', 'footgear': 'รองเท้า', 'ring': 'แหวน', 'pet': 'สัตว์เลี้ยง', 'costume': 'ชุดแต่งกาย', 'potion': 'ยา',
     // Monsters
     'Abyss Lord (Boss)': 'ลอร์ดเหวลึก (บอส)',
     'Battle Storm Mage': 'จอมเวทพายุศึก',

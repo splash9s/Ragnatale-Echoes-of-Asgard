@@ -4454,7 +4454,7 @@ function toggleSourceBox(btn) {
     pop.id = 'src-pop';
     pop.dataset.owner = btn.dataset.src;
     pop.style.cssText = 'position:fixed; z-index:400; background:#0b1322; border:1px solid #b8945a; border-radius:8px; padding:6px 10px; font-size:12px; color:#e2e8f0; line-height:1.6; box-shadow:0 4px 14px rgba(0,0,0,.5); white-space:nowrap;';
-    pop.innerHTML = lines.map(l => `<div>- ${escapeHtml(l)}</div>`).join('');
+    pop.innerHTML = lines.map(l => `<div>- ${escapeHtml(thExact(l))}</div>`).join('');
     document.body.appendChild(pop);
     const r = btn.getBoundingClientRect();
     const pr = pop.getBoundingClientRect();
@@ -4495,6 +4495,7 @@ function ddFill(panel, o) {
             ${o.primary || ''}
             ${row}
         </div>`;
+    translateDomIn(panel);
 }
 function ddStatRows(stats) {
     if (!stats || !Object.keys(stats).length) return '';
