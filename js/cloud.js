@@ -28,12 +28,12 @@ async function claimDiamondTopups() {
         const d = typeof data === 'number' ? (Number(data) || 0) : (Number(data && data.diamonds) || 0);
         const g = typeof data === 'number' ? 0 : (Number(data && data.gold) || 0);
         const n = d + g;
-        if (n > 0) {
-            if (d > 0) player.diamonds = (player.diamonds || 0) + d;
-            if (g > 0) player.gold = (player.gold || 0) + g;
+        if (n !== 0) {
+            if (d !== 0) player.diamonds = Math.max(0, (player.diamonds || 0) + d);
+            if (g !== 0) player.gold = Math.max(0, (player.gold || 0) + g);
             saveGame();
-            const parts = [d > 0 ? `${d.toLocaleString()} diamonds` : '', g > 0 ? `${g.toLocaleString()} gold` : ''].filter(Boolean).join(' and ');
-            showModal('Top-up added', `${parts} ${parts.indexOf(' and ') >= 0 ? 'were' : 'was'} added to your account.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
+            const parts = [d !== 0 ? `${Math.abs(d).toLocaleString()} diamonds` : '', g !== 0 ? `${Math.abs(g).toLocaleString()} gold` : ''].filter(Boolean).join(' and ');
+            showModal(d < 0 || g < 0 ? 'Refund applied' : 'Top-up added', `${parts} ${parts.indexOf(' and ') >= 0 ? 'were' : 'was'} ${d < 0 || g < 0 ? 'removed for a refund' : 'added to your account'}.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
         }
         return n;
     } catch (e) {

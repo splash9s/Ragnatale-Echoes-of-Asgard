@@ -61,6 +61,37 @@ Deno.serve(async (req) => {
   }
 
   const event = JSON.parse(body);
+
+  // A full refund takes back what that payment added. The game applies it on the next sign-in, never below zero.
+  if (event.type === "charge.refunded") {
+    const c = event.data.object;
+    if (!c.refunded) return new Response("partial refund ignored", { status: 200 });
+    const pi = String(c.payment_intent ?? "");
+    if (!pi) return new Response("no payment intent", { status: 200 });
+
+    const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+      auth: { persistSession: false },
+    });
+    const { data: orig, error: findErr } = await admin
+      .from("diamond_topups").select("user_id, diamonds, gold").eq("payment_intent", pi).maybeSingle();
+    if (findErr) return new Response("database error", { status: 500 });
+    if (!orig) return new Response("no top-up for this payment", { status: 200 });
+
+    const { error: refundErr } = await admin.from("diamond_topups").insert({
+      payment_id: `refund_${c.id}`,
+      user_id: orig.user_id,
+      diamonds: -orig.diamonds,
+      gold: -orig.gold,
+      amount_total: -(c.amount_refunded ?? 0),
+      currency: c.currency,
+      payment_intent: pi,
+      claimed: false,
+    });
+    // 23505 = already recorded (Stripe retried). Acknowledge without reversing again.
+    if (refundErr && refundErr.code !== "23505") return new Response("database error", { status: 500 });
+    return new Response("refund recorded", { status: 200 });
+  }
+
   if (event.type !== "checkout.session.completed") return new Response("ignored", { status: 200 });
 
   const s = event.data.object;
@@ -90,6 +121,7 @@ Deno.serve(async (req) => {
     gold,
     amount_total: s.amount_total,
     currency: s.currency,
+    payment_intent: s.payment_intent ?? null,
   });
   // 23505 = already recorded (Stripe retried). Acknowledge without crediting again.
   if (error && error.code !== "23505") return new Response("database error", { status: 500 });
