@@ -390,7 +390,7 @@ let guestBookView = 'inbox';     // 'inbox' (list of conversations) or 'thread' 
 let guestBookPartner = null;     // { id, name } of the friend in the open thread
 let guestBookInbox = null;       // conversations, newest first (null while loading)
 let guestBookThread = null;      // messages with the open friend, newest first (null while loading)
-let guestBookPendingId = null;   // received message waiting for a yes/no before it is deleted
+let guestBookPendingPartner = null; // conversation in the list waiting for a yes/no before it is deleted
 let guestBookBusy = false;
 let guestBookStatus = null;      // { msg, err } shown under the panel
 
@@ -416,7 +416,7 @@ function openGuestBook() {
         document.body.appendChild(box);
         box.style.setProperty('--ps', Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1);
     }
-    guestBookPendingId = null;
+    guestBookPendingPartner = null;
     guestBookStatus = null;
     if (friendTentVisiting()) {
         guestBookView = 'thread';
@@ -429,7 +429,7 @@ function openGuestBook() {
     }
 }
 function closeGuestBook() {
-    guestBookPendingId = null;
+    guestBookPendingPartner = null;
     guestBookStatus = null;
     const box = document.getElementById('guestbook-panel');
     if (box) box.remove();
@@ -469,14 +469,14 @@ function guestBookOpenThread(id, name) {
     guestBookView = 'thread';
     guestBookPartner = { id, name };
     guestBookStatus = null;
-    guestBookPendingId = null;
+    guestBookPendingPartner = null;
     loadGuestBookThread();
 }
 function guestBookBack() {
     guestBookView = 'inbox';
     guestBookPartner = null;
     guestBookStatus = null;
-    guestBookPendingId = null;
+    guestBookPendingPartner = null;
     loadGuestBookInbox();
 }
 
@@ -496,10 +496,16 @@ function gbInboxHTML() {
     if (guestBookInbox === null) return `<p class="gb-sub">Loading...</p>`;
     if (!guestBookInbox.length) return `<p class="gb-sub">No messages in the last 7 days.</p>`;
     return `<div class="gb-list">` + guestBookInbox.map(c => {
+        const pid = gbEsc(c.partner_id);
         const badge = c.unread > 0 ? `<span class="gb-unread">${Number(c.unread)}</span>` : '';
-        return `<button class="gb-row gb-thread" onclick="guestBookOpenThread('${gbEsc(c.partner_id)}', '${gbEsc(String(c.partner_name).replace(/'/g, ''))}')">`
+        const action = guestBookPendingPartner === c.partner_id
+            ? `<div class="gb-confirm"><span>Delete this conversation?</span><button class="gb-del" onclick="guestBookDeleteConversation('${pid}')" ${guestBookBusy ? 'disabled' : ''}>Yes</button><button class="gb-del" onclick="guestBookCancel()">No</button></div>`
+            : `<div class="gb-foot"><span></span><button class="gb-del" onclick="guestBookAskConversation('${pid}')">Delete</button></div>`;
+        return `<div class="gb-row">`
+            + `<button class="gb-thread" onclick="guestBookOpenThread('${pid}', '${gbEsc(String(c.partner_name).replace(/'/g, ''))}')">`
             + `<div class="gb-meta"><b>${gbEsc(c.partner_name)}</b><span>${badge}${gbStamp(c.last_at)}</span></div>`
-            + `<div class="gb-body">${c.last_mine ? 'You: ' : ''}${gbEsc(c.last_body)}</div></button>`;
+            + `<div class="gb-body">${c.last_mine ? 'You: ' : ''}${gbEsc(c.last_body)}</div></button>`
+            + action + `</div>`;
     }).join('') + `</div>`;
 }
 
@@ -508,15 +514,11 @@ function gbThreadHTML() {
     if (!guestBookThread.length) return `<p class="gb-sub">No messages yet. Say hello.</p>`;
     // Oldest first, so the newest message is at the bottom
     const msgs = guestBookThread.slice().reverse().map(m => {
-        const id = Number(m.id);
         if (m.mine) {
             return `<div class="gb-msg mine"><div class="gb-body">${gbEsc(m.body)}</div><div class="gb-meta"><span>${gbStamp(m.created_at)}</span></div></div>`;
         }
-        const action = guestBookPendingId === id
-            ? `<div class="gb-confirm"><span>Delete?</span><button class="gb-del" onclick="guestBookDelete(${id})" ${guestBookBusy ? 'disabled' : ''}>Yes</button><button class="gb-del" onclick="guestBookCancel()">No</button></div>`
-            : `<button class="gb-del" onclick="guestBookAsk(${id})">Delete</button>`;
         return `<div class="gb-msg theirs"><div class="gb-meta"><b>${gbEsc(m.sender_name || 'Hero')}</b><span>${gbStamp(m.created_at)}</span></div>`
-            + `<div class="gb-body">${gbEsc(m.body)}</div>${action}</div>`;
+            + `<div class="gb-body">${gbEsc(m.body)}</div></div>`;
     }).join('');
     return `<div class="gb-chat" id="gb-chat">${msgs}</div>`;
 }
@@ -564,17 +566,19 @@ async function guestBookSend() {
     loadGuestBookThread();
 }
 
-function guestBookAsk(id) { guestBookPendingId = id; renderGuestBook(); }
-function guestBookCancel() { guestBookPendingId = null; renderGuestBook(); }
-async function guestBookDelete(id) {
+function guestBookAskConversation(partnerId) { guestBookPendingPartner = partnerId; renderGuestBook(); }
+function guestBookCancel() { guestBookPendingPartner = null; renderGuestBook(); }
+// Removes the conversation from your own Guest Book only; the friend keeps their copy
+async function guestBookDeleteConversation(partnerId) {
     if (guestBookBusy) return;
     guestBookBusy = true;
     renderGuestBook();
-    const res = await friendApi.pagerDelete(id);
+    const res = await friendApi.pagerHide(partnerId);
     guestBookBusy = false;
-    guestBookPendingId = null;
+    guestBookPendingPartner = null;
     if (res.error) { guestBookStatus = { msg: res.error, err: true }; renderGuestBook(); return; }
-    guestBookThread = (guestBookThread || []).filter(m => Number(m.id) !== Number(id));
+    guestBookInbox = (guestBookInbox || []).filter(c => c.partner_id !== partnerId);
     guestBookStatus = null;
     renderGuestBook();
+    refreshGuestBookAlert();
 }
