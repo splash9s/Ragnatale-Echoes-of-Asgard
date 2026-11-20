@@ -544,9 +544,9 @@
         #view-character.screen-clear .tent-icon-btn { display: block; }
         #view-character.screen-clear.ui-off .tent-icon-btn { opacity: .3; }
         /* Tent menu (bottom right): the menu button opens a column above it: Guest Book, Home, Puzzle, Pets */
-        #tent-menu-list { position: absolute; right: 24px; bottom: 99px; z-index: 10; display: none; flex-direction: column; align-items: flex-end; gap: 14px; }
+        #tent-menu-list { position: absolute; right: 24px; bottom: 99px; z-index: 10; display: none; flex-direction: column; align-items: center; gap: 14px; }
         #view-character.screen-clear #tent-menu-list.open { display: flex; }
-        #tent-menu-list .tent-icon-btn { position: relative; right: auto; bottom: auto; }
+        #tent-menu-list .tent-icon-btn { position: relative !important; left: auto !important; top: auto !important; right: auto !important; bottom: auto !important; flex: 0 0 auto; margin: 0; }
         #view-character.screen-clear.ui-off #tent-menu-btn, #view-character.screen-clear.ui-off #tent-menu-list { display: none !important; }
         /* Hide UI keeps the minimize button, which now sits at the bottom left */
         #view-character #tent-ui-toggle { left: 24px; right: auto; }
