@@ -2705,6 +2705,11 @@ const DIAMOND_SHOP_DISCOUNT = 20;
 function dsPrice(item) { if (item.fixedPrice) return item.fixedPrice; return item.type === 'topup' ? item.price : Math.floor(item.price * (100 - DIAMOND_SHOP_DISCOUNT) / 100); }
 function vipPriceTagHTML(item) {
     if (item.type === 'topup') return item.usd ? `$${item.usd.toFixed(2)}` : `${item.thb} THB`;
+    // Ticket items are paid in their ticket, so the price shows the ticket icon and count
+    if (item.ticket) {
+        const icon = item.ticket.name === 'Pet Ticket' ? 'assets/items/mat_petticket_q85.webp' : 'assets/items/mat_costumeticket_q85.webp';
+        return `<img src="${icon}" alt="" style="width:1.3em;height:1.3em;object-fit:contain;vertical-align:middle;"> ${item.ticket.qty}`;
+    }
     if (item.fixedPrice) return `${dsPrice(item)}`;
     return `<s style="opacity:.6; font-size:.8em;">${item.price}</s> ${dsPrice(item)} <span style="color:#4ade80; font-size:.75em;">-${DIAMOND_SHOP_DISCOUNT}%</span>`;
 }
@@ -2846,7 +2851,7 @@ function vhPlayPet(stage, img, gen) {
     };
     step();
 }
-const VIP_HIGHLIGHT_ITEMS = ['dchest_costume', 'pet_box', 'vip_pass', 'vip_7d', 'vip_1d', 'res_potion'];
+const VIP_HIGHLIGHT_ITEMS = ['dchest_costume_ticket', 'pet_box_ticket', 'vip_pass', 'vip_7d', 'vip_1d', 'res_potion'];
 function vipCellHTML(item) {
     return `<div class="vip-cell">
             <button class="vip-slot${vipSelected === item.id ? ' selected' : ''}" title="${escapeHtml(item.name)}" onclick="vipSelect('${item.id}')"><span class="vip-glow"></span>${item.icon ? `<img class="${item.type === 'estone' || item.type === 'bs_rune' || item.type === 'resurrection' ? 'vip-big' : ''}" src="${item.icon}" alt="">` : ''}</button>
