@@ -22,6 +22,18 @@ const I18N = {
         'town.classlv': 'Class Lv.',
         'town.baseexp': 'Base EXP',
         'town.classexp': 'Class EXP',
+        'quest.milestones': 'Daily Quest Milestones',
+        'quest.completed': 'Completed',
+        'quest.m1': '1 Quest',
+        'quest.m2': '2 Quests',
+        'quest.m3': '3 Quests',
+        'quest.claimed': 'Claimed',
+        'quest.q_slimes.title': 'Slime Exterminator',
+        'quest.q_slimes.desc': 'Defeat {n} monsters during expeditions.',
+        'quest.q_crit.title': 'Precision Striker',
+        'quest.q_crit.desc': 'Land {n} Critical hits in combat.',
+        'quest.q_gold.title': 'Treasure Hunter',
+        'quest.q_gold.desc': 'Collect {n} Gold from expeditions.',
     },
     th: {
         'set.save': '💾 บันทึกเกม',
@@ -44,6 +56,18 @@ const I18N = {
         'town.classlv': 'Lv. อาชีพ',
         'town.baseexp': 'EXP หลัก',
         'town.classexp': 'EXP อาชีพ',
+        'quest.milestones': 'ความคืบหน้าภารกิจประจำวัน',
+        'quest.completed': 'สำเร็จ',
+        'quest.m1': '1 ภารกิจ',
+        'quest.m2': '2 ภารกิจ',
+        'quest.m3': '3 ภารกิจ',
+        'quest.claimed': 'รับแล้ว',
+        'quest.q_slimes.title': 'กำจัดสไลม์',
+        'quest.q_slimes.desc': 'กำจัดมอนสเตอร์ {n} ตัวระหว่างการสำรวจ',
+        'quest.q_crit.title': 'นักยิงแม่นยำ',
+        'quest.q_crit.desc': 'ทำคริติคอล {n} ครั้งในการต่อสู้',
+        'quest.q_gold.title': 'นักล่าสมบัติ',
+        'quest.q_gold.desc': 'เก็บทอง {n} จากการสำรวจ',
     },
 };
 
@@ -53,6 +77,20 @@ function tr(key) {
     return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
 }
 
+// Daily quest text: the stored English title/desc is used when there is no translation
+function questTitle(q) {
+    const k = 'quest.' + q.id + '.title';
+    const v = tr(k);
+    return v === k ? q.title : v;
+}
+
+function questDesc(q) {
+    const k = 'quest.' + q.id + '.desc';
+    const v = tr(k);
+    if (v === k) return q.desc;
+    return v.replace('{n}', Number(q.target).toLocaleString());
+}
+
 function applyLanguage() {
     document.documentElement.lang = currentLanguage === 'th' ? 'th' : 'en';
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -60,6 +98,7 @@ function applyLanguage() {
         el.textContent = key === 'set.lang' ? tr('set.lang') + ' ' + tr('lang.name') : tr(key);
     });
     if (typeof refreshAudioUI === 'function') refreshAudioUI();
+    if (typeof renderQuestsView === 'function' && document.getElementById('quests-container')) renderQuestsView();
 }
 
 // Remember the choice on this device only

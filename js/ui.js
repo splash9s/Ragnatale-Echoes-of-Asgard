@@ -6067,22 +6067,22 @@ function renderQuestsView() {
 
     container.innerHTML = `
         <div class="p-3 bg-slate-950 rounded-xl border border-amber-500/30 mb-3 flex flex-col gap-2">
-            <span class="text-xs font-bold text-amber-300">Daily Quest Milestones (${completedCount} / 3 Completed)</span>
+            <span class="text-xs font-bold text-amber-300">${tr('quest.milestones')} (${completedCount} / 3 ${tr('quest.completed')})</span>
             <div class="grid grid-cols-3 gap-2 mt-1">
                 <button onclick="claimQuestMilestone(1)" ${completedCount < 1 || player.questMilestoneClaimed[1] ? 'disabled' : ''} class="p-2 bg-slate-900 border border-amber-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
-                    <span class="block font-bold text-amber-400">1 Quest</span>
+                    <span class="block font-bold text-amber-400">${tr('quest.m1')}</span>
                     <img src="assets/chest/copper/coppercsmall_q85.webp" alt="Copper Chest" class="block mx-auto" style="width:90px; height:72px;">
-                    ${player.questMilestoneClaimed[1] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
+                    ${player.questMilestoneClaimed[1] ? `<span class="text-emerald-400 block">${tr('quest.claimed')}</span>` : ''}
                 </button>
                 <button onclick="claimQuestMilestone(2)" ${completedCount < 2 || player.questMilestoneClaimed[2] ? 'disabled' : ''} class="p-2 bg-slate-900 border-slate-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
-                    <span class="block font-bold text-slate-300">2 Quests</span>
+                    <span class="block font-bold text-slate-300">${tr('quest.m2')}</span>
                     <img src="assets/chest/silver/silvercsmall_q85.webp" alt="Silver Chest" class="block mx-auto" style="width:90px; height:72px;">
-                    ${player.questMilestoneClaimed[2] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
+                    ${player.questMilestoneClaimed[2] ? `<span class="text-emerald-400 block">${tr('quest.claimed')}</span>` : ''}
                 </button>
                 <button onclick="claimQuestMilestone(3)" ${completedCount < 3 || player.questMilestoneClaimed[3] ? 'disabled' : ''} class="p-2 bg-slate-900 border-purple-500/40 rounded text-center text-[10px] cursor-pointer disabled:opacity-50">
-                    <span class="block font-bold text-purple-300">3 Quests</span>
+                    <span class="block font-bold text-purple-300">${tr('quest.m3')}</span>
                     <img src="assets/chest/gold/goldcsmall_q85.webp" alt="Gold Chest" class="block mx-auto" style="width:90px; height:72px;">
-                    ${player.questMilestoneClaimed[3] ? '<span class="text-emerald-400 block">Claimed</span>' : ''}
+                    ${player.questMilestoneClaimed[3] ? `<span class="text-emerald-400 block">${tr('quest.claimed')}</span>` : ''}
                 </button>
             </div>
         </div>
@@ -6093,10 +6093,10 @@ function renderQuestsView() {
         container.innerHTML += `
             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col gap-1.5 text-xs">
                 <div class="flex justify-between items-center">
-                    <span class="font-bold text-slate-200">${q.title}</span>
+                    <span class="font-bold text-slate-200">${questTitle(q)}</span>
                     <span class="font-mono text-[10px] ${q.completed ? 'text-emerald-400' : 'text-amber-400'}">${q.current} / ${q.target}</span>
                 </div>
-                <span class="text-[10px] text-slate-400">${q.desc}</span>
+                <span class="text-[10px] text-slate-400">${questDesc(q)}</span>
                 <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
                     <div class="bg-amber-500 h-full transition-all duration-300" style="width: ${pct}%"></div>
                 </div>
