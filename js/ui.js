@@ -2484,7 +2484,7 @@ function ensureDailyQuestsToday() {
     if (!player.dailyQuestsDate) { player.dailyQuestsDate = today; return; } // older saves: keep today's progress
     if (player.dailyQuestsDate === today) return;
     player.dailyQuestsDate = today;
-    (player.dailyQuests || []).forEach(q => { q.current = 0; q.completed = false; });
+    player.dailyQuests = rollDailyQuests();
     player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
     if (document.getElementById('quests-container')) renderQuestsView(); // redraw so milestones show reset
 }
@@ -6056,11 +6056,7 @@ function renderQuestsView() {
     container.innerHTML = '';
 
     if (!player.dailyQuests || player.dailyQuests.length === 0) {
-        player.dailyQuests = [
-            { id: 'q_slimes', title: "Slime Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
-            { id: 'q_crit', title: "Precision Striker", desc: "Land 60 Critical hits in combat.", target: 60, current: 0, rewardChest: "silver", completed: false },
-            { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 10,000 Gold from expeditions.", target: 10000, current: 0, rewardChest: "gold", completed: false }
-        ];
+        player.dailyQuests = rollDailyQuests();
     }
 
     let completedCount = player.dailyQuests.filter(q => q.completed).length;

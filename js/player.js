@@ -10,6 +10,27 @@ const BAG_EXPAND_STEP = 9;  // each Bag Expansion adds one row of 9
 // Open bag slots for this player: base + expansions, never beyond the grid
 function bagSlotCount() { return Math.min(BAG_MAX_SLOTS, BAG_BASE_SLOTS + BAG_EXPAND_STEP * ((typeof player !== 'undefined' && player.bagExpansions) || 0)); }
 
+// Daily quest pool: each day the game picks one target tier per quest type at random.
+// Easier tiers give a copper chest, harder ones a gold chest. Progress types are the ones combat.js already tracks.
+const DAILY_QUEST_POOL = {
+    slimes: { id: 'q_slimes', title: "Slime Exterminator", tpl: "Defeat {n} monsters during expeditions.", tiers: [{ t: 30, c: 'copper' }, { t: 45, c: 'silver' }, { t: 60, c: 'gold' }] },
+    crit:   { id: 'q_crit', title: "Precision Striker", tpl: "Land {n} Critical hits in combat.", tiers: [{ t: 40, c: 'copper' }, { t: 60, c: 'silver' }, { t: 80, c: 'gold' }] },
+    gold:   { id: 'q_gold', title: "Treasure Hunter", tpl: "Collect {n} Gold from expeditions.", tiers: [{ t: 5000, c: 'copper' }, { t: 10000, c: 'silver' }, { t: 15000, c: 'gold' }] },
+};
+
+// Picks today's three quests, one per type, each at a random tier
+function rollDailyQuests() {
+    return Object.keys(DAILY_QUEST_POOL).map(type => {
+        const def = DAILY_QUEST_POOL[type];
+        const tier = def.tiers[Math.floor(Math.random() * def.tiers.length)];
+        return {
+            id: def.id, v: 2, title: def.title,
+            desc: def.tpl.replace('{n}', tier.t.toLocaleString()),
+            target: tier.t, current: 0, rewardChest: tier.c, completed: false,
+        };
+    });
+}
+
 let player = {
     name: "Hero",
     avatar: "assets/avatars/man1_q85.webp",
@@ -34,11 +55,7 @@ let player = {
     stats: { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 },
     materials: { ironScraps: 0 },
     mailBox: createWelcomeMail(),
-    dailyQuests: [
-        { id: 'q_slimes', title: "Slime Exterminator", desc: "Defeat 45 monsters during expeditions.", target: 45, current: 0, rewardChest: "copper", completed: false },
-        { id: 'q_crit', title: "Precision Striker", desc: "Land 60 Critical hits in combat.", target: 60, current: 0, rewardChest: "silver", completed: false },
-        { id: 'q_gold', title: "Treasure Hunter", desc: "Collect 10,000 Gold from expeditions.", target: 10000, current: 0, rewardChest: "gold", completed: false }
-    ],
+    dailyQuests: rollDailyQuests(),
     questMilestoneClaimed: { 1: false, 2: false, 3: false },
     dailyFree: {},
     skills: defaultSkills(),
@@ -424,8 +441,11 @@ function loadGame() {
                 player.mailBox = createWelcomeMail();
             }
             if (!player.dailyQuests) player.dailyQuests = [];
-            const QUEST_TARGETS = { q_slimes: 45, q_crit: 60, q_gold: 10000 };
-            player.dailyQuests.forEach(q => { if (QUEST_TARGETS[q.id]) q.target = QUEST_TARGETS[q.id]; });
+            // Quests from before the daily pool (no v: 2 marker): roll a fresh set once
+            if (!player.dailyQuests.length || !player.dailyQuests.every(q => q.v === 2)) {
+                player.dailyQuests = rollDailyQuests();
+                player.dailyQuestsDate = null;
+            }
             if (!player.questMilestoneClaimed) player.questMilestoneClaimed = { 1: false, 2: false, 3: false };
             if (typeof ensureDailyQuestsToday === 'function') ensureDailyQuestsToday();
             if (!player.materials) player.materials = { ironScraps: 0 };
