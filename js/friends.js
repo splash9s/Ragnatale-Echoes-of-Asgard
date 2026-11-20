@@ -334,7 +334,7 @@ function enterFriendTent(name, snap) {
     window.friendVisit = { name, backup };
     document.body.classList.add('friend-visiting');
     const nameEl = document.getElementById('friend-visit-name');
-    if (nameEl) nameEl.textContent = name;
+    if (nameEl) nameEl.textContent = `${name}'s Tent`;
     switchView('character'); // opens the character page reset to the inventory; the tent is turned on after it
     if (!isCharClear()) toggleCharClear();
 }
