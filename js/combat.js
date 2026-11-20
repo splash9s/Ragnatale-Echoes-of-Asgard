@@ -2655,7 +2655,11 @@ function towerSlotFeet(id) { return TOWER_SLOT_FEET[id] || TOWER_SLOT_FEET.a2; }
 function combatHeroFeet() {
     return towerIsActive() ? towerSlotFeet('hero') : { x: combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x, y: combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y };
 }
+// Warded Tower stacking: the main player (red) on top, then the 3rd member (blue), then the 2nd (green) at the back
+const TOWER_LAYER = { hero: 6, a2: 5, a1: 4 };
 function towerRenderField() {
+    const heroSprite = document.getElementById('combat-player-sprite');
+    if (heroSprite) heroSprite.style.zIndex = towerIsActive() ? String(TOWER_LAYER.hero) : '';
     const stage = document.querySelector('#combat-stage .ts-inner');
     if (!towerIsActive() || !stage) {
         document.querySelectorAll('.tower-field-ally').forEach(n => n.remove());
@@ -2688,7 +2692,7 @@ function towerRenderField() {
             if (el.dataset.src !== f.src) { el.src = f.src; el.dataset.src = f.src; }
             const fx = f.fx !== undefined ? f.fx : f.w / 2;
             const fy = f.fy !== undefined ? f.fy : f.h;
-            el.style.cssText = `position:absolute;left:${footX - fx * S}px;top:${footY - fy * S}px;width:${f.w * S}px;height:${f.h * S}px;image-rendering:pixelated;z-index:4;pointer-events:none;`;
+            el.style.cssText = `position:absolute;left:${footX - fx * S}px;top:${footY - fy * S}px;width:${f.w * S}px;height:${f.h * S}px;image-rendering:pixelated;z-index:${TOWER_LAYER[id]};pointer-events:none;`;
         } else {
             // Art still loading: show the avatar until the sprite is ready
             if (!el || el.tagName !== 'DIV') {
@@ -2699,7 +2703,7 @@ function towerRenderField() {
                 el.innerHTML = friendAvatarHTML(m.avatar || '');
                 stage.appendChild(el);
             }
-            el.style.cssText = `position:absolute;left:${footX - 32}px;top:${footY - 70}px;width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14;z-index:4;pointer-events:none;`;
+            el.style.cssText = `position:absolute;left:${footX - 32}px;top:${footY - 70}px;width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #ffd45a;background:#1d1a14;z-index:${TOWER_LAYER[id]};pointer-events:none;`;
         }
         // Fall once when the friend goes down (same animation as the hero)
         if (!alive) el.classList.add('tower-fall');
@@ -2715,7 +2719,7 @@ function towerRenderField() {
             stage.appendChild(label);
         }
         label.textContent = m.name;
-        label.style.cssText = `position:absolute;left:${footX - 60}px;top:${footY + 4}px;width:120px;text-align:center;font-size:14px;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000;z-index:4;pointer-events:none;opacity:${alive ? 1 : 0.35};`;
+        label.style.cssText = `position:absolute;left:${footX - 60}px;top:${footY + 4}px;width:120px;text-align:center;font-size:14px;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000;z-index:${TOWER_LAYER[id]};pointer-events:none;opacity:${alive ? 1 : 0.35};`;
     });
     document.querySelectorAll('.tower-field-ally').forEach(n => { if (!keep.has(n.id)) n.remove(); });
 }
