@@ -5641,18 +5641,18 @@ function makeMailGear(slot, lv) {
 // Short reward summary shown under a mail's message
 function mailRewardText(r) {
     const parts = [];
-    if (r.gold) parts.push(`${r.gold} Gold`);
-    if (r.diamonds) parts.push(`${r.diamonds} Diamonds`);
-    if (r.refiningStones) parts.push(`${r.refiningStones} Refining Stones`);
-    if (r.resurrection) parts.push(`${r.resurrection} Resurrection Potion`);
-    if (r.vipDays) parts.push(`${r.vipDays} day VIP`);
+    if (r.gold) parts.push(`${r.gold} ${tr('mail.gold')}`);
+    if (r.diamonds) parts.push(`${r.diamonds} ${tr('mail.diamonds')}`);
+    if (r.refiningStones) parts.push(`${r.refiningStones} ${tr('mail.refining')}`);
+    if (r.resurrection) parts.push(`${r.resurrection} ${tr('mail.resurrection')}`);
+    if (r.vipDays) parts.push(`${r.vipDays} ${tr('mail.vipday')}`);
     for (const [id, q] of Object.entries(r.potions || {})) {
         if (q > 0) parts.push(`${q} ${(GOLD_SHOP_CONSUMABLES.find(i => i.id === id) || { name: id }).name}`);
     }
-    if (r.baseLv) parts.push(`${r.baseLv} Base LV`);
-    if (r.classLv) parts.push(`${r.classLv} Class LV`);
-    if (r.baseExp) parts.push(`${r.baseExp} Base EXP`); // mails sent before the LV rewards
-    if (r.classExp) parts.push(`${r.classExp} Class EXP`);
+    if (r.baseLv) parts.push(`${r.baseLv} ${tr('mail.baselv')}`);
+    if (r.classLv) parts.push(`${r.classLv} ${tr('mail.classlv')}`);
+    if (r.baseExp) parts.push(`${r.baseExp} ${tr('mail.baseexp')}`); // mails sent before the LV rewards
+    if (r.classExp) parts.push(`${r.classExp} ${tr('mail.classexp')}`);
     for (const it of Array.isArray(r.items) ? r.items : []) if (it && it.name) parts.push(it.name); // auction items
     if (r.chest) parts.push(`${r.chest[0].toUpperCase() + r.chest.slice(1)} Chest`);
     if (r.gear) parts.push(`${(MAIL_GEAR_SLOTS.find(s => s[0] === r.gear.slot) || [0, r.gear.slot])[1]} Lv ${r.gear.lv} (R5)`);
@@ -5762,7 +5762,7 @@ function sendPlayerMail() {
 function mailTimeText(m) {
     const t = m.sentAt || (m.id > 1e12 ? m.id : 0);
     if (!t) return '';
-    return new Date(t).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return new Date(t).toLocaleString(currentLanguage === 'th' ? 'th-TH' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 // Deletes a mail. An unclaimed mail with rewards asks first, so the rewards are not lost by accident.
@@ -5771,7 +5771,7 @@ function deleteMail(mailId) {
     if (!mail) return;
     // Server mail stays on the server until it is claimed, so deleting it first would bring it back on the next sync
     if (mail.serverId && !mail.claimed) {
-        showModal('Mail', 'Claim this gift first, then you can delete it.');
+        showModal(tr('mail.title'), tr('mail.claimfirst'));
         return;
     }
     const remove = () => {

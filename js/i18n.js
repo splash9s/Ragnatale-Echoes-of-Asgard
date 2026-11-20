@@ -62,6 +62,17 @@ const I18N = {
         'exp.cleared': 'Cleared',
         'exp.selected': 'Selected',
         'exp.available': 'Available',
+        'mail.gold': 'Gold',
+        'mail.diamonds': 'Diamonds',
+        'mail.refining': 'Refining Stones',
+        'mail.resurrection': 'Resurrection Potion',
+        'mail.vipday': 'day VIP',
+        'mail.baselv': 'Base LV',
+        'mail.classlv': 'Class LV',
+        'mail.baseexp': 'Base EXP',
+        'mail.classexp': 'Class EXP',
+        'mail.title': 'Mail',
+        'mail.claimfirst': 'Claim this gift first, then you can delete it.',
     },
     th: {
         'set.save': '💾 บันทึกเกม',
@@ -124,6 +135,17 @@ const I18N = {
         'exp.cleared': 'ผ่านแล้ว',
         'exp.selected': 'เลือกอยู่',
         'exp.available': 'เปิดให้เล่น',
+        'mail.gold': 'ทอง',
+        'mail.diamonds': 'เพชร',
+        'mail.refining': 'หินปรับปรุง',
+        'mail.resurrection': 'ยาฟื้นคืนชีพ',
+        'mail.vipday': 'วัน VIP',
+        'mail.baselv': 'Lv. หลัก',
+        'mail.classlv': 'Lv. อาชีพ',
+        'mail.baseexp': 'EXP หลัก',
+        'mail.classexp': 'EXP อาชีพ',
+        'mail.title': 'จดหมาย',
+        'mail.claimfirst': 'รับของขวัญนี้ก่อน แล้วจึงลบได้',
     },
 };
 
@@ -224,6 +246,13 @@ const DOM_TH = {
     'garment': 'เสื้อคลุม',
     'footgear': 'รองเท้า',
     'Slot:': 'ช่อง:',
+    'Attached': 'แนบมา',
+    'Claim': 'รับ',
+    'Claimed': 'รับแล้ว',
+    'Delete': 'ลบ',
+    'No mail.': 'ไม่มีจดหมาย',
+    'Rewards': 'รางวัล',
+    'REWARDS': 'รางวัล',
     '+0 to +4: refining always succeeds.': '+0 ถึง +4: การปรับปรุงสำเร็จเสมอ',
     'A failed forge never loses the weapon. It only uses up the stone and the Gold.': 'การตีธาตุที่ล้มเหลวจะไม่ทำให้อาวุธหาย ใช้แค่หินและทองไป',
     'A failed refine drops the gear by 1 level (never below +4) and consumes the Gold and the refine material.': 'การปรับปรุงที่ล้มเหลวจะลดระดับอุปกรณ์ลง 1 ระดับ (ไม่ต่ำกว่า +4) และใช้ทองกับวัสดุไป',
@@ -291,10 +320,10 @@ function startDomTranslation() {
         pending = true;
         requestAnimationFrame(() => {
             pending = false;
-            ['view-friend', 'view-events', 'view-blacksmith'].forEach(id => translateDomIn(document.getElementById(id)));
+            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => translateDomIn(document.getElementById(id)));
         });
     });
-    ['view-friend', 'view-events', 'view-blacksmith'].forEach(id => {
+    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => {
         const el = document.getElementById(id);
         if (el) domObserver.observe(el, { childList: true, subtree: true, characterData: true });
     });
@@ -314,7 +343,7 @@ function applyLanguage() {
         if (typeof renderEventsView === 'function' && document.getElementById('events-detail')) renderEventsView();
         if (typeof renderFriendPage === 'function' && document.getElementById('friend-list')) renderFriendPage();
     } catch (e) { console.warn('Language re-render skipped:', e); }
-    ['view-friend', 'view-events', 'view-blacksmith'].forEach(id => translateDomIn(document.getElementById(id)));
+    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => translateDomIn(document.getElementById(id)));
 }
 
 // Remember the choice on this device only
