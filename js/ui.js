@@ -2281,7 +2281,7 @@ function dailyFreeCardHTML(key) {
                 <span class="font-bold block text-xs">${item.name}</span>
                 <span class="text-[10px]">${item.desc}</span>
             </div>
-            <button disabled class="px-3 py-1.5 font-bold rounded-lg text-xs">Claimed today</button>
+            ${key === 'gold' ? '<span class="font-bold text-xs" style="color:#16a34a;">Claimed</span>' : '<button disabled class="px-3 py-1.5 font-bold rounded-lg text-xs">Claimed today</button>'}
         </div>
     `;
     }
