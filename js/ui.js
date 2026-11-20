@@ -2909,7 +2909,7 @@ function renderVipDetail() {
         ? `<div class="vd-icon">${item.icon ? `<img src="${item.icon}" alt="">` : ''}</div>
            <div class="vd-name">${escapeHtml(item.name)}</div>
            <div class="vd-desc">${escapeHtml(item.desc)}</div>
-           <div class="vd-price">${item.type === 'topup' ? '' : '<img src="assets/icons/diamondiconsmall_q85.webp" alt="">'}${vipPriceTagHTML(item)}</div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
+           <div class="vd-price">${item.type === 'topup' || item.ticket ? '' : '<img src="assets/icons/diamondiconsmall_q85.webp" alt="">'}${vipPriceTagHTML(item)}</div>${item.type === 'chest' ? chestDropRatesHTML(item.chestType) : ''}`
         : '<p class="vd-empty">Select an item</p>';
 }
 // Drop rates shown on a chest's detail before purchase. Figures come from the same tables that openChest uses.
