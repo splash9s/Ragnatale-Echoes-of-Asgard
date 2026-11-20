@@ -433,10 +433,7 @@ function onRunePickClosed() {
     window.runeCallback = null;
     if (cb) cb();
 }
-(function bindRunePickBackdrop() {
-    const gm = document.getElementById('game-modal');
-    if (gm) gm.addEventListener('click', e => { if (e.target === e.currentTarget && runePickOpen) closeModal(); });
-})();
+// The rune pick cannot be skipped: clicks outside the window do nothing (a rune must be chosen)
 
 function showRuneChoices(isNew) {
     const pool = Object.keys(RUNE_DEFS).filter(isRuneOffered);
