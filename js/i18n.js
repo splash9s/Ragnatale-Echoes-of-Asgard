@@ -300,7 +300,7 @@ function translateDomIn(root) {
     nodes.forEach(n => {
         const t = n.nodeValue.trim();
         if (!t) return;
-        let out = DOM_TH[t];
+        let out = DOM_TH[t] || (typeof NAMES_TH !== 'undefined' ? NAMES_TH[t] : undefined);
         if (!out) {
             for (const p of DOM_TH_PATTERNS) {
                 const m = t.match(p.re);
@@ -320,7 +320,7 @@ function startDomTranslation() {
         pending = true;
         requestAnimationFrame(() => {
             pending = false;
-            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => translateDomIn(document.getElementById(id)));
+            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions'].forEach(id => translateDomIn(document.getElementById(id)));
         });
     });
     ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => {
@@ -343,7 +343,7 @@ function applyLanguage() {
         if (typeof renderEventsView === 'function' && document.getElementById('events-detail')) renderEventsView();
         if (typeof renderFriendPage === 'function' && document.getElementById('friend-list')) renderFriendPage();
     } catch (e) { console.warn('Language re-render skipped:', e); }
-    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => translateDomIn(document.getElementById(id)));
+    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions'].forEach(id => translateDomIn(document.getElementById(id)));
 }
 
 // Remember the choice on this device only
