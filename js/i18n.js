@@ -210,12 +210,54 @@ const DOM_TH = {
     'Type a player name or ID.': 'พิมพ์ชื่อหรือรหัสผู้เล่น',
     'Friendship Lv. ': 'ระดับมิตรภาพ ',
     'Lv. ': 'Lv. ',
+    'Success Rate': 'อัตราสำเร็จ',
+    'First refine FREE': 'ปรับปรุงครั้งแรกฟรี',
+    'Smelt': 'หลอม',
+    'Iron Scraps': 'เศษเหล็ก',
+    'Ingot': 'อินกอต',
+    'Bars': 'แท่งโลหะ',
+    'Alloy': 'โลหะผสม',
+    'Select gear to refine': 'เลือกอุปกรณ์ที่จะปรับปรุง',
+    'weapon': 'อาวุธ',
+    'shield': 'โล่',
+    'armor': 'เกราะ',
+    'garment': 'เสื้อคลุม',
+    'footgear': 'รองเท้า',
+    'Slot:': 'ช่อง:',
+    '+0 to +4: refining always succeeds.': '+0 ถึง +4: การปรับปรุงสำเร็จเสมอ',
+    'A failed forge never loses the weapon. It only uses up the stone and the Gold.': 'การตีธาตุที่ล้มเหลวจะไม่ทำให้อาวุธหาย ใช้แค่หินและทองไป',
+    'A failed refine drops the gear by 1 level (never below +4) and consumes the Gold and the refine material.': 'การปรับปรุงที่ล้มเหลวจะลดระดับอุปกรณ์ลง 1 ระดับ (ไม่ต่ำกว่า +4) และใช้ทองกับวัสดุไป',
+    'A forged weapon is named after you: your name in blue, then the element, then the weapon name.': 'อาวุธที่ตีธาตุจะตั้งชื่อตามคุณ: ชื่อคุณเป็นสีน้ำเงิน ตามด้วยธาตุ แล้วชื่ออาวุธ',
+    'Costs 1 Blacksmith Rune Stone.': 'ใช้หินรูนช่างตี 1 ก้อน',
+    'Each campaign boss drops the Elemental Stone of its element, with a 5% chance per kill.': 'บอสในด่านหลักดรอปหินธาตุของธาตุนั้น โอกาส 5% ต่อการฆ่า',
+    'Each forge costs Gold = item level x 100, and Elemental Stones = item level / 10 (rounded up, at least 1).': 'การตีแต่ละครั้งใช้ทอง = เลเวลไอเทม x 100 และหินธาตุ = เลเวลไอเทม / 10 (ปัดขึ้น อย่างน้อย 1)',
+    'Each refine costs (target level) × 100 Gold and 1 refine material: Ingot for +1 to +4, Bar for +5 to +7, Alloy for +8 to +10.': 'การปรับปรุงแต่ละครั้งใช้ทอง (ระดับเป้าหมาย) × 100 และวัสดุ 1 ชิ้น: อินกอตสำหรับ +1 ถึง +4, แท่งโลหะสำหรับ +5 ถึง +7, โลหะผสมสำหรับ +8 ถึง +10',
+    'Elemental': 'ธาตุ',
+    'Elemental Forge Rules': 'กฎการตีธาตุ',
+    'Forging succeeds 20% of the time.': 'การตีธาตุสำเร็จ 20%',
+    'From +5 on, the success rate drops by 15% per level (minimum 10%).': 'ตั้งแต่ +5 ขึ้นไป อัตราสำเร็จลด 15% ต่อระดับ (ขั้นต่ำ 10%)',
+    'Ingot drops from normal monsters (5%), Bar from mini bosses (5%), Alloy from bosses (2%).': 'อินกอตดรอปจากมอนสเตอร์ทั่วไป (5%) แท่งโลหะจากมินิบอส (5%) โลหะผสมจากบอส (2%)',
+    'Inherit': 'ถ่ายทอด',
+    'Inherit Rules': 'กฎการถ่ายทอด',
+    'Maximum refinement is +10.': 'การปรับปรุงสูงสุดคือ +10',
+    'Only gear of the same type. Refinement moves from higher to lower only.': 'ใช้ได้กับอุปกรณ์ชนิดเดียวกันเท่านั้น การปรับปรุงย้ายจากระดับสูงไปต่ำเท่านั้น',
+    'Pick a weapon and an Elemental Stone, then forge the element onto the weapon.': 'เลือกอาวุธและหินธาตุ แล้วตีธาตุลงบนอาวุธ',
+    'Pick the gear to take refinement from (From), then the gear to move it to (To).': 'เลือกอุปกรณ์ที่จะเอาการปรับปรุงออก (จาก) แล้วเลือกอุปกรณ์ที่จะย้ายไป (ไปยัง)',
+    'Refine': 'ปรับปรุง',
+    'Refine Rules': 'กฎการปรับปรุง',
+    'Refinement': 'การปรับปรุง',
+    'Return': 'กลับ',
+    'Smelting: 20 Iron Scraps make 1 Ingot, 20 Ingots make 1 Bar, 10 Bars make 1 Alloy.': 'การหลอม: เศษเหล็ก 20 ชิ้น = อินกอต 1, อินกอต 20 = แท่งโลหะ 1, แท่งโลหะ 10 = โลหะผสม 1',
+    "The target takes the source's level; the source resets to +0.": 'เป้าหมายรับระดับของต้นทาง ต้นทางรีเซ็ตเป็น +0',
+    'Weapons no longer roll an element when they drop from monsters.': 'อาวุธจะไม่สุ่มธาตุตอนดรอปจากมอนสเตอร์อีกต่อไป',
     'Friends need the cloud. Sign in to use them.': 'เพื่อนต้องใช้บัญชีออนไลน์ กรุณาเข้าสู่ระบบก่อน',
 };
 
 const DOM_TH_PATTERNS = [
     { re: /^(\d+) \/ (\d+) plays left today$/, f: m => `เหลือ ${m[1]} / ${m[2]} ครั้งวันนี้` },
     { re: /^Unlimited attempts for now · (\d+) \/ 2 friends$/, f: m => `ไม่จำกัดจำนวนครั้งตอนนี้ · ${m[1]} / 2 เพื่อน` },
+    { re: /^Success Rate: (.+)$/, f: m => `อัตราสำเร็จ: ${m[1]}` },
+    { re: /^Rune Stone: (\d+)$/, f: m => `หินรูน: ${m[1]}` },
     { re: /^Campaign Lv\. (\d+)$/, f: m => `ด่าน Lv. ${m[1]}` },
     { re: /^(\d+) floors in the castle\. Monsters grow stronger on every floor\. Bring two friends\. Each friend can join again 3 days after a run\. You are paid for each floor you clear\.$/, f: m => `มี ${m[1]} ชั้นในปราสาท มอนสเตอร์แข็งแกร่งขึ้นทุกชั้น พาเพื่อนได้ 2 คน เพื่อนแต่ละคนเข้าร่วมได้อีกครั้งหลังผ่านไป 3 วัน คุณได้รับรางวัลทุกชั้นที่ผ่าน` },
 ];
@@ -249,10 +291,10 @@ function startDomTranslation() {
         pending = true;
         requestAnimationFrame(() => {
             pending = false;
-            ['view-friend', 'view-events'].forEach(id => translateDomIn(document.getElementById(id)));
+            ['view-friend', 'view-events', 'view-blacksmith'].forEach(id => translateDomIn(document.getElementById(id)));
         });
     });
-    ['view-friend', 'view-events'].forEach(id => {
+    ['view-friend', 'view-events', 'view-blacksmith'].forEach(id => {
         const el = document.getElementById(id);
         if (el) domObserver.observe(el, { childList: true, subtree: true, characterData: true });
     });
@@ -272,7 +314,7 @@ function applyLanguage() {
         if (typeof renderEventsView === 'function' && document.getElementById('events-detail')) renderEventsView();
         if (typeof renderFriendPage === 'function' && document.getElementById('friend-list')) renderFriendPage();
     } catch (e) { console.warn('Language re-render skipped:', e); }
-    ['view-friend', 'view-events'].forEach(id => translateDomIn(document.getElementById(id)));
+    ['view-friend', 'view-events', 'view-blacksmith'].forEach(id => translateDomIn(document.getElementById(id)));
 }
 
 // Remember the choice on this device only
