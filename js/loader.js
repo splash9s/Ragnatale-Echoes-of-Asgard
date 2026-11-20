@@ -382,17 +382,27 @@ function isFirstScreenImage(src) {
 let townArtResolve;
 window.townAssetsReady = new Promise(resolve => { townArtResolve = resolve; });
 
+// Loads a list of images a few at a time. Many requests at once stalled on phones, so the bar sat at 0%.
+function preloadAll(list, onEach, limit = 6) {
+    let next = 0;
+    const run = () => {
+        if (next >= list.length) return Promise.resolve();
+        const src = list[next++];
+        return preloadImage(src).then(() => onEach(src)).then(run);
+    };
+    return Promise.all(Array.from({ length: Math.min(limit, list.length) }, run));
+}
+
 function runPreload() {
     const firstVisit = isFirstVisit();
     const critical = LOADING_IMAGES.filter(firstVisit ? isFirstScreenImage : isCriticalImage);
     const total = critical.length;
     let done = 0;
-    return Promise.all(critical.map(src =>
-        preloadImage(src).then(() => {
-            done++;
-            setLoading((done / total) * 100, `Loading images: ${src} (${done} / ${total})`);
-        })
-    )).then(() => {
+    setLoading(0, `Loading images (0 / ${total})`);
+    return preloadAll(critical, src => {
+        done++;
+        setLoading((done / total) * 100, `Loading images: ${src} (${done} / ${total})`);
+    }).then(() => {
         if (firstVisit) return; // the town art and hero art load in loadTownArtInBackground
         townArtResolve();
         return loadHeroArtBands(HERO_ART_EARLY_BANDS); // the hero's early gear art is needed on the town page

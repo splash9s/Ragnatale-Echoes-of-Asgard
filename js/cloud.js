@@ -172,7 +172,9 @@ function cloudFlush() {
     if (json === cloudLastPushed) return;
     cloudLastPushed = json;
     cloudPushProfile();
-    cloudClient.from('saves').upsert({ user_id: cloudUserId, data: player, updated_at: new Date().toISOString() })
+    // updated_at is the local save time, so the next start sees the same timestamp and does not reload the page
+    const localAt = Number(localStorage.getItem('ragnatale_save_at')) || Date.now();
+    cloudClient.from('saves').upsert({ user_id: cloudUserId, data: player, updated_at: new Date(localAt).toISOString() })
         .then(({ error }) => { if (error) { console.warn('Cloud save failed:', error.message); cloudLastPushed = null; cloudDirty = true; } });
 }
 
