@@ -158,6 +158,106 @@ function localGameName(text) {
         .replace(/^Map Lv\. (\d+)$/, 'แผนที่ Lv. $1');
 }
 
+// Event and friend page text that is written in code (not in the dictionary above).
+// Matched on whole text pieces; the game re-renders these pages, so the observer translates again.
+const DOM_TH = {
+    'Daily Quests': 'ภารกิจประจำวัน',
+    'Daily Challenge': 'ท้าทายประจำวัน',
+    'Gold Frenzy': 'ทองคำพุ่งทะยาน',
+    'Wisdom Trail': 'เส้นทางแห่งปัญญา',
+    'Warded Tower': 'หอคอยผนึก',
+    'Void Tower': 'หอคอยความว่างเปล่า',
+    'Void Test Map': 'แผนที่ทดสอบความว่างเปล่า',
+    'Boss Gauntlet': 'ด่านบอส',
+    '31 stages with bosses on 11, 21 and 31. Level, skills and gear have no effect. Health potions are disabled and only one resurrection can be used per run.': '31 ด่าน มีบอสที่ด่าน 11, 21 และ 31 เลเวล สกิล และอุปกรณ์ไม่มีผล ยาเพิ่ม HP ใช้ไม่ได้ และใช้การฟื้นคืนชีพได้เพียงครั้งเดียวต่อการลง',
+    'Cleared today: locked until tomorrow': 'ผ่านแล้ววันนี้ ล็อกจนถึงพรุ่งนี้',
+    'Monsters at x1.5 HP and damage. Gold x2, but no EXP. No item drops.': 'มอนสเตอร์มี HP และพลังโจมตี x1.5 ทองคำ x2 แต่ไม่ได้ EXP และไม่มีไอเทมดรอป',
+    'Monsters at x1.5 HP and damage. Base and Class EXP x2, but no Gold. No item drops.': 'มอนสเตอร์มี HP และพลังโจมตี x1.5 EXP หลักและ EXP อาชีพ x2 แต่ไม่ได้ทองคำ และไม่มีไอเทมดรอป',
+    'Copper Mines': 'เหมืองทองแดง',
+    'Silver Vault': 'คลังเงิน',
+    "Dragon's Hoard": 'คลังมังกร',
+    'Moonlit Grove': 'ป่าใต้แสงจันทร์',
+    'Sage Library': 'ห้องสมุดปราชญ์',
+    'Starfall Peak': 'ยอดดาวตก',
+    'Endless test map. 100x rewards, test only.': 'แผนที่ทดสอบไม่จำกัด รางวัล 100 เท่า ใช้ทดสอบเท่านั้น',
+    'Free test map: 1 stage, 6 monsters.': 'แผนที่ทดสอบฟรี: 1 ด่าน มอนสเตอร์ 6 ตัว',
+    'A boss on every level 1–99. Choose the boss to fight.': 'มีบอสทุกระดับ 1–99 เลือกบอสที่จะสู้',
+    'Boss to fight': 'บอสที่จะสู้',
+    'Guest Book': 'สมุดเยี่ยม',
+    'Accept': 'ยอมรับ',
+    'Cancel Request': 'ยกเลิกคำขอ',
+    'Decline': 'ปฏิเสธ',
+    'Delete': 'ลบ',
+    'Delete Friend': 'ลบเพื่อน',
+    'Hero': 'ฮีโร่',
+    'Loading friends...': 'กำลังโหลดเพื่อน...',
+    'Loading requests...': 'กำลังโหลดคำขอ...',
+    'Loading...': 'กำลังโหลด...',
+    'No friend requests.': 'ไม่มีคำขอเป็นเพื่อน',
+    'No friends yet. Add a player with their name or ID above.': 'ยังไม่มีเพื่อน เพิ่มผู้เล่นด้วยชื่อหรือรหัสด้านบน',
+    'No messages yet. Say hello.': 'ยังไม่มีข้อความ ทักทายกันเลย',
+    'Send': 'ส่ง',
+    'Send Gift': 'ส่งของขวัญ',
+    'Sent today': 'ส่งวันนี้แล้ว',
+    'Visit Tent': 'เยี่ยมเต็นท์',
+    'Yes': 'ใช่',
+    'No streak': 'ไม่มีสตรีค',
+    'Max friendship level': 'ระดับมิตรภาพสูงสุด',
+    'Waiting for them to accept.': 'รอให้ยอมรับ',
+    'Wants to be your friend.': 'ต้องการเป็นเพื่อนกับคุณ',
+    'Write a message...': 'เขียนข้อความ...',
+    'Write a message first.': 'เขียนข้อความก่อน',
+    'Type a player name or ID.': 'พิมพ์ชื่อหรือรหัสผู้เล่น',
+    'Friendship Lv. ': 'ระดับมิตรภาพ ',
+    'Lv. ': 'Lv. ',
+    'Friends need the cloud. Sign in to use them.': 'เพื่อนต้องใช้บัญชีออนไลน์ กรุณาเข้าสู่ระบบก่อน',
+};
+
+const DOM_TH_PATTERNS = [
+    { re: /^(\d+) \/ (\d+) plays left today$/, f: m => `เหลือ ${m[1]} / ${m[2]} ครั้งวันนี้` },
+    { re: /^Unlimited attempts for now · (\d+) \/ 2 friends$/, f: m => `ไม่จำกัดจำนวนครั้งตอนนี้ · ${m[1]} / 2 เพื่อน` },
+    { re: /^Campaign Lv\. (\d+)$/, f: m => `ด่าน Lv. ${m[1]}` },
+    { re: /^(\d+) floors in the castle\. Monsters grow stronger on every floor\. Bring two friends\. Each friend can join again 3 days after a run\. You are paid for each floor you clear\.$/, f: m => `มี ${m[1]} ชั้นในปราสาท มอนสเตอร์แข็งแกร่งขึ้นทุกชั้น พาเพื่อนได้ 2 คน เพื่อนแต่ละคนเข้าร่วมได้อีกครั้งหลังผ่านไป 3 วัน คุณได้รับรางวัลทุกชั้นที่ผ่าน` },
+];
+
+// Replaces the English text pieces under root with Thai (Thai mode only)
+function translateDomIn(root) {
+    if (!root || currentLanguage !== 'th') return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n => {
+        const t = n.nodeValue.trim();
+        if (!t) return;
+        let out = DOM_TH[t];
+        if (!out) {
+            for (const p of DOM_TH_PATTERNS) {
+                const m = t.match(p.re);
+                if (m) { out = p.f(m); break; }
+            }
+        }
+        if (out && out !== t) n.nodeValue = n.nodeValue.replace(t, out);
+    });
+}
+
+let domObserver = null;
+function startDomTranslation() {
+    if (domObserver || typeof MutationObserver === 'undefined') return;
+    let pending = false;
+    domObserver = new MutationObserver(() => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+            pending = false;
+            ['view-friend', 'view-events'].forEach(id => translateDomIn(document.getElementById(id)));
+        });
+    });
+    ['view-friend', 'view-events'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) domObserver.observe(el, { childList: true, subtree: true, characterData: true });
+    });
+}
+
 function applyLanguage() {
     document.documentElement.lang = currentLanguage === 'th' ? 'th' : 'en';
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -167,6 +267,12 @@ function applyLanguage() {
     if (typeof refreshAudioUI === 'function') refreshAudioUI();
     if (typeof renderQuestsView === 'function' && document.getElementById('quests-container')) renderQuestsView();
     if (typeof renderMapGateUI === 'function' && document.getElementById('campaign-map-select')) renderMapGateUI();
+    startDomTranslation();
+    try {
+        if (typeof renderEventsView === 'function' && document.getElementById('events-detail')) renderEventsView();
+        if (typeof renderFriendPage === 'function' && document.getElementById('friend-list')) renderFriendPage();
+    } catch (e) { console.warn('Language re-render skipped:', e); }
+    ['view-friend', 'view-events'].forEach(id => translateDomIn(document.getElementById(id)));
 }
 
 // Remember the choice on this device only
