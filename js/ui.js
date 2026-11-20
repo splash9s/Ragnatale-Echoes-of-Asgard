@@ -2271,14 +2271,13 @@ function claimDailyFree(key) {
     saveGame();
 }
 
-// Free 20 Diamond: the card image with a Claim button (red alert while unclaimed); "Claimed" in green after
+// Free 20 Diamond: the whole card is the claim (click it); red alert while unclaimed; "Claimed" in green after
 function freeDiamondCardHTML() {
     const claimed = isDailyFreeClaimed('diamond');
-    const overlay = claimed
-        ? '<span style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); color:#4ade80; font-weight:bold; font-size:14px; background:rgba(0,0,0,.55); padding:4px 14px; border-radius:8px; white-space:nowrap;">Claimed</span>'
-        : `<button onclick="claimDailyFree('diamond')" style="position:absolute; left:50%; bottom:12px; transform:translateX(-50%); padding:6px 22px; background:#fff; color:#b91c1c; font-weight:bold; border-radius:8px; border:0; cursor:pointer; white-space:nowrap;">Claim</button>`
-          + '<img id="alert-free-diamond" src="assets/page01/alert_q85.webp" alt="" style="position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;">';
-    return `<div class="shrink-0" style="position:relative; margin-right:12px;"><img src="assets/diamond/free/free_diamond_card_q85.webp" alt="Free 20 Diamond" style="height:200px; width:auto; display:block; border-radius:10px;">${overlay}</div>`;
+    const alert = claimed ? '' : '<img id="alert-free-diamond" src="assets/page01/alert_q85.webp" alt="" style="position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;">';
+    const overlay = claimed ? '<span style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); color:#4ade80; font-weight:bold; font-size:16px; background:rgba(0,0,0,.6); padding:4px 14px; border-radius:8px; white-space:nowrap;">Claimed</span>' : '';
+    const click = claimed ? '' : ` onclick="claimDailyFree('diamond')" title="Claim free 20 diamonds" style="cursor:pointer;"`;
+    return `<div class="vip-pack"${click} style="position:relative; margin-right:12px;"><img src="assets/diamond/free/free_diamond_card_q85.webp" alt="Free 20 Diamond" style="height:540px; width:auto; display:block; border-radius:14px;">${overlay}${alert}</div>`;
 }
 function dailyFreeCardHTML(key) {
     if (key === 'diamond') return freeDiamondCardHTML();
