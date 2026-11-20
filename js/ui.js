@@ -1058,7 +1058,7 @@ function applyPlayerFrame(img, f, dy = 0) {
     if (!f) return; // still loading
     img.src = f.src;
     const S = COMBAT_PLAYER_SCALE;
-    img.style.left = (combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - (f.fx !== undefined ? f.fx : f.w / 2) * S) + 'px';
+    img.style.left = (combatHeroFootX() - (f.fx !== undefined ? f.fx : f.w / 2) * S) + 'px';
     img.style.top = (combatPlayerAnchor.y + COMBAT_PLAYER_FOOT.y - (f.fy !== undefined ? f.fy : f.h) * S + dy * S) + 'px';
     img.style.width = f.w * S + 'px';
     img.style.height = f.h * S + 'px';
@@ -1740,7 +1740,7 @@ function applyCombatEarthPositions() {
     // Shadow: the character's right foot (71.5,188 in the 95x193 art) sits on the shadow's dark spot (78,29 in the 102x41 shadow).
     const shadow = document.getElementById('combat-player-shadow');
     if (shadow) {
-        shadow.style.left = (combatPlayerAnchor.x - 54.5) + 'px';
+        shadow.style.left = (combatHeroFootX() - COMBAT_PLAYER_FOOT.x - 54.5) + 'px';
         shadow.style.top = (combatPlayerAnchor.y - 34 - combatShadowLift) + 'px';
     }
     document.querySelectorAll('#monsters-lineup-container > div').forEach(card => {

@@ -2576,6 +2576,21 @@ function towerFriendFrame(m, pose = 'IDLE') {
 // Friends stand on the battlefield behind the hero, on the same ground line (stage coordinates).
 // Elements are kept between renders, so a fallen friend plays the hero's fall animation once.
 const TOWER_FRIEND_GAP_X = 190;
+// Where a party member stands (foot x). The front fighter takes the front spot on the right, facing the monster;
+// everyone else stands behind it on the left in party order. With the hero alive, the hero is the front, so nothing moves.
+function towerSlotFootX(id) {
+    const base = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x;
+    if (!towerIsActive()) return base;
+    const front = towerFront();
+    if (id === front) return base;
+    const behind = towerParty.order.filter(x => x !== (front || 'hero'));
+    const k = behind.indexOf(id);
+    return k < 0 ? base : base - TOWER_FRIEND_GAP_X * (k + 1);
+}
+// Foot x of the hero's own sprite, which also moves back when a friend takes the front spot
+function combatHeroFootX() {
+    return towerIsActive() ? towerSlotFootX('hero') : combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x;
+}
 function towerRenderField() {
     const stage = document.querySelector('#combat-stage .ts-inner');
     if (!towerIsActive() || !stage) {
@@ -2589,7 +2604,7 @@ function towerRenderField() {
         const m = towerParty.members[id];
         if (!m) return;
         const alive = m.hp > 0;
-        const footX = combatPlayerAnchor.x + COMBAT_PLAYER_FOOT.x - TOWER_FRIEND_GAP_X * (i + 1);
+        const footX = towerSlotFootX(id);
         const attacking = alive && Date.now() < (m.attackUntil || 0);
         const f = !alive ? (towerFriendFrame(m, 'DEAD') || towerFriendFrame(m, 'IDLE'))
             : attacking ? (towerFriendFrame(m, 'ATTACK') || towerFriendFrame(m, 'IDLE'))
