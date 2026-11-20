@@ -4168,7 +4168,9 @@ function elementDetailHTML(el) {
 function buffsDetailHTML(buffs, debuffs) {
     const up = (buffs || []).map(b => {
         const tier = RARITY_INFO[b.tier] || RARITY_INFO[1];
-        return `<div>• ${b.desc} <span class="text-[9px] ${tier.text}">[Tier ${b.tier} ${tier.name}]</span></div>`;
+        // Inline colour so the detail panel's forced text colours do not hide the rarity colour
+        const hex = { 1: '#cbd5e1', 2: '#34d399', 3: '#60a5fa', 4: '#c084fc', 5: '#fbbf24' }[b.tier] || '#cbd5e1';
+        return `<div>• ${b.desc} <span class="text-[9px]" style="color:${hex} !important">[Tier ${b.tier} ${tier.name}]</span></div>`;
     }).join('');
     const down = (debuffs || []).map(d => `<div class="text-red-400">▾ ${d.desc}</div>`).join('');
     if (!up && !down) return '<span class="text-slate-500">No buffs</span>';
