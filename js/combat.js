@@ -2565,8 +2565,8 @@ function towerRewardHTML() {
     const cells = [];
     if (t.gold) cells.push(cell('assets/icons/goldpile_q85.webp', 'Gold', t.gold));
     if (t.diamonds) cells.push(cell('assets/icons/diamondiconsmall_q85.webp', 'Diamond', t.diamonds));
-    if (t.planks) cells.push(cell(PLANK_ITEM.icon, 'Plank', t.planks));
-    if (t.ore) cells.push(cell(REFINE_MATERIAL_ITEMS[2].icon, 'Refine Ore', t.ore));
+    if (t.planks) cells.push(cell('assets/items/mat_plank_q85.webp', 'Plank', t.planks));
+    if (t.ore) cells.push(cell('assets/items/mat_bar_q85.webp', 'Bar', t.ore)); // the ore reward is a Bar
     Object.keys(t.stones).forEach(el => { if (t.stones[el]) cells.push(cell(`assets/items/elemental/stone_${el}.webp`, `${ELEMENTS[el].name} Stone`, t.stones[el])); });
     if (t.costume) cells.push(cell('assets/chest/costume/costumeicon_q85.webp', 'Costume Chest', t.costume));
     return `<div class="flex flex-col gap-2"><div class="text-xs font-bold text-slate-300">Tower Reward</div>${cells.length ? `<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${cells.join('')}</div>` : '<div class="text-slate-500 text-xs">No floor cleared</div>'}</div>`;
