@@ -1710,6 +1710,7 @@ function monsterTurnTick() {
             return;
         }
 
+        if (currentMode === 'tower') grantTowerRunReward(); // the run ends here (no revive left)
         stopCombatTimers(); combatRunId++;
         removeGuideSpotlight();
         if (typeof resetMapRunes === 'function') resetMapRunes();
@@ -2034,6 +2035,7 @@ function onStageCleared() {
 
             if (currentMode === 'tower' && currentStage > maxStages) {
                 if (typeof resetMapRunes === 'function') resetMapRunes();
+                grantTowerRunReward();
                 sendTowerFriendRewards();
                 logMessage(`[Tower] The Warded Tower is cleared!`, 'levelup');
                 showModal("Warded Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Town'), () => switchView('town'));
@@ -2323,7 +2325,20 @@ function towerFloorReward(f) {
     };
 }
 
+// Each cleared floor only updates the run's best floor (the reward is for the highest floor cleared, not stacked)
 function grantTowerFloorReward(f) {
+    if (towerParty) {
+        towerParty.best = Math.max(towerParty.best || 0, f);
+        towerParty.cleared = Math.max(towerParty.cleared || 0, f);
+    }
+    logMessage(`[Tower] Floor ${f} cleared!`, 'drop');
+    saveGame();
+}
+// Paid once when the run ends (win or defeat): the reward of the highest floor cleared
+function grantTowerRunReward() {
+    if (!towerParty || !towerParty.best || towerParty.paid) return;
+    towerParty.paid = true;
+    const f = towerParty.best;
     const r = towerFloorReward(f);
     player.gold += r.gold;
     player.diamonds = (player.diamonds || 0) + r.diamonds;
@@ -2351,8 +2366,7 @@ function grantTowerFloorReward(f) {
         const chest = { name: "Costume Chest", type: 'chest', chestType: 'costume', qty: 1, icon: 'assets/chest/costume/costumeicon_q85.webp', desc: "" };
         if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); if (tally) tally.costume++; }
     }
-    if (towerParty) towerParty.cleared = Math.max(towerParty.cleared || 0, f);
-    logMessage(`[Tower] Floor ${f} cleared! Reward: ${got.join(', ')}`, 'drop');
+    logMessage(`[Tower] Run reward for floor ${f}: ${got.join(', ')}`, 'drop');
     updateUI();
     saveGame();
 }
