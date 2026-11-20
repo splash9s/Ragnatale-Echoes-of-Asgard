@@ -443,13 +443,13 @@ function showRuneChoices(isNew) {
     const acquiredHtml = acquired.map(pr => {
         const def = RUNE_DEFS[pr.id];
         const rarity = def ? def.rarity : 1;
-        const detail = def ? def.text(runeN(pr.id)) : pr.desc;
+        const detail = def ? thRuneText(pr.id, runeN(pr.id), def.text(runeN(pr.id))) : pr.desc;
         // Every acquired rune uses the same big card size as the pick cards
         const cardW = 270;
         return `<div class="rune-pick-card rune-acq-card" style="width:${cardW}px;">
                 <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}_q85.webp" alt="">
                 <span class="rune-pick-text">
-                    <span class="rune-pick-name">${escapeHtml(pr.name)}</span>
+                    <span class="rune-pick-name">${escapeHtml(thRuneName(pr.id, pr.name))}</span>
                     <span class="rune-pick-desc">${runeHighlightHtml(detail)}</span>
                 </span>
             </div>`;
@@ -464,8 +464,8 @@ function showRuneChoices(isNew) {
             <button onclick="selectRuneChoice('${id}', window.runeCallback)" class="rune-pick-card">
                 <img class="rune-pick-art" src="assets/combat/runes/bigr${r.rarity}_q85.webp" alt="">
                 <span class="rune-pick-text">
-                    <span class="rune-pick-name">${escapeHtml(r.name)}${owned}</span>
-                    <span class="rune-pick-desc">${runeHighlightHtml(r.desc)}</span>
+                    <span class="rune-pick-name">${escapeHtml(thRuneName(id, r.name))}${owned}</span>
+                    <span class="rune-pick-desc">${runeHighlightHtml(thRuneDesc(id, r.desc))}</span>
                 </span>
             </button>`;
     });
@@ -515,7 +515,7 @@ function selectRuneChoice(runeId, callback) {
     applyRune(runeId);
     if (!player.currentRunRunes) player.currentRunRunes = [];
     player.currentRunRunes.push({ id: runeId, name: def.name, desc: def.desc });
-    logMessage(`[Rune Blessing] Acquired ${def.name}: ${def.desc}`, 'levelup');
+    logMessage(`[Rune Blessing] Acquired ${thRuneName(runeId, def.name)}: ${thRuneDesc(runeId, def.desc)}`, 'levelup');
 
     closeModal();
     updateUI();

@@ -1527,18 +1527,18 @@ function showRuneDetail(index) {
     if (!r) return;
     const def = RUNE_DEFS[r.id];
     const rarity = def ? def.rarity : 1;
-    const detail = def ? def.text(runeN(r.id)) : r.desc;
+    const detail = def ? thRuneText(r.id, runeN(r.id), def.text(runeN(r.id))) : r.desc;
     const html = `<div id="rune-card-view" class="flex flex-col items-center gap-4">
             <div class="rune-pick-card rune-acq-card">
                 <img class="rune-pick-art" src="assets/combat/runes/bigr${rarity}_q85.webp" alt="">
                 <span class="rune-pick-text">
-                    <span class="rune-pick-name">${escapeHtml(r.name)}</span>
+                    <span class="rune-pick-name">${escapeHtml(thRuneName(r.id, r.name))}</span>
                     <span class="rune-pick-desc">${runeHighlightHtml(detail)}</span>
                 </span>
             </div>
             <button onclick="closeModal()" class="mx-auto w-40 py-2 border border-slate-700 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer transition">Close</button>
         </div>`;
-    showModal(r.name, '', html);
+    showModal(thRuneName(r.id, r.name), '', html);
 }
 
 function showModal(title, message, customHTML = '', onCloseCallback = null) {

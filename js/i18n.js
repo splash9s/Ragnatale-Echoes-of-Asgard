@@ -344,6 +344,12 @@ function translateDomIn(root) {
     });
 }
 
+// Rune helpers: Thai name, pick-card description and value text (English when not in Thai or missing)
+function thRune(id) { return currentLanguage === 'th' && typeof RUNE_TH !== 'undefined' ? RUNE_TH[id] || null : null; }
+function thRuneName(id, en) { const t = thRune(id); return t && t.name ? t.name : en; }
+function thRuneDesc(id, en) { const t = thRune(id); return t && t.desc ? t.desc : en; }
+function thRuneText(id, v, en) { const t = thRune(id); return t && t.text ? t.text(v) : en; }
+
 // Splits "weapon · Rare" style text into translated parts
 function thExactPart(text) {
     const t = String(text).trim();
@@ -435,7 +441,7 @@ const LOG_TH_PHRASES = [
     ['Claimed rewards from', 'รับรางวัลจาก'], ['is now ', 'ตอนนี้เป็น '], ['reset to', 'รีเซ็ตเป็น'],
     [' splits into ', ' แตกเป็น '], [' slimes!', ' สไลม์!'], ['Sorted by ', 'เรียงตาม '],
     ['Could not fit', 'ใส่ไม่ได้'], [' was discarded.', ' ถูกทิ้ง'], ['was added to your potion slot.', 'ถูกเพิ่มในช่องยาแล้ว'],
-    [' and ', ' และ '], ['Attack on ', 'การโจมตี '], ['(Rarity ', '(ความหายาก '], ['Welcome to Haven of Dawn,', 'ยินดีต้อนรับสู่ Haven of Dawn,'], [' falls! The next in line takes the front.', ' ล้มลง! คนถัดไปขึ้นหน้า'],
+    [' and ', ' และ '], ['Acquired ', 'ได้รับ '], ['Attack on ', 'การโจมตี '], ['(Rarity ', '(ความหายาก '], ['Welcome to Haven of Dawn,', 'ยินดีต้อนรับสู่ Haven of Dawn,'], [' falls! The next in line takes the front.', ' ล้มลง! คนถัดไปขึ้นหน้า'],
 ];
 function thLog(msg) {
     if (currentLanguage !== 'th') return msg;
