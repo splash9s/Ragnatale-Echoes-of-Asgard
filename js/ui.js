@@ -4948,6 +4948,7 @@ function manualDrinkPotion() {
     potionSlot.qty--;
     if (potionSlot.qty <= 0) player.equipped.potionSlot = { name: "", type: "potion", heal: 0, qty: 0, desc: "" };
     healPlayer(healAmt, 'Potion');
+    if (towerIsActive()) towerHealAllies(healAmt); // Warded Tower: the potion heals the whole party
     checkStageClearAfterHeal();
     updateUI();
     saveGame();
