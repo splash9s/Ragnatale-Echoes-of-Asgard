@@ -485,7 +485,7 @@ function guestBookBack() {
 function setGuestBookStatus(msg, isErr) {
     guestBookStatus = msg ? { msg, err: !!isErr } : null;
     const el = document.getElementById('gb-status');
-    if (el) { el.textContent = msg || ''; el.classList.toggle('err', !!isErr); }
+    if (el) { el.textContent = thExact(msg || ''); el.classList.toggle('err', !!isErr); }
 }
 function gbCount() {
     const ta = document.getElementById('gb-text');
@@ -543,6 +543,7 @@ function renderGuestBook() {
     const st = guestBookStatus ? guestBookStatus.msg : '';
     const stErr = guestBookStatus && guestBookStatus.err ? ' err' : '';
     box.innerHTML = head + body + `<p class="gb-status${stErr}" id="gb-status">${gbEsc(st)}</p>`;
+    translateDomIn(box);
     const chat = document.getElementById('gb-chat');
     if (chat) chat.scrollTop = chat.scrollHeight;
     if (inThread) gbCount();

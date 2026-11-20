@@ -40,6 +40,11 @@ const NAMES_TH = {
     'Resurrection': 'ฟื้นคืนชีพ', 'ON': 'เปิด', '1 left': 'เหลือ 1', 'Potion': 'ยา', 'Next Stage': 'ด่านถัดไป',
     '[Combat] Battle started...': '[การต่อสู้] เริ่มการต่อสู้...', 'Base Lv.': 'เลเวลฐาน', 'Base EXP': 'EXP ฐาน',
     'Class Lv.': 'เลเวลอาชีพ', 'Class EXP': 'EXP อาชีพ', 'Hero': 'ฮีโร่', '0 Gold': '0 ทอง',
+    // Guest book
+    'Guest Book': 'สมุดเยี่ยม', 'Write a message...': 'เขียนข้อความ...', 'Send': 'ส่ง', 'Loading...': 'กำลังโหลด...',
+    'No messages in the last 7 days.': 'ไม่มีข้อความใน 7 วันที่ผ่านมา', 'No messages yet. Say hello.': 'ยังไม่มีข้อความ ทักทายกันเลย',
+    'Delete this conversation?': 'ลบการสนทนานี้ใช่ไหม?', 'Delete': 'ลบ', 'Yes': 'ใช่', 'No': 'ไม่',
+    'You:': 'คุณ:', 'Hero': 'ฮีโร่', 'Write a message first.': 'กรุณาเขียนข้อความก่อน',
     // Monsters
     'Abyss Lord (Boss)': 'ลอร์ดเหวลึก (บอส)',
     'Battle Storm Mage': 'จอมเวทพายุศึก',

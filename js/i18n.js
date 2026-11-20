@@ -283,6 +283,8 @@ const DOM_TH = {
 };
 
 const DOM_TH_PATTERNS = [
+    { re: /^(.+)'s Guest Book$/, f: m => `สมุดเยี่ยมของ ${m[1]}` },
+    { re: /^Messages can be up to (\d+) characters\.$/, f: m => `ข้อความยาวได้สูงสุด ${m[1]} ตัวอักษร` },
     { re: /^(.+) — Stage (\d+) \/ (\d+)$/, f: m => `${localGameName(m[1])} — ด่านที่ ${m[2]} / ${m[3]}` },
     { re: /^(\d+) \/ (\d+) plays left today$/, f: m => `เหลือ ${m[1]} / ${m[2]} ครั้งวันนี้` },
     { re: /^Unlimited attempts for now · (\d+) \/ 2 friends$/, f: m => `ไม่จำกัดจำนวนครั้งตอนนี้ · ${m[1]} / 2 เพื่อน` },
@@ -310,6 +312,17 @@ function translateDomIn(root) {
         }
         if (out && out !== t) n.nodeValue = n.nodeValue.replace(t, out);
     });
+    root.querySelectorAll('[placeholder]').forEach(el => {
+        const out = thExact(el.getAttribute('placeholder'));
+        if (out !== el.getAttribute('placeholder')) el.setAttribute('placeholder', out);
+    });
+}
+
+// Exact lookup for text that scripts set after render (status lines and the like)
+function thExact(text) {
+    if (currentLanguage !== 'th') return text;
+    const t = String(text).trim();
+    return (typeof DOM_TH !== 'undefined' && DOM_TH[t]) || (typeof NAMES_TH !== 'undefined' && NAMES_TH[t]) || text;
 }
 
 let domObserver = null;
