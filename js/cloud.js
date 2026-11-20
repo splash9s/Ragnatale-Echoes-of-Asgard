@@ -246,7 +246,7 @@ const friendApi = {
     pagerThread: (withId) => friendRpc('pager_thread', { p_with: withId }),
     pagerInbox: () => friendRpc('pager_inbox'),
     pagerUnread: () => friendRpc('pager_unread'),
-    pagerDelete: (id) => friendRpc('pager_delete', { p_id: id }),
+    pagerHide: (withId) => friendRpc('pager_hide_conversation', { p_with: withId }),
 };
 
 // Copies unclaimed server mail (friend gifts) into the mailbox once. Negative ids keep them apart from local mail.
