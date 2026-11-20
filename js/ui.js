@@ -79,8 +79,8 @@ function potionHealText(item) {
 
 const DIAMOND_SHOP_ITEMS = [
     // Real-money top-up: opens the Stripe payment link. Diamonds are credited by the server after payment is confirmed.
-    { id: 'topup_usd_1', name: "500 Diamonds", desc: "Top up 500 diamonds for $1.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 1, diamonds: 500, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
-    { id: 'topup_usd_5_9', name: "4,000 Diamonds", desc: "Top up 4,000 diamonds for $5.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 5.9, diamonds: 4000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_1', name: "500 Diamonds", desc: "Top up 500 diamonds for $1.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 1, diamonds: 500, payLink: '', card: 'assets/diamond/topup/topup_500_q85.webp', icon: 'assets/icons/diamondiconsmall_q85.webp' },
+    { id: 'topup_usd_5_9', name: "4,000 Diamonds", desc: "Top up 4,000 diamonds for $5.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 5.9, diamonds: 4000, payLink: '', card: 'assets/diamond/topup/topup_4000_q85.webp', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'topup_usd_9_9', name: "8,000 Diamonds", desc: "Top up 8,000 diamonds for $9.90.", price: 0, type: 'topup', vipCat: 'stone', usd: 9.9, diamonds: 8000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'topup_usd_19', name: "18,000 Diamonds", desc: "Top up 18,000 diamonds for $19.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 19, diamonds: 18000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
     { id: 'topup_usd_29', name: "30,000 Diamonds", desc: "Top up 30,000 diamonds for $29.00.", price: 0, type: 'topup', vipCat: 'stone', usd: 29, diamonds: 30000, payLink: '', icon: 'assets/icons/diamondiconsmall_q85.webp' },
@@ -3054,7 +3054,7 @@ function renderDiamondShop() {
         container.innerHTML += `
             <div class="p-3 bg-slate-900/80 rounded-xl border flex justify-between items-center" style="border-color:#facc15;box-shadow:0 0 10px 2px rgba(250,204,21,.55), inset 0 0 8px rgba(250,204,21,.25);">
                 <div class="flex items-center gap-3 min-w-0">
-                    ${item.icon ? `<img src="${item.icon}" alt="" style="width:56px;height:56px;object-fit:contain;flex:0 0 auto;">` : ''}
+                    ${item.card ? `<img src="${item.card}" alt="${item.name}" style="height:150px;width:auto;max-width:100px;object-fit:contain;flex:0 0 auto;">` : (item.icon ? `<img src="${item.icon}" alt="" style="width:56px;height:56px;object-fit:contain;flex:0 0 auto;">` : '')}
                     <div class="min-w-0">
                         <span class="font-bold text-purple-300 block text-xs">${item.name}</span>
                         <span class="text-[10px] text-slate-400 block">${item.desc}</span>
