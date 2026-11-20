@@ -299,7 +299,7 @@ function thHealText(s) {
 const DOM_TH_PATTERNS = [
     { re: /^(.+)'s Guest Book$/, f: m => `สมุดเยี่ยมของ ${m[1]}` },
     { re: /^Restores (.+) · Qty (\d+)$/, f: m => `ฟื้นฟู ${thHealText(m[1])} · จำนวน ${m[2]}` },
-    { re: /^(.+) · Requires Lv (\d+)$/, f: m => `${thExactPart(m[1])} · ต้องการเลเวล ${m[2]}` },
+    { re: /^(.+?) · (.+?) · Requires Lv (\d+)$/, f: m => `${thExactPart(m[1])} · ${thExactPart(m[2])} · ต้องการเลเวล ${m[3]}` },
     { re: /^(.+) · (Common|Uncommon|Rare|Epic|Legendary)$/, f: m => `${thExactPart(m[1])} · ${thExactPart(m[2])}` },
     { re: /^, Requires Base Lv\. (\d+)$/, f: m => `, ต้องการเลเวลฐาน ${m[1]}` },
     { re: /^\((\d+) pcs\) (.+)$/, f: m => `(${m[1]} ชิ้น) ${thStatText(m[2])}` },
