@@ -1683,6 +1683,7 @@ function monsterTurnTick() {
     tickPlayerDebuffs();
     alive.forEach((m, i) => monsterAct(m, derived, i));
     monsterOpenerRound = false;
+    towerHeroDownCheck(); // Warded Tower: the hero falls (or is revived) while allies still fight
 
     monstersList.forEach(m => { if (m.hp <= 0 && !m.rewarded) awardKill(m); });
     if (getAliveMonsters().length === 0) {
@@ -2014,7 +2015,8 @@ function onStageCleared() {
     const wasBossStage = isBossStage(); // read before the stage number moves on
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
-    const bossStayLeft = monstersList.reduce((t, x) => (monsterIsBoss(x) && x.hp <= 0)
+    // Every dead monster, the last one included, plays its death animation before the stage ends
+    const bossStayLeft = monstersList.reduce((t, x) => (x.hp <= 0)
         ? Math.max(t, (x._deathAt || Date.now()) + monsterDeathTotalMs(x) - Date.now()) : t, 0);
     setTimeout(() => {
         if (sid !== combatSessionId) return; // player left combat before the stage ended
@@ -2117,7 +2119,7 @@ function onStageCleared() {
                 showNextStageGuide();
             }
         };
-        if (wasBossStage && currentStage < maxStages) {
+        if (wasBossStage && currentStage < maxStages && currentMode !== 'tower') { // the Tower shows its result only at the end
             // Boss stage completed (not the last stage): show the result right away; closing it moves on
             showModal("Boss Defeated!", '', buildMapSummaryHTML('win', `Continue to Stage ${currentStage + 1}`, false, 'Boss Defeated'), () => continueRun());
         } else if (wasBossStage) {
@@ -2217,7 +2219,7 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', g
         + `<button onclick="goFromResult('blacksmith')" class="${guideHint ? 'guide-flash-link ' : ''}flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/articanbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Lost this stage? Make your gear stronger at the Refining.</span></button>`
         + `<button onclick="goFromResult('character')" class="flex items-center gap-3 bg-slate-950 border border-amber-700/50 rounded-xl p-2 text-left cursor-pointer hover:bg-slate-900 transition"><img src="assets/page01/characterbutton_q85.webp" alt="" style="width:64px;height:64px;object-fit:contain;flex:none"><span class="text-xs font-bold text-amber-300">Check your upgrade status and skills on the Character.</span></button>`
         + `</div>`;
-    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
+    return `<div class="flex flex-col gap-3 text-left">${header}<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${statCards}</div>${towerRewardHTML()}${powerBox}<div class="flex flex-col gap-2">${sections}</div></div>`;
 }
 
 // Result-screen quick link: close the result without running its return action, then open the page
@@ -2324,14 +2326,16 @@ function grantTowerFloorReward(f) {
     const r = towerFloorReward(f);
     player.gold += r.gold;
     player.diamonds = (player.diamonds || 0) + r.diamonds;
+    const tally = towerParty && towerParty.rewards; // the run's running total for the result screen
+    if (tally) { tally.gold += r.gold; tally.diamonds += r.diamonds; }
     const got = [`${r.gold} Gold`, `${r.diamonds} Diamond`];
     if (r.planks > 0) {
         const plank = { ...PLANK_ITEM, qty: r.planks };
-        if (placeItemInInventory(plank)) { recordStageDrop(plank); got.push(`${r.planks} Plank`); }
+        if (placeItemInInventory(plank)) { recordStageDrop(plank); got.push(`${r.planks} Plank`); if (tally) tally.planks += r.planks; }
     }
     if (r.ore > 0) {
         const ore = { ...REFINE_MATERIAL_ITEMS[2], qty: r.ore };
-        if (placeItemInInventory(ore)) { recordStageDrop(ore); got.push(`${r.ore} Refine Ore`); }
+        if (placeItemInInventory(ore)) { recordStageDrop(ore); got.push(`${r.ore} Refine Ore`); if (tally) tally.ore += r.ore; }
     }
     for (let i = 0; i < r.stones; i++) {
         const els = Object.keys(ELEMENTS);
@@ -2340,10 +2344,11 @@ function grantTowerFloorReward(f) {
         player.elementStones[el] = (player.elementStones[el] || 0) + 1;
         recordStageDrop({ name: `${ELEMENTS[el].name} Elemental Stone`, type: 'estone', element: el, qty: 1, icon: `assets/items/elemental/stone_${el}.webp`, desc: `Forge ${ELEMENTS[el].name} onto a weapon at the Blacksmith.` });
         got.push(`${ELEMENTS[el].name} Elemental Stone`);
+        if (tally) tally.stones[el] = (tally.stones[el] || 0) + 1;
     }
     if (r.costume) {
         const chest = { name: "Costume Chest", type: 'chest', chestType: 'costume', qty: 1, icon: 'assets/chest/costume/costumeicon_q85.webp', desc: "" };
-        if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); }
+        if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); if (tally) tally.costume++; }
     }
     if (towerParty) towerParty.cleared = Math.max(towerParty.cleared || 0, f);
     logMessage(`[Tower] Floor ${f} cleared! Reward: ${got.join(', ')}`, 'drop');
@@ -2503,6 +2508,69 @@ function towerRandomAlive() {
     return alive[Math.floor(Math.random() * alive.length)] || null;
 }
 
+// Warded Tower: the hero going down while allies still stand. A Resurrection Potion or Angel of Death revives the hero only (not the allies).
+function towerReviveHero() {
+    const derived = getDerivedStats();
+    let how = '';
+    if (player.runes.angelOfDeath && !player.angelUsedThisRun) {
+        player.angelUsedThisRun = true;
+        how = 'Angel of Death';
+    } else if ((player.resurrectionPotions || 0) > 0 && !player.runes.resurrectionUsed && player.resurrectionOn !== false) {
+        player.resurrectionPotions--;
+        player.runes.resurrectionUsed = true;
+        how = `Resurrection Potion (${player.resurrectionPotions} left)`;
+    }
+    if (!how) return false;
+    player.hp = derived.maxHp;
+    // Stand back up (a fall still playing is cut short)
+    combatPlayerDeadAt = 0;
+    combatPlayerFalling = false;
+    const sp = document.getElementById('combat-player-sprite');
+    if (sp) {
+        sp.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); });
+        sp.style.transform = '';
+        sp.style.transformOrigin = '';
+    }
+    logMessage(`[Tower] ${how} brings you back up!`, 'winlose');
+    updateUI();
+    return true;
+}
+// Runs after each monster turn: a hero who is down while allies stand is revived, or falls once and the allies fight on
+function towerHeroDownCheck() {
+    if (!towerIsActive() || player.hp > 0 || !towerAnyAlive()) return;
+    if (towerReviveHero()) return;
+    if (combatPlayerDeadAt) return; // already down
+    logMessage(`[Tower] You are down! Your allies keep fighting.`, 'winlose');
+    playPlayerFallAnim();
+}
+// Warded Tower: a potion heals every living ally by the same amount (capped at each ally's max HP)
+function towerHealAllies(amount) {
+    if (!towerIsActive() || amount <= 0) return;
+    towerParty.order.forEach(id => {
+        const a = id === 'hero' ? null : towerParty.members[id];
+        if (!a || a.hp <= 0) return;
+        const before = a.hp;
+        a.hp = Math.min(a.maxHp, a.hp + amount);
+        if (a.hp > before) showHealNumber(`#tower-field-${id}`, a.hp - before);
+    });
+    towerRenderField();
+}
+// Warded Tower: what the run has earned so far, shown on the result screen
+function newTowerRewardTally() { return { gold: 0, diamonds: 0, planks: 0, ore: 0, stones: {}, costume: 0 }; }
+function towerRewardHTML() {
+    const t = towerParty && towerParty.rewards;
+    if (!t) return '';
+    const cell = (icon, label, qty) => `<div class="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl p-2 min-w-0"><img src="${icon}" alt="" class="w-9 h-9 object-contain shrink-0"><div class="min-w-0"><div class="text-[10px] text-slate-500 truncate">${label}</div><div class="text-sm font-bold font-mono text-slate-100">x${Number(qty).toLocaleString()}</div></div></div>`;
+    const cells = [];
+    if (t.gold) cells.push(cell('assets/icons/goldpile_q85.webp', 'Gold', t.gold));
+    if (t.diamonds) cells.push(cell('assets/icons/diamondiconsmall_q85.webp', 'Diamond', t.diamonds));
+    if (t.planks) cells.push(cell(PLANK_ITEM.icon, 'Plank', t.planks));
+    if (t.ore) cells.push(cell(REFINE_MATERIAL_ITEMS[2].icon, 'Refine Ore', t.ore));
+    Object.keys(t.stones).forEach(el => { if (t.stones[el]) cells.push(cell(`assets/items/elemental/stone_${el}.webp`, `${ELEMENTS[el].name} Stone`, t.stones[el])); });
+    if (t.costume) cells.push(cell('assets/chest/costume/costumeicon_q85.webp', 'Costume Chest', t.costume));
+    return `<div class="flex flex-col gap-2"><div class="text-xs font-bold text-slate-300">Tower Reward</div>${cells.length ? `<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${cells.join('')}</div>` : '<div class="text-slate-500 text-xs">No floor cleared</div>'}</div>`;
+}
+
 // Allies come from the two chosen friends' tents. Fallback (not expected): 70% stubs
 function setupTowerParty() {
     const d = getDerivedStats();
@@ -2519,7 +2587,7 @@ function setupTowerParty() {
     const ids = towerPendingIds || [];
     towerPendingIds = null;
     // cleared: highest floor cleared this run (the friends' mail is sent for it when the run ends)
-    towerParty = { order, members, ids: { a1: ids[0], a2: ids[1] }, cleared: 0 };
+    towerParty = { order, members, ids: { a1: ids[0], a2: ids[1] }, cleared: 0, rewards: newTowerRewardTally() };
 }
 
 // A hit on the front ally (returns true when the hit went to an ally)
@@ -2546,6 +2614,9 @@ function towerAllyAttacks() {
         const dmg = Math.max(1, Math.floor(a.atk * (0.8 + Math.random() * 0.4) * 100 / (100 + (t.def || 0))));
         t.hp -= dmg;
         a.attackUntil = Date.now() + 330; // friend's attack pose, then back to idle
+        // Friends alternate both attack poses; every third swing uses the critical poses (damage unchanged)
+        const swing = (a.swings = (a.swings || 0) + 1);
+        a.attackPose = swing % 3 === 0 ? (Math.floor(swing / 3) % 2 ? 'CRI2' : 'CRI') : (swing % 2 ? 'ATTACK' : 'ATTACK2');
         const ti = monstersList.indexOf(t);
         if (ti >= 0) showCombatText(`#monsters-lineup-container > div:nth-child(${ti + 1}) img`, String(dmg), '');
         logMessage(`[Tower] ${a.name} hits ${t.name} for ${dmg} damage`, 'combat');
@@ -2578,7 +2649,7 @@ function towerFriendFrame(m, pose = 'IDLE') {
 const TOWER_FRIEND_GAP_X = 190;
 // Fixed tower battle spots (feet, stage coordinates). Each member keeps its own spot; party order no longer moves them.
 // hero = main player (red), a1 = 2nd (green), a2 = 3rd (blue).
-const TOWER_SLOT_FEET = { hero: { x: 561, y: 824 }, a1: { x: 698, y: 690 }, a2: { x: 636, y: 749 } };
+const TOWER_SLOT_FEET = { hero: { x: 561, y: 824 }, a1: { x: 718, y: 690 }, a2: { x: 656, y: 749 } };
 function towerSlotFeet(id) { return TOWER_SLOT_FEET[id] || TOWER_SLOT_FEET.a2; }
 // Feet of the hero's own sprite: the fixed red spot in a tower fight, the normal spot otherwise
 function combatHeroFeet() {
@@ -2601,7 +2672,7 @@ function towerRenderField() {
         const footY = towerSlotFeet(id).y;
         const attacking = alive && Date.now() < (m.attackUntil || 0);
         const f = !alive ? (towerFriendFrame(m, 'DEAD') || towerFriendFrame(m, 'IDLE'))
-            : attacking ? (towerFriendFrame(m, 'ATTACK') || towerFriendFrame(m, 'IDLE'))
+            : attacking ? (towerFriendFrame(m, m.attackPose || 'ATTACK') || towerFriendFrame(m, 'IDLE'))
             : towerFriendFrame(m, 'IDLE');
         const elId = `tower-field-${id}`;
         keep.add(elId);
