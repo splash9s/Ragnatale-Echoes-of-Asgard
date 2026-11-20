@@ -654,6 +654,10 @@
         .friend-visitors span { color: #7a5a32; }
         /* Friend's tent (read-only): the owner's controls hidden; the return button goes back to friends */
         body.friend-visiting #view-character .tent-top-btn, body.friend-visiting #view-character .char-clear-toggle { display: none !important; }
+        /* A friend's tent: no Home / Puzzle / Pets buttons; the owner's name shows at the top centre */
+        body.friend-visiting #view-character #tent-home-btn, body.friend-visiting #view-character #tent-puzzle-btn, body.friend-visiting #view-character #tent-pets-btn { display: none !important; }
+        #friend-visit-name { display: none; position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 50; padding: 6px 26px; border-radius: 12px; background: rgba(10,14,24,.72); border: 2px solid #b8945a; color: #f5e6c0; font: 900 30px 'Roboto', 'Noto Sans Thai', sans-serif; text-shadow: 0 2px 4px #000; white-space: nowrap; pointer-events: none; }
+        body.friend-visiting #friend-visit-name { display: block; }
         #view-friend .friend-title { position: absolute; left: 0; top: 0; width: 1920px; height: 70px; line-height: 70px; text-align: center; font-size: 32px; font-weight: 700; color: #f5c451; letter-spacing: 3px; z-index: 3; pointer-events: none; font-family: Georgia, "Times New Roman", serif; }
         #view-friend .friend-window { position: absolute; left: 60px; top: 92px; width: 1800px; height: 956px; box-sizing: border-box; padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; background: rgba(231,209,170,.9); border-radius: 18px; z-index: 5; font-family: Georgia, "Times New Roman", serif; color: #2a1a0e; }
         .friend-top { display: flex; flex-direction: column; gap: 12px; flex: none; }
@@ -1653,6 +1657,7 @@
 
                 <!-- VIEW: CHARACTER & EQUIPMENT (layout: 04_psd/pagecharacter) -->
         <div id="view-character" class="hidden art-screen art-dark stats-hidden">
+            <div id="friend-visit-name" aria-live="polite"></div>
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <img class="ts-bg" src="assets/pages/character/tent/tent_off_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
@@ -2099,7 +2104,7 @@
     <script src="js/guide-upgrade.js?v=20261116a"></script>
     <script src="js/guide-elem.js?v=20261119c"></script>
     <script src="js/beginner-quest.js?v=20261114x"></script>
-    <script src="js/friends.js?v=20261120fa"></script>
+    <script src="js/friends.js?v=20261120ft"></script>
     <script src="js/town.js?v=20261116b"></script>
     <script src="js/loader.js?v=20261119i"></script>
 
