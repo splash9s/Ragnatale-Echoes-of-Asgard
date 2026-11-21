@@ -207,7 +207,7 @@ const DOM_TH = {
     'You do not have enough gold for this bid.': 'ทองของคุณไม่พอสำหรับการประมูลนี้', 'That item is no longer in your bag.': 'ของชิ้นนี้ไม่อยู่ในกระเป๋าแล้ว', 'Starting price must be 1 to 1,000,000,000 gold.': 'ราคาเริ่มต้นต้องอยู่ระหว่าง 1 ถึง 1,000,000,000 ทอง',
     'The market needs a cloud save. Sign in first.': 'ตลาดต้องใช้เซฟบนคลาวด์ กรุณาเข้าสู่ระบบก่อน', 'Link your Gmail in Settings to use the market.': 'กรุณาเชื่อม Gmail ในการตั้งค่าก่อนใช้ตลาด', 'The market needs the cloud. Check your connection and try again.': 'ตลาดต้องใช้คลาวด์ กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง',
     'The market is unavailable right now.': 'ตลาดใช้งานไม่ได้ในขณะนี้', '1 day': '1 วัน',
-    'Stat': 'ค่าสถานะ', 'Rarity': 'ความหายาก', 'Element': 'ธาตุ', 'Sort': 'เรียงตาม',
+    'Stat': 'ค่าสถานะ', 'Rarity': 'ความหายาก', 'Element': 'ธาตุ', 'Sort': 'เรียงตาม', 'Set': 'ชุด', 'Any set': 'ทุกชุด',
     'Any stat': 'ทุกค่าสถานะ', 'Any rarity': 'ทุกระดับ', 'Uncommon+': 'อันคอมมอนขึ้นไป', 'Rare+': 'แรร์ขึ้นไป', 'Epic+': 'เอปิกขึ้นไป',
     'Any element': 'ทุกธาตุ', 'Usable at my level': 'ใช้ได้ที่เลเวลของฉัน', 'Ending soon': 'ใกล้หมดเวลา',
     'Price: low to high': 'ราคา: ต่ำไปสูง', 'Price: high to low': 'ราคา: สูงไปต่ำ', 'Clear': 'ล้าง',

@@ -7,11 +7,15 @@
 --   p_max_level only gear with level requirement at or below this (e.g. the player's level)
 --   p_element   weapon element: fire, wind, earth, water
 --   p_sort      'ending' (default), 'price_asc', 'price_desc'
+--   p_set       gear set key: warrior, merchant, ember, tide, stoneheart, windrunner
+
+drop function if exists public.auction_browse_filter(text, int, text, numeric, int, int, text, text);
 
 create or replace function public.auction_browse_filter(
     p_category text default 'all', p_offset int default 0,
     p_stat text default null, p_min numeric default null, p_rarity int default null,
-    p_max_level int default null, p_element text default null, p_sort text default 'ending'
+    p_max_level int default null, p_element text default null, p_sort text default 'ending',
+    p_set text default null
 ) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare
@@ -33,6 +37,7 @@ begin
           and (p_rarity is null or coalesce((item->>'rarity')::int, 1) >= p_rarity)
           and (p_max_level is null or coalesce((item->>'levelReq')::int, 1) <= p_max_level)
           and (p_element is null or p_element = '' or item->>'element' = p_element)
+          and (p_set is null or p_set = '' or item->>'setName' = p_set)
           and (p_stat is null or p_stat = '' or (
                 coalesce((item->'stats'->>p_stat)::numeric, 0)
               + coalesce((select sum((b->>'value')::numeric) from jsonb_array_elements(coalesce(item->'buffs', '[]'::jsonb)) b where b->>'stat' = p_stat), 0)
@@ -44,4 +49,4 @@ begin
     return rows;
 end $$;
 
-grant execute on function public.auction_browse_filter(text, int, text, numeric, int, int, text, text) to authenticated;
+grant execute on function public.auction_browse_filter(text, int, text, numeric, int, int, text, text, text) to authenticated;

@@ -25,7 +25,7 @@ const MARKET_FILTER_STATS = [
     ['armor', 'ARMOR'], ['block', 'Block'], ['mdef', 'MDEF'],
     ['res_fire', 'Fire Res'], ['res_wind', 'Wind Res'], ['res_earth', 'Earth Res'], ['res_water', 'Ice Res']
 ];
-const MARKET_FILTER_DEFAULT = { stat: '', min: '', rarity: 0, usable: false, element: '', sort: 'ending' };
+const MARKET_FILTER_DEFAULT = { stat: '', min: '', rarity: 0, usable: false, element: '', set: '', sort: 'ending' };
 let marketFilter = (() => {
     try { return { ...MARKET_FILTER_DEFAULT, ...JSON.parse(localStorage.getItem('rune_thread_market_filter') || '{}') }; }
     catch (e) { return { ...MARKET_FILTER_DEFAULT }; }
@@ -33,7 +33,7 @@ let marketFilter = (() => {
 let marketFilterServer = true; // false once the server says it has no filter function (SQL not run yet)
 function marketFilterActive() {
     const f = marketFilter;
-    return !!(f.stat || f.rarity > 1 || f.usable || f.element || f.sort !== 'ending');
+    return !!(f.stat || f.rarity > 1 || f.usable || f.element || f.set || f.sort !== 'ending');
 }
 function setMarketFilter(key, value) {
     marketFilter[key] = value;
@@ -53,6 +53,7 @@ function marketRowMatches(r) {
     if (f.rarity > 1 && (it.rarity || 1) < f.rarity) return false;
     if (f.usable && (it.levelReq || 1) > (player.baseLv || 1)) return false;
     if (f.element && it.element !== f.element) return false;
+    if (f.set && it.setName !== f.set) return false;
     if (f.stat) {
         const total = (typeof effectiveStats === 'function' ? effectiveStats(it)[f.stat] : 0) || 0;
         if (total < (Number(f.min) || 1)) return false;
@@ -80,6 +81,8 @@ function renderMarketFilters() {
             <select onchange="setMarketFilter('rarity', Number(this.value))">${opt(0, 'Any rarity', f.rarity)}${opt(2, 'Uncommon+', f.rarity)}${opt(3, 'Rare+', f.rarity)}${opt(4, 'Epic+', f.rarity)}${opt(5, 'Legendary', f.rarity)}</select></div>
         <div class="mk-field"><span>Element</span>
             <select onchange="setMarketFilter('element', this.value)">${opt('', 'Any element', f.element)}${ELEMENT_KEYS.map(k => opt(k, ELEMENTS[k].name, f.element)).join('')}</select></div>
+        <div class="mk-field"><span>Set</span>
+            <select onchange="setMarketFilter('set', this.value)">${opt('', 'Any set', f.set)}${Object.keys(SET_DATA).map(k => opt(k, SET_DATA[k].name, f.set)).join('')}</select></div>
         <div class="mk-field"><span>Sort</span>
             <select onchange="setMarketFilter('sort', this.value)">${opt('ending', 'Ending soon', f.sort)}${opt('price_asc', 'Price: low to high', f.sort)}${opt('price_desc', 'Price: high to low', f.sort)}</select></div>
         <label class="mk-check"><input type="checkbox" ${f.usable ? 'checked' : ''} onchange="setMarketFilter('usable', this.checked)"> Usable at my level</label>
@@ -95,7 +98,7 @@ async function marketBrowse() {
             p_category: marketCat, p_offset: 0,
             p_stat: f.stat || null, p_min: f.stat ? (Number(f.min) || 1) : null,
             p_rarity: f.rarity > 1 ? f.rarity : null, p_max_level: f.usable ? (player.baseLv || 1) : null,
-            p_element: f.element || null, p_sort: f.sort || 'ending'
+            p_element: f.element || null, p_sort: f.sort || 'ending', p_set: f.set || null
         });
         if (!res.error) return res;
         if (!/auction_browse_filter|function/i.test(res.error)) return res;
