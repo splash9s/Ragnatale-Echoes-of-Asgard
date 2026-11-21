@@ -6887,7 +6887,7 @@ function toggleEquippedFavorite(slot) {
 // Boxes: a random reward from the box's pool. A costume box with no costumes yet stays unopened.
 const PET_BOX_POOL = [
     { name: "Orange Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp', desc: "ATK +2%, HP +100" },
-    { name: "Black Cat", type: 'pet', slot: 'pet', stats: { hp: 120, atkPct: 3 }, icon: 'assets/pet/blackcat/icon_q85.webp', desc: "ATK +3%, HP +120" },
+    { name: "Midnight Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 120, atkPct: 3 }, icon: 'assets/pet/blackcat/icon_q85.webp', desc: "ATK +3%, HP +120" },
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
