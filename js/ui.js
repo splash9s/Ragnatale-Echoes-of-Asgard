@@ -814,6 +814,12 @@ function showCombatNumber(selector, amount, crit, elem) {
     const variant = elem ? ['elem-adv', 'elem-' + elem, crit ? 'crit' : ''].filter(Boolean).join(' ') : (crit ? 'crit' : '');
     showCombatText(selector, String(Math.round(amount)), variant);
 }
+// Floating words over the combat stage, in Thai
+const COMBAT_WORDS_TH = {
+    'DODGE': 'หลบ', 'REGENERATED': 'ฟื้นฟู', 'STUNNED': 'สตัน', 'NO POTION': 'ไม่มียา', 'Paused': 'หยุดชั่วคราว', 'Resumed': 'เล่นต่อ',
+    'Auto Rune ON': 'รูนอัตโนมัติ เปิด', 'Auto Rune OFF': 'รูนอัตโนมัติ ปิด', 'Resurrection ON': 'ฟื้นคืนชีพ เปิด', 'Resurrection OFF': 'ฟื้นคืนชีพ ปิด',
+    'Sound On': 'เสียงเปิด', 'Sound Off': 'เสียงปิด', 'Tap again to leave': 'แตะอีกครั้งเพื่อออก',
+};
 // Floating text above the top border of a combat sprite (damage numbers, MISS)
 // Speech balloon at the top middle of the combat screen (white box, thick black border, big bold black text)
 function showBossBalloon(text) {
@@ -874,6 +880,7 @@ function freeCombatTextSlot(key, i) { if (combatTextSlots[key]) combatTextSlots[
 
 // delayMs: show the number later (heal numbers wait so they do not cover the hit that caused them)
 function showCombatText(selector, text, variant, delayMs = 0) {
+    if (currentLanguage === 'th' && typeof COMBAT_WORDS_TH !== 'undefined' && COMBAT_WORDS_TH[text]) text = COMBAT_WORDS_TH[text];
     const view = document.getElementById('view-combat');
     if (!view || view.classList.contains('hidden')) return;
     const spawn = () => {
