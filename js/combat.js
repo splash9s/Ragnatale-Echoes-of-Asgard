@@ -600,6 +600,7 @@ function startExpedition(mode, opts = {}) {
     } else if (mode === 'tower') {
         activeMap = buildTowerMap();
         setupTowerParty();
+        towerTimerStart();
         currentStage = 1;
         maxStages = TOWER_FLOORS;
         if (tagEl) tagEl.innerText = "Warded Tower";
@@ -2058,6 +2059,7 @@ function onStageCleared() {
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     const sid = combatSessionId;
     const wasBossStage = isBossStage(); // read before the stage number moves on
+    const clearElapsed = towerElapsedMs(); // tower time at the moment the floor is cleared
     const wasFadeStage = wasBossStage || isMiniBossStage(); // mini boss and boss stages fade out to black when cleared
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
@@ -2074,7 +2076,7 @@ function onStageCleared() {
             showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.add('hidden');
-            if (currentMode === 'tower') grantTowerFloorReward(currentStage);
+            if (currentMode === 'tower') { grantTowerFloorReward(currentStage); submitTowerRecord(currentStage, clearElapsed); }
             currentStage++;
 
             if (currentMode === 'tower' && currentStage > maxStages) {
@@ -2370,6 +2372,35 @@ function eventCanPlay(kind) {
 // ---------- CASTLE TOWER ----------
 const TOWER_FLOORS = 21;
 // Monsters get stronger every floor: normal stats on floor 1, then x1.6 on floor 2, +0.1 per floor (x3.5 on floor 21)
+// ---------- WARDED TOWER TIMER ----------
+// Counts from the start of a tower run. Each cleared floor saves the time it took to reach it.
+let towerRunStartedAt = 0;
+let towerTimerTick = null;
+function towerElapsedMs() { return towerRunStartedAt ? Date.now() - towerRunStartedAt : 0; }
+function formatTowerTime(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+    const pad = n => String(n).padStart(2, '0');
+    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+function towerTimerDraw() {
+    const el = document.getElementById('tower-timer');
+    if (el) el.textContent = formatTowerTime(towerElapsedMs());
+}
+function towerTimerStart() {
+    towerRunStartedAt = Date.now();
+    clearInterval(towerTimerTick);
+    towerTimerTick = setInterval(towerTimerDraw, 1000);
+    document.getElementById('tower-timer')?.classList.remove('hidden');
+    towerTimerDraw();
+}
+function towerTimerStop() {
+    clearInterval(towerTimerTick);
+    towerTimerTick = null;
+    towerRunStartedAt = 0;
+    document.getElementById('tower-timer')?.classList.add('hidden');
+}
+
 function towerFloorMult(f) { return f <= 1 ? 1 : 1.5 + 0.1 * (f - 1); } // floor 1: normal stats
 
 // Floor-clear rewards (draft table). Gold 1,600 per floor number.
@@ -2893,6 +2924,7 @@ function restoreAfterCombat() {
     combatSessionId++;
     if (!player.inCombat) return;
     player.inCombat = false;
+    towerTimerStop();
     stopCombatTimers(); combatRunId++;
     const d = getDerivedStats();
     player.hp = d.maxHp;

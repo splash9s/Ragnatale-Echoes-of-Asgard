@@ -1100,6 +1100,16 @@
         /* Final boss stage: a tighter, darker vignette */
         #combat-stage.final-stage .combat-vignette { background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 18%, rgba(0, 0, 0, .97) 80%); }
         /* Black cover for mini boss and boss stage fades (js/combat.js stageFadeSet) */
+        /* Warded Tower leaderboard (Events page) */
+        .tlb-row { display: grid; grid-template-columns: 36px 1fr 70px 100px; align-items: center; gap: 8px; padding: 8px 6px; border-bottom: 1px solid rgba(255, 255, 255, .15); color: #f3e6c8; }
+        .tlb-head { font-weight: 700; color: #ffd978; border-bottom-width: 2px; }
+        .tlb-rank { font-weight: 700; text-align: center; }
+        .tlb-player { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .tlb-player > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+        .tlb-player small { opacity: .75; }
+        .tlb-avatar { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 6px; overflow: hidden; background: #1d1a14; }
+        .tlb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .tlb-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .stage-fade { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #000; opacity: 0; pointer-events: none; z-index: 8; }
         /* Critical slash light: a soft light source that lights up the scene around the monster */
         .slash-light { position: absolute; width: 1100px; height: 1100px; border-radius: 50%; pointer-events: none; z-index: 5; opacity: 0; mix-blend-mode: screen; background: radial-gradient(circle, rgba(190, 240, 255, .9) 0%, rgba(110, 170, 255, .45) 25%, rgba(60, 90, 200, .15) 50%, rgba(0, 0, 0, 0) 70%); }
@@ -1997,6 +2007,7 @@
                     <div id="spirit-motes" aria-hidden="true" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; overflow:hidden;"></div>
                     <div class="combat-vignette"></div>
                     <div id="stage-fade" class="stage-fade" aria-hidden="true"></div>
+                    <div id="tower-timer" class="hidden" style="position:absolute; left:50%; top:74px; transform:translateX(-50%); z-index:6; color:#fff; font-family:'Roboto',sans-serif; font-weight:700; font-size:20px; -webkit-text-stroke:2px #000; paint-order:stroke fill; pointer-events:none;">00:00</div>
 
                     <!-- Stage title (top centre) -->
                     <div style="position:absolute; left:460px; top:28px; width:1000px; text-align:center; z-index:5;">
@@ -2142,12 +2153,12 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261121qt"></script>
     <script src="js/audio.js?v=20261121i1"></script>
-    <script src="js/cloud.js?v=20261121rf"></script>
+    <script src="js/cloud.js?v=20261121lb"></script>
     <script src="js/hero-art.js?v=20261118t"></script>
     <script src="js/hero-body.js?v=20261121fa"></script>
-    <script src="js/combat.js?v=20261121fg"></script>
+    <script src="js/combat.js?v=20261121lb"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261121sw"></script>
+    <script src="js/ui.js?v=20261121lb"></script>
     <script src="js/names-th.js?v=20261121of"></script>
     <script src="js/i18n.js?v=20261121of"></script>
     <script src="js/market.js?v=20261113c"></script>

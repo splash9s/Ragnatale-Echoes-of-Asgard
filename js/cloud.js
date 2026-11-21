@@ -180,6 +180,23 @@ function cloudFlush() {
 
 // ---- Friends, player IDs and server mail (needs supabase/friends.sql) ----
 
+// Warded Tower leaderboard: the server keeps only the best record per player (see supabase/tower_leaderboard.sql)
+async function submitTowerRecord(floor, timeMs) {
+    if (!cloudClient || !cloudUserId || !(timeMs > 0)) return;
+    try {
+        const { error } = await cloudClient.rpc('submit_tower_record', { p_floor: floor, p_time_ms: Math.round(timeMs) });
+        if (error) console.warn('Tower record save failed:', error.message);
+    } catch (e) { console.warn('Tower record save failed:', e); }
+}
+async function fetchTowerLeaderboard() {
+    if (!cloudClient || !cloudUserId) return { error: 'signin' };
+    try {
+        const { data, error } = await cloudClient.rpc('tower_leaderboard');
+        if (error) return { error: error.message };
+        return { rows: data || [] };
+    } catch (e) { return { error: 'offline' }; }
+}
+
 // The public card other players see: name, base level and avatar (the friend ID is made by the server)
 let cloudProfileKey = null; // the last profile row the server accepted; unchanged profiles are not sent again
 function cloudPushProfile() {

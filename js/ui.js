@@ -6547,6 +6547,7 @@ const EVENT_MENU = [
     { key: 'endless',  label: 'Void Tower',      banner: null },
     { key: 'voidtest', label: 'Void Test Map',   banner: null },
     { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
+    { key: 'leaderboard', label: 'Leaderboard',  banner: null },
 ];
 const eventMapPick = { gold: null, xp: null };
 
@@ -6588,6 +6589,12 @@ function renderEventsView() {
         return;
     }
 
+    if (cur === 'leaderboard') {
+        detailEl.innerHTML = `<div class="ev-body ev-body-full"><div id="tower-leaderboard"><p class="ev-status">Loading...</p></div></div>`;
+        loadTowerLeaderboard();
+        return;
+    }
+
     let body = '', foot = '', start = null;
     if (cur === 'daily') {
         const left = Math.max(0, EVENT_LIMIT - st.plays.daily);
@@ -6626,6 +6633,32 @@ function renderEventsView() {
     if (cur === 'bossmap' && typeof populateBossGauntletPick === 'function') populateBossGauntletPick();
 }
 
+
+// ---------- WARDED TOWER LEADERBOARD ----------
+// Top 5 players: furthest floor, then the fastest time to reach it
+async function loadTowerLeaderboard() {
+    const box = document.getElementById('tower-leaderboard');
+    if (!box) return;
+    const res = await fetchTowerLeaderboard();
+    if (!document.getElementById('tower-leaderboard')) return; // the player changed tab
+    if (res.error) {
+        const msg = res.error === 'signin' ? 'Sign in to see the leaderboard.' : 'The leaderboard is unavailable right now.';
+        box.innerHTML = `<p class="ev-status">${escapeHtml(msg)}</p>`;
+        return;
+    }
+    if (!res.rows.length) {
+        box.innerHTML = '<p class="ev-status">No records yet. Clear a floor in the Warded Tower to appear here.</p>';
+        return;
+    }
+    box.innerHTML = `<div class="tlb-row tlb-head"><span>#</span><span>Player</span><span>Floor</span><span>Best time</span></div>`
+        + res.rows.map(r => `
+        <div class="tlb-row">
+            <span class="tlb-rank">${Number(r.rank)}</span>
+            <span class="tlb-player"><span class="tlb-avatar">${friendAvatarHTML(r.avatar)}</span><span><b>${escapeHtml(r.name)}</b><small>Base Lv. ${Number(r.base_lv)}</small></span></span>
+            <span>${Number(r.floor)}</span>
+            <span>${formatTowerTime(Number(r.time_ms))}</span>
+        </div>`).join('');
+}
 
 // ---------- CASTLE TOWER FRIEND PICK ----------
 let towerFriends = null;       // friend list for the picker (null until loaded)
