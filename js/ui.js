@@ -1135,10 +1135,10 @@ function petIconSrc(it) {
     return isMidnightPet(it) ? 'assets/pet/blackcat/icon_q85.webp?v=2' : 'assets/shop/diamond/ocatpet_q85.webp';
 }
 let midnightCooldownUntil = 0;
-// Plays the Midnight click: angry sound, frames 6, 4, 6 at 600 ms each, then the sitting frame. 10 second cooldown.
+// Plays the Midnight click: angry sound, frames 6, 4, 6 at 600 ms each, then the sitting frame. 1 second cooldown.
 function midnightClickPlay(setFrame, onDone) {
     if (Date.now() < midnightCooldownUntil) { onDone(); return; }
-    midnightCooldownUntil = Date.now() + 10000;
+    midnightCooldownUntil = Date.now() + 1000; // 1 second cooldown
     playSfx(SFX.angryCat);
     let i = 0;
     const step = () => {
@@ -8162,7 +8162,7 @@ function placeTentPet(w) {
         const src = w.art ? w.art.walk(w.frame + 1) : `assets/page01/cat/c${w.frame + 1}_q85.webp`;
         if (w.cat.dataset.frame !== src) { w.cat.src = src; w.cat.dataset.frame = src; }
     }
-    const cw = (w.art && w.state === 'lick') ? 174 : TENT_CAT.w; // the angry click art is narrower
+    const cw = (w.art && w.state === 'lick') ? 165 : TENT_CAT.w; // the angry click art is narrower
     w.cat.style.transform = `translate(${w.x - cw / 2}px, ${w.y - TENT_CAT.feetDy}px) scaleX(${w.flip})`;
     w.shadow.style.transform = `translate(${w.x - TENT_CAT.shadowW / 2}px, ${w.y - TENT_CAT.shadowH / 2}px)`;
     if (w.state === 'lick') w.lick.style.transform = `translate(${w.x - 67}px, ${w.y - 120}px)`;
@@ -8199,7 +8199,7 @@ function tentPetLick(w) {
         }
         const findPet = tentPetItem(w.token);
         if (typeof petDailyFind === 'function') setTimeout(() => petDailyFind(findPet), 1600);
-        w.cat.style.width = '174px'; w.cat.style.height = '121px'; // angry click art: 10% smaller than the walk size
+        w.cat.style.width = '165px'; w.cat.style.height = '115px'; // angry click art: 15% smaller than the walk size
         midnightClickPlay(n => { w.cat.src = MIDNIGHT_ART.click(n); w.cat.dataset.frame = ''; }, () => {
             w.cat.style.width = ''; w.cat.style.height = ''; w.cat.dataset.frame = '';
             w.state = 'idle'; w.idleLeft = tentPetIdleTime();
