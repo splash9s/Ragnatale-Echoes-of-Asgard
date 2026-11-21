@@ -2560,11 +2560,12 @@ function towerSetSixMonsters() {
     const pool = lv10 ? lv10.enemies : activeMap.enemies;
     // Floors 2+: regular monsters use the level 1 curve, times the floor factor
     const lvl = lv10 ? lv10.levelReq : 1;
-    // Boss: the boss curve, spread evenly over the boss floors within the difficulty's range
-    // (Normal 1-30, Hard 40-70, Hell 80-99; see TOWER_DIFFS in js/tower-page.js)
+    // Boss: the boss of a map level from this difficulty's list (Normal Lv 1-30, Hard 40-70, Hell 80-99),
+    // spread evenly over the boss floors (see bossMaps in js/tower-page.js)
     const bossIdx = Math.max(0, TOWER_BOSS_FLOORS.indexOf(currentStage));
-    const [bossLo, bossHi] = ((typeof TOWER_DIFFS !== 'undefined' && TOWER_DIFFS[towerRunDiff()]) || {}).bossLv || [1, 99];
-    const bossLvl = Math.round(bossLo + bossIdx * (bossHi - bossLo) / (TOWER_BOSS_FLOORS.length - 1));
+    const bossMapKeys = ((typeof TOWER_DIFFS !== 'undefined' && TOWER_DIFFS[towerRunDiff()]) || {}).bossMaps || ['map1'];
+    const bossMapKey = bossMapKeys[Math.min(bossMapKeys.length - 1, Math.floor(bossIdx * bossMapKeys.length / TOWER_BOSS_FLOORS.length))];
+    const bossSrc = (GAME_DATA.maps[bossMapKey] && GAME_DATA.maps[bossMapKey].boss) || activeMap.boss;
     const plan = isBossStage()
         ? ['front', 'front', 'boss', 'back', 'healer', 'healer']
         : ['front', 'front', 'front', 'back', 'back', 'back'];
@@ -2576,7 +2577,7 @@ function towerSetSixMonsters() {
         return scaledUnit(makeUnit(levelScaled(picked, lvl), 1));
     };
     const slots = plan.map((p, i) => {
-        if (p === 'boss') { if (!activeMap.boss) return null; const boss = makeBoss(curveBoss(activeMap.boss, bossLvl)); boss.lineupSlot = i; return boss; }
+        if (p === 'boss') { if (!bossSrc) return null; const boss = makeBoss({ ...bossSrc }); boss.lineupSlot = i; return boss; }
         const unit = p === 'front' ? make(Math.random() < 0.5 ? 'melee' : 'tank')
             : p === 'healer' ? make('healer')
             : make(Math.random() < 0.5 ? 'range' : 'mage');
