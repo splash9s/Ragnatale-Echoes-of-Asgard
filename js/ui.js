@@ -1118,7 +1118,36 @@ const PET_SPRITES = {
     'Support Slime Pet': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Orange Stray Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Orange Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
+    // Midnight Stray Cat: sits on the main page like the orange cat (shop cat sitting frame)
+    'Midnight Stray Cat': { src: 'assets/cha/page/blackcat/cat_3_q85.webp', w: 120, h: 83, fx: 60, fy: 83 },
 };
+// Midnight Stray Cat art: walk = bc1-4 at 400 ms per frame; click = the shopkeeper's black cat (6, 4, 6, angry sound, 10 s cooldown)
+const MIDNIGHT_PET_NAME = 'Midnight Stray Cat';
+const MIDNIGHT_ART = {
+    walk: n => `assets/pet/blackcat/bc${n}_q85.webp`, walkFrames: 4, walkFrameMs: 400,
+    sit: 'assets/cha/page/blackcat/cat_3_q85.webp',
+    click: n => `assets/cha/page/blackcat/cat_${n}_q85.webp`, clickSeq: [6, 4, 6], clickStepMs: 600,
+};
+function isMidnightPet(it) { return !!it && it.name === MIDNIGHT_PET_NAME; }
+// The pet's icon: its own icon when it has one, else the Midnight icon or the orange cat icon
+function petIconSrc(it) {
+    if (it && it.icon) return it.icon;
+    return isMidnightPet(it) ? 'assets/pet/blackcat/icon_q85.webp' : 'assets/shop/diamond/ocatpet_q85.webp';
+}
+let midnightCooldownUntil = 0;
+// Plays the Midnight click: angry sound, frames 6, 4, 6 at 600 ms each, then the sitting frame. 10 second cooldown.
+function midnightClickPlay(setFrame, onDone) {
+    if (Date.now() < midnightCooldownUntil) { onDone(); return; }
+    midnightCooldownUntil = Date.now() + 10000;
+    playSfx(SFX.angryCat);
+    let i = 0;
+    const step = () => {
+        if (i >= MIDNIGHT_ART.clickSeq.length) { setFrame(3); onDone(); return; }
+        setFrame(MIDNIGHT_ART.clickSeq[i++]);
+        setTimeout(step, MIDNIGHT_ART.clickStepMs);
+    };
+    step();
+}
 const COMBAT_PET_GAP_X = 120;
 // Fine position of the combat pet (px) from the player's feet anchor: 50 left, 60 up
 const COMBAT_PET_OFFSET = { dx: -50, dy: -60 };
@@ -1196,6 +1225,10 @@ function petLick(el) {
     const findPet = player.equipped && player.equipped.pet;
     if (typeof petDailyFind === 'function') setTimeout(() => petDailyFind(findPet), 1600);
     el.dataset.licking = '1';
+    if (isMidnightPet(findPet)) {
+        midnightClickPlay(n => { el.src = MIDNIGHT_ART.click(n); }, () => { delete el.dataset.licking; el.src = MIDNIGHT_ART.sit; });
+        return;
+    }
     playSfx(SFX.meow);
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
     show(1);
@@ -7953,7 +7986,7 @@ scheduleCatWalk(1500); // first walk right after the main page shows (the cat wa
 
 // ---- Black Cat pet on the main page: same route and single-walker slot as the orange cat ----
 // Walk cycle: 4 frames, 400 ms per cycle (100 ms per frame). Click: a small hop and a meow, then it keeps walking.
-const BCAT_FRAMES = 4, BCAT_CYCLE_MS = 400, BCAT_WALK_MS = 26000;
+const BCAT_FRAMES = 4, BCAT_CYCLE_MS = 1600, BCAT_WALK_MS = 26000; // 400 ms per frame
 let bcatFrameTimer = null, bcatWalkAnim = null, bcatShadowAnim = null, bcatFrame = 0;
 function scheduleBcatWalk(ms) { setTimeout(walkBcat, ms); }
 function walkBcat() {
@@ -8049,7 +8082,7 @@ function renderTentPetPicker() {
         const on = sel.includes(String(c.token));
         const tok = typeof c.token === 'string' ? `'${c.token}'` : c.token;
         return `<button class="tpp-row${on ? ' on' : ''}" onclick="toggleTentPet(${tok})">`
-            + `<img src="assets/shop/diamond/ocatpet_q85.webp" alt="">`
+            + `<img src="${petIconSrc(c.item)}" alt="">`
             + `<span class="tpp-name">${c.name}${c.token === 'eq' ? ' (equipped)' : ''}</span><span class="tpp-state">${on ? 'Walking' : 'Select'}</span></button>`;
     }).join('') : `<p class="tpp-empty">You have no pets yet. Buy one in the shop.</p>`;
     box.innerHTML = `<div class="tpp-box">`
@@ -8118,6 +8151,7 @@ function createTentPetWalker(tok, stage) {
     const start = randomTentFloorPoint(null);
     const w = {
         token: tok, cat, shadow, lick, label,
+        art: isMidnightPet(tentPetItem(tok)) ? MIDNIGHT_ART : null,
         x: start.x, y: start.y, flip: 1,        // feet position in design px
         state: 'idle', target: null, idleLeft: tentPetIdleTime(),
         frame: 0, frameT: 0
@@ -8159,12 +8193,15 @@ function tentPetStep(w, dt) {
     w.x += dx / d * step; w.y += dy / d * step;
     if (Math.abs(dx) > 0.5) w.flip = dx < 0 ? -1 : 1;
     w.frameT += dt * 1000;
-    if (w.frameT >= TENT_CAT.frameMs) { w.frameT = 0; w.frame = (w.frame + 1) % TENT_CAT.frames; }
+    const fN = w.art ? w.art.walkFrames : TENT_CAT.frames, fMs = w.art ? w.art.walkFrameMs : TENT_CAT.frameMs;
+    if (w.frameT >= fMs) { w.frameT = 0; w.frame = (w.frame + 1) % fN; }
 }
 // Position the sprites from the walker's feet point (design px)
 function placeTentPet(w) {
-    const src = `assets/page01/cat/c${w.frame + 1}_q85.webp`;
-    if (w.cat.dataset.frame !== src) { w.cat.src = src; w.cat.dataset.frame = src; }
+    if (!(w.art && w.state === 'lick')) { // during a Midnight click the click frames stay on screen
+        const src = w.art ? w.art.walk(w.frame + 1) : `assets/page01/cat/c${w.frame + 1}_q85.webp`;
+        if (w.cat.dataset.frame !== src) { w.cat.src = src; w.cat.dataset.frame = src; }
+    }
     w.cat.style.transform = `translate(${w.x - TENT_CAT.w / 2}px, ${w.y - TENT_CAT.feetDy}px) scaleX(${w.flip})`;
     w.shadow.style.transform = `translate(${w.x - TENT_CAT.shadowW / 2}px, ${w.y - TENT_CAT.shadowH / 2}px)`;
     if (w.state === 'lick') w.lick.style.transform = `translate(${w.x - 67}px, ${w.y - 120}px)`;
@@ -8195,6 +8232,19 @@ function ensureTentPetLoop() {
 function tentPetLick(w) {
     if (w.state === 'lick') return;
     w.state = 'lick';
+    if (w.art) {
+        if (petDailyPlay(tentPetItem(w.token))) {
+            spawnPetHeart(document.querySelector('#character-stage .ts-inner'), w.x, w.y - TENT_CAT.feetDy - 30);
+        }
+        const findPet = tentPetItem(w.token);
+        if (typeof petDailyFind === 'function') setTimeout(() => petDailyFind(findPet), 1600);
+        w.cat.style.height = '134px'; // the click art is taller than the walk art
+        midnightClickPlay(n => { w.cat.src = MIDNIGHT_ART.click(n); w.cat.dataset.frame = ''; }, () => {
+            w.cat.style.height = ''; w.cat.dataset.frame = '';
+            w.state = 'idle'; w.idleLeft = tentPetIdleTime();
+        });
+        return;
+    }
     playSfx(SFX.meow);
     w.cat.style.display = 'none';
     w.lick.style.display = 'block';
@@ -8318,7 +8368,7 @@ function renderPetPanel() {
         const rows = choices.length ? choices.map(c => {
             const f = petFriendText(c.item), on = sel.includes(String(c.token));
             return `<button class="pet-row" onclick="openPetDetail('${c.token}')">`
-                + `<img src="assets/shop/diamond/ocatpet_q85.webp" alt="">`
+                + `<img src="${petIconSrc(c.item)}" alt="">`
                 + `<span class="pet-row-main"><span class="pet-row-name">${petEsc(c.name)}<span class="pet-hearts">${petHearts(f)}</span></span><small>Lv ${f.lv + 1} · ${petEsc(f.title)}</small></span>`
                 + (on ? `<span class="pet-tag">Walking</span>` : '') + `</button>`;
         }).join('') : `<p class="pet-empty">You have no pets yet. Buy one in the shop.</p>`;
@@ -8342,7 +8392,7 @@ function renderPetPanel() {
         + (editing ? `<button class="pet-submit" onclick="petSubmit(${tok}, '${key}')">Submit</button>` : '')
         + `</div>`;
     box.innerHTML = `<div class="pet-head"><button class="pet-back" onclick="petPanelBack()">‹ Pets</button><button class="pet-x" onclick="closePetPanel()">×</button></div>`
-        + `<div class="pet-portrait"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""></div>`
+        + `<div class="pet-portrait"><img src="${petIconSrc(tentPetItem(String(tok)))}" alt=""></div>`
         + fieldHead('name', 'Name', nameEdit)
         + `<input id="pet-name-input" maxlength="${PET_NAME_MAX}" value="${petEsc(nameVal)}"${nameEdit ? '' : ' readonly'} oninput="petCount('pet-name-input', 'pet-name-count')">`
         + `<div class="pet-count"><span id="pet-name-count">${nameVal.length}</span> / ${PET_NAME_MAX}</div>`
@@ -8506,7 +8556,7 @@ function renderPuzzlePanel() {
             // A pet whose puzzle was solved today (its daily friendship reward is used) gets a check mark
             const doneToday = !!(c.item && c.item.lastPuzzleDay === petDayKey());
             const mark = doneToday ? `<b class="pz-done" style="color:#4ade80; font-size:26px; font-weight:900; white-space:nowrap;">&#10004;</b>` : '';
-            return `<button class="pz-row" onclick="puzzleOpenPet(${i})"><img src="assets/shop/diamond/ocatpet_q85.webp" alt=""><span class="pz-name">${petEsc(c.name)}</span>${mark}<small>${list.length ? list.length + ' puzzle' + (list.length > 1 ? 's' : '') : 'No puzzles yet'}</small></button>`;
+            return `<button class="pz-row" onclick="puzzleOpenPet(${i})"><img src="${petIconSrc(c.item)}" alt=""><span class="pz-name">${petEsc(c.name)}</span>${mark}<small>${list.length ? list.length + ' puzzle' + (list.length > 1 ? 's' : '') : 'No puzzles yet'}</small></button>`;
         }).join('');
         body = `<p class="pz-sub">Choose a pet</p><div class="pz-list">${rows || '<p class="pz-sub">You have no pets yet.</p>'}</div>`;
         box.innerHTML = `<div class="pz-head"><h3>Puzzle</h3><button class="pz-x" onclick="closePuzzlePanel()">✕</button></div>${body}`;
