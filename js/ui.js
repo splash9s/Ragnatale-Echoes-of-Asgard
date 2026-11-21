@@ -2041,6 +2041,27 @@ function showFloatPage(viewId) {
 }
 // Each page's usage is counted for the developer dashboard (feature names must match supabase/feature_usage.sql)
 const FEATURE_BY_VIEW = { town: 'town', shop: 'shop', blacksmith: 'blacksmith', market: 'market', diamond: 'diamond', vip: 'vip', events: 'events', friend: 'friend', quests: 'mail', setting: 'setting', skills: 'skills', character: 'tent', expeditions: 'expedition', inventory: 'inventory' };
+// Keep the phone screen on while battling: Screen Wake Lock, re-requested when the page comes back
+let screenWakeLock = null;
+let wantScreenAwake = false;
+async function setScreenAwake(on) {
+    wantScreenAwake = on;
+    try {
+        if (!('wakeLock' in navigator)) return;
+        if (on && !screenWakeLock) {
+            screenWakeLock = await navigator.wakeLock.request('screen');
+            screenWakeLock.addEventListener('release', () => { screenWakeLock = null; });
+        } else if (!on && screenWakeLock) {
+            const lock = screenWakeLock;
+            screenWakeLock = null;
+            await lock.release();
+        }
+    } catch (e) { /* not granted or not supported: the game still plays */ }
+}
+document.addEventListener('visibilitychange', () => {
+    if (wantScreenAwake && document.visibilityState === 'visible') setScreenAwake(true);
+});
+
 function switchView(viewName) {
     if (typeof trackFeature === 'function' && FEATURE_BY_VIEW[viewName]) trackFeature(FEATURE_BY_VIEW[viewName]);
     if (viewName !== 'character' && typeof closePuzzlePanel === 'function') closePuzzlePanel(); // leaving the tent closes the puzzle
@@ -2133,6 +2154,7 @@ function switchView(viewName) {
         renderMailBox();
         syncServerMail(); // friend gifts that arrived while playing
     }
+    setScreenAwake(viewName === 'combat');
     if (viewName === 'combat') {
         const combatView = document.getElementById('view-combat');
         if (combatView) { combatView.classList.remove('hidden'); combatView.classList.add('art-loading'); }
