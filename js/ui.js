@@ -2417,9 +2417,36 @@ function freeDiamondCardHTML() {
     const claimed = isDailyFreeClaimed('diamond');
     const alert = claimed ? '' : '<img id="alert-free-diamond" src="assets/page01/alert_q85.webp" alt="" style="position:absolute; right:-8px; top:-8px; width:30px; height:30px; pointer-events:none;">';
     const overlay = claimed ? '<span style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); color:#4ade80; font-weight:bold; font-size:16px; background:rgba(0,0,0,.6); padding:4px 14px; border-radius:8px; white-space:nowrap;">Claimed</span>' : '';
-    const click = claimed ? '' : ` onclick="claimDailyFree('diamond')" title="Claim free 20 diamonds"`;
+    const click = claimed ? '' : ` onclick="watchDiamondAd()" title="Watch an ad to claim 20 diamonds"`;
     const cursor = claimed ? '' : 'cursor:pointer; ';
-    return `<div class="vip-pack"${click} style="${cursor}position:relative; margin-right:12px;"><img src="assets/diamond/free/free_diamond_card_v2_q85.webp" alt="Free 20 Diamond" style="height:540px; width:auto; display:block; border-radius:14px;">${overlay}${alert}</div>`;
+    return `<div id="free-diamond-card" class="vip-pack"${click} style="${cursor}position:relative; margin-right:12px;"><img src="assets/diamond/free/free_diamond_ad_q85.webp" alt="Free 20 Diamond - Watch Ad" style="height:540px; width:auto; display:block; border-radius:14px;">${overlay}${alert}</div>`;
+}
+// Watch an ad for the free 20 diamonds: placeholder 5 second countdown on the card, then the claim (no real ad SDK yet)
+const DIAMOND_AD_SECONDS = 5;
+let diamondAdTimer = null;
+function watchDiamondAd() {
+    if (diamondAdTimer || isDailyFreeClaimed('diamond')) return;
+    let left = DIAMOND_AD_SECONDS;
+    const showTimer = () => {
+        const card = document.getElementById('free-diamond-card');
+        if (!card) return;
+        let o = document.getElementById('free-diamond-ad-timer');
+        if (!o) {
+            o = document.createElement('span');
+            o.id = 'free-diamond-ad-timer';
+            o.style.cssText = 'position:absolute; left:50%; bottom:14px; transform:translateX(-50%); color:#fde68a; font-weight:bold; font-size:16px; background:rgba(0,0,0,.6); padding:4px 14px; border-radius:8px; white-space:nowrap;';
+            card.appendChild(o);
+        }
+        o.textContent = `Watching ad… ${left}s`;
+    };
+    showTimer();
+    diamondAdTimer = setInterval(() => {
+        left--;
+        if (left > 0) { showTimer(); return; }
+        clearInterval(diamondAdTimer);
+        diamondAdTimer = null;
+        claimDailyFree('diamond'); // grants the 20 diamonds and re-renders the card as Claimed
+    }, 1000);
 }
 function dailyFreeCardHTML(key) {
     if (key === 'diamond') return freeDiamondCardHTML();
