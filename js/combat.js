@@ -9,9 +9,10 @@ let maxStages = 11;
 let combatInterval = null;
 let combatSessionId = 0; // changes whenever the player leaves combat; stale timers check it and stop
 let combatPaused = false;
-// Refreshes used on this map: the first is free, then 1, 2, 4... diamonds (doubling each time)
+// Refreshes used on this map: the first costs a watched ad, then 10, 20, 40... diamonds (doubling each time)
 let runeRefreshUsed = 0;
-function runeRefreshCost() { return runeRefreshUsed === 0 ? 0 : 2 ** (runeRefreshUsed - 1); }
+let runeAdTimer = null;
+function runeRefreshCost() { return runeRefreshUsed === 0 ? 0 : 10 * 2 ** (runeRefreshUsed - 1); }
 let stageSummary = null;
 let lastHitBy = null;
 let monstersList = [];
@@ -470,9 +471,10 @@ function showRuneChoices(isNew) {
     });
     html += `</div>`;
     const refreshCost = runeRefreshCost();
-    const canRefresh = (player.diamonds || 0) >= refreshCost;
-    const refreshLabel = refreshCost === 0 ? '↻ Refresh (free)' : `↻ Refresh · <img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:14px;height:14px;display:inline-block;vertical-align:-2px"> ${refreshCost}`;
-    html += `<button onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">${refreshLabel}</button>`;
+    const adRefresh = runeRefreshUsed === 0; // the first refresh on a map is a watched ad
+    const canRefresh = adRefresh || (player.diamonds || 0) >= refreshCost;
+    const refreshLabel = adRefresh ? '▶ Watch ad to refresh (free)' : `↻ Refresh · <img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:14px;height:14px;display:inline-block;vertical-align:-2px"> ${refreshCost}`;
+    html += `<button id="rune-refresh-btn" onclick="refreshRuneChoices()" ${canRefresh ? '' : 'disabled'} class="mx-auto w-72 py-2 border border-slate-700 rounded-xl text-xs font-bold ${canRefresh ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer' : 'bg-slate-900 text-slate-600 cursor-not-allowed'} transition">${refreshLabel}</button>`;
     // Edge tab on the right side of the window: opens the list of runes acquired
     html += `<button id="rune-acq-tab" onclick="toggleRuneAcquired(true)">Runes (${acquired.length})</button>`;
     // Slide-out list of acquired runes, overlaying the pick window
@@ -497,6 +499,9 @@ function toggleRuneAcquired(open) {
 }
 
 function refreshRuneChoices() {
+    if (runeAdTimer) return; // an ad is already playing
+    // First refresh on a map: watch an ad (placeholder: a short countdown, no real ad SDK yet)
+    if (runeRefreshUsed === 0) { watchRuneRefreshAd(); return; }
     const cost = runeRefreshCost();
     if ((player.diamonds || 0) < cost) { diamondShortPopup(); return; }
     player.diamonds -= cost;
@@ -504,6 +509,29 @@ function refreshRuneChoices() {
     updateUI();
     saveGame();
     showRuneChoices(false);
+}
+
+// Placeholder rewarded ad: counts down 5 seconds on the button, then refreshes the offer for free
+const RUNE_AD_SECONDS = 5;
+function watchRuneRefreshAd() {
+    let left = RUNE_AD_SECONDS;
+    const setBtn = (text) => {
+        const btn = document.getElementById('rune-refresh-btn');
+        if (btn) { btn.disabled = true; btn.textContent = text; }
+    };
+    setBtn(`▶ Watching ad… ${left}s`);
+    runeAdTimer = setInterval(() => {
+        // The pick window was closed during the ad: stop without refreshing
+        if (!runePickOpen) { clearInterval(runeAdTimer); runeAdTimer = null; return; }
+        left--;
+        if (left > 0) { setBtn(`▶ Watching ad… ${left}s`); return; }
+        clearInterval(runeAdTimer);
+        runeAdTimer = null;
+        runeRefreshUsed++;
+        updateUI();
+        saveGame();
+        showRuneChoices(false);
+    }, 1000);
 }
 
 function selectRuneChoice(runeId, callback) {
