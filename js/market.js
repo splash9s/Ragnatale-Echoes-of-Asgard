@@ -18,6 +18,89 @@ let marketTab = 'buy';          // buy | sell | mine
 let marketCat = 'all';
 let marketBusy = false;
 
+// ---- Buy filters (gear stats, rarity, level, element, sort). The server filters every open auction
+// (supabase/market_filter.sql); without it, the first 50 auctions are filtered here.
+const MARKET_FILTER_STATS = [
+    ['atk', 'ATK'], ['def', 'DEF'], ['hp', 'HP'], ['crit', 'CRIT'], ['flee', 'FLEE'], ['hit', 'HIT'], ['aspd', 'ASPD'],
+    ['armor', 'ARMOR'], ['block', 'Block'], ['mdef', 'MDEF'],
+    ['res_fire', 'Fire Res'], ['res_wind', 'Wind Res'], ['res_earth', 'Earth Res'], ['res_water', 'Ice Res']
+];
+const MARKET_FILTER_DEFAULT = { stat: '', min: '', rarity: 0, usable: false, element: '', sort: 'ending' };
+let marketFilter = (() => {
+    try { return { ...MARKET_FILTER_DEFAULT, ...JSON.parse(localStorage.getItem('rune_thread_market_filter') || '{}') }; }
+    catch (e) { return { ...MARKET_FILTER_DEFAULT }; }
+})();
+let marketFilterServer = true; // false once the server says it has no filter function (SQL not run yet)
+function marketFilterActive() {
+    const f = marketFilter;
+    return !!(f.stat || f.rarity > 1 || f.usable || f.element || f.sort !== 'ending');
+}
+function setMarketFilter(key, value) {
+    marketFilter[key] = value;
+    if (key === 'stat' && !value) marketFilter.min = '';
+    try { localStorage.setItem('rune_thread_market_filter', JSON.stringify(marketFilter)); } catch (e) { /* remembered for this visit only */ }
+    clearTimeout(setMarketFilter.t);
+    setMarketFilter.t = setTimeout(renderMarket, key === 'min' ? 400 : 0); // typing a number waits a moment
+}
+function clearMarketFilter() {
+    marketFilter = { ...MARKET_FILTER_DEFAULT };
+    try { localStorage.removeItem('rune_thread_market_filter'); } catch (e) { /* ignore */ }
+    renderMarket();
+}
+// Same rule as the server: total of the stat (base + bonus - penalty) at least the minimum
+function marketRowMatches(r) {
+    const f = marketFilter, it = r.item || {};
+    if (f.rarity > 1 && (it.rarity || 1) < f.rarity) return false;
+    if (f.usable && (it.levelReq || 1) > (player.baseLv || 1)) return false;
+    if (f.element && it.element !== f.element) return false;
+    if (f.stat) {
+        const total = (typeof effectiveStats === 'function' ? effectiveStats(it)[f.stat] : 0) || 0;
+        if (total < (Number(f.min) || 1)) return false;
+    }
+    return true;
+}
+function marketSortRows(rows) {
+    const s = marketFilter.sort;
+    if (s === 'price_asc') rows.sort((a, b) => Number(a.current_price) - Number(b.current_price));
+    else if (s === 'price_desc') rows.sort((a, b) => Number(b.current_price) - Number(a.current_price));
+    return rows;
+}
+function renderMarketFilters() {
+    const box = document.getElementById('market-filters');
+    if (!box) return;
+    if (marketTab !== 'buy') { box.innerHTML = ''; return; }
+    const f = marketFilter;
+    const opt = (v, l, cur) => `<option value="${v}"${String(cur) === String(v) ? ' selected' : ''}>${l}</option>`;
+    box.innerHTML = `<div class="mk-filters">
+        <select onchange="setMarketFilter('stat', this.value)">${opt('', 'Any stat', f.stat)}${MARKET_FILTER_STATS.map(([k, l]) => opt(k, l, f.stat)).join('')}</select>
+        ${f.stat ? `<span>≥</span><input type="number" min="1" placeholder="Min" value="${marketEsc(f.min)}" oninput="setMarketFilter('min', this.value)">` : ''}
+        <select onchange="setMarketFilter('rarity', Number(this.value))">${opt(0, 'Any rarity', f.rarity)}${opt(2, 'Uncommon+', f.rarity)}${opt(3, 'Rare+', f.rarity)}${opt(4, 'Epic+', f.rarity)}${opt(5, 'Legendary', f.rarity)}</select>
+        <select onchange="setMarketFilter('element', this.value)">${opt('', 'Any element', f.element)}${ELEMENT_KEYS.map(k => opt(k, ELEMENTS[k].name, f.element)).join('')}</select>
+        <label><input type="checkbox" ${f.usable ? 'checked' : ''} onchange="setMarketFilter('usable', this.checked)"> Usable at my level</label>
+        <select onchange="setMarketFilter('sort', this.value)">${opt('ending', 'Ending soon', f.sort)}${opt('price_asc', 'Price: low to high', f.sort)}${opt('price_desc', 'Price: high to low', f.sort)}</select>
+        ${marketFilterActive() ? '<button onclick="clearMarketFilter()">Clear</button>' : ''}
+    </div>`;
+    if (typeof translateDomIn === 'function' && typeof currentLanguage !== 'undefined' && currentLanguage === 'th') translateDomIn(box);
+}
+// Loads one page of auctions with the filters: on the server when it can, otherwise filtered here
+async function marketBrowse() {
+    const f = marketFilter;
+    if (marketFilterServer && marketFilterActive()) {
+        const res = await marketRpc('auction_browse_filter', {
+            p_category: marketCat, p_offset: 0,
+            p_stat: f.stat || null, p_min: f.stat ? (Number(f.min) || 1) : null,
+            p_rarity: f.rarity > 1 ? f.rarity : null, p_max_level: f.usable ? (player.baseLv || 1) : null,
+            p_element: f.element || null, p_sort: f.sort || 'ending'
+        });
+        if (!res.error) return res;
+        if (!/auction_browse_filter|function/i.test(res.error)) return res;
+        marketFilterServer = false; // the filter SQL is not installed yet: filter here instead
+    }
+    const res = await marketRpc('auction_browse', { p_category: marketCat, p_offset: 0 });
+    if (res.error) return res;
+    return { data: marketSortRows((res.data || []).filter(marketRowMatches)) };
+}
+
 function marketEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
 // Gear slot -> market category (both rings are one category)
@@ -108,6 +191,7 @@ function renderMarket() {
     if (gold) gold.textContent = `Your gold: ${Number(player.gold || 0).toLocaleString()}`;
     if (cats) cats.innerHTML = marketTab === 'buy' ? MARKET_CATEGORIES.map(([k, l]) =>
         `<button onclick="setMarketCat('${k}')" class="px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${marketCat === k ? 'bg-sky-700 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${l}</button>`).join('') : '';
+    renderMarketFilters();
     if (marketTab === 'buy') renderMarketBuy();
     else if (marketTab === 'sell') renderMarketSell();
     else renderMarketMine();
@@ -120,11 +204,11 @@ async function renderMarketBuy() {
     body.innerHTML = '<div class="text-sm text-slate-400">Loading auctions...</div>';
     const msg = await marketAccessMessage();
     if (msg && !(await cloudCurrentUser())) { renderMarketNotice(msg); return; }
-    const res = await marketRpc('auction_browse', { p_category: marketCat, p_offset: 0 });
+    const res = await marketBrowse();
     if (res.error) { renderMarketNotice(res.error); return; }
     const rows = res.data || [];
     const note = msg ? `<div class="text-xs text-amber-200">${marketEsc(msg)} You can look but not bid.</div>` : '';
-    if (!rows.length) { body.innerHTML = note + '<div class="text-sm text-slate-400">No auctions in this category right now.</div>'; return; }
+    if (!rows.length) { body.innerHTML = note + `<div class="text-sm text-slate-400">${marketFilterActive() ? 'No auctions match these filters.' : 'No auctions in this category right now.'}</div>`; return; }
     marketBuyRows = {};
     marketBuyBlock = msg;
     rows.forEach(r => { marketBuyRows[r.id] = r; });

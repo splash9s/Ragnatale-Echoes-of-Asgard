@@ -1509,6 +1509,13 @@
                 #view-market #market-body { font-size: 24px; }
                 #view-market #market-body .text-sm, #view-market #market-body .text-xs, #view-market #market-body .text-\[10px\] { font-size: 22px !important; }
                 #view-market #market-body select, #view-market #market-body input { font-size: 24px; }
+                #view-market #market-filters:empty { display: none; }
+                #view-market .mk-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(15, 23, 42, .75); border: 1px solid #b8945a; border-radius: 12px; font-size: 22px; color: #e2e8f0; }
+                #view-market .mk-filters select, #view-market .mk-filters input[type=number] { font-size: 22px; background: #0f172a; color: #f8fafc; border: 1px solid #475569; border-radius: 8px; padding: 6px 8px; }
+                #view-market .mk-filters input[type=number] { width: 110px; }
+                #view-market .mk-filters label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+                #view-market .mk-filters input[type=checkbox] { width: 24px; height: 24px; }
+                #view-market .mk-filters button { font-size: 22px !important; padding: 6px 14px; border-radius: 8px; background: #334155; color: #f8fafc; cursor: pointer; }
             </style>
             <div id="market-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
@@ -1527,6 +1534,7 @@
                         <div id="market-tabs"></div>
                     </div>
                     <div id="market-list-panel" class="mk-panel" style="left:330px; top:95px; width:1530px; height:890px;">
+                        <div id="market-filters"></div>
                         <div id="market-body" class="flex flex-col gap-3"></div>
                     </div>
                 </div>
@@ -2165,8 +2173,8 @@
     <script src="js/crit-fx.js?v=20261118j"></script>
     <script src="js/ui.js?v=20261121pp"></script>
     <script src="js/names-th.js?v=20261121of"></script>
-    <script src="js/i18n.js?v=20261121em"></script>
-    <script src="js/market.js?v=20261121pp"></script>
+    <script src="js/i18n.js?v=20261121mf"></script>
+    <script src="js/market.js?v=20261121mf"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
     <script src="js/guide-elem.js?v=20261119c"></script>
