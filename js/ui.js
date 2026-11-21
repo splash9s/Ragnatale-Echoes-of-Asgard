@@ -4657,8 +4657,8 @@ function showItemDetail(index, refresh = false) {
         name: title,
         meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip && item.slot !== 'pet' ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
         stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : (item.slot === 'pet' ? ddStatRows(item.stats) : ''),
-        compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
-        lore: (!isEquip || item.slot === 'pet') ? (item.lore || item.desc || '') : '',
+        compare: isEquip && (!NO_GEAR_SLOTS.includes(item.slot) || item.slot === 'pet') ? compareHTML(item, equippedForCompare(item)) : '', // pets compare with the worn pet
+        lore: !isEquip ? (item.lore || item.desc || '') : '',
         price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
         primary, secondary
     });
