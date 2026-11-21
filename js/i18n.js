@@ -437,7 +437,7 @@ function startDomTranslation() {
             ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market', 'view-combat'].forEach(id => translateDomIn(document.getElementById(id)));
         });
     });
-    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests'].forEach(id => {
+    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-market'].forEach(id => {
         const el = document.getElementById(id);
         if (el) domObserver.observe(el, { childList: true, subtree: true, characterData: true });
     });
