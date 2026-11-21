@@ -2151,10 +2151,7 @@ function switchView(viewName) {
     closePetPanel(); // leaving any page closes the pet menu and pet detail
     syncHeroSprites(); // town and character hero art follow the current gear on every page change
     // The Diamond Cash Shop is a tab on the Shop page now
-    if (viewName === 'diamond') {
-        currentShopTab = 'shop';
-        viewName = 'shop';
-    }
+    if (viewName === 'diamond') viewName = 'vip'; // the Diamond cash shop is the VIP page
     let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market', 'view-vip', 'view-tower'];
     document.getElementById('view-town')?.classList.remove('friend-under');
     views.forEach(id => {
