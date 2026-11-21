@@ -1510,12 +1510,43 @@
                 #view-market #market-body .text-sm, #view-market #market-body .text-xs, #view-market #market-body .text-\[10px\] { font-size: 22px !important; }
                 #view-market #market-body select, #view-market #market-body input { font-size: 24px; }
                 #view-market #market-filters:empty { display: none; }
-                #view-market .mk-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(15, 23, 42, .75); border: 1px solid #b8945a; border-radius: 12px; font-size: 22px; color: #e2e8f0; }
-                #view-market .mk-filters select, #view-market .mk-filters input[type=number] { font-size: 22px; background: #0f172a; color: #f8fafc; border: 1px solid #475569; border-radius: 8px; padding: 6px 8px; }
-                #view-market .mk-filters input[type=number] { width: 110px; }
-                #view-market .mk-filters label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-                #view-market .mk-filters input[type=checkbox] { width: 24px; height: 24px; }
-                #view-market .mk-filters button { font-size: 22px !important; padding: 6px 14px; border-radius: 8px; background: #334155; color: #f8fafc; cursor: pointer; }
+                /* Category and tab buttons: dark wood, gold when picked */
+                #view-market #market-cats button, #view-market #market-tabs button { background: linear-gradient(180deg, rgba(52, 36, 18, .95), rgba(26, 18, 9, .95)) !important;
+                    color: #f3e2b5 !important; border: 1px solid #8a6a3a; box-shadow: inset 0 1px 0 rgba(255, 226, 160, .15); font-weight: 700; }
+                #view-market #market-cats button:hover, #view-market #market-tabs button:hover { border-color: #e9c77b; filter: brightness(1.15); }
+                #view-market #market-cats button.bg-sky-700, #view-market #market-tabs button.bg-amber-600 { background: linear-gradient(180deg, #f6dc98, #c6943f) !important;
+                    color: #2a1a08 !important; border-color: #fbe7b0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 0 10px rgba(233, 199, 123, .35); }
+                /* Auction rows: wood cards with gold trim; gold price and Bid button */
+                #view-market #market-body > div.bg-slate-900 { background: linear-gradient(180deg, rgba(46, 32, 16, .92), rgba(24, 16, 8, .94)) !important; border: 1px solid #8a6a3a !important;
+                    box-shadow: inset 0 1px 0 rgba(255, 226, 160, .15), 0 3px 8px rgba(0, 0, 0, .4); }
+                #view-market #market-body > div.bg-slate-900:hover { border-color: #e9c77b !important; }
+                #view-market #market-body .text-slate-400 { color: #cdb98a !important; }
+                #view-market #market-body .font-mono.text-amber-200 { color: #f6dc98 !important; font-weight: 700; }
+                #view-market #market-body button.bg-amber-600 { background: linear-gradient(180deg, #f6dc98, #c6943f) !important; color: #2a1a08 !important; border: 1px solid #fbe7b0;
+                    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 2px 4px rgba(0, 0, 0, .5); }
+                #view-market #market-body button.bg-amber-600:active { filter: brightness(.9); transform: translateY(1px); }
+                /* Filter bar: dark wood with gold trim, like the market panels */
+                #view-market .mk-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 18px; padding: 12px 16px 14px; border-radius: 14px;
+                    background: linear-gradient(180deg, rgba(58, 40, 20, .92), rgba(28, 19, 10, .94)); border: 2px solid #b8945a;
+                    box-shadow: inset 0 1px 0 rgba(255, 226, 160, .25), inset 0 0 18px rgba(0, 0, 0, .55), 0 4px 10px rgba(0, 0, 0, .45); color: #f3e2b5; }
+                #view-market .mk-field { display: flex; flex-direction: column; gap: 4px; }
+                #view-market .mk-field > span { font-size: 17px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #e9c77b; text-shadow: 0 1px 2px #000; }
+                #view-market .mk-row { display: flex; align-items: center; gap: 8px; }
+                #view-market .mk-filters select, #view-market .mk-filters input[type=number] { -webkit-appearance: none; appearance: none; font-size: 22px; font-weight: 600; color: #f8eccc;
+                    background-color: #140d06; border: 1px solid #8a6a3a; border-radius: 9px; padding: 7px 12px; height: 46px; box-sizing: border-box;
+                    box-shadow: inset 0 2px 5px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 226, 160, .12); outline: none; }
+                #view-market .mk-filters select { padding-right: 38px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23e9c77b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; }
+                #view-market .mk-filters select option { background: #1c130a; color: #f8eccc; }
+                #view-market .mk-filters select:focus, #view-market .mk-filters input[type=number]:focus { border-color: #e9c77b; box-shadow: inset 0 2px 5px rgba(0, 0, 0, .7), 0 0 0 2px rgba(233, 199, 123, .35); }
+                #view-market .mk-filters input[type=number] { width: 104px; text-align: center; }
+                #view-market .mk-filters .mk-ge { font-size: 24px; font-weight: 800; color: #e9c77b; }
+                #view-market .mk-check { display: inline-flex; align-items: center; gap: 10px; height: 46px; cursor: pointer; font-size: 21px; font-weight: 600; color: #f8eccc; }
+                #view-market .mk-check input { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; margin: 0; border-radius: 6px; cursor: pointer;
+                    background: #140d06; border: 2px solid #b8945a; box-shadow: inset 0 2px 4px rgba(0, 0, 0, .7); display: grid; place-content: center; }
+                #view-market .mk-check input:checked { background: linear-gradient(180deg, #f4d48a, #c6943f); border-color: #f4d48a; }
+                #view-market .mk-check input:checked::after { content: ""; width: 8px; height: 15px; border: solid #2a1a08; border-width: 0 4px 4px 0; transform: rotate(45deg) translate(-1px, -2px); }
+                #view-market .mk-filters .mk-clear { font-size: 21px !important; height: 50px; min-width: 120px; padding: 0 20px; margin-left: auto; cursor: pointer; }
+                #view-market .mk-filters .mk-clear:active { background-image: url(assets/pages/button/redbuttonpress_q85.webp) !important; }
             </style>
             <div id="market-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
@@ -2173,8 +2204,8 @@
     <script src="js/crit-fx.js?v=20261118j"></script>
     <script src="js/ui.js?v=20261121pp"></script>
     <script src="js/names-th.js?v=20261121of"></script>
-    <script src="js/i18n.js?v=20261121mf"></script>
-    <script src="js/market.js?v=20261121mf"></script>
+    <script src="js/i18n.js?v=20261121md"></script>
+    <script src="js/market.js?v=20261121md"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
     <script src="js/guide-elem.js?v=20261119c"></script>

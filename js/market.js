@@ -72,13 +72,18 @@ function renderMarketFilters() {
     const f = marketFilter;
     const opt = (v, l, cur) => `<option value="${v}"${String(cur) === String(v) ? ' selected' : ''}>${l}</option>`;
     box.innerHTML = `<div class="mk-filters">
-        <select onchange="setMarketFilter('stat', this.value)">${opt('', 'Any stat', f.stat)}${MARKET_FILTER_STATS.map(([k, l]) => opt(k, l, f.stat)).join('')}</select>
-        ${f.stat ? `<span>≥</span><input type="number" min="1" placeholder="Min" value="${marketEsc(f.min)}" oninput="setMarketFilter('min', this.value)">` : ''}
-        <select onchange="setMarketFilter('rarity', Number(this.value))">${opt(0, 'Any rarity', f.rarity)}${opt(2, 'Uncommon+', f.rarity)}${opt(3, 'Rare+', f.rarity)}${opt(4, 'Epic+', f.rarity)}${opt(5, 'Legendary', f.rarity)}</select>
-        <select onchange="setMarketFilter('element', this.value)">${opt('', 'Any element', f.element)}${ELEMENT_KEYS.map(k => opt(k, ELEMENTS[k].name, f.element)).join('')}</select>
-        <label><input type="checkbox" ${f.usable ? 'checked' : ''} onchange="setMarketFilter('usable', this.checked)"> Usable at my level</label>
-        <select onchange="setMarketFilter('sort', this.value)">${opt('ending', 'Ending soon', f.sort)}${opt('price_asc', 'Price: low to high', f.sort)}${opt('price_desc', 'Price: high to low', f.sort)}</select>
-        ${marketFilterActive() ? '<button onclick="clearMarketFilter()">Clear</button>' : ''}
+        <div class="mk-field"><span>Stat</span><div class="mk-row">
+            <select onchange="setMarketFilter('stat', this.value)">${opt('', 'Any stat', f.stat)}${MARKET_FILTER_STATS.map(([k, l]) => opt(k, l, f.stat)).join('')}</select>
+            ${f.stat ? `<span class="mk-ge">≥</span><input type="number" min="1" placeholder="Min" value="${marketEsc(f.min)}" oninput="setMarketFilter('min', this.value)">` : ''}
+        </div></div>
+        <div class="mk-field"><span>Rarity</span>
+            <select onchange="setMarketFilter('rarity', Number(this.value))">${opt(0, 'Any rarity', f.rarity)}${opt(2, 'Uncommon+', f.rarity)}${opt(3, 'Rare+', f.rarity)}${opt(4, 'Epic+', f.rarity)}${opt(5, 'Legendary', f.rarity)}</select></div>
+        <div class="mk-field"><span>Element</span>
+            <select onchange="setMarketFilter('element', this.value)">${opt('', 'Any element', f.element)}${ELEMENT_KEYS.map(k => opt(k, ELEMENTS[k].name, f.element)).join('')}</select></div>
+        <div class="mk-field"><span>Sort</span>
+            <select onchange="setMarketFilter('sort', this.value)">${opt('ending', 'Ending soon', f.sort)}${opt('price_asc', 'Price: low to high', f.sort)}${opt('price_desc', 'Price: high to low', f.sort)}</select></div>
+        <label class="mk-check"><input type="checkbox" ${f.usable ? 'checked' : ''} onchange="setMarketFilter('usable', this.checked)"> Usable at my level</label>
+        ${marketFilterActive() ? '<button class="pix-btn pix-btn-red mk-clear" onclick="clearMarketFilter()">Clear</button>' : ''}
     </div>`;
     if (typeof translateDomIn === 'function' && typeof currentLanguage !== 'undefined' && currentLanguage === 'th') translateDomIn(box);
 }

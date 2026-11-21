@@ -183,6 +183,7 @@ function localGameName(text) {
 // Event and friend page text that is written in code (not in the dictionary above).
 // Matched on whole text pieces; the game re-renders these pages, so the observer translates again.
 const DOM_TH = {
+    'Stat': 'ค่าสถานะ', 'Rarity': 'ความหายาก', 'Element': 'ธาตุ', 'Sort': 'เรียงตาม',
     'Any stat': 'ทุกค่าสถานะ', 'Any rarity': 'ทุกระดับ', 'Uncommon+': 'อันคอมมอนขึ้นไป', 'Rare+': 'แรร์ขึ้นไป', 'Epic+': 'เอปิกขึ้นไป',
     'Any element': 'ทุกธาตุ', 'Usable at my level': 'ใช้ได้ที่เลเวลของฉัน', 'Ending soon': 'ใกล้หมดเวลา',
     'Price: low to high': 'ราคา: ต่ำไปสูง', 'Price: high to low': 'ราคา: สูงไปต่ำ', 'Clear': 'ล้าง',
