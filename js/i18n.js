@@ -183,6 +183,11 @@ function localGameName(text) {
 // Event and friend page text that is written in code (not in the dictionary above).
 // Matched on whole text pieces; the game re-renders these pages, so the observer translates again.
 const DOM_TH = {
+    'Element matchup:': 'ความสัมพันธ์ธาตุ:',
+    'beats': 'ชนะ',
+    'Stronger element: deals': 'ธาตุที่เหนือกว่า: ทำดาเมจ',
+    'Weaker element: deals': 'ธาตุที่ด้อยกว่า: ทำดาเมจ',
+    'damage': 'ดาเมจ',
     'Daily Quests': 'ภารกิจประจำวัน',
     'Daily Challenge': 'ท้าทายประจำวัน',
     'Gold Frenzy': 'ทองคำพุ่งทะยาน',

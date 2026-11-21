@@ -3559,6 +3559,18 @@ function renderBlacksmithChrome() {
     });
 }
 
+// Which element beats which (each ELEMENTS entry's beats), shown under the stone list
+function elementMatchupHTML() {
+    const nm = k => `<span class="fn-el fn-el-${k}">${ELEMENTS[k].name}</span>`;
+    const rows = ELEMENT_KEYS.map(k => `<div class="flex items-center gap-2 text-xs text-slate-200">${ELEMENTS[k].icon} ${nm(k)} <span class="text-slate-400">beats</span> ${ELEMENTS[ELEMENTS[k].beats].icon} ${nm(ELEMENTS[k].beats)}</div>`).join('');
+    return `<div class="mt-3 p-3 rounded border border-slate-700 bg-slate-900/70">
+        <div class="text-[10px] text-slate-400 mb-2"><span>Element matchup:</span></div>
+        ${rows}
+        <div class="text-[10px] text-slate-400 mt-2"><span>Stronger element: deals</span> <b class="text-slate-200">x${ELEMENT_ADVANTAGE}</b> <span>damage</span></div>
+        <div class="text-[10px] text-slate-400"><span>Weaker element: deals</span> <b class="text-slate-200">x${ELEMENT_DISADVANTAGE}</b> <span>damage</span></div>
+    </div>`;
+}
+
 // Elemental mode, left window: the equipped weapon to forge and the element stones held
 function renderElementalUI() {
     const container = document.getElementById('refining-slots-container');
@@ -3590,6 +3602,7 @@ function renderElementalUI() {
                 <span class="text-xs text-slate-200">x${stones[k] || 0}</span>
             </div>`;
     });
+    html += elementMatchupHTML();
     container.innerHTML = html;
     renderBlacksmithSlot();
 }
