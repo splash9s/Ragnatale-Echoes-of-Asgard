@@ -659,8 +659,8 @@ function startExpedition(mode, opts = {}) {
     combatPaused = false;
     updatePauseButton();
     monsterOpenerRound = true;
-    // Black covers (first visit, mini boss and boss fades) go first; monsters and timers start after them
-    if (isBossStage() || isMiniBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
+    // Black covers (first visit and boss fades) go first; monsters and timers start after them
+    if (isBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
     const startSid = combatSessionId;
     whenCombatCoversClear(() => {
         if (startSid !== combatSessionId) return; // left combat while the cover was up
@@ -2062,7 +2062,7 @@ function onStageCleared() {
     const sid = combatSessionId;
     const wasBossStage = isBossStage(); // read before the stage number moves on
     const clearElapsed = towerElapsedMs(); // tower time at the moment the floor is cleared
-    const wasFadeStage = wasBossStage || isMiniBossStage(); // mini boss and boss stages fade out to black when cleared
+    const wasFadeStage = wasBossStage; // only boss stages fade out to black when cleared
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
     // Every dead monster, the last one included, plays its death animation before the stage ends
@@ -2150,7 +2150,7 @@ function onStageCleared() {
             const enterNextStage = () => changeEarthLayers().then(() => {
                 if (sid !== combatSessionId) return; // left combat while the next stage loaded
                 // Mini boss and boss stages fade in from black; monsters and timers start once the black is gone
-                if (isBossStage() || isMiniBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
+                if (isBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
                 whenCombatCoversClear(() => {
                     if (sid !== combatSessionId) return;
                     startCombatTimers(getDerivedStats());

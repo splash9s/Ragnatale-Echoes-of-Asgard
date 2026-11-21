@@ -1918,9 +1918,9 @@ async function changeEarthLayers() {
     const artKey = (typeof currentPath !== 'undefined' && COMBAT_ART[currentPath]) ? currentPath : 'earth';
     const art = COMBAT_ART[artKey];
     const fgList = Array.isArray(art.fg) ? art.fg : [art.fg]; // a null entry means no foreground
-    // Earth map mini-boss and boss stages use their own midground (mgnew3) as the foreground
+    // Earth map boss stages use their own midground (mgnew3) as the foreground; mini boss stages use the normal midgrounds
     const towerArt = currentMode === 'tower';
-    const bossFg = !towerArt && artKey === 'earth' && (isBossStage() || isMiniBossStage());
+    const bossFg = !towerArt && artKey === 'earth' && isBossStage();
     const nextBg = towerArt ? TOWER_ART.bg : pick(art.bg);
     const nextBase = towerArt ? TOWER_ART.base : pick(art.base);
     const nextFg = towerArt ? towerFgForFloor(currentStage) : (pick(bossFg ? [EARTH_BOSS_FG] : fgList) || null);
