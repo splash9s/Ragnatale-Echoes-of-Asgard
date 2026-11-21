@@ -3760,7 +3760,8 @@ function smeltMaterial(tier) {
     }
     logMessage(`[Forge] Smelted 1 ${target.name} from ${r.label}.`, 'levelup');
     updateQuestProgress(/Alloy/i.test(target.name) ? 'alloy' : (/Bar/i.test(target.name) ? 'bar' : 'ingot'), 1);
-    showModal("Smelting Successful", `Forged 1 ${target.name} from ${r.label}.`);
+    // Smelting success: just the word "Smelted" in green bold, with a Confirm button
+    showModal('', '', `<div style="color:#86efac; font-weight:900; font-size:22px; text-align:center; padding:14px 0 10px; text-shadow:0 1px 3px #000;">Smelted</div><button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Confirm</button>`);
     updateUI();
     renderRefiningUI();
     saveGame();
