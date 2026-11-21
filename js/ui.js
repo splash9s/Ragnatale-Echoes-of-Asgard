@@ -1132,7 +1132,7 @@ function isMidnightPet(it) { return !!it && it.name === MIDNIGHT_PET_NAME; }
 // The pet's icon: its own icon when it has one, else the Midnight icon or the orange cat icon
 function petIconSrc(it) {
     if (it && it.icon) return it.icon;
-    return isMidnightPet(it) ? 'assets/pet/blackcat/icon_q85.webp' : 'assets/shop/diamond/ocatpet_q85.webp';
+    return isMidnightPet(it) ? 'assets/pet/blackcat/icon_q85.webp?v=2' : 'assets/shop/diamond/ocatpet_q85.webp';
 }
 let midnightCooldownUntil = 0;
 // Plays the Midnight click: angry sound, frames 6, 4, 6 at 600 ms each, then the sitting frame. 10 second cooldown.
@@ -4141,7 +4141,7 @@ const ITEM_ICON_RULES = [
     [/Pet Box/, 'assets/shop/diamond/silverchest.png'],
     [/Costume Box/, 'assets/shop/diamond/copperchest.png'],
     [/Orange (Stray )?Cat( Pet)?|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
-    [/Midnight Stray Cat/, 'assets/pet/blackcat/icon_q85.webp'],
+    [/Midnight Stray Cat/, 'assets/pet/blackcat/icon_q85.webp?v=2'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
@@ -6921,7 +6921,7 @@ function toggleEquippedFavorite(slot) {
 // Boxes: a random reward from the box's pool. A costume box with no costumes yet stays unopened.
 const PET_BOX_POOL = [
     { name: "Orange Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp', desc: "ATK +2%, HP +100" },
-    { name: "Midnight Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 120, atkPct: 3 }, icon: 'assets/pet/blackcat/icon_q85.webp', desc: "ATK +3%, HP +120" },
+    { name: "Midnight Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 120, atkPct: 3 }, icon: 'assets/pet/blackcat/icon_q85.webp?v=2', desc: "ATK +3%, HP +120" },
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
