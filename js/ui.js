@@ -1119,7 +1119,7 @@ const PET_SPRITES = {
     'Orange Stray Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Orange Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     // Midnight Stray Cat: sits on the main page like the orange cat (shop cat sitting frame)
-    'Midnight Stray Cat': { src: 'assets/cha/page/blackcat/cat_3_q85.webp', w: 139, h: 96, fx: 70, fy: 96 },
+    'Midnight Stray Cat': { src: 'assets/cha/page/blackcat/cat_3_q85.webp', w: 139, h: 96, fx: 70, fy: 96, flip: true },
 };
 // Midnight Stray Cat art: walk = bc1-4 at 400 ms per frame; click = the shopkeeper's black cat (6, 4, 6, angry sound, 10 s cooldown)
 const MIDNIGHT_PET_NAME = 'Midnight Stray Cat';
@@ -1165,6 +1165,7 @@ function placePetImg(el, spec, feetX, feetY) {
     el.style.height = spec.h + 'px';
     el.style.left = (feetX - spec.fx) + 'px';
     el.style.top = (feetY - spec.fy) + 'px';
+    el.style.transform = spec.flip ? 'scaleX(-1)' : ''; // Midnight Stray Cat faces the other way
 }
 function syncPetSprite() {
     const spec = petSpriteOf();
@@ -8163,7 +8164,9 @@ function placeTentPet(w) {
         if (w.cat.dataset.frame !== src) { w.cat.src = src; w.cat.dataset.frame = src; }
     }
     const cw = (w.art && w.state === 'lick') ? 165 : TENT_CAT.w; // the angry click art is narrower
-    w.cat.style.transform = `translate(${w.x - cw / 2}px, ${w.y - TENT_CAT.feetDy}px) scaleX(${w.flip})`;
+    // Midnight: the base pose and the angry click face the other way (walking keeps its direction)
+    const faceFlip = (w.art && (w.state === 'lick' || w.state === 'idle')) ? -w.flip : w.flip;
+    w.cat.style.transform = `translate(${w.x - cw / 2}px, ${w.y - TENT_CAT.feetDy}px) scaleX(${faceFlip})`;
     w.shadow.style.transform = `translate(${w.x - TENT_CAT.shadowW / 2}px, ${w.y - TENT_CAT.shadowH / 2}px)`;
     if (w.state === 'lick') w.lick.style.transform = `translate(${w.x - 67}px, ${w.y - 120}px)`;
     w.label.style.left = w.x + 'px';
