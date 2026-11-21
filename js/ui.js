@@ -830,11 +830,16 @@ function showBossBalloon(text) {
     stage.appendChild(wrap);
     setTimeout(() => { if (wrap.parentNode) wrap.remove(); }, 3000);
 }
+// Artwork popups (top-up, purchase success): the art is the whole popup, so the default dark panel goes transparent
+function useArtPanel() {
+    const panel = document.getElementById('game-modal')?.firstElementChild;
+    if (panel) panel.classList.add('art-panel');
+}
 // Waiting for Stripe: the top-up artwork with an OK button over its OK area
 function showTopUpWaiting() {
     showModal('', '', `<div style="position:relative; width:min(92vw, 560px); aspect-ratio:1200 / 896; margin:0 auto; background:url(assets/diamond/topup_waiting_q85.webp) center / 100% 100% no-repeat;">
         <button onclick="closeModal()" aria-label="OK" style="position:absolute; left:34.2%; top:72.3%; width:31.7%; height:11.6%; background:transparent; border:0; cursor:pointer;"></button>
-    </div>`);
+    </div>`);    useArtPanel();
 }
 
 // Red floating notice (replaces browser alert popups). Floats above the anchor element, or the screen centre.
@@ -1559,7 +1564,7 @@ function showModal(title, message, customHTML = '', onCloseCallback = null) {
     if (titleEl) titleEl.innerText = title;
     if (msgEl) msgEl.innerText = message;
     if (area) area.innerHTML = customHTML;
-    if (modalEl && modalEl.firstElementChild) { modalEl.firstElementChild.classList.add('relative'); modalEl.firstElementChild.style.maxWidth = ''; }
+    if (modalEl && modalEl.firstElementChild) { modalEl.firstElementChild.classList.add('relative'); modalEl.firstElementChild.classList.remove('art-panel'); modalEl.firstElementChild.style.maxWidth = ''; }
     if (btn) {
         if (customHTML) btn.classList.add('hidden');
         else btn.classList.remove('hidden');
