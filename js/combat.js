@@ -601,6 +601,7 @@ function startExpedition(mode, opts = {}) {
         activeMap = buildTowerMap();
         setupTowerParty();
         towerTimerStart();
+        if (typeof startTowerRun === 'function') startTowerRun(); // the server keeps the leaderboard clock
         currentStage = 1;
         maxStages = TOWER_FLOORS;
         if (tagEl) tagEl.innerText = "Warded Tower";
@@ -2078,7 +2079,7 @@ function onStageCleared() {
             showCombatText('#combat-player-sprite', 'REGENERATED', 'heal');
             const nextBtn = document.getElementById('next-stage-btn');
             if (nextBtn) nextBtn.classList.add('hidden');
-            if (currentMode === 'tower') { grantTowerFloorReward(currentStage); submitTowerRecord(currentStage, clearElapsed); }
+            if (currentMode === 'tower') { grantTowerFloorReward(currentStage); if (typeof reportTowerFloor === 'function') reportTowerFloor(currentStage); }
             currentStage++;
 
             if (currentMode === 'tower' && currentStage > maxStages) {

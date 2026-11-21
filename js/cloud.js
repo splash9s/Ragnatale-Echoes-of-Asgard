@@ -193,13 +193,28 @@ function cloudFlush() {
 
 // ---- Friends, player IDs and server mail (needs supabase/friends.sql) ----
 
-// Warded Tower leaderboard: the server keeps only the best record per player (see supabase/tower_leaderboard.sql)
-async function submitTowerRecord(floor, timeMs) {
-    if (!cloudClient || !cloudUserId || !(timeMs > 0)) return;
-    try {
-        const { error } = await cloudClient.rpc('submit_tower_record', { p_floor: floor, p_time_ms: Math.round(timeMs) });
-        if (error) console.warn('Tower record save failed:', error.message);
-    } catch (e) { console.warn('Tower record save failed:', e); }
+// Warded Tower leaderboard (see supabase/tower_leaderboard_strict.sql): the server starts the run and keeps the clock.
+// Each cleared floor is reported in order; the server checks it and records the time it measured itself.
+let towerRunPromise = null;            // resolves to the server's run id, or null when it cannot be used
+let towerReportChain = Promise.resolve(); // floor reports go one after another, in floor order
+function startTowerRun() {
+    towerReportChain = Promise.resolve();
+    if (!cloudClient || !cloudUserId) { towerRunPromise = Promise.resolve(null); return; }
+    towerRunPromise = cloudClient.rpc('start_tower_run')
+        .then(({ data, error }) => { if (error) { console.warn('Tower run not started on the server:', error.message); return null; } return data; },
+              () => null);
+}
+function reportTowerFloor(floor) {
+    const run = towerRunPromise;
+    if (!run) return;
+    towerReportChain = towerReportChain
+        .then(() => run)
+        .then(id => {
+            if (!id) return;
+            return cloudClient.rpc('tower_floor_clear', { p_run: id, p_floor: floor })
+                .then(({ error }) => { if (error) console.warn('Tower floor not recorded:', error.message); });
+        })
+        .catch(() => {});
 }
 async function fetchTowerLeaderboard() {
     if (!cloudClient || !cloudUserId) return { error: 'signin' };
