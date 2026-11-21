@@ -1320,6 +1320,8 @@ function awardKill(m) {
     // Home bonus: each owned Tent and Pet House level adds EXP and gold
     const homeMul = 1 + (typeof homeBonusPct === 'function' ? homeBonusPct() : 0) / 100;
     if (homeMul > 1) { baseExpGain = Math.floor(baseExpGain * homeMul); jobExpGain = Math.floor(jobExpGain * homeMul); finalGold = Math.floor(finalGold * homeMul); }
+    // Warded Tower kills give a small share of the normal gold and EXP (the run's main pay is the floor reward)
+    if (currentMode === 'tower') { finalGold = Math.floor(finalGold * TOWER_KILL_REWARD_MULT); baseExpGain = Math.floor(baseExpGain * TOWER_KILL_REWARD_MULT); jobExpGain = Math.floor(jobExpGain * TOWER_KILL_REWARD_MULT); }
     // Bosses and mini bosses always drop at least one coin (100%), even when the event rules zero the gold.
     if (bossKill && finalGold < 1) finalGold = 1;
 
@@ -1770,10 +1772,13 @@ function monsterTurnTick() {
         updateUI();
         const firstDeath = !guideFlag('death'); // first defeat ever: point to the Refining page and teach refining
         if (firstDeath) markGuide('death');
-        const defeatHtml = buildMapSummaryHTML('lose', undefined, firstDeath);
+        // Event-type maps (Warded Tower, Void Tower, Void Test, Boss Gauntlet) say "Event" and return to their own page
+        const isEventMap = currentMode === 'tower' || currentMode === 'voidtest' || currentMode === 'bossmap' || currentMode === 'endless';
+        const defeatLabel = currentMode === 'tower' ? 'Return to Tower' : isEventMap ? 'Return to Events' : undefined;
+        const defeatHtml = buildMapSummaryHTML('lose', defeatLabel, firstDeath);
         playPlayerFallAnim(); // the hero falls first, then the result shows
         const failReturn = currentMode === 'tower' ? 'tower' : (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
-        setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView(failReturn)), PLAYER_FALL_MS);
+        setTimeout(() => showModal(isEventMap ? "Event Failed" : "Expedition Failed", '', defeatHtml, () => switchView(failReturn)), PLAYER_FALL_MS);
     }
     updateUI();
 }
@@ -2378,6 +2383,8 @@ function eventCanPlay(kind) {
 
 // ---------- CASTLE TOWER ----------
 const TOWER_FLOORS = 21;
+// Share of the normal kill gold and EXP that a Warded Tower kill gives (tune here)
+const TOWER_KILL_REWARD_MULT = 0.1;
 // Monsters get stronger every floor: normal stats on floor 1, then x1.6 on floor 2, +0.1 per floor (x3.5 on floor 21)
 // ---------- WARDED TOWER TIMER ----------
 // Counts from the start of a tower run. Each cleared floor saves the time it took to reach it.
