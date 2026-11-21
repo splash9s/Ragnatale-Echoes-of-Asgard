@@ -319,6 +319,20 @@ function warmHeroPoses() {
     try { if (typeof combatPose === 'function') combatPose(); } catch (e) { /* art loads on demand anyway */ }
 }
 
+// Resolves once the hero's standing pose (with the worn gear) is composed, or after maxMs at the latest.
+// Asking for the battle poses also starts their images loading.
+function heroDressed(maxMs) {
+    const started = Date.now();
+    return new Promise(resolve => {
+        const tick = () => {
+            let ready = true;
+            try { if (typeof combatPose === 'function') ready = !!combatPose().IDLE; } catch (e) { ready = true; }
+            if (ready || Date.now() - started > maxMs) resolve(); else setTimeout(tick, 50);
+        };
+        tick();
+    });
+}
+
 function setLoading(percent, text) {
     const fill = document.getElementById('loading-bar-fill');
     const pct = document.getElementById('loading-percent');
@@ -419,13 +433,15 @@ function loadTownArtInBackground() {
 // Called before the town opens: if the town art is still loading, the loading screen waits for it
 window.waitForTownArt = async function () {
     let ready = false;
-    window.townAssetsReady.then(() => { ready = true; });
-    await Promise.resolve();
+    const all = window.townAssetsReady.then(() => heroDressed(3000)); // town art, then the hero's gear art
+    all.then(() => { ready = true; });
+    await new Promise(r => setTimeout(r, 0));
     if (ready) return;
     const screen = document.getElementById('loading-screen');
     if (screen) { screen.style.display = ''; screen.style.opacity = '1'; }
     setLoading(0, 'Preparing town...');
-    await window.townAssetsReady;
+    await all;
+    try { if (typeof syncHeroSprites === 'function') syncHeroSprites(); } catch (e) { /* the 500 ms sync catches up */ }
     hideLoading();
 };
 
@@ -466,7 +482,11 @@ window.addEventListener('load', () => {
     const start = () => {
         try { if (typeof startGame === 'function') startGame(); }
         catch (err) { console.error('Start failed:', err); }
-        hideLoading();
+        // Keep the loading screen until the hero's gear art is in, so the town never shows a bare hero
+        return heroDressed(3000).then(() => {
+            try { if (typeof syncHeroSprites === 'function') syncHeroSprites(); } catch (e) { /* the 500 ms sync catches up */ }
+            hideLoading();
+        });
     };
     const firstVisit = isFirstVisit();
     runPreload()
