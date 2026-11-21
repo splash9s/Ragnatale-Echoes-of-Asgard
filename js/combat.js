@@ -1390,13 +1390,13 @@ function awardKill(m) {
     }
     if (m.isMiniBoss && pool.length > 0 && Math.random() < (isVoidTest ? 1 : 0.5)) {
         const template = pool[Math.floor(Math.random() * pool.length)];
-        const droppedItem = generatePoEItem(template, rollMiniBossDropRarity(), 1);
+        const droppedItem = generatePoEItem(template, null, 1, MINI_BOSS_RARITY_WEIGHTS);
         logMessage(`[Mini Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }
     for (let bd = 0; bd < (m.isFinalBoss ? 2 : 1); bd++) if (m.isBoss && pool.length > 0) {
         const template = pool[Math.floor(Math.random() * pool.length)];
-        const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
+        const droppedItem = generatePoEItem(template, null, 1, BOSS_RARITY_WEIGHTS);
         logMessage(`[Boss Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }
@@ -1425,7 +1425,7 @@ function awardKill(m) {
         const helmLv = BOSS_HELMET_LEVEL_BY_ID[m.id] || bossHelmetLevel(activeMap.levelReq);
         const list = HELMET_DROP_POOL[helmLv];
         const template = list[Math.floor(Math.random() * list.length)];
-        const droppedItem = generatePoEItem(template, rollBossDropRarity(), 1);
+        const droppedItem = generatePoEItem(template, null, 1, BOSS_RARITY_WEIGHTS);
         logMessage(`[Helmet Drop!] ${m.name} dropped <span style="color: yellow;">${droppedItem.name} (Rarity ${droppedItem.rarity})</span>!`, 'drop');
         addItemToInventory(rollSetForDrop(droppedItem)); showMonsterGroundDrop(m, itemIconHTML(droppedItem, 48));
     }

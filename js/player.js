@@ -304,9 +304,18 @@ function resetMapRunes() {
     if (typeof stasisAtkPct !== 'undefined') stasisAtkPct = 0; // Stasis Rune bonus ends with the map run
 }
 
-function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0) {
-    const rarity = forcedRarity || rollItemRarity();
-    const buffCount = Math.min(4, Math.max(minBuffs, weightedPick(BUFF_COUNT_WEIGHTS[rarity])));
+// Rarity follows the buffs: rarity = buff count + 1 (0 buffs Common ... 4 buffs Legendary).
+// forcedRarity (chests, mail, rewards): the item gets exactly that many buffs minus one.
+// Otherwise the drop source's weights pick a roll, and that roll sets the odds of each buff count.
+function gearRarityFromBuffs(item) { return Math.min(5, ((item && item.buffs) || []).length + 1); }
+function generatePoEItem(baseTemplate, forcedRarity = null, minBuffs = 0, sourceWeights = null) {
+    let buffCount;
+    if (forcedRarity) buffCount = Math.min(4, Math.max(minBuffs, forcedRarity - 1));
+    else {
+        const roll = rollWeightedRarity(sourceWeights || NORMAL_RARITY_WEIGHTS);
+        buffCount = Math.min(4, Math.max(minBuffs, weightedPick(BUFF_COUNT_WEIGHTS[roll])));
+    }
+    const rarity = buffCount + 1;
 
     const shuffled = [...BUFF_POOL].sort(() => 0.5 - Math.random());
     const buffs = [];
@@ -497,6 +506,11 @@ function loadGame() {
                 player.mailBox.unshift({ id: Date.now(), title: "Bag Overflow", sender: "Bag Office", message: `Your bag now has ${openSlots} slots. Items that did not fit were sent here.`, rewards: { items: overflow }, claimed: false, sentAt: Date.now() });
             }
             delete player.stash;
+            // Gear rarity now follows its buffs (buff count + 1): relabel gear from older saves
+            const fixRarity = it => { if (it && it.slot && it.slot !== 'pet' && !it.costumeId && Array.isArray(it.buffs)) it.rarity = gearRarityFromBuffs(it); };
+            player.inventory.forEach(fixRarity);
+            Object.values(player.equipped || {}).forEach(fixRarity);
+            if (player.storage && Array.isArray(player.storage.slots)) player.storage.slots.forEach(fixRarity);
             // Old saves kept scraps as a counter: move them into the bag as stacks
             if (player.materials && player.materials.ironScraps > 0 && typeof addScraps === 'function') {
                 let left = player.materials.ironScraps;
