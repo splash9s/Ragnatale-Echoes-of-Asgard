@@ -3456,9 +3456,9 @@ function renderBlacksmithSlot() {
         return;
     }
     const lv = gear.refineLevel || 0;
-    // The +level sits behind the item icon, at the bottom of the box
+    // The +level sits in front of the item icon, at the bottom of the box
     slotEl.innerHTML = `<div style="position:relative; z-index:1; display:flex;">${itemIconHTML(gear, 60)}</div>`
-        + (lv > 0 ? `<span style="position:absolute; z-index:0; left:50%; bottom:2px; transform:translateX(-50%); font-size:16px; font-weight:900; color:#86efac; text-shadow:0 1px 3px #000; white-space:nowrap;">+${lv}</span>` : '');
+        + (lv > 0 ? `<span style="position:absolute; z-index:2; left:50%; bottom:2px; transform:translateX(-50%); font-size:16px; font-weight:900; color:#86efac; text-shadow:0 0 3px #000, 0 1px 3px #000; white-space:nowrap; pointer-events:none;">+${lv}</span>` : '');
     const isMax = lv >= 10;
     const cost = (lv + 1) * 100;
     const rateEl = document.getElementById('bs-success-rate');
