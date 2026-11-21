@@ -304,6 +304,9 @@
         #town-cat { position: absolute; left: -200px; top: 795px; width: 193px; height: 120px; pointer-events: auto; cursor: pointer; z-index: 3; display: none; image-rendering: auto; }
         #town-cat-lick { position: absolute; left: -67px; top: 795px; width: 134px; height: 120px; pointer-events: auto; cursor: pointer; z-index: 3; display: none; image-rendering: auto; }
         #town-cat-shadow { position: absolute; left: -179px; top: 885px; width: 150px; height: 60px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
+        /* Black Cat pet: walks the same floor route as the orange cat (js/ui.js walkBcat); feet at y 915 */
+        #town-bcat { position: absolute; left: -200px; top: 794px; width: 193px; height: 121px; pointer-events: auto; cursor: pointer; z-index: 3; display: none; image-rendering: auto; }
+        #town-bcat-shadow { position: absolute; left: -179px; top: 885px; width: 150px; height: 60px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
         #town-smith-shadow { position: absolute; left: 274px; top: 768px; width: 102px; height: 41px; object-fit: contain; pointer-events: none; z-index: 1; opacity: 0.4; }
         #town-cart-shadow { position: absolute; left: -220px; top: 879px; width: 180px; height: 72px; object-fit: contain; pointer-events: none; z-index: 3; opacity: 0.4; display: none; }
         /* Blacksmith at the smithy: frames are 480x320 with the anvil stump centre at (290, 305), shown at 0.71 so he is the player's height (about 193px). Loops the hammer swing (js/ui.js) */
@@ -1334,6 +1337,8 @@
                     <img id="town-cat-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
                     <img id="town-cat" alt="" aria-hidden="true" src="assets/page01/cat/c1_q85.webp" onclick="catClick()">
                     <img id="town-cat-lick" alt="" aria-hidden="true" src="assets/page01/cat/lick1_q85.webp" onclick="catClick()">
+                    <img id="town-bcat-shadow" alt="" aria-hidden="true" src="assets/cha/shadowclean_q85.webp">
+                    <img id="town-bcat" alt="Black Cat" title="Black Cat" src="assets/pet/blackcat/bc1_q85.webp" onclick="bcatClick()">
                     <img class="ts-fg" src="assets/page01/mainfg02_v2_q85.webp" alt="" aria-hidden="true">
                     <div id="town-sparkles" aria-hidden="true" style="position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:0; pointer-events:none; overflow:hidden;"></div>
                     <!-- (the foreground sits above the background and below the hero and buttons; it never takes clicks) -->
@@ -2334,7 +2339,7 @@
     <script src="js/hero-body.js?v=20261121lz"></script>
     <script src="js/combat.js?v=20261121bn"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261121pf2"></script>
+    <script src="js/ui.js?v=20261121pf3"></script>
     <script src="js/names-th.js?v=20261121rn"></script>
     <script src="js/i18n.js?v=20261121sf"></script>
     <script src="js/market.js?v=20261121sf"></script>

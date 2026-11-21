@@ -7920,6 +7920,47 @@ function catResume() {
 }
 scheduleCatWalk(1500); // first walk right after the main page shows (the cat waits until then)
 
+// ---- Black Cat pet on the main page: same route and single-walker slot as the orange cat ----
+// Walk cycle: 4 frames, 400 ms per cycle (100 ms per frame). Click: a small hop and a meow, then it keeps walking.
+const BCAT_FRAMES = 4, BCAT_CYCLE_MS = 400, BCAT_WALK_MS = 26000;
+let bcatFrameTimer = null, bcatWalkAnim = null, bcatShadowAnim = null, bcatFrame = 0;
+function scheduleBcatWalk(ms) { setTimeout(walkBcat, ms); }
+function walkBcat() {
+    const el = document.getElementById('town-bcat');
+    const town = document.getElementById('view-town');
+    if (!el || !town || town.classList.contains('hidden')) { scheduleBcatWalk(3000); return; }
+    if (townWalker) { scheduleBcatWalk(2000); return; } // the cat, the cart or the black cat is walking: wait our turn
+    townWalker = 'bcat';
+    el.style.display = 'block';
+    bcatFrame = 0;
+    bcatFrameTimer = setInterval(() => {
+        bcatFrame = (bcatFrame + 1) % BCAT_FRAMES;
+        el.src = `assets/pet/blackcat/bc${bcatFrame + 1}_q85.webp`;
+    }, BCAT_CYCLE_MS / BCAT_FRAMES);
+    const shadow = document.getElementById('town-bcat-shadow');
+    bcatShadowAnim = null;
+    if (shadow) { shadow.style.display = 'block'; bcatShadowAnim = shadow.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: BCAT_WALK_MS, easing: 'linear' }); }
+    bcatWalkAnim = el.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(2300px)' }], { duration: BCAT_WALK_MS, easing: 'linear' });
+    bcatWalkAnim.onfinish = () => {
+        clearInterval(bcatFrameTimer);
+        el.style.display = 'none';
+        if (shadow) shadow.style.display = 'none';
+        el.src = 'assets/pet/blackcat/bc1_q85.webp';
+        bcatWalkAnim = null;
+        townWalker = null;
+        scheduleBcatWalk(20000 + Math.random() * 15000);
+    };
+}
+// Click the Black Cat: a small hop and a meow; the walk carries on from the same spot
+function bcatClick() {
+    const el = document.getElementById('town-bcat');
+    if (!el || townWalker !== 'bcat' || !bcatWalkAnim) return;
+    playSfx(SFX.meow);
+    // 'translate' is a separate property from the walk's 'transform', so the hop and the walk do not fight
+    el.animate([{ translate: '0px 0px' }, { translate: '0px -22px' }, { translate: '0px 0px' }], { duration: 400, easing: 'ease-out' });
+}
+scheduleBcatWalk(8000); // the Black Cat first walks a few seconds after the main page shows
+
 // ---- Tent pets: the player picks up to 3 owned pets; they walk the tent floor with the same walk and lick as the tent cat ----
 const TENT_PETS_MAX = 3;
 const tentPetWalkers = new Map(); // token -> walker
