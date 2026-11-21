@@ -1309,6 +1309,8 @@ function awardKill(m) {
     baseExpGain = Math.floor(baseExpGain * (1 + (skillBonus('baseExpPct') + skillBonus('allExpPct') + bossExp) / 100));
     jobExpGain = Math.floor(jobExpGain * (1 + (skillBonus('classExpPct') + skillBonus('allExpPct') + bossExp) / 100));
     if (isVoidTest) { const em = voidExpMult(currentStage); baseExpGain *= em; jobExpGain *= em; finalGold *= voidGoldMult(currentStage); }
+    // Campaign maps above Lv. 20: monsters give 1.5x EXP
+    if (currentMode === 'campaign' && activeMap && activeMap.levelReq > 20) { baseExpGain = Math.floor(baseExpGain * 1.5); jobExpGain = Math.floor(jobExpGain * 1.5); }
     if (player.baseLv >= MAX_BASE_LV) baseExpGain = 0;
     if (player.jobLv >= MAX_CLASS_LV) jobExpGain = 0;
     // Home bonus: each owned Tent and Pet House level adds EXP and gold
