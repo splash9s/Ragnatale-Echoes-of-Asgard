@@ -1105,14 +1105,26 @@
         #combat-stage.final-stage .combat-vignette { background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 18%, rgba(0, 0, 0, .97) 80%); }
         /* Black cover for mini boss and boss stage fades (js/combat.js stageFadeSet) */
         /* Warded Tower leaderboard (Events page) */
-        .tlb-row { display: grid; grid-template-columns: 36px 1fr 70px 100px; align-items: center; gap: 8px; padding: 8px 6px; border-bottom: 1px solid rgba(255, 255, 255, .15); color: #f3e6c8; }
-        .tlb-head { font-weight: 700; color: #ffd978; border-bottom-width: 2px; }
-        .tlb-rank { font-weight: 700; text-align: center; }
+        /* Tower leaderboard on the parchment panel: dark ink text so it reads on the light paper */
+        .tlb-row { display: grid; grid-template-columns: 36px minmax(0, 1.2fr) minmax(0, 1.3fr) 60px 90px; align-items: center; gap: 8px; padding: 8px 6px; border-bottom: 1px solid rgba(90, 55, 20, .22); color: #3a2410; }
+        .tlb-head { font-weight: 800; color: #7a2e0e; border-bottom: 2px solid rgba(122, 46, 14, .45); font-size: .85em; line-height: 1.15; }
+        .tlb-rank { font-weight: 800; text-align: center; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; color: #3a2410; }
+        .tlb-rank-1 .tlb-rank { background: linear-gradient(#ffe38a, #d9a325); color: #4a2a00; box-shadow: 0 0 0 2px #8a5a10; }
+        .tlb-rank-2 .tlb-rank { background: linear-gradient(#f2f2f2, #a9a9a9); color: #2a2a2a; box-shadow: 0 0 0 2px #6b6b6b; }
+        .tlb-rank-3 .tlb-rank { background: linear-gradient(#f0b27a, #a8612a); color: #3a1a00; box-shadow: 0 0 0 2px #6e3a12; }
         .tlb-player { display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .tlb-player > span:last-child { display: flex; flex-direction: column; min-width: 0; }
-        .tlb-player small { opacity: .75; }
-        .tlb-avatar { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 6px; overflow: hidden; background: #1d1a14; }
+        .tlb-player > span:last-child, .tlb-mate-txt { display: flex; flex-direction: column; min-width: 0; }
+        .tlb-player b { color: #2a1606; }
+        .tlb-player small, .tlb-mate small { color: #6b4520; font-weight: 600; font-size: .78em; }
+        .tlb-avatar { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 6px; overflow: hidden; background: #1d1a14; box-shadow: 0 0 0 2px #8a6a3a; }
         .tlb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .tlb-avatar-sm { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 5px; }
+        .tlb-team { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .tlb-mate { display: flex; align-items: center; gap: 6px; min-width: 0; }
+        .tlb-mate b { color: #2a1606; font-size: .82em; }
+        .tlb-mate small { font-size: .7em; }
+        .tlb-solo { color: #6b4520; font-style: italic; font-weight: 600; }
+        .tlb-num { font-weight: 800; color: #2a1606; font-variant-numeric: tabular-nums; }
         .tlb-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .stage-fade { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #000; opacity: 0; pointer-events: none; z-index: 8; }
         /* Critical slash light: a soft light source that lights up the scene around the monster */
@@ -2196,15 +2208,15 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="js/player.js?v=20261121qt"></script>
     <script src="js/audio.js?v=20261121i1"></script>
-    <script src="js/cloud.js?v=20261121ps"></script>
+    <script src="js/cloud.js?v=20261121lb"></script>
     <!-- hero-art.js holds the hero art as data URLs (948 KB); only file:// pages need it, web pages load the image files -->
     <script>if (location.protocol === 'file:') document.write('<script src="js/hero-art.js?v=20261118t"><\/script>');</script>
     <script src="js/hero-body.js?v=20261121lz"></script>
-    <script src="js/combat.js?v=20261121pp"></script>
+    <script src="js/combat.js?v=20261121lb"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261121cb"></script>
+    <script src="js/ui.js?v=20261121lb"></script>
     <script src="js/names-th.js?v=20261121of"></script>
-    <script src="js/i18n.js?v=20261121cb"></script>
+    <script src="js/i18n.js?v=20261121lb"></script>
     <script src="js/market.js?v=20261121mt"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>

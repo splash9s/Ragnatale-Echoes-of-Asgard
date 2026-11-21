@@ -183,6 +183,7 @@ function localGameName(text) {
 // Event and friend page text that is written in code (not in the dictionary above).
 // Matched on whole text pieces; the game re-renders these pages, so the observer translates again.
 const DOM_TH = {
+    'Player': 'ผู้เล่น', 'Team': 'ทีม', 'Floor': 'ชั้น', 'Best time': 'เวลาดีที่สุด', 'Solo': 'เดี่ยว', 'Leaderboard': 'อันดับ',
     'Armor': 'เกราะ', 'CRIT': 'คริติคอล', 'FLEE': 'หลบหลีก',
     'Block': 'บล็อก', 'Min': 'ขั้นต่ำ', 'Bid': 'ประมูล',
     'Place a Bid': 'ประมูลสินค้า', 'Confirm bid': 'ยืนยันการประมูล', 'Minimum bid:': 'ราคาประมูลขั้นต่ำ:',
@@ -329,6 +330,7 @@ function thHealText(s) {
 }
 
 const DOM_TH_PATTERNS = [
+    { re: /^Base Lv\. (\d+)$/, f: m => `เลเวลฐาน ${m[1]}` }, { re: /^Lv\. (\d+)$/, f: m => `เลเวล ${m[1]}` },
     // Market (auction house)
     { re: /^(.+?) · (\d+) bids? · (.+?) · ends in (.+)$/, f: m => `${m[1]} · ${m[2]} ครั้ง · ${marketLeadTh(m[3])} · สิ้นสุดใน ${thMarketTime(m[4])}` },
     { re: /^(.+?) · (\d+) bids? ·$/, f: m => `${m[1]} · ${m[2]} ครั้ง ·` },

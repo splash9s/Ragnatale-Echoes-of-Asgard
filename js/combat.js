@@ -599,9 +599,10 @@ function startExpedition(mode, opts = {}) {
         logMessage(`[Event] ${cfg.name}: entering ${activeMap.title}.`, 'winlose');
     } else if (mode === 'tower') {
         activeMap = buildTowerMap();
+        const towerTeamIds = (towerPendingIds || []).slice(); // friends who came, shown on the leaderboard
         setupTowerParty();
         towerTimerStart();
-        if (typeof startTowerRun === 'function') startTowerRun(); // the server keeps the leaderboard clock
+        if (typeof startTowerRun === 'function') startTowerRun(towerTeamIds); // the server keeps the leaderboard clock
         currentStage = 1;
         maxStages = TOWER_FLOORS;
         if (tagEl) tagEl.innerText = "Warded Tower";

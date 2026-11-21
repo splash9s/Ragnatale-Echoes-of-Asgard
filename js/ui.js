@@ -6674,13 +6674,19 @@ async function loadTowerLeaderboard() {
         box.innerHTML = '<p class="ev-status">No records yet. Clear a floor in the Warded Tower to appear here.</p>';
         return;
     }
-    box.innerHTML = `<div class="tlb-row tlb-head"><span>#</span><span>Player</span><span>Floor</span><span>Best time</span></div>`
+    const teamHTML = team => {
+        const list = Array.isArray(team) ? team : [];
+        if (!list.length) return '<span class="tlb-solo">Solo</span>';
+        return list.map(f => `<span class="tlb-mate"><span class="tlb-avatar tlb-avatar-sm">${friendAvatarHTML(f.avatar)}</span><span class="tlb-mate-txt"><b>${escapeHtml(f.name || 'Hero')}</b><small>Lv. ${Number(f.base_lv) || 1}</small></span></span>`).join('');
+    };
+    box.innerHTML = `<div class="tlb-row tlb-head"><span>#</span><span>Player</span><span>Team</span><span>Floor</span><span>Best time</span></div>`
         + res.rows.map(r => `
-        <div class="tlb-row">
+        <div class="tlb-row tlb-rank-${Number(r.rank)}">
             <span class="tlb-rank">${Number(r.rank)}</span>
             <span class="tlb-player"><span class="tlb-avatar">${friendAvatarHTML(r.avatar)}</span><span><b>${escapeHtml(r.name)}</b><small>Base Lv. ${Number(r.base_lv)}</small></span></span>
-            <span>${Number(r.floor)}</span>
-            <span>${formatTowerTime(Number(r.time_ms))}</span>
+            <span class="tlb-team">${teamHTML(r.team)}</span>
+            <span class="tlb-num">${Number(r.floor)}</span>
+            <span class="tlb-num">${formatTowerTime(Number(r.time_ms))}</span>
         </div>`).join('');
 }
 

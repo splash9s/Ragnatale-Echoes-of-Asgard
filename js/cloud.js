@@ -197,12 +197,14 @@ function cloudFlush() {
 // Each cleared floor is reported in order; the server checks it and records the time it measured itself.
 let towerRunPromise = null;            // resolves to the server's run id, or null when it cannot be used
 let towerReportChain = Promise.resolve(); // floor reports go one after another, in floor order
-function startTowerRun() {
+function startTowerRun(team) {
     towerReportChain = Promise.resolve();
     if (!cloudClient || !cloudUserId) { towerRunPromise = Promise.resolve(null); return; }
-    towerRunPromise = cloudClient.rpc('start_tower_run')
-        .then(({ data, error }) => { if (error) { console.warn('Tower run not started on the server:', error.message); return null; } return data; },
-              () => null);
+    const ids = (team || []).filter(Boolean).slice(0, 2);
+    const done = ({ data, error }) => { if (error) { console.warn('Tower run not started on the server:', error.message); return null; } return data; };
+    // With the team (supabase/tower_team.sql); falls back to the older no-team call when that is not installed
+    towerRunPromise = cloudClient.rpc('start_tower_run', { p_team: ids })
+        .then(res => res.error ? cloudClient.rpc('start_tower_run').then(done) : done(res), () => null);
 }
 function reportTowerFloor(floor) {
     const run = towerRunPromise;
