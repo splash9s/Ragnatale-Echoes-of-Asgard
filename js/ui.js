@@ -1166,6 +1166,9 @@ function petLick(el) {
     if (petDailyPlay(player.equipped && player.equipped.pet)) {
         spawnPetHeart(el.parentElement, parseFloat(el.style.left) + 50, parseFloat(el.style.top) - 20);
     }
+    // First pet of the day: after the lick, the pet shows what it found today (js/pet-finds.js)
+    const findPet = player.equipped && player.equipped.pet;
+    if (typeof petDailyFind === 'function') setTimeout(() => petDailyFind(findPet), 1600);
     el.dataset.licking = '1';
     playSfx(SFX.meow);
     const show = n => { el.src = `${PET_LICK_BASE}${n}_q85.webp`; };
@@ -8100,6 +8103,8 @@ function tentPetLick(w) {
     if (petDailyPlay(tentPetItem(w.token))) {
         spawnPetHeart(document.querySelector('#character-stage .ts-inner'), w.x, w.y - TENT_CAT.feetDy - 30);
     }
+    const findPet = tentPetItem(w.token); // first pet of the day: what it found today (js/pet-finds.js)
+    if (typeof petDailyFind === 'function') setTimeout(() => petDailyFind(findPet), 1600);
     const show = n => { w.lick.src = `assets/page01/cat/lick${n}_q85.webp`; };
     show(1);
     setTimeout(() => {

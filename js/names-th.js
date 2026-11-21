@@ -176,6 +176,7 @@ const NAMES_TH = {
     "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn.": 'ชุดนักดาบพเนจรพร้อมหมวกฟาง เปลี่ยนท่าต่อสู้ขณะสวมใส่',
     'Bent and broken metal pulled from old gear. Smelt 20 of them into an Ingot at the Blacksmith.': 'เศษโลหะบิดงอที่ดึงมาจากอุปกรณ์เก่า หลอม 20 ชิ้นเป็นแท่งเหล็กที่ช่างตี',
     'Salvaged metal. 20 make an Ingot.': 'โลหะที่แยกได้ 20 ชิ้นทำเป็นแท่งเหล็ก 1 แท่ง',
+    'Raw iron cooled from the forge. Refines gear from +1 to +4. Smelt 20 into a Bar.': 'เหล็กดิบที่เย็นตัวจากเตาหลอม ใช้ตีบวกอุปกรณ์ +1 ถึง +4 หลอม 20 ชิ้นได้แท่ง 1 ชิ้น',
     'Iron tempered until it rings. Refines gear from +5 to +7. Smelt 10 into an Alloy.': 'เหล็กที่ชุบจนกังวาน ปรับปรุงอุปกรณ์ +5 ถึง +7 หลอม 10 ชิ้นเป็นโลหะผสม',
     'A rare blend of metals that holds an edge forever. Refines gear from +8 to +10.': 'โลหะผสมหายากที่คมอยู่ตลอดไป ปรับปรุงอุปกรณ์ +8 ถึง +10',
     'Refine material for +1 to +4. 20 Ingots smelt into 1 Bar.': 'วัสดุปรับปรุงสำหรับ +1 ถึง +4 แท่งเหล็ก 20 แท่งหลอมเป็นแท่ง 1 แท่ง',
