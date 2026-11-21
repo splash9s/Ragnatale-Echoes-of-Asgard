@@ -173,13 +173,39 @@ async function bindGmail() {
     if (r.error && msg) msg.textContent = 'Gmail link failed: ' + r.error;
 }
 
+// Reset is only confirmed when the player types their exact player name
 function resetSaveGame() {
-    showGameConfirm("Reset Save", "Are you sure you want to reset all save data?", "Reset", () => {
+    const name = String((typeof player !== 'undefined' && player && player.name) || 'Hero').trim();
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : (x => x);
+    const html = `<div class="flex flex-col gap-3 text-left">
+        <p class="text-xs text-slate-200 whitespace-pre-line">This deletes all save data and cannot be undone.</p>
+        <p class="text-xs text-slate-200">Type your player name <b class="text-red-300">${esc(name)}</b> to confirm:</p>
+        <input id="reset-name-input" type="text" autocomplete="off" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-xs">
+        <div class="flex gap-2 justify-end">
+            <button onclick="closeModal()" class="px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-100 font-bold text-xs cursor-pointer">Cancel</button>
+            <button id="reset-yes" disabled class="px-3 py-2 rounded-xl bg-red-600 text-slate-100 font-bold text-xs cursor-not-allowed opacity-50">Reset</button>
+        </div></div>`;
+    showModal("Reset Save", '', html, null);
+    const input = document.getElementById('reset-name-input');
+    const yes = document.getElementById('reset-yes');
+    if (!input || !yes) return;
+    const matches = () => input.value.trim() === name;
+    input.oninput = () => {
+        const ok = matches();
+        yes.disabled = !ok;
+        yes.classList.toggle('opacity-50', !ok);
+        yes.classList.toggle('cursor-not-allowed', !ok);
+        yes.classList.toggle('cursor-pointer', ok);
+    };
+    yes.onclick = () => {
+        if (!matches()) return;
+        closeModal();
         localStorage.removeItem('ragnatale_save');
         localStorage.removeItem('ragnatale_save_at');
         const done = typeof cloudDeleteSave === 'function' ? cloudDeleteSave() : Promise.resolve();
         done.finally(() => location.reload());
-    });
+    };
+    input.focus();
 }
 
 // Unlock check for an avatar path. Custom uploads and unknown paths are always open.
