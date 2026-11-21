@@ -327,7 +327,7 @@ const DOM_TH_PATTERNS = [
     { re: /^Slot: (.+?) \| Success Rate: (.+)$/, f: m => `ช่อง: ${(typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1]]) || m[1]} | อัตราสำเร็จ: ${m[2]}` },
     { re: /^(.+) Elemental Stone: (\d+)$/, f: m => `${(typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1] + ' Elemental Stone']) || m[1]} หินธาตุ: ${m[2]}` },
     { re: /^(.+) x(\d+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[1]]) ? `${NAMES_TH[m[1]]} x${m[2]}` : m[0] },
-    { re: /^(Heavy|Light) (.+)$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${NAMES_TH[m[2]]} (${m[1] === 'Heavy' ? 'หนัก' : 'เบา'})` : m[0] },
+    { re: /^(Heavy|Light) (.+?)( \+\d+)?$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${NAMES_TH[m[2]]} (${m[1] === 'Heavy' ? 'หนัก' : 'เบา'})${m[3] || ''}` : m[0] },
     { re: /^Top up ([\d,]+) (diamonds|gold) for \$([\d.]+)\.$/, f: m => `เติม ${m[1]} ${m[2] === 'diamonds' ? 'เพชร' : 'ทอง'} ราคา $${m[3]}` },
     { re: /^(★ )?(.+?)( \+(\d+))?$/, f: m => (typeof NAMES_TH !== 'undefined' && NAMES_TH[m[2]]) ? `${m[1] || ''}${NAMES_TH[m[2]]}${m[3] || ''}` : m[0] },];
 
@@ -344,7 +344,9 @@ function translateDomIn(root) {
         if (!out) {
             for (const p of DOM_TH_PATTERNS) {
                 const m = t.match(p.re);
-                if (m) { out = p.f(m); break; }
+                if (!m) continue;
+                const o = p.f(m);
+                if (o && o !== t) { out = o; break; } // a pattern that leaves the text unchanged lets the next one try
             }
         }
         if (out && out !== t) n.nodeValue = n.nodeValue.replace(t, out);
