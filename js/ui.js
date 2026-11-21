@@ -6260,7 +6260,11 @@ function renderQuestsView() {
     player.dailyQuests.forEach((q, i) => {
         let pct = Math.min(100, Math.floor((q.current / q.target) * 100));
         // Refresh: a watched ad swaps this quest for another one; under every quest, off once it is finished
-        const refresh = `<button id="quest-reroll-${i}" onclick="rerollDailyQuest(${i})" ${q.completed ? 'disabled' : ''} style="color:#f8fafc;" class="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">${q.completed ? 'Completed' : '▶ Watch ad to refresh'}</button>`;
+        // Parchment colours so the text reads on the quest page (the game's dark button style does not)
+        const rerollStyle = q.completed
+            ? 'background:#cbb68a; color:#5a4628; border:2px solid #9c8254;'
+            : 'background:#f3e3bd; color:#3b2a14; border:2px solid #8a6a3a;';
+        const refresh = `<button id="quest-reroll-${i}" onclick="rerollDailyQuest(${i})" ${q.completed ? 'disabled' : ''} style="${rerollStyle} font-weight:700; font-size:12px; padding:6px 10px; border-radius:10px; width:100%; cursor:${q.completed ? 'not-allowed' : 'pointer'};">${q.completed ? 'Completed' : '▶ Watch ad to refresh'}</button>`;
         container.innerHTML += `
             <div class="flex flex-col gap-1.5">
             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col gap-1.5 text-xs">
@@ -6287,7 +6291,7 @@ function rerollDailyQuest(index) {
     let left = QUEST_AD_SECONDS;
     const showTimer = () => {
         const btn = document.getElementById('quest-reroll-' + index);
-        if (btn) { btn.disabled = true; btn.style.color = '#f8fafc'; btn.textContent = `Watching ad… ${left}s`; }
+        if (btn) { btn.disabled = true; btn.style.background = '#e9d6a6'; btn.style.color = '#3b2a14'; btn.textContent = `Watching ad… ${left}s`; }
     };
     showTimer();
     questAdTimer = setInterval(() => {
