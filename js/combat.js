@@ -2300,8 +2300,15 @@ function buildMapSummaryHTML(kind, returnLabel = 'Return to Expedition Gates', g
     const card = (title, value, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-center min-w-0"><div class="text-[10px] text-slate-500 uppercase">${title}</div><div class="text-sm font-bold font-mono truncate ${cls}">${value}</div></div>`;
     const section = (title, count, body, open = true) => `<details ${open ? 'open' : ''} class="bg-slate-950 border border-slate-800 rounded-xl p-3"><summary class="cursor-pointer text-xs font-bold text-slate-300 select-none">${title} <span class="text-slate-500">(${count})</span></summary><div class="mt-2 text-[11px] text-slate-300 flex flex-col gap-1">${body}</div></details>`;
     // Items as icons; a click opens the item's detail (the same detail menu as the inventory)
+    // Same plain items (materials, planks, potions) share one slot with a count; gear stays one slot per piece
+    const dropGroups = [], dropByKey = {};
+    s.items.forEach((i, idx) => {
+        const key = i.slot ? 'gear' + idx : 'name:' + i.name;
+        if (!dropByKey[key]) { dropByKey[key] = { item: i, idx, qty: 0 }; dropGroups.push(dropByKey[key]); }
+        dropByKey[key].qty += (i.qty || 1);
+    });
     const itemBody = s.items.length
-        ? `<div class="flex flex-wrap gap-2">${s.items.map((i, idx) => `<button onclick="showResultItemDetail(${idx})" title="${escapeHtml(i.name)}" class="cursor-pointer rounded-lg border border-slate-700 bg-slate-950 hover:border-amber-400 p-1" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;">${itemIconHTML(i, 50)}</button>`).join('')}</div>`
+        ? `<div class="flex flex-wrap gap-2">${dropGroups.map(g => `<button onclick="showResultItemDetail(${g.idx})" title="${escapeHtml(g.item.name)}" class="cursor-pointer rounded-lg border border-slate-700 bg-slate-950 hover:border-amber-400 p-1 relative" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;">${itemIconHTML(g.item, 50)}${g.qty > 1 ? `<span class="absolute bottom-0 right-1 text-[11px] font-bold text-amber-200">x${g.qty}</span>` : ''}</button>`).join('')}</div>`
         : '<div class="text-slate-500">No item dropped</div>';
     const runeBody = s.runes.length ? s.runes.map(r => `<div class="${(RARITY_INFO[r.rarity] || RARITY_INFO[1]).text}">${escapeHtml(r.text)}</div>`).join('') : '<div class="text-slate-500">No rune picked</div>';
     const logBody = s.log.length ? `<div class="max-h-48 overflow-y-auto font-mono text-[10px] flex flex-col gap-0.5">${s.log.map(l => `<div class="${logClassFor(l.type)}">${l.msg}</div>`).join('')}</div>` : '<div class="text-slate-500">No log</div>';
