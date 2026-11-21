@@ -183,6 +183,20 @@ function localGameName(text) {
 // Event and friend page text that is written in code (not in the dictionary above).
 // Matched on whole text pieces; the game re-renders these pages, so the observer translates again.
 const DOM_TH = {
+    'Armor': 'เกราะ', 'CRIT': 'คริติคอล', 'FLEE': 'หลบหลีก',
+    'Block': 'บล็อก', 'Min': 'ขั้นต่ำ', 'Bid': 'ประมูล',
+    'Place a Bid': 'ประมูลสินค้า', 'Confirm bid': 'ยืนยันการประมูล', 'Minimum bid:': 'ราคาประมูลขั้นต่ำ:',
+    'You lead': 'คุณนำอยู่', 'Your auction': 'การประมูลของคุณ', 'Leading': 'กำลังนำ',
+    'Selling': 'กำลังขาย', 'No bids yet': 'ยังไม่มีการเสนอราคา', 'No bids': 'ไม่มีการเสนอราคา',
+    'Open': 'เปิดอยู่', 'Sold': 'ขายแล้ว', 'Cancelled': 'ยกเลิกแล้ว',
+    'Cancel auction': 'ยกเลิกการประมูล', 'List for auction': 'ลงประมูล', 'Auction time': 'ระยะเวลาประมูล',
+    'Starting price (gold)': 'ราคาเริ่มต้น (ทอง)', 'Your selling items': 'ของที่กำลังขาย', 'You are not selling anything right now.': 'ตอนนี้ยังไม่มีของที่ขาย',
+    'You have no auctions.': 'คุณไม่มีการประมูล', 'You are not leading any auction.': 'คุณไม่ได้นำการประมูลใด', 'Items and gold from finished auctions arrive in your mailbox.': 'ของและทองจากการประมูลที่จบแล้วจะส่งไปที่กล่องจดหมาย',
+    'No gear in your bag to sell. Take off or move gear out of equipped slots first.': 'ไม่มีอุปกรณ์ในกระเป๋าให้ขาย ให้ถอดหรือย้ายอุปกรณ์ที่สวมอยู่ออกก่อน', 'No auctions in this category right now.': 'ตอนนี้ไม่มีการประมูลในหมวดนี้', 'Loading auctions...': 'กำลังโหลดการประมูล...',
+    'This is your own auction.': 'นี่คือการประมูลของคุณ', 'You already lead this auction.': 'คุณกำลังนำการประมูลนี้อยู่แล้ว', 'Enter a valid bid.': 'กรอกราคาประมูลที่ถูกต้อง',
+    'You do not have enough gold for this bid.': 'ทองของคุณไม่พอสำหรับการประมูลนี้', 'That item is no longer in your bag.': 'ของชิ้นนี้ไม่อยู่ในกระเป๋าแล้ว', 'Starting price must be 1 to 1,000,000,000 gold.': 'ราคาเริ่มต้นต้องอยู่ระหว่าง 1 ถึง 1,000,000,000 ทอง',
+    'The market needs a cloud save. Sign in first.': 'ตลาดต้องใช้เซฟบนคลาวด์ กรุณาเข้าสู่ระบบก่อน', 'Link your Gmail in Settings to use the market.': 'กรุณาเชื่อม Gmail ในการตั้งค่าก่อนใช้ตลาด', 'The market needs the cloud. Check your connection and try again.': 'ตลาดต้องใช้คลาวด์ กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง',
+    'The market is unavailable right now.': 'ตลาดใช้งานไม่ได้ในขณะนี้', '1 day': '1 วัน',
     'Stat': 'ค่าสถานะ', 'Rarity': 'ความหายาก', 'Element': 'ธาตุ', 'Sort': 'เรียงตาม',
     'Any stat': 'ทุกค่าสถานะ', 'Any rarity': 'ทุกระดับ', 'Uncommon+': 'อันคอมมอนขึ้นไป', 'Rare+': 'แรร์ขึ้นไป', 'Epic+': 'เอปิกขึ้นไป',
     'Any element': 'ทุกธาตุ', 'Usable at my level': 'ใช้ได้ที่เลเวลของฉัน', 'Ending soon': 'ใกล้หมดเวลา',
@@ -315,6 +329,16 @@ function thHealText(s) {
 }
 
 const DOM_TH_PATTERNS = [
+    // Market (auction house)
+    { re: /^(.+?) · (\d+) bids? · (.+?) · ends in (.+)$/, f: m => `${m[1]} · ${m[2]} ครั้ง · ${marketLeadTh(m[3])} · สิ้นสุดใน ${thMarketTime(m[4])}` },
+    { re: /^(.+?) · (\d+) bids? ·$/, f: m => `${m[1]} · ${m[2]} ครั้ง ·` },
+    { re: /^· ends in (.+)$/, f: m => `· สิ้นสุดใน ${thMarketTime(m[1])}` },
+    { re: /^Top bid: (.+)$/, f: m => `ราคาสูงสุด: ${m[1]}` },
+    { re: /^(·\s*)?Your gold: (.+)$/, f: m => `${m[1] || ''}ทองของคุณ: ${m[2]}` },
+    { re: /^The market opens at level (\d+)\.$/, f: m => `ตลาดเปิดที่เลเวล ${m[1]}` },
+    { re: /^You need (.+) gold for the listing fee\.$/, f: m => `คุณต้องมี ${m[1]} ทองสำหรับค่าลงประมูล` },
+    { re: /^(\d+) hours?$/, f: m => `${m[1]} ชั่วโมง` },
+    { re: /^Lv\. (\d+)(.*)$/, f: m => `เลเวล ${m[1]}${m[2]}` },
     { re: /^(.+)'s Guest Book$/, f: m => `สมุดเยี่ยมของ ${m[1]}` },
     { re: /^Restores (.+) · Qty (\d+)$/, f: m => `ฟื้นฟู ${thHealText(m[1])} · จำนวน ${m[2]}` },
     { re: /^(.+?) · (.+?) · Requires Lv (\d+)$/, f: m => `${thExactPart(m[1])} · ${thExactPart(m[2])} · ต้องการเลเวล ${m[3]}` },
@@ -387,6 +411,20 @@ function thExact(text) {
     return (typeof DOM_TH !== 'undefined' && DOM_TH[t]) || (typeof NAMES_TH !== 'undefined' && NAMES_TH[t]) || text;
 }
 
+// Who leads an auction: "No bids yet", "You lead" or "Top bid: name"
+function marketLeadTh(t) {
+    const top = t.match(/^Top bid: (.+)$/);
+    if (top) return `ราคาสูงสุด: ${top[1]}`;
+    if (t === 'You lead') return 'คุณนำอยู่';
+    return thExact(t);
+}
+// Market time left: "59m", "2h 5m", "ended"
+function thMarketTime(t) {
+    if (t === 'ended') return 'สิ้นสุดแล้ว';
+    const hm = t.match(/^(\d+)h (\d+)m$/); if (hm) return `${hm[1]} ชม. ${hm[2]} นาที`;
+    const m = t.match(/^(\d+)m$/); if (m) return `${m[1]} นาที`;
+    return t;
+}
 let domObserver = null;
 function startDomTranslation() {
     if (domObserver || typeof MutationObserver === 'undefined') return;
