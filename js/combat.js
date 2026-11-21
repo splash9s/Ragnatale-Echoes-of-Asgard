@@ -827,9 +827,34 @@ function supportedElemMult(mult, m) {
     return Math.max(0, 1 + (mult - 1) * 2);
 }
 
+// Black cover over the combat scene: mini boss and boss stages fade in from black and fade out to black
+function stageFadeSet(opacity, ms) {
+    const el = document.getElementById('stage-fade');
+    if (!el) return;
+    el.style.transition = `opacity ${ms}ms ease`;
+    el.style.opacity = String(opacity);
+}
+function stageFadeIn(ms = 900) {
+    const el = document.getElementById('stage-fade');
+    if (!el) return;
+    el.style.transition = 'none';
+    el.style.opacity = '1';
+    void el.offsetWidth; // apply the black frame before the fade starts
+    stageFadeSet(0, ms);
+}
+
 function spawnStageMonsters() {
     const stageEl = document.getElementById('combat-stage');
     if (stageEl) stageEl.classList.remove('final-stage');
+    // Vignette strength follows the stage: stronger on mini boss and boss stages
+    const bossLike = isBossStage();
+    const miniLike = !bossLike && isMiniBossStage();
+    if (stageEl) {
+        stageEl.classList.toggle('boss-stage', bossLike);
+        stageEl.classList.toggle('mini-stage', miniLike);
+    }
+    if (bossLike || miniLike) stageFadeIn();
+    else stageFadeSet(0, 400); // ordinary stage: clear any black left from the stage before
     // A new stage starts: fold the Max HP gained last stage into the carried bonus,
     // so later gains are a % of the Max HP at this stage's start
     player.mhpCarry = (player.mhpCarry || 1) * (1 + stageMaxHpAdd());
@@ -2013,6 +2038,7 @@ function onStageCleared() {
     logMessage(`[Stage Cleared] Stage ${currentStage} completed!`, 'drop');
     const sid = combatSessionId;
     const wasBossStage = isBossStage(); // read before the stage number moves on
+    const wasFadeStage = wasBossStage || isMiniBossStage(); // mini boss and boss stages fade out to black when cleared
 
     // A boss stays on screen for its damaged and death animations (BOSS_DEATH_STAY_MS); the stage waits for that
     // Every dead monster, the last one included, plays its death animation before the stage ends
@@ -2020,6 +2046,7 @@ function onStageCleared() {
         ? Math.max(t, (x._deathAt || Date.now()) + monsterDeathTotalMs(x) - Date.now()) : t, 0);
     setTimeout(() => {
         if (sid !== combatSessionId) return; // player left combat before the stage ended
+        if (wasFadeStage) stageFadeSet(1, 700);
         const proceedNext = () => {
             if (sid !== combatSessionId) return;
             stageClearing = false;
