@@ -1119,7 +1119,7 @@ const PET_SPRITES = {
     'Orange Stray Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     'Orange Cat': { src: 'assets/combat/ocat/ocat1_q85.webp', w: 100, h: 90, fx: 50, fy: 90 },
     // Midnight Stray Cat: sits on the main page like the orange cat (shop cat sitting frame)
-    'Midnight Stray Cat': { src: 'assets/cha/page/blackcat/cat_3_q85.webp', w: 120, h: 83, fx: 60, fy: 83 },
+    'Midnight Stray Cat': { src: 'assets/cha/page/blackcat/cat_3_q85.webp', w: 139, h: 96, fx: 70, fy: 96 },
 };
 // Midnight Stray Cat art: walk = bc1-4 at 400 ms per frame; click = the shopkeeper's black cat (6, 4, 6, angry sound, 10 s cooldown)
 const MIDNIGHT_PET_NAME = 'Midnight Stray Cat';
@@ -8162,7 +8162,8 @@ function placeTentPet(w) {
         const src = w.art ? w.art.walk(w.frame + 1) : `assets/page01/cat/c${w.frame + 1}_q85.webp`;
         if (w.cat.dataset.frame !== src) { w.cat.src = src; w.cat.dataset.frame = src; }
     }
-    w.cat.style.transform = `translate(${w.x - TENT_CAT.w / 2}px, ${w.y - TENT_CAT.feetDy}px) scaleX(${w.flip})`;
+    const cw = (w.art && w.state === 'lick') ? 174 : TENT_CAT.w; // the angry click art is narrower
+    w.cat.style.transform = `translate(${w.x - cw / 2}px, ${w.y - TENT_CAT.feetDy}px) scaleX(${w.flip})`;
     w.shadow.style.transform = `translate(${w.x - TENT_CAT.shadowW / 2}px, ${w.y - TENT_CAT.shadowH / 2}px)`;
     if (w.state === 'lick') w.lick.style.transform = `translate(${w.x - 67}px, ${w.y - 120}px)`;
     w.label.style.left = w.x + 'px';
@@ -8198,9 +8199,9 @@ function tentPetLick(w) {
         }
         const findPet = tentPetItem(w.token);
         if (typeof petDailyFind === 'function') setTimeout(() => petDailyFind(findPet), 1600);
-        w.cat.style.height = '134px'; // the click art is taller than the walk art
+        w.cat.style.width = '174px'; w.cat.style.height = '121px'; // angry click art: 10% smaller than the walk size
         midnightClickPlay(n => { w.cat.src = MIDNIGHT_ART.click(n); w.cat.dataset.frame = ''; }, () => {
-            w.cat.style.height = ''; w.cat.dataset.frame = '';
+            w.cat.style.width = ''; w.cat.style.height = ''; w.cat.dataset.frame = '';
             w.state = 'idle'; w.idleLeft = tentPetIdleTime();
         });
         return;
