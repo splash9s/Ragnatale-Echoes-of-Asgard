@@ -6966,7 +6966,7 @@ function renderLibraryRules() {
                 <li><span class="text-lime-300">Rock</span>: cannot attack or dodge for 2 seconds, and takes the earth element.</li>
                 <li><span class="text-yellow-400">Stun</span>: cannot attack for 2 seconds (from the Stun Touch, Ranged Stun and Stun Burst runes).</li>
                 <li><span class="text-orange-400">Ignite</span> and <span class="text-lime-400">Poison</span>: damage over time while afflicted.</li>
-                <li><span class="text-amber-300">Boss</span>: about 25% stronger, uses special skills, enrages in later turns.</li>
+                <li><span class="text-amber-300">Boss</span>: 1.75x HP and 2.4x ATK on the level curve. Skills: Enrage (below 35% HP, +50% ATK), Heavy Strike (every 4th attack, x2 damage), Regeneration (1.5% HP per turn).</li>
                 <li><span class="text-amber-200">Mini Boss</span>: appears on stage 7 of campaign and event maps (after the 3rd rune), has 3x HP.</li>
             </ul>
         </div>
@@ -6985,8 +6985,7 @@ function renderLibraryRules() {
                 <tr class="border-b border-slate-800"><td class="py-1">Silver Chest</td><td>3-5 Medium Healing Potion + 1 armory item (Rarity 3 or 4, 50/50)</td></tr>
                 <tr><td class="py-1">Gold Chest</td><td>3-5 Large Healing Potion + 2 armory items (Rarity 3, 4 or 5, equal chance)</td></tr>
             </table>
-            <p class="text-[10px] text-slate-500 mt-2">Gold shop: Copper 1000, Silver 4000, Gold 8000 Gold. Diamond shop: Copper 1, Silver 3, Gold 5 Diamond.</p>
-        </div>`;
+                    </div>`;
 }
 
 // Character page: stats window slides in from the left edge / minimizes to the left tab
