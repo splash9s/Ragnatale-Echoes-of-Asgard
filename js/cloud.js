@@ -18,6 +18,15 @@ function cloudInitClient() {
     return cloudClient;
 }
 
+// Purchase success popup: the artwork has the title and thank-you line; the amount sits in its red box
+function showPurchaseSuccess(d, g) {
+    const amount = d > 0 ? `+${d.toLocaleString()} Diamonds` : `+${g.toLocaleString()} Gold`;
+    showModal('', '', `<div class="tpu-wrap" style="position:relative; width:min(92vw, 560px); aspect-ratio:982 / 674; margin:0 auto; container-type:inline-size; background:url(assets/diamond/purchase_success_q85.webp) center / 100% 100% no-repeat;">
+        <div style="position:absolute; left:33.6%; top:70.9%; width:33.1%; height:10.1%; display:flex; align-items:center; justify-content:center; color:#4ade80; font-weight:900; font-size:clamp(11px, 3.3cqw, 22px); white-space:nowrap; text-shadow:0 0 3px #000, 0 2px 3px #000;">${amount}</div>
+        <button onclick="closeModal()" aria-label="OK" style="position:absolute; left:36.1%; top:82.5%; width:27.5%; height:12.5%; background:transparent; border:0; cursor:pointer;"></button>
+    </div>`);
+}
+
 // Adds diamonds from Stripe top-ups the server has recorded for this player. Each top-up is claimed once.
 async function claimDiamondTopups() {
     if (!cloudClient || typeof player === 'undefined') return 0;
@@ -33,7 +42,11 @@ async function claimDiamondTopups() {
             if (g !== 0) player.gold = Math.max(0, (player.gold || 0) + g);
             saveGame();
             const parts = [d !== 0 ? `${Math.abs(d).toLocaleString()} diamonds` : '', g !== 0 ? `${Math.abs(g).toLocaleString()} gold` : ''].filter(Boolean).join(' and ');
-            showModal(d < 0 || g < 0 ? 'Refund applied' : 'Top-up added', `${parts} ${parts.indexOf(' and ') >= 0 ? 'were' : 'was'} ${d < 0 || g < 0 ? 'removed for a refund' : 'added to your account'}.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
+            if (d < 0 || g < 0) {
+                showModal('Refund applied', `${parts} were removed for a refund.`, '<div style="text-align:center; margin-top:8px;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:72px;height:72px;object-fit:contain;"></div>');
+            } else {
+                showPurchaseSuccess(d, g);
+            }
         }
         return n;
     } catch (e) {
