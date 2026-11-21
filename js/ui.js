@@ -3090,8 +3090,8 @@ function chestDropRatesHTML(chestType) {
         else rows.push('Costumes: coming soon');
     }
     if (cfg.pet) {
-        const n = PET_BOX_POOL.length;
-        if (n) PET_BOX_POOL.forEach(c => rows.push(`${escapeHtml(c.name)}: ${(100 / n).toFixed(1)}%`));
+        const total = PET_BOX_POOL.reduce((a, c) => a + (c.weight || 1), 0);
+        if (PET_BOX_POOL.length) PET_BOX_POOL.forEach(c => rows.push(`${escapeHtml(c.name)}: ${((c.weight || 1) / total * 100).toFixed(2).replace(/\.?0+$/, '')}%`));
         else rows.push('Pets: coming soon');
     }
     if (cfg.items) {
@@ -4550,6 +4550,9 @@ function itemSourceLines(item) {
     } else if (item.slot && item.levelReq) {
         const sh = itemShopLabel(item); if (sh) lines.push(sh);
         lines.push('Drop from monster');
+    } else if (item.slot === 'pet') {
+        const sh = itemShopLabel(item); if (sh) lines.push(sh);
+        lines.push('Pet Chest');
     } else {
         const sh = itemShopLabel(item); if (sh) lines.push(sh);
     }
@@ -4652,10 +4655,10 @@ function showItemDetail(index, refresh = false) {
         icon: itemIconHTML(item, 80),
         source: itemSourceHTML(item),
         name: title,
-        meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
-        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : '',
+        meta: `${kind} · ${rarity ? rarity.name : ''}${isEquip && item.slot !== 'pet' ? ` · Requires Lv ${item.levelReq || 1}` : ''}`,
+        stats: isPotion ? `<span>Restores ${potionHealText(item)} · Qty ${item.qty || 1}</span>` : (item.slot === 'pet' ? ddStatRows(item.stats) : ''),
         compare: isEquip && !NO_GEAR_SLOTS.includes(item.slot) ? compareHTML(item, equippedForCompare(item)) : '',
-        lore: !isEquip ? (item.lore || item.desc || '') : '',
+        lore: (!isEquip || item.slot === 'pet') ? (item.lore || item.desc || '') : '',
         price: canSell ? `Sells for <b>${getSellPrice(item)} Gold</b>` : '',
         primary, secondary
     });
@@ -6116,7 +6119,7 @@ function openChest(chestType) {
     }
 
     if (cfg.pet && PET_BOX_POOL.length) {
-        const pet = { ...PET_BOX_POOL[Math.floor(Math.random() * PET_BOX_POOL.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
+        const pet = { ...pickWeighted(PET_BOX_POOL), qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
         addItemToInventory(pet);
         rewardCells.push(rewardCellHTML(pet));
     }
@@ -6921,8 +6924,8 @@ function toggleEquippedFavorite(slot) {
 
 // Boxes: a random reward from the box's pool. A costume box with no costumes yet stays unopened.
 const PET_BOX_POOL = [
-    { name: "Orange Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp', desc: "ATK +2%, HP +100" },
-    { name: "Midnight Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 120, atkPct: 3 }, icon: 'assets/pet/blackcat/icon_q85.webp?v=2', desc: "ATK +3%, HP +120" },
+    { name: "Orange Stray Cat", type: 'pet', slot: 'pet', weight: 70, stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp', desc: "ATK +2%, HP +100" },
+    { name: "Midnight Stray Cat", type: 'pet', slot: 'pet', weight: 30, stats: { hp: 120, atkPct: 3 }, icon: 'assets/pet/blackcat/icon_q85.webp?v=2', desc: "ATK +3%, HP +120" },
 ];
 const COSTUME_BOX_POOL = [
     { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
@@ -6943,7 +6946,7 @@ function openBoxNow(boxType, title) {
     const pool = boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
     if (!pool.length) { floatFailAt('Costumes are coming soon'); return false; }
     const tenth = takeChestOpenIsTenth();
-    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
+    const reward = { ...pickWeighted(pool), qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     if (countFreeCapacity(reward) < 1) { floatFailAt("Inventory is full!"); return false; }
     placeItemInInventory(reward);
     floatSuccessAt(`You got ${reward.name}!`);
@@ -6957,7 +6960,7 @@ function openBoxFromDetail(index) {
     const pool = item.boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
     if (!pool.length) { floatFailAt('Costumes are coming soon'); return; }
     const tenth = takeChestOpenIsTenth();
-    const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
+    const reward = { ...pickWeighted(pool), qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     // A box that is the last one frees its own slot; a stack needs room for the reward
     if ((item.qty || 1) > 1 && countFreeCapacity(reward) < 1) { floatFailAt("Inventory is full!"); return; }
     closeInvDetail();
