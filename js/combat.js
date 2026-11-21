@@ -287,6 +287,7 @@ const RUNE_DEFS = {
     thorn: { name: "Briar Thorn Rune", rarity: 1, add: 10, desc: "Reflect 10% of melee damage", text: v => `Reflect ${v}% of melee damage` },
     critHeal: { name: "Critical Heal Rune", rarity: 2, add: 5, desc: "Crit restores 5% HP", text: v => `Crit restores ${v}% HP` },
     lifeline: { name: "Lifeline Rune", rarity: 4, add: 20, once: true, desc: "First hit each battle restores 20% Max HP", text: v => `First hit each battle restores ${v}% Max HP` },
+    armorFirstHit: { name: "Ironclad Opening Rune", rarity: 2, add: 20, once: true, desc: "First hit each battle restores 20% armor", text: v => `First hit each battle restores ${v}% armor` },
     fortify: { name: "Iron Vow Rune", rarity: 2, add: 5, once: true, desc: "Every 3rd attack restores 5% armor", text: v => `Every 3rd attack restores ${v}% armor` },
     evasion: { name: "Ghostly Reflex Rune", rarity: 2, add: 5, desc: "Dodge restores 5% HP", text: v => `Dodge restores ${v}% HP` },
     alwaysCritFirst: { name: "Assassination Rune", rarity: 3, flag: true, desc: "First hit each battle is a crit", text: () => "First hit each battle is a crit" },
@@ -296,7 +297,6 @@ const RUNE_DEFS = {
     instantKill: { name: "Death Whisper Rune", rarity: 2, flag: true, desc: "1% chance to instantly kill a normal monster", text: () => "1% chance to instantly kill a normal monster" },
     divineLight: { name: "Divine Light Rune", rarity: 3, add: 100, once: true, desc: "Every 3rd attack: +100% damage", text: v => `Every 3rd attack: +${v}% damage` },
     momentum: { name: "Crit Storm Rune", rarity: 2, add: 20, once: true, desc: "3 crits in a row restore 20% HP", text: v => `3 crits in a row restore ${v}% HP` },
-    retribution: { name: "Retribution Rune", rarity: 3, add: 5, once: true, desc: "Heals hit a random enemy for 5% of the heal", text: v => `Heals hit a random enemy for ${v}% of the heal` },
     killBlast: { name: "Shockwave Rune", rarity: 4, add: 20, once: true, desc: "Kill: 20% ATK damage to all other enemies", text: v => `Kill: ${v}% ATK damage to all other enemies` },
     elementIgnore: { name: "Void Rune", rarity: 5, flag: true, desc: "Ignore enemy elements", text: () => "Ignore enemy elements" },
     armorStance: { name: "Iron Stance Rune", rarity: 2, flag: true, desc: "While armor is above 0: +20% damage", text: () => "While armor is above 0: +20% damage" },
@@ -317,7 +317,6 @@ const RUNE_DEFS = {
     glassCannon: { name: "Glass Cannon Rune", rarity: 2, add: 10, once: true, desc: "Max armor 0, +10% crit chance", text: v => `Max armor 0, +${v}% crit chance` },
     runeScholar: { name: "Scholar Rune", rarity: 1, flag: true, desc: "+5% Max HP per rune picked (from Max HP at stage start)", text: () => "+5% Max HP per rune picked (from Max HP at stage start)" },
     runeMastery: { name: "Mastery Rune", rarity: 3, flag: true, desc: "+20% damage for each rune you own", text: () => "+20% damage for each rune you own" },
-    powerSurge: { name: "Power Surge Rune", rarity: 3, add: 50, once: true, disabled: true, desc: "+50% of your ATK at the moment you pick it, added to every hit", text: v => `+${v}% of your ATK at the moment you pick it, added to every hit`, onApply: () => { player.runes.powerSurgeBase = getDerivedStats().atk; } },
     giantSlayer: { name: "Giant Slayer Rune", rarity: 3, add: 25, once: true, desc: "+25% damage vs bosses and mini-bosses", text: v => `+${v}% damage vs bosses and mini-bosses` },
     monsterHunter: { name: "Monster Hunter Rune", rarity: 2, add: 50, once: true, desc: "+50% damage vs normal monsters", text: v => `+${v}% damage vs normal monsters` },
     ironFortress: { name: "Iron Fortress Rune", rarity: 5, flag: true, desc: "While armor is above 0: 3x damage", text: () => "While armor is above 0: 3x damage" },
@@ -1422,18 +1421,6 @@ function healPlayer(amount, source) {
     }
     if (gained <= 0) return;
     logMessage(`[Heal] ${source} restores ${gained} HP`, 'drop');
-    triggerRetribution(gained, source);
-}
-
-// Retribution: every heal strikes a random monster for the rune's damage
-function triggerRetribution(amount, source) {
-    const dmg = Math.floor((amount || 0) * runeN('retribution') / 100);
-    if (dmg <= 0) return;
-    const alive = getAliveMonsters();
-    if (alive.length === 0) return;
-    const target = alive[Math.floor(Math.random() * alive.length)];
-    target.hp -= dmg;
-    logMessage(`[Retribution] ${source} heal strikes ${target.name} for ${dmg} damage`, 'drop');
 }
 
 // Called after a heal made outside the combat tick (manual potion)
@@ -1442,8 +1429,6 @@ function checkStageClearAfterHeal() {
     updateUI();
     if (monstersList.length > 0 && getAliveMonsters().length === 0) onStageCleared();
 }
-
-// Called by manual potion use: Retribution rune strikes a random monster
 
 
 // Tank hits: 10% chance to stun the player for at least 2 seconds. Shorter with VIT, and no stun at VIT 70.
@@ -1882,10 +1867,14 @@ function runCombatTick() {
         if (elemMult !== 1 && !player.runes.elementIgnore) {
             logMessage(`[Element] ${elemMult > 1 ? 'Advantage' : 'Resisted'} x${elemMult} vs ${targetEnemy.name}`, elemMult > 1 ? 'drop' : 'combat');
         }
+        if (isFirstHitOfBattle && runeN('armorFirstHit') > 0) {
+            const gainArmor = Math.floor(derived.maxArmor * runeN('armorFirstHit') / 100);
+            player.armor = Math.min(derived.maxArmor, player.armor + gainArmor);
+            logMessage(`[Ironclad] First hit restores ${gainArmor} armor`, 'drop');
+        }
         let pDmg = Math.floor((derived.atk + bonusDmg) * elemMult);
         if (Date.now() < playerDebuffs.curseUntil) pDmg = Math.floor(pDmg * 0.8);
         if (targetEnemy.armor) pDmg = Math.floor(pDmg * (1 - targetEnemy.armor / 100));
-        if (runeN('powerSurge') > 0) pDmg += Math.floor(runeN('powerSurgeBase') * runeN('powerSurge') / 100); // from the damage when picked
         if (targetEnemy.isBoss || targetEnemy.isMiniBoss) pDmg = Math.floor(pDmg * (1 + skillBonus('bossDmgPct') / 100));
         if (targetEnemy.iceShieldReady) {
             pDmg = Math.floor(pDmg * 0.8);
