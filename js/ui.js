@@ -127,7 +127,7 @@ function toggleLanguage() {
 function manualSaveGame() {
     saveGame();
     if (typeof cloudFlush === 'function') cloudFlush();
-    showModal("Notice", "Your game progress has been successfully saved!");
+    floatSuccessAt("Progress saved!");
 }
 
 // Settings: guest players see Bind Gmail; players already linked see their Gmail as read-only
@@ -2609,7 +2609,7 @@ function buyGoldConsumable(itemId) {
     const max = Math.min(MAX_STACK, byGold, byRoom);
     if (max < 1) {
         if (byGold < 1) floatNoticeAt("Not enough Gold", window.event);
-        else showModal("Purchase Failed", "Inventory is full!");
+        else floatFailAt("Inventory is full!");
         return;
     }
     const btn = 'px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-200 font-bold cursor-pointer';
@@ -2653,7 +2653,7 @@ function buyGoldConsumableQty(item, qty) {
         return;
     }
     if (!placeItemInInventory({ ...item, qty })) {
-        showModal("Purchase Failed", "Inventory is full!");
+        floatFailAt("Inventory is full!");
         return;
     }
 
@@ -2754,7 +2754,7 @@ function buyArmoryItem(itemIndex) {
     if (!Array.isArray(player.inventory)) player.inventory = new Array(BAG_MAX_SLOTS).fill(null);
     let emptyIdx = player.inventory.findIndex(s => s === null);
     if (emptyIdx === -1) {
-        showModal("Purchase Failed", "Inventory is full!");
+        floatFailAt("Inventory is full!");
         return;
     }
 
@@ -3121,19 +3121,19 @@ function buyDiamondItem(itemId) {
         return;
     }
     if (item.type === 'bag' && bagSlotCount() >= BAG_MAX_SLOTS) {
-        showModal("Bag Full Size", "Your bag is already at its maximum size.");
+        floatFailAt("Bag is already at maximum size");
         return;
     }
     if (item.type === 'box' && countFreeCapacity({ name: item.name, type: 'box', qty: 1 }) < 1) {
-        showModal("Purchase Failed", "Inventory is full!");
+        floatFailAt("Inventory is full!");
         return;
     }
     if (item.type === 'costume' && countFreeCapacity({ name: item.name, type: 'costume', qty: 1 }) < 1) {
-        showModal("Purchase Failed", "Inventory is full!");
+        floatFailAt("Inventory is full!");
         return;
     }
     if (item.type === 'chest' && countFreeCapacity({ name: item.name, type: 'chest', qty: 1 }) < 1) {
-        showModal("Purchase Failed", "Inventory is full!");
+        floatFailAt("Inventory is full!");
         return;
     }
 
@@ -3157,7 +3157,7 @@ function buyDiamondItem(itemId) {
         let totalSpent = (player.stats.str - 1) + (player.stats.agi - 1) + (player.stats.vit - 1) + (player.stats.int - 1) + (player.stats.dex - 1) + (player.stats.luk - 1);
         player.statPoints += totalSpent;
         player.stats = { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 };
-        showModal("Stat Reset Successful", `Attributes reset and ${totalSpent} Stat Points refunded!`);
+        floatSuccessAt(`Stats reset! ${totalSpent} Stat Points refunded`);
     } else if (item.type === 'skill_reset') {
         let refunded = 0;
         for (let key in player.skills) {
@@ -3165,10 +3165,10 @@ function buyDiamondItem(itemId) {
             player.skills[key].level = 0;
         }
         player.jobSp += refunded;
-        showModal("Skill Reset Successful", `All skills reset and ${refunded} Class SP refunded!`);
+        floatSuccessAt(`Skills reset! ${refunded} Class SP refunded`);
     } else if (item.type === 'bag') {
         player.bagExpansions = (player.bagExpansions || 0) + 1;
-        showModal("Bag Expanded", `Your bag now has ${bagSlotCount()} slots.`);
+        floatSuccessAt(`Bag now has ${bagSlotCount()} slots`);
     } else if (item.type === 'box') {
         openBoxNow(item.boxType, item.name); // opens at once, nothing goes to the bag
     } else if (item.type === 'costume') {
@@ -3180,10 +3180,10 @@ function buyDiamondItem(itemId) {
     } else if (item.type === 'vip') {
         player.vipUntil = Date.now() + item.days * 24 * 60 * 60 * 1000;
         grantVipDailyMail();
-        showModal("VIP Activated", `${item.name} active. Check your mailbox for today's Resurrection Potion.`);
+        floatSuccessAt(`${item.name} active! Check mail for today's potion`);
     } else if (item.type === 'boost') {
         startBoost(item.boost, item.ms);
-        showModal("Boost Active", `${item.name} started. It lasts ${item.ms / (60 * 60 * 1000)} hours from now.`);
+        floatSuccessAt(`${item.name} started (${item.ms / (60 * 60 * 1000)} h)`);
     } else if (item.type === 'estone') {
         if (!player.elementStones) player.elementStones = { fire: 0, wind: 0, earth: 0, water: 0 };
         player.elementStones[item.element] = (player.elementStones[item.element] || 0) + 1;
@@ -3750,7 +3750,7 @@ function smeltMaterial(tier) {
     const target = REFINE_MATERIAL_ITEMS[tier];
     if (!r || !target) return;
     const have = r.input === SCRAP_ITEM.name ? getScrapCount() : countItemByName(r.input);
-    if (have < r.cost) { showModal("Smelting Failed", `You need ${r.cost} ${r.input} to smelt 1 ${target.name}.`); return; }
+    if (have < r.cost) { floatFailAt(`Need ${r.cost} ${r.input} to smelt`); return; }
     const inputTpl = r.input === SCRAP_ITEM.name ? SCRAP_ITEM : REFINE_MATERIAL_ITEMS[tier - 1];
     if (r.input === SCRAP_ITEM.name) removeScraps(r.cost); else removeItemByName(r.input, r.cost);
     if (!placeItemInInventory({ ...target, qty: 1 })) {
@@ -3761,7 +3761,7 @@ function smeltMaterial(tier) {
     logMessage(`[Forge] Smelted 1 ${target.name} from ${r.label}.`, 'levelup');
     updateQuestProgress(/Alloy/i.test(target.name) ? 'alloy' : (/Bar/i.test(target.name) ? 'bar' : 'ingot'), 1);
     // Smelting success: just the word "Smelted" in green bold, with a Confirm button
-    showModal('', '', `<div style="color:#86efac; font-weight:900; font-size:22px; text-align:center; padding:14px 0 10px; text-shadow:0 1px 3px #000;">Smelted</div><button onclick="closeModal()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Confirm</button>`);
+    floatSuccessAt("Smelted");
     updateUI();
     renderRefiningUI();
     saveGame();
@@ -5567,7 +5567,7 @@ async function claimMail(mailId) {
     for (const [id, q] of potionRewards) {
         const template = GOLD_SHOP_CONSUMABLES.find(i => i.id === id && i.type === 'potion');
         if (template && countFreeCapacity(template) < q) {
-            showModal('Inventory Full', 'Make room in your bag to claim this mail.');
+            floatFailAt('Inventory is full!');
             return;
         }
     }
@@ -5587,12 +5587,12 @@ async function claimMail(mailId) {
     // Build the gear first: if it cannot be made, the mail stays unclaimed
     const gear = mail.rewards.gear ? makeMailGear(mail.rewards.gear.slot, mail.rewards.gear.lv) : null;
     if (mail.rewards.gear && !gear) {
-        showModal('Mail Error', 'This gear reward cannot be created. The mail is kept.');
+        floatFailAt('Gear reward cannot be created');
         return;
     }
     const bossHelm = mail.rewards.bossHelm ? makeBossHelmItem(mail.rewards.bossHelm) : null;
     if (mail.rewards.bossHelm && !bossHelm) {
-        showModal('Mail Error', 'This boss helm reward cannot be created. The mail is kept.');
+        floatFailAt('Boss helm reward cannot be created');
         return;
     }
     // Auction items (market mail) are full gear objects; each one needs a free bag slot
@@ -5600,7 +5600,7 @@ async function claimMail(mailId) {
     const freeSlots = Array.isArray(player.inventory) ? openInventory().filter(s => s === null).length : 0;
     const slotsNeeded = (gear ? 1 : 0) + (bossHelm ? 1 : 0) + marketItems.length + (mail.rewards.planks ? 1 : 0) + (mail.rewards.refineOre ? 1 : 0);
     if (slotsNeeded > 0 && freeSlots < slotsNeeded) {
-        showModal('Inventory Full', 'Make room in your bag to claim this mail.');
+        floatFailAt('Inventory is full!');
         return;
     }
 
@@ -5719,7 +5719,7 @@ async function sendFeedback() {
     try {
         const { error } = await cloudClient.from('feedback').insert({ player_name: (player && player.name) || '', message: msg.slice(0, 1000) });
         if (error) throw error;
-        showModal('Thank you', 'Your feedback was sent.');
+        floatSuccessAt('Feedback sent. Thank you!');
     } catch (e) {
         console.warn('Feedback failed:', e);
         if (status) status.textContent = 'Could not send. Please try again later.';
@@ -6817,7 +6817,7 @@ function openBoxNow(boxType, title) {
     if (!pool.length) { showModal(title || "Box", "Costumes are coming soon."); return false; }
     const tenth = takeChestOpenIsTenth();
     const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
-    if (countFreeCapacity(reward) < 1) { showModal("Inventory Full", "Make room in your bag first."); return false; }
+    if (countFreeCapacity(reward) < 1) { floatFailAt("Inventory is full!"); return false; }
     placeItemInInventory(reward);
     showModal(title || "Box", `You got ${reward.name}!`);
     updateUI();
@@ -6832,7 +6832,7 @@ function openBoxFromDetail(index) {
     const tenth = takeChestOpenIsTenth();
     const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     // A box that is the last one frees its own slot; a stack needs room for the reward
-    if ((item.qty || 1) > 1 && countFreeCapacity(reward) < 1) { showModal("Inventory Full", "Make room in your bag first."); return; }
+    if ((item.qty || 1) > 1 && countFreeCapacity(reward) < 1) { floatFailAt("Inventory is full!"); return; }
     closeInvDetail();
     if ((item.qty || 1) > 1) item.qty--;
     else player.inventory[index] = null;
