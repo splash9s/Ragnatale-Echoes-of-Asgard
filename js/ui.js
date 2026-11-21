@@ -3051,7 +3051,8 @@ function chestDropRatesHTML(chestType) {
     const rows = [];
     if (cfg.costume) {
         const n = COSTUME_BOX_POOL.length;
-        if (n) COSTUME_BOX_POOL.forEach(c => rows.push(`${escapeHtml(c.name)}: ${(100 / n).toFixed(1)}%`));
+        const total = COSTUME_BOX_POOL.reduce((a, c) => a + (c.weight || 1), 0);
+        if (n) COSTUME_BOX_POOL.forEach(c => rows.push(`${escapeHtml(c.name)}: ${((c.weight || 1) / total * 100).toFixed(2).replace(/\.?0+$/, '')}%`));
         else rows.push('Costumes: coming soon');
     }
     if (cfg.pet) {
@@ -6074,7 +6075,7 @@ function openChest(chestType) {
     }
 
     if (cfg.costume && COSTUME_BOX_POOL.length) {
-        const costume = { ...COSTUME_BOX_POOL[Math.floor(Math.random() * COSTUME_BOX_POOL.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
+        const costume = { ...pickWeighted(COSTUME_BOX_POOL), qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
         addItemToInventory(costume);
         rewardCells.push(rewardCellHTML(costume));
     }
@@ -6888,12 +6889,19 @@ const PET_BOX_POOL = [
     { name: "Orange Stray Cat", type: 'pet', slot: 'pet', stats: { hp: 100, atkPct: 2 }, icon: 'assets/shop/diamond/ocatpet_q85.webp', desc: "ATK +2%, HP +100" },
 ];
 const COSTUME_BOX_POOL = [
-    { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
-    { name: "Blue Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'blue_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/blue_samurai/icon_v1_q85.webp', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn." },
-    { name: "Red Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'red_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/red_samurai/icon_v1_q85.webp', desc: "A red-armoured samurai outfit. Replaces your battle poses while worn." },
-    { name: "Yellow Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'yellow_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/yellow_samurai/icon_v1_q85.webp', desc: "A yellow-armoured samurai outfit. Replaces your battle poses while worn." },
-    { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
+    { name: "Christmas Costume", type: 'costume', slot: 'costume', costumeId: 'christmas', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/christmas/icon_q85.webp', desc: "Festive Santa outfit. Replaces your battle poses while worn." },
+    { name: "Blue Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'blue_samurai', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/blue_samurai/icon_v1_q85.webp', desc: "A blue-armoured samurai outfit. Replaces your battle poses while worn." },
+    { name: "Red Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'red_samurai', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/red_samurai/icon_v1_q85.webp', desc: "A red-armoured samurai outfit. Replaces your battle poses while worn." },
+    { name: "Yellow Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'yellow_samurai', weight: 23.75, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/yellow_samurai/icon_v1_q85.webp', desc: "A yellow-armoured samurai outfit. Replaces your battle poses while worn." },
+    { name: "Wanderer Samurai Costume", type: 'costume', slot: 'costume', costumeId: 'wanderer_samurai', weight: 5, levelReq: 1, refineLevel: 0, rarity: 1, stats: {}, buffs: [], setName: null, icon: 'assets/costume/wanderer_samurai/icon_v2_q85.webp', desc: "A wandering swordsman's outfit under a straw hat. Replaces your battle poses while worn." },
 ];
+// Weighted random pick from a pool (an entry with no weight counts as 1)
+function pickWeighted(pool) {
+    const total = pool.reduce((a, c) => a + (c.weight || 1), 0);
+    let r = Math.random() * total;
+    for (const c of pool) { r -= (c.weight || 1); if (r < 0) return c; }
+    return pool[pool.length - 1];
+}
 // Opens a box at once: a random reward from its pool goes into the bag
 function openBoxNow(boxType, title) {
     const pool = boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
