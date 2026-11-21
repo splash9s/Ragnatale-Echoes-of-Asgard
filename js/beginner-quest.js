@@ -92,7 +92,7 @@ function claimBeginnerQuest() {
         type: 'chest', chestType: step.chest, desc: '', qty: 1
     });
     if (!placed) {
-        if (typeof showModal === 'function') showModal('Bag Full', 'Make room in your bag, then claim the reward.');
+        if (typeof floatFailAt === 'function') floatFailAt('Bag is full! Make room first');
         return;
     }
     st.index += 1;

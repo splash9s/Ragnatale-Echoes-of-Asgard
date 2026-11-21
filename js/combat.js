@@ -531,7 +531,7 @@ function startExpedition(mode, opts = {}) {
     window.combatMapKey = mode === 'campaign' ? (opts.final ? 'final' : (document.getElementById('campaign-map-select')?.value || 'campaign')) : mode;
     if (mode === 'campaign' && typeof guideIntroDone === 'function') guideIntroDone(); // first campaign run ends the intro guide
     if (mode === 'campaign' && opts.final && !isFinalMapUnlocked()) {
-        showModal("World-Eater", "Locked.");
+        floatFailAt("Locked");
         return;
     }
     if (mode === 'campaign' && !opts.final) {
@@ -540,16 +540,16 @@ function startExpedition(mode, opts = {}) {
         const [cpk, cmk] = mapKey.split(':');
         const mapObj = (typeof GAME_DATA !== 'undefined' && GAME_DATA.paths && GAME_DATA.paths[cpk]) ? GAME_DATA.paths[cpk].maps[cmk] : null;
         if (!mapObj) {
-            showModal("Map Error", "Map data is not loaded. Check that monsters.js and maps.js are included in index.html.");
+            floatFailAt("Map data is not loaded");
             return;
         }
         if (!isMapUnlocked(mapKey)) {
-            showModal("Map Locked", "Clear the previous map first to unlock this expedition!");
+            floatFailAt("Clear the previous map first");
             return;
         }
     }
     if ((mode === 'daily' || mode === 'event') && typeof GAME_DATA === 'undefined') {
-        showModal("Map Error", "Map data is not loaded. Check that monsters.js and maps.js are included in index.html.");
+        floatFailAt("Map data is not loaded");
         return;
     }
 
@@ -2507,18 +2507,18 @@ let towerPendingIds = null;   // the two friends' user ids, in pick order
 // Starts a Warded Tower run with two friends. One attempt per day.
 async function startTower(friendIds, order) {
     if (!eventCanPlay('tower')) {
-        showModal("Warded Tower", "Already entered today. One attempt per day.");
+        floatFailAt("Already entered today");
         return;
     }
     const ids = friendIds || []; // zero, one or two friends (going alone is allowed)
-    if (ids.length > 2) { showModal("Warded Tower", "Choose up to 2 friends to join your party."); return; }
+    if (ids.length > 2) { floatFailAt("Choose up to 2 friends"); return; }
     if (ids.some(id => towerFriendCooldownLeft(id) > 0)) {
-        showModal("Warded Tower", "A chosen friend is still resting. Each friend can join again 3 days after their last run.");
+        floatFailAt("A chosen friend is resting (3 days after a run)");
         return;
     }
     const res = await Promise.all(ids.map(id => friendApi.visitTent(id)));
     const bad = res.find(r => !r.data);
-    if (bad) { showModal("Warded Tower", bad.error || "Could not load your friends' tents."); return; }
+    if (bad) { floatFailAt(bad.error || "Could not load your friends' tents"); return; }
     towerPendingAllies = res.map(r => towerAllyFromSnapshot(r.data)); // empty when going alone
     towerPendingOrder = Array.isArray(order) && order.length >= 1 ? order.slice() : null;
     towerPendingIds = ids.slice();
@@ -2904,7 +2904,7 @@ function buildEventMap(kind, mapKey) {
 function startEvent(kind, mapKey) {
     if (kind === 'daily') {
         if (!eventCanPlay('daily')) {
-            showModal("Daily Challenge", getEventState().dailyCleared ? "Already cleared today. Come back tomorrow." : `No plays left today (${EVENT_LIMIT} per day).`);
+            floatFailAt(getEventState().dailyCleared ? "Already cleared today" : `No plays left today (${EVENT_LIMIT} per day)`);
             return;
         }
         getEventState().plays.daily++;
@@ -2913,7 +2913,7 @@ function startEvent(kind, mapKey) {
         return;
     }
     if (!eventCanPlay(kind)) {
-        showModal(EVENT_CONFIG[kind].name, `No plays left today (${EVENT_LIMIT} per day).`);
+        floatFailAt(`No plays left today (${EVENT_LIMIT} per day)`);
         return;
     }
     getEventState().plays[kind]++;

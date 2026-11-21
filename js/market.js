@@ -153,9 +153,9 @@ let marketBuyBlock = null;
 function marketRowClick(id) {
     const r = marketBuyRows[id];
     if (!r) return;
-    if (marketBuyBlock) { showModal('Market', marketBuyBlock); return; }
-    if (r.is_mine) { showModal('Market', 'This is your own auction.'); return; }
-    if (r.i_lead) { showModal('Market', 'You already lead this auction.'); return; }
+    if (marketBuyBlock) { floatFailAt(marketBuyBlock); return; }
+    if (r.is_mine) { floatFailAt('This is your own auction.'); return; }
+    if (r.i_lead) { floatFailAt('You already lead this auction.'); return; }
     marketBidPrompt(id, Number(r.current_price), r.bid_count);
 }
 
@@ -177,12 +177,12 @@ function marketBidPrompt(id, price, bidCount) {
 async function marketConfirmBid(id) {
     if (marketBusy) return;
     const amount = Math.floor(Number(document.getElementById('market-bid-amount')?.value) || 0);
-    if (amount < 1 || amount > MARKET_MAX_GOLD) { showModal('Market', 'Enter a valid bid.'); return; }
-    if (amount > (player.gold || 0)) { showModal('Market', 'You do not have enough gold for this bid.'); return; }
+    if (amount < 1 || amount > MARKET_MAX_GOLD) { floatFailAt('Enter a valid bid.'); return; }
+    if (amount > (player.gold || 0)) { floatFailAt('You do not have enough gold for this bid.'); return; }
     marketBusy = true;
     const res = await marketRpc('auction_bid', { p_id: id, p_amount: amount });
     marketBusy = false;
-    if (res.error) { showModal('Market', res.error); return; }
+    if (res.error) { floatFailAt(res.error); return; }
     player.gold -= amount;
     saveGame();
     updateUI();
@@ -252,15 +252,15 @@ function marketSellPreview() {
 async function marketConfirmList() {
     if (marketBusy) return;
     const msg = await marketAccessMessage();
-    if (msg) { showModal('Market', msg); return; }
+    if (msg) { floatFailAt(msg); return; }
     const idx = Number(document.getElementById('market-sell-item')?.value);
     const item = player.inventory && player.inventory[idx];
-    if (!item || !marketCategoryOf(item)) { showModal('Market', 'That item is no longer in your bag.'); renderMarket(); return; }
+    if (!item || !marketCategoryOf(item)) { floatFailAt('That item is no longer in your bag.'); renderMarket(); return; }
     const start = Math.floor(Number(document.getElementById('market-sell-start')?.value) || 0);
     const hours = Number(document.getElementById('market-sell-hours')?.value) || 6;
-    if (start < 1 || start > MARKET_MAX_GOLD) { showModal('Market', 'Starting price must be 1 to 1,000,000,000 gold.'); return; }
+    if (start < 1 || start > MARKET_MAX_GOLD) { floatFailAt('Starting price must be 1 to 1,000,000,000 gold.'); return; }
     const fee = marketFeeOf(start);
-    if (fee > (player.gold || 0)) { showModal('Market', `You need ${fee.toLocaleString()} gold for the listing fee.`); return; }
+    if (fee > (player.gold || 0)) { floatFailAt(`You need ${fee.toLocaleString()} gold for the listing fee.`); return; }
 
     marketBusy = true;
     const copy = JSON.parse(JSON.stringify(item));
@@ -269,7 +269,7 @@ async function marketConfirmList() {
     marketBusy = false;
     if (res.error) {
         player.inventory[idx] = item; // the listing did not happen: the item goes back
-        showModal('Market', res.error);
+        floatFailAt(res.error);
         updateUI();
         return;
     }
@@ -314,7 +314,7 @@ async function marketCancel(id) {
     marketBusy = true;
     const res = await marketRpc('auction_cancel', { p_id: id });
     marketBusy = false;
-    if (res.error) { showModal('Market', res.error); return; }
+    if (res.error) { floatFailAt(res.error); return; }
     logMessage('[Market] Auction cancelled. The item is in your mailbox.', 'drop');
     if (typeof syncServerMail === 'function') syncServerMail();
     renderMarket();

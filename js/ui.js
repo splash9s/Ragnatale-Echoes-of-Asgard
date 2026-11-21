@@ -395,13 +395,13 @@ async function startGameWithName() {
 
         // Names that sound like staff are reserved for the game team
         if (nameInput && isReservedPlayerName(nameInput)) {
-            showModal('Name not allowed', `"${nameInput}" is reserved. Choose a different name.`);
+            floatFailAt(`"${nameInput}" is reserved. Choose a different name.`);
             return;
         }
 
         // Player names are unique: a name another player uses is refused and the name window stays open
         if (nameInput && await cloudNameTaken(nameInput)) {
-            showModal('Name taken', `"${nameInput}" is already used by another player. Choose a different name.`);
+            floatFailAt(`"${nameInput}" is already taken. Choose a different name.`);
             return;
         }
 
@@ -2330,19 +2330,8 @@ function claimDailyFree(key) {
     if (item.reward.gold) player.gold += item.reward.gold;
     if (item.reward.diamonds) player.diamonds += item.reward.diamonds;
     logMessage(`[Free] Received ${item.name}!`, 'levelup');
-    // The free diamond shows green bold text instead of the item box
-    const claimedText = key === 'diamond'
-        ? `<div style="color:#4ade80; font-weight:bold; font-size:26px; padding:18px 0;">Claimed ${item.reward.diamonds} Diamond</div>`
-        : rewardCellHTML(item);
-    const claimedHTML = key === 'diamond'
-        ? `<div class="flex flex-col items-center gap-3 text-center">
-        <div class="text-slate-300 text-sm">You received:</div>
-        ${claimedText}
-        <div class="text-slate-400 text-xs">Come back tomorrow for another.</div>
-        <button onclick="closeModal()" class="w-full mt-2 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl">Confirm</button>
-    </div>`
-        : rewardPopupHTML('You received:', claimedText, '<div class="text-slate-400 text-xs">Come back tomorrow for another.</div>');
-    showModal("Free Reward", '', claimedHTML);
+    // Floating green text, like a shop purchase: "+20 Diamonds" or "+3,000 Gold"
+    floatSuccessAt(item.reward.diamonds ? `+${item.reward.diamonds.toLocaleString()} Diamonds` : `+${(item.reward.gold || 0).toLocaleString()} Gold`);
     updateUI();
     renderShop();
     renderDiamondShop();
@@ -2458,9 +2447,10 @@ function floatFailAt(text, ev) {
     ev = ev || window.event;
     let x = window.innerWidth / 2, y = window.innerHeight / 2;
     if (ev && (ev.clientX || ev.clientY)) { x = ev.clientX; y = ev.clientY; }
+    const half = Math.min(window.innerWidth * 0.45, 280); x = Math.min(Math.max(x, half), window.innerWidth - half); // long text stays on screen
     const el = document.createElement('div');
     el.textContent = text;
-    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#f87171; font-weight:800; font-size:22px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform 1.8s ease-out 0.4s, opacity 0.6s ease-in 1.4s;`;
+    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#f87171; font-weight:800; font-size:22px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:normal; width:max-content; max-width:min(90vw, 560px); text-align:center; transition:transform 1.8s ease-out 0.4s, opacity 0.6s ease-in 1.4s;`;
     document.body.appendChild(el);
     requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-220%)'; el.style.opacity = '0'; }));
     setTimeout(() => el.remove(), 2200);
@@ -2469,9 +2459,10 @@ function floatSuccessAt(text, ev) {
     ev = ev || window.event;
     let x = window.innerWidth / 2, y = window.innerHeight / 2;
     if (ev && (ev.clientX || ev.clientY)) { x = ev.clientX; y = ev.clientY; }
+    const half = Math.min(window.innerWidth * 0.45, 280); x = Math.min(Math.max(x, half), window.innerWidth - half); // long text stays on screen
     const el = document.createElement('div');
     el.textContent = text;
-    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#86efac; font-weight:800; font-size:22px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:nowrap; transition:transform 1.8s ease-out 0.4s, opacity 0.6s ease-in 1.4s;`;
+    el.style.cssText = `position:fixed; left:${x}px; top:${y}px; transform:translate(-50%,-50%); color:#86efac; font-weight:800; font-size:22px; text-shadow:0 2px 4px #000; pointer-events:none; z-index:9999; white-space:normal; width:max-content; max-width:min(90vw, 560px); text-align:center; transition:transform 1.8s ease-out 0.4s, opacity 0.6s ease-in 1.4s;`;
     document.body.appendChild(el);
     requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = 'translate(-50%,-220%)'; el.style.opacity = '0'; }));
     setTimeout(() => el.remove(), 2200);
@@ -3118,14 +3109,14 @@ function buyDiamondItem(itemId) {
     if (!item) return;
     if (item.type === 'topup') { openDiamondTopUp(item); return; }
     if (item.type === 'vip' && isVipActive()) {
-        showModal("VIP Active", `You already have a VIP Pass until ${new Date(player.vipUntil).toLocaleDateString()}. You can buy another after it expires.`);
+        floatFailAt(`VIP active until ${new Date(player.vipUntil).toLocaleDateString()}`);
         return;
     }
 
     const cost = dsPrice(item);
     if (item.ticket) {
         if (countItemByName(item.ticket.name) < item.ticket.qty) {
-            showModal("Not Enough Tickets", `You need ${item.ticket.qty} ${item.ticket.name}s to buy this.`);
+            floatFailAt(`Need ${item.ticket.qty} ${item.ticket.name}s`);
             return;
         }
     } else if (player.diamonds < cost) {
@@ -3319,7 +3310,7 @@ function transferConfirm() {
     if (from.slot !== to.slot) { showFloatNotice('Only gear of the same type can share refinement.'); return; }
     if (transferLevel(from) <= transferLevel(to)) { showFloatNotice('Refinement only moves to lower-refined gear.'); return; }
     if ((player.blacksmithRuneStones || 0) < REFINE_TRANSFER_COST) {
-        showModal('No Rune Stone', 'Inherit needs 1 Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.');
+        floatFailAt('Need 1 Blacksmith Rune Stone (Diamond shop)');
         return;
     }
     const fromName = transferPlainName(from), toName = transferPlainName(to);
@@ -3391,7 +3382,7 @@ function blacksmithToggleRune() {
     if (blacksmithMode !== 'refine') return; // elemental and transfer modes use this slot for display only
     if (!player.blacksmithRuneEquipped) {
         if ((player.blacksmithRuneStones || 0) < 1) {
-            showModal("No Rune Stone", "You have no Blacksmith Rune Stone. Buy one in the Diamond shop for 5 Diamonds.");
+            floatFailAt('Need 1 Blacksmith Rune Stone (Diamond shop)');
             return;
         }
         player.blacksmithRuneStones -= 1;
@@ -4704,8 +4695,8 @@ function useInventoryPotion(index) {
 // Opens the Stripe payment link. client_reference_id carries the player's Supabase user ID so the webhook knows who to credit.
 function openDiamondTopUp(item) {
     const uid = typeof cloudUserId !== 'undefined' ? cloudUserId : null;
-    if (!item.payLink) { showModal("Coming soon", "This diamond pack is not available yet."); return; }
-    if (!uid) { showModal("Sign in needed", "Sign in with Google before you top up diamonds."); return; }
+    if (!item.payLink) { floatFailAt('This pack is not available yet'); return; }
+    if (!uid) { floatFailAt('Sign in with Google to top up'); return; }
     const ref = uid + (item.creditTag ? '|' + item.creditTag : ''); // '|gold' tells the webhook to credit gold, not diamonds
     const url = item.payLink + '?client_reference_id=' + encodeURIComponent(ref);
     window.open(url, '_blank', 'noopener');
@@ -4844,7 +4835,7 @@ function executeEquipItem(index, targetSlot) {
     let item = player.inventory[index];
     if (!item) return false;
     if (player.baseLv < (item.levelReq || 1)) {
-        showModal("Cannot Equip", `This gear requires Base Level ${item.levelReq || 1}. Your Base Level is ${player.baseLv}.`);
+        floatFailAt(`Requires Base Lv ${item.levelReq || 1}`);
         return false;
     }
     const slotKey = targetSlot || (item.slot === 'ring' ? (!player.equipped.ringLeft ? 'ringLeft' : (!player.equipped.ringRight ? 'ringRight' : 'ringLeft')) : item.slot);
@@ -5602,7 +5593,7 @@ async function claimMail(mailId) {
         const res = await claimServerMail(mail.serverId);
         mailClaimBusy.delete(mailId);
         if (res.error) {
-            showModal('Mail Error', res.error + ' The mail is kept.');
+            floatFailAt(res.error);
             return;
         }
         mail.rewards = res.rewards;
@@ -5821,7 +5812,7 @@ function deleteMail(mailId) {
     if (!mail) return;
     // Server mail stays on the server until it is claimed, so deleting it first would bring it back on the next sync
     if (mail.serverId && !mail.claimed) {
-        showModal(tr('mail.title'), tr('mail.claimfirst'));
+        floatFailAt(tr('mail.claimfirst'));
         return;
     }
     const remove = () => {
@@ -6839,12 +6830,12 @@ const COSTUME_BOX_POOL = [
 // Opens a box at once: a random reward from its pool goes into the bag
 function openBoxNow(boxType, title) {
     const pool = boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
-    if (!pool.length) { showModal(title || "Box", "Costumes are coming soon."); return false; }
+    if (!pool.length) { floatFailAt('Costumes are coming soon'); return false; }
     const tenth = takeChestOpenIsTenth();
     const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     if (countFreeCapacity(reward) < 1) { floatFailAt("Inventory is full!"); return false; }
     placeItemInInventory(reward);
-    showModal(title || "Box", `You got ${reward.name}!`);
+    floatSuccessAt(`You got ${reward.name}!`);
     updateUI();
     saveGame();
     return true;
@@ -6853,7 +6844,7 @@ function openBoxFromDetail(index) {
     const item = player.inventory[index];
     if (!item || item.type !== 'box') return;
     const pool = item.boxType === 'costume' ? COSTUME_BOX_POOL : PET_BOX_POOL;
-    if (!pool.length) { showModal("Costume Box", "Costumes are coming soon. The box is kept."); return; }
+    if (!pool.length) { floatFailAt('Costumes are coming soon'); return; }
     const tenth = takeChestOpenIsTenth();
     const reward = { ...pool[Math.floor(Math.random() * pool.length)], qty: 1, rarity: tenth ? 2 : boxRarityRoll() };
     // A box that is the last one frees its own slot; a stack needs room for the reward
@@ -6862,7 +6853,7 @@ function openBoxFromDetail(index) {
     if ((item.qty || 1) > 1) item.qty--;
     else player.inventory[index] = null;
     placeItemInInventory(reward);
-    showModal(item.name, `You got ${reward.name}!`);
+    floatSuccessAt(`You got ${reward.name}!`);
     updateUI();
     saveGame();
 }
