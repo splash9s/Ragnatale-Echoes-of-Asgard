@@ -1165,7 +1165,7 @@ function placePetImg(el, spec, feetX, feetY) {
     el.style.height = spec.h + 'px';
     el.style.left = (feetX - spec.fx) + 'px';
     el.style.top = (feetY - spec.fy) + 'px';
-    el.style.transform = spec.flip ? 'scaleX(-1)' : ''; // Midnight Stray Cat faces the other way
+    el.style.scale = spec.flip ? '-1 1' : ''; // Midnight Stray Cat faces the other way (separate from the idle bob transform)
 }
 function syncPetSprite() {
     const spec = petSpriteOf();
