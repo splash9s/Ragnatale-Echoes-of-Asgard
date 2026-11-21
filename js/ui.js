@@ -6129,7 +6129,7 @@ function openChest(chestType) {
 
 // Chest opening animation for copper, silver and gold (total 3.0 s each). Frame 2 holds with a shake; the final frame gets a light burst.
 // Chest art version: bump when the chest pictures are re-cut so browsers do not show old frames
-const CHEST_ART_VER = '20261116c';
+const CHEST_ART_VER = '20261121b';
 function chestFrames(type) {
     return [
         { src: `assets/chest/${type}/${type}c0_q85.webp?v=${CHEST_ART_VER}`, ms: 500 },
