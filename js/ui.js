@@ -6723,9 +6723,6 @@ const EVENT_MENU = [
     { key: 'daily',    label: 'Daily Challenge', banner: 'assets/events/banner_daily_q85.webp' },
     { key: 'gold',     label: 'Gold Frenzy',     banner: 'assets/events/banner_gold_q85.webp' },
     { key: 'xp',       label: 'Wisdom Trail',    banner: 'assets/events/banner_xp_q85.webp' },
-    { key: 'endless',  label: 'Void Tower',      banner: null },
-    { key: 'voidtest', label: 'Void Test Map',   banner: null },
-    { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
 ];
 const eventMapPick = { gold: null, xp: null };
 
