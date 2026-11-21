@@ -2066,7 +2066,6 @@ function onStageCleared() {
         ? Math.max(t, (x._deathAt || Date.now()) + monsterDeathTotalMs(x) - Date.now()) : t, 0);
     setTimeout(() => {
         if (sid !== combatSessionId) return; // player left combat before the stage ended
-        if (wasFadeStage) stageFadeSet(1, 700);
         const proceedNext = () => {
             if (sid !== combatSessionId) return;
             stageClearing = false;
@@ -2144,7 +2143,7 @@ function onStageCleared() {
             }
 
             // Layers and positions swap first; the stage's monsters and ticks start after that
-            changeEarthLayers().then(() => {
+            const enterNextStage = () => changeEarthLayers().then(() => {
                 if (sid !== combatSessionId) return; // left combat while the next stage loaded
                 // Mini boss and boss stages fade in from black; monsters and timers start once the black is gone
                 if (isBossStage() || isMiniBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
@@ -2154,6 +2153,14 @@ function onStageCleared() {
                     spawnStageMonsters();
                 });
             });
+            // Leaving a mini boss or boss stage: fade to black as the player moves on (not at the clear,
+            // so the Next Stage button and the rewards stay visible while they wait)
+            if (wasFadeStage) {
+                stageFadeSet(1, 500);
+                setTimeout(() => { if (sid === combatSessionId) enterNextStage(); }, 550);
+            } else {
+                enterNextStage();
+            }
         };
 
         const continueRun = () => {
