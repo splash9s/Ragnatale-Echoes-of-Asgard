@@ -5857,6 +5857,7 @@ function openSendMailForm() {
     const field = 'px-2 py-1 bg-slate-950 border border-slate-700 rounded text-slate-100 w-full';
     showModal('Send Mail', '', `
         <div class="flex flex-col gap-2 text-left text-sm">
+            <label>Send to (blank = my mailbox; or a player name / ID) <input id="mail-to" placeholder="Blank = me" class="${field}"></label>
             <label>Title <input id="mail-title" value="Test Mail" class="${field}"></label>
             <label>Sender <input id="mail-sender" value="Game Master" class="${field}"></label>
             <label>Message <textarea id="mail-message" rows="2" class="${field}">A gift for you.</textarea></label>
@@ -5879,7 +5880,7 @@ function openSendMailForm() {
         </div>`);
 }
 
-function sendPlayerMail() {
+async function sendPlayerMail() {
     const val = id => document.getElementById(id)?.value ?? '';
     const num = id => Math.max(0, Math.floor(Number(val(id)) || 0));
     const rewards = {};
@@ -5891,6 +5892,19 @@ function sendPlayerMail() {
     if (num('mail-class-lv')) rewards.classLv = num('mail-class-lv');
     if (val('mail-gear-slot') && val('mail-gear-lv')) rewards.gear = { slot: val('mail-gear-slot'), lv: Number(val('mail-gear-lv')) };
     if (val('mail-boss-helm')) rewards.bossHelm = Number(val('mail-boss-helm'));
+    // A name or ID in "Send to" goes to that player's server mailbox
+    const to = val('mail-to').trim();
+    if (to) {
+        if (!cloudClient || !cloudUserId) { showFloatNotice('Sign in to send mail to a player.'); return; }
+        const { data, error } = await cloudClient.rpc('admin_send_mail', {
+            p_to: to, p_title: val('mail-title').trim() || 'Mail', p_sender: val('mail-sender').trim() || 'System',
+            p_message: val('mail-message'), p_rewards: rewards
+        });
+        if (error) { showFloatNotice(error.message || 'Could not send mail.'); return; }
+        closeModal();
+        logMessage(`[Mail] Sent a mail to ${data || to}`, 'drop');
+        return;
+    }
     if (!player.mailBox || player.mailBox.length === 0) player.mailBox = createWelcomeMail();
     player.mailBox.unshift({
         id: Date.now(),
