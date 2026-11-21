@@ -2571,9 +2571,11 @@ function towerSetSixMonsters() {
     const pool = lv10 ? lv10.enemies : activeMap.enemies;
     // Floors 2+: regular monsters use the level 1 curve, times the floor factor
     const lvl = lv10 ? lv10.levelReq : 1;
-    // Boss: the boss curve from level 1 (floor 2) up to level 99 (floor 21), spread evenly over the boss floors
+    // Boss: the boss curve, spread evenly over the boss floors within the difficulty's range
+    // (Normal 1-30, Hard 40-70, Hell 80-99; see TOWER_DIFFS in js/tower-page.js)
     const bossIdx = Math.max(0, TOWER_BOSS_FLOORS.indexOf(currentStage));
-    const bossLvl = Math.round(1 + bossIdx * 98 / (TOWER_BOSS_FLOORS.length - 1));
+    const [bossLo, bossHi] = ((typeof TOWER_DIFFS !== 'undefined' && TOWER_DIFFS[towerRunDiff()]) || {}).bossLv || [1, 99];
+    const bossLvl = Math.round(bossLo + bossIdx * (bossHi - bossLo) / (TOWER_BOSS_FLOORS.length - 1));
     const plan = isBossStage()
         ? ['front', 'front', 'boss', 'back', 'healer', 'healer']
         : ['front', 'front', 'front', 'back', 'back', 'back'];

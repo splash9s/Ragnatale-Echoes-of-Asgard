@@ -11,9 +11,10 @@
 // Hard unlocks after clearing every floor on Normal; Hell after clearing every floor on Hard.
 // Only Normal runs go to the leaderboard.
 const TOWER_DIFFS = {
-    normal: { label: 'Normal', monster: 1, reward: 1, needs: null },
-    hard:   { label: 'Hard',   monster: 2, reward: 2, needs: 'normal' },
-    hell:   { label: 'Hell',   monster: 4, reward: 3, needs: 'hard' },
+    // bossLv: the level of the first and last boss floor (the boss floors are spread evenly between them)
+    normal: { label: 'Normal', monster: 1, reward: 1, needs: null,     bossLv: [1, 30] },
+    hard:   { label: 'Hard',   monster: 2, reward: 2, needs: 'normal', bossLv: [40, 70] },
+    hell:   { label: 'Hell',   monster: 4, reward: 3, needs: 'hard',   bossLv: [80, 99] },
 };
 let towerDifficulty = 'normal';  // the difficulty chosen on the Tower page (used when the run starts)
 let towerPageTab = 'friend';     // left panel: 'friend' or 'leaderboard'
