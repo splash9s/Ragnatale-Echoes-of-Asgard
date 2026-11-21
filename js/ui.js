@@ -4108,6 +4108,7 @@ const ITEM_ICON_RULES = [
     [/Pet Box/, 'assets/shop/diamond/silverchest.png'],
     [/Costume Box/, 'assets/shop/diamond/copperchest.png'],
     [/Orange (Stray )?Cat( Pet)?|Support Slime Pet/, 'assets/shop/diamond/ocatpet_q85.webp'],
+    [/Midnight Stray Cat/, 'assets/pet/blackcat/icon_q85.webp'],
     [/Minor Healing Potion/, 'potion_minor'],
     [/Medium Healing Potion/, 'potion_med'],
     [/Large Healing Potion/, 'potion_large'],
