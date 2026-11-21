@@ -2145,6 +2145,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function switchView(viewName) {
+    if (typeof guideWalkClear === 'function') guideWalkClear(); // leaving a page ends the guide walkthrough
     if (typeof trackFeature === 'function' && FEATURE_BY_VIEW[viewName]) trackFeature(FEATURE_BY_VIEW[viewName]);
     if (viewName !== 'character' && typeof closePuzzlePanel === 'function') closePuzzlePanel(); // leaving the tent closes the puzzle
     if (viewName !== 'combat') restoreAfterCombat();
@@ -4160,7 +4161,7 @@ function elemIconText(item) {
 
 // Inventory picture: gear by slot, consumables by type
 const ITEM_SLOT_EMOJI = { weapon: '⚔️', shield: '🛡️', armor: '🥋', garment: '🧣', footgear: '👢', hat: '🎩', ring: '💍', pet: '🐾' };
-const ITEM_TYPE_EMOJI = { potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
+const ITEM_TYPE_EMOJI = { guide: '📖', potion: '🧪', chest: '🎁', material: '🪨', pet: '🐾', resurrection: '✨', vip: '👑', service: '🛠️', skill_reset: '📜' };
 // Inventory icons (PNG, transparent) for consumables and materials; other items keep the emoji
 const ITEM_ICON_RULES = [
     [/Pet Box/, 'assets/shop/diamond/silverchest.png'],
@@ -7386,6 +7387,59 @@ function stashTake(i) {
     openStash();
 }
 
+// ---- Guide book (granted once at level 30, kept in the stash): walks the player from the main page to the stash ----
+const GUIDE_ITEM = { name: 'Guide', type: 'guide', maxStack: 1, price: 0, desc: 'A step-by-step walkthrough, starting from the main page.', lore: 'Notes for a new adventurer: where to go next, and where your stash is.' };
+const GUIDE_WALK = [
+    { view: 'town', sel: '#view-town [data-action="character"]', text: 'Start here: tap the Character button to open your tent.' },
+    { view: 'character', sel: '#view-character .inv-top-btns button[title="Stash"]', text: 'Tap the Stash icon at the top right of your bag to open your stash.' }
+];
+let guideWalkStep = -1, guideWalkTarget = null, guideWalkHandler = null;
+function guideWalkClear() {
+    document.getElementById('guide-walk-overlay')?.remove();
+    document.getElementById('guide-walk-tip')?.remove();
+    if (guideWalkTarget) {
+        guideGlowOff(guideWalkTarget);
+        if (guideWalkHandler) guideWalkTarget.removeEventListener('click', guideWalkHandler);
+    }
+    guideWalkTarget = null; guideWalkHandler = null; guideWalkStep = -1;
+}
+function openGuideBook() {
+    closeStashDetail();
+    switchView('town');
+    guideWalkShow(0);
+}
+function guideWalkShow(i) {
+    guideWalkClear();
+    const s = GUIDE_WALK[i];
+    if (!s) return;
+    const inner = document.querySelector('#view-' + s.view + ' .ts-inner');
+    const el = document.querySelector(s.sel);
+    if (!inner || !el) return;
+    guideWalkStep = i;
+    const overlay = document.createElement('div');
+    overlay.id = 'guide-walk-overlay';
+    overlay.style.cssText = 'position:absolute; inset:0; z-index:50; background:rgba(2,6,15,.72);';
+    inner.appendChild(overlay);
+    guideWalkTarget = el;
+    guideGlowOn(el);
+    // Clicking the glowing target does its normal action, then the walkthrough moves on (or ends)
+    guideWalkHandler = () => {
+        const next = i + 1;
+        guideWalkClear();
+        if (next < GUIDE_WALK.length) setTimeout(() => guideWalkShow(next), 0);
+    };
+    el.addEventListener('click', guideWalkHandler);
+    const r = el.getBoundingClientRect(), sr = inner.getBoundingClientRect(), scale = sr.width / 1920;
+    const cx = (r.left - sr.left + r.width / 2) / scale;
+    const topY = (r.top - sr.top) / scale, bottomY = (r.bottom - sr.top) / scale;
+    const tip = document.createElement('div');
+    tip.id = 'guide-walk-tip';
+    const below = topY < 300; // near the top of the screen: the tip goes under the target instead
+    tip.style.cssText = `position:absolute; z-index:52; width:min(420px, 80%); background:#0f172a; border:1px solid #fbbf24; color:#fde68a; padding:10px 14px; border-radius:12px; font-size:20px; line-height:1.3; text-align:center; left:${cx}px; top:${below ? bottomY + 12 : topY - 12}px; transform:translate(-50%, ${below ? '0' : '-100%'});`;
+    tip.innerHTML = `<div>${s.text}</div><button onclick="guideWalkClear()" style="margin-top:8px; padding:4px 14px; border-radius:8px; border:1px solid #92400e; background:#1e293b; color:#fde68a; font-size:16px; cursor:pointer;">Close</button>`;
+    inner.appendChild(tip);
+}
+
 // Stash and bag cells: hover (1 s) or long-press (0.5 s) opens a detail window, like the bag
 let stashDetailKey = null, stashHoverOpened = false;
 let stashHoverTimer = null, stashPressTimer = null, stashPressStart = null, stashSuppressClick = false;
@@ -7416,7 +7470,7 @@ function stashShowDetail(src, idx, byHover = false) {
     const rarity = RARITY_INFO[item.rarity];
     const kind = isEquip ? item.slot : (isPotion ? 'Consumable' : 'Item');
     const title = (item.favorite ? '★ ' : '') + item.name + (item.refineLevel > 0 ? ` +${item.refineLevel}` : '');
-    const btn = src === 'stash'
+    const btn = item.type === 'guide' ? `<button onclick="openGuideBook()" class="dd-btn primary">Read</button>` : src === 'stash'
         ? `<button onclick="stashTake(${idx})" class="dd-btn primary">Take out</button>`
         : `<button onclick="stashPut(${idx})" class="dd-btn primary">Store</button>`;
     stashDetailKey = key;

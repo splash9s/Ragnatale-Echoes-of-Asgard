@@ -1312,6 +1312,7 @@ function checkLevelUps() {
         logMessage(`[BASE LEVEL UP!] Reached Base Level ${player.baseLv}! Gained 3 Stat Points`, 'levelup');
         playSfx(SFX.levelup);
     }
+    if (player.baseLv >= 30 && !guideFlag('lv30')) grantGuideBook();
 
     if (player.jobLv < MAX_CLASS_LV && player.jobExp >= player.jobMaxExp) {
         leveled = true;
@@ -3017,6 +3018,18 @@ function markGuide(key) {
     saveGame();
 }
 let guideLowHpActive = false;
+
+// First time the base level reaches 30: a Guide book goes into the stash (or the bag if the stash is full)
+function grantGuideBook() {
+    if (guideFlag('lv30')) return;
+    const item = { ...GUIDE_ITEM, qty: 1 };
+    const st = stashState();
+    const slot = st.slots.findIndex(s => !s);
+    if (slot >= 0) st.slots[slot] = item;
+    else if (!placeItemInInventory(item)) return; // no room: try again on the next level-up
+    markGuide('lv30');
+    logMessage(`[Guide] Reached Base Level 30! A Guide was added to your stash.`, 'drop');
+}
 
 // Called after every hit on the player. Pauses the fight and points at the potion button the first time HP drops below 40%
 function checkGuideLowHp() {
