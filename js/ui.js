@@ -8472,9 +8472,11 @@ setInterval(() => { if (!document.hidden) syncTentPets(); }, 1000);
 // ----- Tent slide puzzle: Puzzle button -> pet list -> that pet's puzzles -> 3x3 board -----
 // Puzzles belong to a pet kind (cat = Orange Cat / Support Slime sprites). Add more kinds here.
 const PUZZLES = {
-    cat: [{ id: 'cat_grass', name: 'Cat on Grass', img: 'assets/tent/puzzle/cat_grass_q85.webp' }]
+    cat: [{ id: 'cat_grass', name: 'Cat on Grass', img: 'assets/tent/puzzle/cat_grass_q85.webp' }],
+    midnight: [{ id: 'midnight_grass', name: 'Midnight on Grass', img: 'assets/tent/puzzle/midnight_grass_q85.webp' }]
 };
 function puzzleKeyOf(petName) {
+    if (petName === 'Midnight Stray Cat') return 'midnight';
     const src = (PET_SPRITES[petName] || {}).src || '';
     return src.includes('/ocat/') ? 'cat' : null;
 }
