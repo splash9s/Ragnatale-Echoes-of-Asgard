@@ -6259,9 +6259,10 @@ function renderQuestsView() {
 
     player.dailyQuests.forEach((q, i) => {
         let pct = Math.min(100, Math.floor((q.current / q.target) * 100));
-        // Refresh: a watched ad swaps this quest for another one (not finished quests only)
-        const refresh = q.completed ? '' : `<button id="quest-reroll-${i}" onclick="rerollDailyQuest(${i})" class="self-end px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-200 cursor-pointer">▶ Watch ad to refresh</button>`;
+        // Refresh: a watched ad swaps this quest for another one; under every quest, off once it is finished
+        const refresh = `<button id="quest-reroll-${i}" onclick="rerollDailyQuest(${i})" ${q.completed ? 'disabled' : ''} style="color:#f8fafc;" class="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">${q.completed ? 'Completed' : '▶ Watch ad to refresh'}</button>`;
         container.innerHTML += `
+            <div class="flex flex-col gap-1.5">
             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col gap-1.5 text-xs">
                 <div class="flex justify-between items-center">
                     <span class="font-bold text-slate-200">${questTitle(q)}</span>
@@ -6271,7 +6272,8 @@ function renderQuestsView() {
                 <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
                     <div class="bg-amber-500 h-full transition-all duration-300" style="width: ${pct}%"></div>
                 </div>
-                ${refresh}
+            </div>
+            ${refresh}
             </div>
         `;
     });
@@ -6285,7 +6287,7 @@ function rerollDailyQuest(index) {
     let left = QUEST_AD_SECONDS;
     const showTimer = () => {
         const btn = document.getElementById('quest-reroll-' + index);
-        if (btn) { btn.disabled = true; btn.textContent = `Watching ad… ${left}s`; }
+        if (btn) { btn.disabled = true; btn.style.color = '#f8fafc'; btn.textContent = `Watching ad… ${left}s`; }
     };
     showTimer();
     questAdTimer = setInterval(() => {
