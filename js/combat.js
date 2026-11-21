@@ -129,7 +129,7 @@ const SFX_LEVEL = {
     'sound/sfx/monster/golem_attack.mp3': 0.72,
     'sound/sfx/monster/golem_damaged.mp3': 0.6,
     'sound/sfx/monster/golem_dead.mp3': 1.3,
-    'sound/sfx/monster/healer_heal.mp3': 2.06,
+    'sound/sfx/monster/healer_heal2.mp3': 1.27,
     'sound/sfx/monster/human_damaged1.mp3': 0.98,
     'sound/sfx/monster/human_damaged2.mp3': 0.97,
     'sound/sfx/monster/human_damaged3.mp3': 0.75,
@@ -192,10 +192,10 @@ const MONSTER_SFX = {
     M070: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Muspel Flame Mage
     M084: { attack: MSFX+'mage_attack.mp3', damaged: MSFX+'skeleton_damaged.mp3', dead: MSFX+'skeleton_dead.mp3' },       // Hel Stone Mage (skeleton sounds)
     // Healers (no attack sound of their own yet: the heal sound is used)
-    M043: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },         // Frost Shaman
-    M056: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Valkyrie Healer
-    M069: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Ember Priest
-    M102: { attack: MSFX+'healer_heal.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },         // Halo Priest
+    M043: { attack: MSFX+'healer_heal2.mp3', damaged: MSFX+'human_damaged1.mp3', dead: MSFX+'human_dead2.mp3' },         // Frost Shaman
+    M056: { attack: MSFX+'healer_heal2.mp3', damaged: MSFX+'human_damaged2.mp3', dead: MSFX+'human_dead3.mp3' },         // Valkyrie Healer
+    M069: { attack: MSFX+'healer_heal2.mp3', damaged: MSFX+'human_damaged3.mp3', dead: MSFX+'human_dead4.mp3' },         // Ember Priest
+    M102: { attack: MSFX+'healer_heal2.mp3', damaged: MSFX+'human_damaged4.mp3', dead: MSFX+'human_dead1.mp3' },         // Halo Priest
     M008: { attack: MSFX+'beast_attack1.mp3', damaged: MSFX+'beast_damaged1.mp3', dead: MSFX+'beast_dead1.mp3' },  // Cave Beast (boss)
     M024: { attack: MSFX+'beast_attack2.mp3', damaged: MSFX+'beast_damaged2.mp3', dead: MSFX+'beast_dead2.mp3' },  // Dusk World-Eater (boss)
     // Melee humans and humanoid bosses: hit and death sounds only, no attack sound yet
