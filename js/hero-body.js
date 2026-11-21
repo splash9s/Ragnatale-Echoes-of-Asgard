@@ -2243,6 +2243,7 @@ function heroBodyImage(src) {
         // Embedded copies are keyed by the plain path; a '?v=' cache tag must not hide them (it left the image empty)
         const plain = src.split('?')[0];
         if (typeof HERO_ART !== 'undefined' && HERO_ART[plain] && plain === src) img.src = HERO_ART[plain]; // data URL on file:// pages
+        else if (location.protocol !== 'file:') img.src = src.replace(/^(assets\/body\/[^?]*)\.png/, '$1.webp'); // web: the lossless WebP copy (same pixels, smaller)
         else img.src = src; // no embedded copy (e.g. a '?v=' tagged file): load it from the server
         heroBodyImgs[src] = img;
     }
@@ -2256,7 +2257,9 @@ function heroBodyAttachArt() {
         if (!img.getAttribute('src') && HERO_ART[src]) img.src = HERO_ART[src];
     }
 }
-HERO_BODY_SRCS.forEach(heroBodyImage);
+// file:// pages: every image is an embedded data URL, so prepare them all now.
+// Web pages: each image loads the first time a pose needs it (loading all ~450 files at start held the loading screen at 0%).
+if (location.protocol === 'file:') HERO_BODY_SRCS.forEach(heroBodyImage);
 function heroBodyLoaded(img) { return img.complete && img.naturalWidth > 0; }
 
 // The gear option worn in each slot. The tool has one sword, shield, armor, boots and cloak (lv10 art).

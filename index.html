@@ -13,6 +13,9 @@
             img.replaceWith(box);
         };
     </script>
+    <!-- Closed pages stay hidden before Tailwind has built its CSS, so their lazy images do not start loading.
+         Same layer order as Tailwind, so its own rules still apply on top. -->
+    <style>@layer theme, base, components, utilities; @layer utilities { .hidden { display: none; } }</style>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700&family=Roboto:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -1387,12 +1390,12 @@
         <div id="view-friend" class="hidden art-screen art-dark">
             <div id="friend-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/friend/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'friendpage.png')">
-                    <img src="assets/pages/friend/window_panel_q85.webp" alt="" style="position:absolute; left:33px; top:60px; width:1855px; height:959px; pointer-events:none;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/friend/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'friendpage.png')">
+                    <img loading="lazy" src="assets/pages/friend/window_panel_q85.webp" alt="" style="position:absolute; left:33px; top:60px; width:1855px; height:959px; pointer-events:none;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div class="friend-window">
                         <div class="friend-top">
@@ -1420,11 +1423,11 @@
         <div id="view-setting" class="hidden art-screen">
             <div id="setting-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/setting/settingpage_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'setting bg')">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/setting/settingpage_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'setting bg')">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div class="art-panel" style="left:441px; top:182px; width:1038px; height:707px;">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 gap-3">
@@ -1443,7 +1446,7 @@
                 </div>
                 <button id="send-mail-btn" onclick="openSendMailForm()" data-i18n="set.mail" class="hidden px-6 py-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xl transition cursor-pointer text-left">✉️ Send Mail</button>
                 <div id="account-status" class="px-5 py-4 bg-slate-800 rounded-xl text-slate-200 text-lg leading-relaxed"></div>
-                <button id="bind-email-btn" onclick="bindGmail()" class="hidden p-0 bg-transparent border-0 cursor-pointer self-start" aria-label="Bind Gmail"><img src="assets/cha/page/link_gmail_q85.webp" alt="Bind Gmail" style="width:280px; max-width:100%; height:auto; display:block;"></button>
+                <button id="bind-email-btn" onclick="bindGmail()" class="hidden p-0 bg-transparent border-0 cursor-pointer self-start" aria-label="Bind Gmail"><img loading="lazy" src="assets/cha/page/link_gmail_q85.webp" alt="Bind Gmail" style="width:280px; max-width:100%; height:auto; display:block;"></button>
                 <p id="bind-msg" class="text-red-300 text-base px-2"></p>
                 <div class="px-5 py-3 bg-slate-800 rounded-xl text-slate-200 flex flex-wrap items-center gap-3 text-lg">
                     <span class="font-bold" data-i18n="set.legal">Legal &amp; Support:</span>
@@ -1464,17 +1467,17 @@
         <div id="view-expeditions" class="hidden art-dark">
             <div id="expo-stage" class="town-stage">
                 <div class="ts-inner">
-                    <img class="ts-bg" src="assets/compaign/mapselect02_q85.webp" alt="" style="width:1920px; height:1080px; object-fit:fill;" onerror="townSwap(this,'mapselect02.png')">
-                    <div class="expo-node" id="expo-node-earth" style="left:532px; top:390px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
-                    <div class="expo-node" id="expo-node-final" style="left:939px; top:132px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
-                    <div class="expo-node" id="expo-node-fire" style="left:1351px; top:388px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
-                    <div class="expo-node" id="expo-node-water" style="left:443px; top:712px;" onclick="openCampaignPath('water')" title="Ice Path (Teal Cave)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
-                    <div class="expo-node" id="expo-node-wind" style="left:1406px; top:670px;" onclick="openCampaignPath('wind')" title="Wind Path (Storm)"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
-                    <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <img loading="lazy" class="ts-bg" src="assets/compaign/mapselect02_q85.webp" alt="" style="width:1920px; height:1080px; object-fit:fill;" onerror="townSwap(this,'mapselect02.png')">
+                    <div class="expo-node" id="expo-node-earth" style="left:532px; top:390px;" onclick="openCampaignPath('earth')" title="Earth Path (Forest)"><img loading="lazy" src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-final" style="left:939px; top:132px;" onclick="onFinalNode()" title="Final Map (World Tree)"><img loading="lazy" src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-fire" style="left:1351px; top:388px;" onclick="openCampaignPath('fire')" title="Fire Path (Volcano)"><img loading="lazy" src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-water" style="left:443px; top:712px;" onclick="openCampaignPath('water')" title="Ice Path (Teal Cave)"><img loading="lazy" src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-wind" style="left:1406px; top:670px;" onclick="openCampaignPath('wind')" title="Wind Path (Storm)"><img loading="lazy" src="assets/compaign/mapbutton_q85.webp" alt=""></div>
+                    <div class="expo-node" id="expo-node-town" style="left:938px; top:630px;" onclick="switchView('town')" title="Back to Town"><img loading="lazy" src="assets/compaign/mapbutton_q85.webp" alt=""></div>
                     <div id="campaign-panel" class="expo-panel hidden">
                         <div class="expo-inner">
                         <div class="mb-1" style="display:flex; width:100%; justify-content:space-between; align-items:center;"><div id="campaign-path-icon" style="width:110px;height:76px;display:flex;align-items:center;justify-content:flex-start;"></div>
-                            <button onclick="startExpedition('campaign')" class="campaign-btn campaign-start" aria-label="Start Campaign"><img class="cb-normal" src="assets/cha/page/btn_start2_glow_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_start2_press_q85.webp" alt=""></button>
+                            <button onclick="startExpedition('campaign')" class="campaign-btn campaign-start" aria-label="Start Campaign"><img loading="lazy" class="cb-normal" src="assets/cha/page/btn_start2_glow_q85.webp" alt=""><img loading="lazy" class="cb-press" src="assets/cha/page/btn_start2_press_q85.webp" alt=""></button>
                         </div>
                         <div class="flex flex-col gap-3">
                             <div id="campaign-path-list" class="grid grid-cols-2 gap-2 mb-2"></div>
@@ -1508,13 +1511,13 @@
             </style>
             <div id="market-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/artisan/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/artisan/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'artisan bg')">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div id="market-gold-top" style="position:absolute; right:110px; top:18px; font-size:26px; color:#fde68a; font-weight:bold;"><span id="market-gold"></span></div>
                     <div style="position:absolute; right:40px; bottom:20px; font-size:22px; color:#f8fafc; background:rgba(20,14,8,.7); border:1px solid #b8945a; border-radius:10px; padding:4px 12px;">Auctions for gear, paid in gold. Level 10 and up, Gmail-linked accounts.</div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div id="market-cats-panel" class="mk-panel" style="left:60px; top:95px; width:240px; height:470px;">
                         <div id="market-cats"></div>
@@ -1604,20 +1607,20 @@
         <div id="view-vip" class="hidden art-screen art-dark">
             <div id="vip-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/diamond/bg_q85.webp" alt="" style="width:1920px; height:1080px;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/diamond/bg_q85.webp" alt="" style="width:1920px; height:1080px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
-                    <div id="vip-balance" style="position:absolute; z-index:4; left:1640px; top:12px; width:190px; height:46px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(12,24,52,.85); border:2px solid #26344f; border-radius:12px; color:#7dd3fc; font-size:26px; font-weight:800; text-shadow:0 2px 4px #000;"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:28px; height:28px;"><span id="vip-diamonds">0</span></div>
+                    <div id="vip-balance" style="position:absolute; z-index:4; left:1640px; top:12px; width:190px; height:46px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(12,24,52,.85); border:2px solid #26344f; border-radius:12px; color:#7dd3fc; font-size:26px; font-weight:800; text-shadow:0 2px 4px #000;"><img loading="lazy" src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:28px; height:28px;"><span id="vip-diamonds">0</span></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
-                    <img class="art-frame" src="assets/diamond/vip/vip_window2_v4_q85.webp" alt="" style="left:0; top:0; width:1920px; height:1080px;">
+                    <img loading="lazy" class="art-frame" src="assets/diamond/vip/vip_window2_v4_q85.webp" alt="" style="left:0; top:0; width:1920px; height:1080px;">
                     <div id="vip-menu" style="position:absolute; z-index:3; left:149px; top:255px; width:214px; height:701px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-evenly; align-items:center;"></div>
                     <div id="vip-grid" style="position:absolute; z-index:3; left:392px; top:255px; width:918px; height:706px; box-sizing:border-box; padding:12px 14px; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,128px); gap:16px 14px; justify-content:start; align-content:start;"></div>
                     <button id="vip-prev" class="vip-arrow" title="Previous" onclick="vipPackStep(-1)" style="position:absolute; z-index:5; left:400px; top:600px;">&lsaquo;</button>
                     <button id="vip-next" class="vip-arrow" title="Next" onclick="vipPackStep(1)" style="position:absolute; z-index:5; left:1256px; top:600px;">&rsaquo;</button>
                     <div id="vip-detail" style="position:absolute; z-index:3; left:1353px; top:303px; width:385px; height:588px; box-sizing:border-box; padding:24px 26px; display:flex; flex-direction:column; align-items:center; gap:14px; color:#e9edf5; font-family:'Roboto','Noto Sans Thai',sans-serif; text-align:center; overflow-y:auto;"></div>
-                    <button id="vip-buy" class="vip-buy" onclick="vipBuySelected()" style="position:absolute; z-index:3; left:1357px; top:891px; width:377px; height:97px; padding:0; border:0; background:none; cursor:pointer;"><img class="vb-normal" src="assets/diamond/vip/ui/buy_v2_q85.webp" alt="Buy" style="width:100%; height:100%; display:block;"><img class="vb-press" src="assets/diamond/vip/ui/buy_press_v2_q85.webp" alt="" style="width:100%; height:100%; display:none;"></button>
+                    <button id="vip-buy" class="vip-buy" onclick="vipBuySelected()" style="position:absolute; z-index:3; left:1357px; top:891px; width:377px; height:97px; padding:0; border:0; background:none; cursor:pointer;"><img loading="lazy" class="vb-normal" src="assets/diamond/vip/ui/buy_v2_q85.webp" alt="Buy" style="width:100%; height:100%; display:block;"><img loading="lazy" class="vb-press" src="assets/diamond/vip/ui/buy_press_v2_q85.webp" alt="" style="width:100%; height:100%; display:none;"></button>
                 </div>
             </div>
         </div>
@@ -1664,18 +1667,18 @@
             </style>
             <div id="events-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/events/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/events/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'events bg')">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div class="ev-left" style="left:93px; top:100px; width:583px; height:839px; transform:scale(1.1); transform-origin:0 0;">
-                        <img src="assets/events/left_q85.webp" alt="">
+                        <img loading="lazy" src="assets/events/left_q85.webp" alt="">
                         <div id="events-menu"></div>
                     </div>
                     <div class="ev-right" style="left:771px; top:100px; width:960px; height:837px; transform:scale(1.1); transform-origin:0 0;">
-                        <img src="assets/events/right_q85.webp?v=2" alt="">
+                        <img loading="lazy" src="assets/events/right_q85.webp?v=2" alt="">
                         <div id="events-banner"></div>
                         <div id="events-detail"></div>
                     </div>
@@ -1689,8 +1692,8 @@
                 <div class="ts-inner" style="width:1920px; height:1080px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('character')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div id="skill-sp-badge" class="art-panel" style="left:895px; top:15px; width:130px; height:47px; display:flex; align-items:center; justify-content:center;">
                         <span class="text-xs font-bold">SP: <strong id="skill-page-sp">0</strong></span>
@@ -1714,17 +1717,17 @@
             <div id="friend-visit-name" aria-live="polite"></div>
             <div id="character-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/character/tent/tent_off_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
-                    <img id="tent-left" class="tent-light" src="assets/pages/character/bg_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:1;">
-                    <img id="tent-right" class="tent-light" src="assets/pages/character/tent/tent_right_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
-                    <img id="tent-both" class="tent-light" src="assets/pages/character/tent/tent_both_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/character/tent/tent_off_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'character bg')">
+                    <img loading="lazy" id="tent-left" class="tent-light" src="assets/pages/character/bg_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:1;">
+                    <img loading="lazy" id="tent-right" class="tent-light" src="assets/pages/character/tent/tent_right_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
+                    <img loading="lazy" id="tent-both" class="tent-light" src="assets/pages/character/tent/tent_both_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; opacity:0;">
                     
                     <img id="char-shadow" class="art-frame pointer-events-none" src="assets/cha/chashadow_q85.webp" alt="" style="left:339px; top:684px; width:102px; height:41px; z-index:4;">
                     <img id="char-hero" class="art-frame pointer-events-none" src="" alt="" style="left:350px; top:527px; width:95px; height:193px; z-index:5;">                    <button class="char-skills-btn" onclick="switchView('skills')" style="position:absolute; left:399px; top:137px; box-sizing:border-box; width:198px; height:101px; line-height:101px; padding:0; white-space:nowrap; z-index:4; background-color:transparent; border:none; color:transparent; border-radius:0;" class="font-bold text-sm transition cursor-pointer hover:brightness-105">Skills<img id="alert-char-skills" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" id="char-return-btn" onclick="charReturn()">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div class="char-light-zone" id="char-light-left" style="position:absolute; left:530px; top:360px; width:130px; height:190px; z-index:6; cursor:pointer;" onclick="toggleCharLight('left')" title="Lamp"></div>
                     <div class="char-light-zone" id="char-light-right" style="position:absolute; left:1430px; top:530px; width:110px; height:130px; z-index:6; cursor:pointer;" onclick="toggleCharLight('right')" title="Lantern"></div>
@@ -1734,16 +1737,16 @@
                     <div class="char-light-zone" id="tent-stash-zone" style="position:absolute; left:802px; top:590px; width:142px; height:116px; z-index:6; cursor:pointer;" onclick="tentStashClick()" title="Stash"></div>
                     <div class="char-light-zone" id="tent-desk-zone" style="position:absolute; left:1376px; top:652px; width:158px; height:80px; z-index:6; cursor:pointer;" onclick="openRuneLore()" title="Desk"></div>
                     <div id="tent-menu-list">
-                        <div id="tent-diary-btn" class="tent-icon-btn" onclick="closeTentMenu();openGuestBook()" title="Guest Book"><img class="min-normal" src="assets/tent/diary/diary_q85.webp" alt="Guest Book"><img class="min-press" src="assets/tent/diary/diarypress_q85.webp" alt=""><img id="alert-tent-diary" class="tent-alert" src="assets/page01/alert_q85.webp" alt="" style="display:none;"></div>
-                        <div id="tent-home-btn" class="tent-icon-btn" onclick="closeTentMenu();openHomePanel()" title="Home"><img class="min-normal" src="assets/tent/home/home_q85.webp" alt="Home"><img class="min-press" src="assets/tent/home/homepress_q85.webp" alt=""></div>
-                        <div id="tent-puzzle-btn" class="tent-icon-btn" onclick="closeTentMenu();openPuzzlePanel()" title="Puzzle"><img class="min-normal" src="assets/tent/puzzle/puzzle_btn_q85.webp" alt="Puzzle"><img class="min-press" src="assets/tent/puzzle/puzzle_btn_press_q85.webp" alt=""></div>
-                        <div id="tent-pets-btn" class="tent-icon-btn" onclick="closeTentMenu();openPetPanel()" title="Pets"><img class="min-normal" src="assets/cha/button/peticon_q85.webp" alt="Pets"><img class="min-press" src="assets/cha/button/peticonpress_q85.webp" alt=""></div>
+                        <div id="tent-diary-btn" class="tent-icon-btn" onclick="closeTentMenu();openGuestBook()" title="Guest Book"><img loading="lazy" class="min-normal" src="assets/tent/diary/diary_q85.webp" alt="Guest Book"><img loading="lazy" class="min-press" src="assets/tent/diary/diarypress_q85.webp" alt=""><img id="alert-tent-diary" class="tent-alert" src="assets/page01/alert_q85.webp" alt="" style="display:none;"></div>
+                        <div id="tent-home-btn" class="tent-icon-btn" onclick="closeTentMenu();openHomePanel()" title="Home"><img loading="lazy" class="min-normal" src="assets/tent/home/home_q85.webp" alt="Home"><img loading="lazy" class="min-press" src="assets/tent/home/homepress_q85.webp" alt=""></div>
+                        <div id="tent-puzzle-btn" class="tent-icon-btn" onclick="closeTentMenu();openPuzzlePanel()" title="Puzzle"><img loading="lazy" class="min-normal" src="assets/tent/puzzle/puzzle_btn_q85.webp" alt="Puzzle"><img loading="lazy" class="min-press" src="assets/tent/puzzle/puzzle_btn_press_q85.webp" alt=""></div>
+                        <div id="tent-pets-btn" class="tent-icon-btn" onclick="closeTentMenu();openPetPanel()" title="Pets"><img loading="lazy" class="min-normal" src="assets/cha/button/peticon_q85.webp" alt="Pets"><img loading="lazy" class="min-press" src="assets/cha/button/peticonpress_q85.webp" alt=""></div>
                     </div>
-                    <div id="tent-menu-btn" class="tent-icon-btn" onclick="toggleTentMenu()" title="Menu"><img class="min-normal" src="assets/tent/menu/menu_q85.webp" alt="Menu"><img class="min-press" src="assets/tent/menu/menupress_q85.webp" alt=""><img id="alert-tent-menu" class="tent-alert" src="assets/page01/alert_q85.webp" alt="" style="display:none;"></div>
-                    <div id="tent-ui-toggle" class="tent-icon-btn" onclick="toggleTentUi()" title="Hide UI"><img class="min-normal" src="assets/cha/button/minimize_q85.webp" alt="Hide UI"><img class="min-press" src="assets/cha/button/minimizepress_q85.webp" alt=""></div>
+                    <div id="tent-menu-btn" class="tent-icon-btn" onclick="toggleTentMenu()" title="Menu"><img loading="lazy" class="min-normal" src="assets/tent/menu/menu_q85.webp" alt="Menu"><img loading="lazy" class="min-press" src="assets/tent/menu/menupress_q85.webp" alt=""><img id="alert-tent-menu" class="tent-alert" src="assets/page01/alert_q85.webp" alt="" style="display:none;"></div>
+                    <div id="tent-ui-toggle" class="tent-icon-btn" onclick="toggleTentUi()" title="Hide UI"><img loading="lazy" class="min-normal" src="assets/cha/button/minimize_q85.webp" alt="Hide UI"><img loading="lazy" class="min-press" src="assets/cha/button/minimizepress_q85.webp" alt=""></div>
                     <div class="ui char-clear-toggle" style="position:absolute; left:2px; top:2px; width:66px; height:67px;" onclick="toggleCharClear()" title="Clear screen">
-                        <img class="clr-normal" src="assets/cha/button/clearscreen_q85.webp" alt="">
-                        <img class="clr-press" src="assets/cha/button/clearscreenpress_q85.webp" alt="">
+                        <img loading="lazy" class="clr-normal" src="assets/cha/button/clearscreen_q85.webp" alt="">
+                        <img loading="lazy" class="clr-press" src="assets/cha/button/clearscreenpress_q85.webp" alt="">
                     </div>
                     <button id="char-stats-tab" class="char-stats-tab" onclick="toggleCharStats(true)">STATS<img id="alert-char-stats" src="assets/page01/alert_q85.webp" alt="" style="display:none; position:absolute; right:-8px; top:-8px; width:34px; height:34px; z-index:2; pointer-events:none;"></button>
                     <div id="char-panel-left" class="art-panel char-stats-panel" style="overflow-y:auto;">
@@ -1814,9 +1817,9 @@
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inventory Bag</h3>
                         <span id="inventory-count" class="text-xs font-mono text-slate-400 ml-6">0 / 63 slots</span>
                         <div class="inv-top-btns ml-auto flex items-center gap-2">
-                            <button onclick="stashOpenOrUnlock()" class="inv-icon-btn" title="Stash" aria-label="Stash"><img class="cb-normal" src="assets/cha/button/stashbutton_q90.webp" alt=""><img class="cb-press" src="assets/cha/button/stashbuttonpress_q90.webp" alt=""></button>
-                            <button onclick="startBulkSelect('salvage')" class="inv-icon-btn" title="Select to salvage" aria-label="Select to salvage"><img class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt=""></button>
-                            <button onclick="startBulkSelect('sell')" class="inv-icon-btn" title="Select to sell" aria-label="Select to sell"><img class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt=""></button>
+                            <button onclick="stashOpenOrUnlock()" class="inv-icon-btn" title="Stash" aria-label="Stash"><img loading="lazy" class="cb-normal" src="assets/cha/button/stashbutton_q90.webp" alt=""><img loading="lazy" class="cb-press" src="assets/cha/button/stashbuttonpress_q90.webp" alt=""></button>
+                            <button onclick="startBulkSelect('salvage')" class="inv-icon-btn" title="Select to salvage" aria-label="Select to salvage"><img loading="lazy" class="cb-normal" src="assets/cha/page/btn_salvageall_q85.webp" alt=""><img loading="lazy" class="cb-press" src="assets/cha/page/btn_salvageallpress_q85.webp" alt=""></button>
+                            <button onclick="startBulkSelect('sell')" class="inv-icon-btn" title="Select to sell" aria-label="Select to sell"><img loading="lazy" class="cb-normal" src="assets/cha/page/btn_sellall_q85.webp" alt=""><img loading="lazy" class="cb-press" src="assets/cha/page/btn_sellallpress_q85.webp" alt=""></button>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1832,8 +1835,8 @@
                         <div id="inventory-filter" class="flex items-center"></div>
                         <div id="bulk-yesno" class="ml-auto items-center gap-2" style="display:none;">
                             <span id="bulk-label" class="text-[11px] font-bold text-amber-200"></span>
-                            <button type="button" onclick="bulkYes()" aria-label="Yes" title="Yes" class="cursor-pointer" style="width:40px;height:40px;padding:0;border-radius:50%;border:3px solid #22c55e;background:#0b1322;box-shadow:0 0 8px rgba(34,197,94,.6);display:flex;align-items:center;justify-content:center;"><img src="assets/cha/page/btn_bulk_yes_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"></button>
-                            <button type="button" onclick="bulkNo()" aria-label="No" title="No" class="cursor-pointer" style="width:40px;height:40px;padding:0;border-radius:50%;border:3px solid #ef4444;background:#0b1322;box-shadow:0 0 8px rgba(239,68,68,.6);display:flex;align-items:center;justify-content:center;"><img src="assets/cha/page/btn_bulk_no_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"></button>
+                            <button type="button" onclick="bulkYes()" aria-label="Yes" title="Yes" class="cursor-pointer" style="width:40px;height:40px;padding:0;border-radius:50%;border:3px solid #22c55e;background:#0b1322;box-shadow:0 0 8px rgba(34,197,94,.6);display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="assets/cha/page/btn_bulk_yes_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"></button>
+                            <button type="button" onclick="bulkNo()" aria-label="No" title="No" class="cursor-pointer" style="width:40px;height:40px;padding:0;border-radius:50%;border:3px solid #ef4444;background:#0b1322;box-shadow:0 0 8px rgba(239,68,68,.6);display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="assets/cha/page/btn_bulk_no_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"></button>
                         </div>
                     </div>
                     <div id="inventory-grid" onclick="closeInvDetail()" class="grid justify-start" style="justify-content:center; margin-top:-10px; grid-template-columns:repeat(9,108px); grid-auto-rows:104px; column-gap:5px; row-gap:5px;"></div>
@@ -1848,19 +1851,19 @@
         <div id="view-shop" class="hidden art-screen art-dark">
             <div id="shop-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/shop/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'shop bg')">
-                    <img class="art-frame" src="assets/pages/artisan/window_q85.webp" alt="" style="left:109px; top:95px; width:803px; height:953px;">
-                    <img id="shop-frame-right" class="art-frame" src="assets/pages/artisan/window_q85.webp" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/shop/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'shop bg')">
+                    <img loading="lazy" class="art-frame" src="assets/pages/artisan/window_q85.webp" alt="" style="left:109px; top:95px; width:803px; height:953px;">
+                    <img loading="lazy" id="shop-frame-right" class="art-frame" src="assets/pages/artisan/window_q85.webp" alt="" style="left:1007px; top:95px; width:803px; height:953px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
-                    <div id="shop-gold-pill" style="position:absolute; left:1640px; top:12px; height:46px; display:flex; align-items:center; gap:8px; padding:0 18px; box-sizing:border-box; border-radius:12px; background:rgba(255,250,235,.9); border:2px solid #b8945a; color:#2a1a0e; font-size:26px; font-weight:700;"><img src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"><span id="shop-gold-value">0</span></div>
+                    <div id="shop-gold-pill" style="position:absolute; left:1640px; top:12px; height:46px; display:flex; align-items:center; gap:8px; padding:0 18px; box-sizing:border-box; border-radius:12px; background:rgba(255,250,235,.9); border:2px solid #b8945a; color:#2a1a0e; font-size:26px; font-weight:700;"><img loading="lazy" src="assets/icons/goldiconsmall_q85.webp" alt="" style="width:34px;height:34px;object-fit:contain;"><span id="shop-gold-value">0</span></div>
                     <div id="shop-panel-left" class="art-panel" style="left:229px; top:214px; width:564px; height:716px;">
                         <div class="flex items-center gap-2 mb-4">
                             
-                            <span class="ml-auto text-xs font-bold text-slate-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-700/40 whitespace-nowrap"><span id="shop-balance-label"><img src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> Balance:</span> <strong id="shop-balance-value">0</strong></span>
+                            <span class="ml-auto text-xs font-bold text-slate-900 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-700/40 whitespace-nowrap"><span id="shop-balance-label"><img loading="lazy" src="assets/icons/diamondiconsmall_q85.webp" alt="" style="width:16px;height:16px;display:inline-block;vertical-align:-3px"> Balance:</span> <strong id="shop-balance-value">0</strong></span>
                         </div>
                         <div id="shop-gold-section" class="hidden flex flex-col gap-3">
                             <div id="shop-consumables-container" class="flex flex-col gap-2"></div>
@@ -1881,13 +1884,13 @@
         <div id="view-blacksmith" class="hidden art-screen art-dark">
             <div id="blacksmith-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/blacksmith/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'blacksmith bg')">
-                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:100px; top:102px; width:803px; height:953px;">
-                    <img class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:1007px; top:102px; width:803px; height:953px;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/blacksmith/bg_v2_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'blacksmith bg')">
+                    <img loading="lazy" class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:100px; top:102px; width:803px; height:953px;">
+                    <img loading="lazy" class="art-frame" src="assets/pages/blacksmith/window_q85.webp" alt="" style="left:1007px; top:102px; width:803px; height:953px;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <!-- Left window: list of equipped gear (refinement) or weapons and stones (elemental) -->
                     <div id="blacksmith-panel-left" class="art-panel" style="left:194px; top:203px; width:614px; height:766px;">
@@ -1900,7 +1903,7 @@
                         <div id="refining-slots-container" class="flex flex-col gap-3"></div>
                     </div>
                     <!-- Right window: refinery, gear slot, rune slot, buttons, rules -->
-                    <img class="art-frame" src="assets/pages/blacksmith/refinenary_q85.webp" alt="" style="left:1090px; top:188px; width:636px; height:360px;">
+                    <img loading="lazy" class="art-frame" src="assets/pages/blacksmith/refinenary_q85.webp" alt="" style="left:1090px; top:188px; width:636px; height:360px;">
                     <div id="blacksmith-gear-slot" class="ui" style="z-index:4; left:1373px; top:411px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#f5e6c4; font-size:11px; font-weight:700; text-shadow:0 1px 2px #000;"></div>
                     <div id="bs-success-rate" style="position:absolute; z-index:4; left:1262px; top:494px; width:300px; white-space:nowrap; text-align:center; font-size:12px; font-weight:900; color:#ffffff; text-shadow:0 1px 3px #000;"></div>
                     <div id="blacksmith-rune-slot" class="ui" onclick="blacksmithToggleRune()" style="z-index:4; left:1374px; top:551px; width:77px; height:79px; background:url(assets/pages/blacksmith/inventoryslot_q85.webp) center/contain no-repeat; display:flex; align-items:center; justify-content:center; flex-direction:column;"></div>
@@ -1980,12 +1983,12 @@
             </style>
             <div id="mail-stage" class="town-stage" data-w="1920" data-h="1080">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img class="ts-bg" src="assets/pages/mail/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'mail bg')">
-                    <img src="assets/pages/mail/window_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/mail/bg_q85.webp" alt="" style="width:1920px; height:1080px;" onerror="townSwap(this,'mail bg')">
+                    <img loading="lazy" src="assets/pages/mail/window_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
                     <div class="char-header-bar" style="left:0px; top:0px; width:1920px; height:70px;"></div>
                     <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                     <div id="mail-menu" class="ml-menu"></div>
                     <div id="mail-detail" class="ml-detail"></div>
@@ -1997,8 +2000,8 @@
         <div id="view-combat" class="hidden art-screen">
             <div id="combat-stage" class="town-stage" data-w="1920" data-h="1080" data-fill="1">
                 <div class="ts-inner" style="width:1920px; height:1080px;">
-                    <img id="earth-bg" class="ts-bg" src="assets/combat/earthbg1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;">
-                    <img id="earth-base" src="assets/combat/earthbase1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
+                    <img id="earth-bg" class="ts-bg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px;">
+                    <img id="earth-base" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;">
                     <div id="earth-light" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; background:radial-gradient(ellipse 900px 520px at 420px 80px, rgba(255,226,160,.6), rgba(255,226,160,0) 70%); mix-blend-mode:screen; opacity:.15;"></div>
                     <div id="sun-shafts" aria-hidden="true" style="display:none;"></div>
                     <div id="fire-sparks" aria-hidden="true" style="display:none; position:absolute; left:0; top:0; width:1920px; height:1080px; z-index:3; pointer-events:none; overflow:hidden;"></div>
@@ -2018,7 +2021,7 @@
                     <div style="position:absolute; left:20px; top:8px; width:502px; height:254px; z-index:5;">
                         <div class="town-panel" style="left:0; top:0; width:824px; height:315px; transform:scale(0.6093); transform-origin:0 0;">
                     <div class="town-info">
-                                        <div id="combat-avatar-c" class="town-avatar"><img src="assets/avatars/slime_q85.webp" alt="" /></div>
+                                        <div id="combat-avatar-c" class="town-avatar"><img loading="lazy" src="assets/avatars/slime_q85.webp" alt="" /></div>
                                         <div class="town-id">
                                             <h1 class="town-name"><span id="header-player-name-c">Hero</span><span id="header-vip-badge-c" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-600/30 border border-purple-400/50 text-purple-200"></span></h1>
                                             <div class="town-lv">Base Lv. <strong id="header-base-lv-c">1</strong></div>
@@ -2032,8 +2035,8 @@
                                                 <div class="row"><span>Class EXP</span><span id="top-job-exp-text-c">0 / 40 (0%)</span></div>
                                             </div>
                                             <div class="town-money">
-                                                <div><img src="assets/icons/goldiconsmall_q85.webp" alt="" class="town-ico"><span id="town-gold-c">1000 Gold</span></div>
-                                                <div ><img src="assets/icons/diamondiconsmall_q85.webp" alt="" class="town-ico"><span id="town-diamonds-c">1000</span></div>
+                                                <div><img loading="lazy" src="assets/icons/goldiconsmall_q85.webp" alt="" class="town-ico"><span id="town-gold-c">1000 Gold</span></div>
+                                                <div ><img loading="lazy" src="assets/icons/diamondiconsmall_q85.webp" alt="" class="town-ico"><span id="town-diamonds-c">1000</span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2096,7 +2099,7 @@
                     </div>
 
                     <!-- Foreground layer (in front of the character and enemies, does not block clicks) -->
-                    <img id="earth-fg" src="assets/combat/earthfg1_q85.webp" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; z-index:3;">
+                    <img id="earth-fg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none; z-index:3;">
 
                     <!-- Enemies: six slots, positioned by CSS -->
                     <div id="monsters-lineup-container" style="position:absolute; left:0; top:0; width:1920px; height:1080px; pointer-events:none;"></div>
@@ -2126,8 +2129,8 @@
 
                     <!-- Return (top right) -->
         <div id="combat-return-btn" class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="combatReturnClick()">
-                        <img class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
-                        <img class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
                     </div>
                 </div>
             </div>
@@ -2154,7 +2157,8 @@
     <script src="js/player.js?v=20261121qt"></script>
     <script src="js/audio.js?v=20261121i1"></script>
     <script src="js/cloud.js?v=20261121pu"></script>
-    <script src="js/hero-art.js?v=20261118t"></script>
+    <!-- hero-art.js holds the hero art as data URLs (948 KB); only file:// pages need it, web pages load the image files -->
+    <script>if (location.protocol === 'file:') document.write('<script src="js/hero-art.js?v=20261118t"><\/script>');</script>
     <script src="js/hero-body.js?v=20261121fa"></script>
     <script src="js/combat.js?v=20261121mg"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>

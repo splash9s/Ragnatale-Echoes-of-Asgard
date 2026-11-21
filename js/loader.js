@@ -3,9 +3,7 @@
 // Shows the loading screen, preloads images and sounds with a progress bar, then starts the game.
 // ==========================================
 
-const LOADING_SOUNDS = [
-    'sound/bgm.mp3'
-];
+const LOADING_SOUNDS = []; // the music tracks load when they first play (sound/bgm.mp3 is not used by the game)
 
 const LOADING_IMAGES = [
     "assets/avatars/abyssalimp_q85.webp",
@@ -187,13 +185,6 @@ const LOADING_IMAGES = [
     "assets/combat/koboltsniper/koboltsniperattack_q85.webp",
     "assets/combat/koboltsniper/koboltsniperdamaged_q85.webp",
     "assets/combat/koboltsniper/koboltsniperdead_q85.webp",
-    "assets/combat/characterinfo_q85.webp",
-    "assets/combat/earthbase1_q85.webp",
-    "assets/combat/earthbg1_q85.webp",
-    "assets/combat/earthbg2_q85.webp",
-    "assets/combat/earthbase2_q85.webp",
-    "assets/combat/earthbase3_q85.webp",
-    "assets/combat/earthfg1_q85.webp",
     "assets/combat/earth1/e1bg.webp",
     "assets/combat/earth1/e1base.webp",
     "assets/combat/earth1/e1mg.webp",
@@ -220,7 +211,6 @@ const LOADING_IMAGES = [
     "assets/combat/runes/r3_q85.webp",
     "assets/combat/runes/r4_q85.webp",
     "assets/combat/runes/r5_q85.webp",
-    "assets/compaign/compaign_q85.webp",
     "assets/compaign/mapselect02_q85.webp",
     "assets/compaign/mapbutton_q85.webp",
     "assets/compaign/mapbuttonoff_q85.webp",
@@ -232,8 +222,6 @@ const LOADING_IMAGES = [
     "assets/compaign/smallretunbuttonpress_q85.webp",
     "assets/page01/articanbutton_q85.webp",
     "assets/page01/articanbuttonpress_q85.webp",
-    "assets/page01/bgmain_q85.webp",
-    "assets/page01/mainbg_q85.webp",
     "assets/page01/mainbg03_q85.webp",
     "assets/page01/cart/c1_q85.webp",
     "assets/page01/cart/c2_q85.webp",
@@ -274,7 +262,6 @@ const LOADING_IMAGES = [
     "assets/page01/cha_idle_0001_q85.webp",
     "assets/page01/characterbutton_q85.webp",
     "assets/page01/characterbuttonpress_q85.webp",
-    "assets/page01/characterinfo_q85.webp",
     "assets/page01/diamondbutton_q85.webp",
     "assets/page01/diamondbuttonpress_q85.webp",
     "assets/page01/eventsbutton_q85.webp",
@@ -314,17 +301,23 @@ const LOADING_IMAGES = [
     "assets/pages/character/slots/weaponslot_q85.webp",
     "assets/pages/character/window_q85.webp",
     "assets/pages/diamond/bg_q85.webp",
-    "assets/pages/diamond/layout_q85.webp",
     "assets/pages/events/bg_q85.webp",
-    "assets/pages/events/layout_q85.webp",
     "assets/pages/frame/c_q85.webp",
     "assets/pages/mail/bg_q85.webp",
-    "assets/pages/mail/layout_q85.webp",
     "assets/pages/setting/bg_q85.webp",
-    "assets/pages/setting/layout_q85.webp",
     "assets/pages/skill/bg_q85.webp",
     "assets/pages/skill/window_q85.webp"
 ];
+
+// Hero art bands are data-URL scripts for file:// pages; web pages load the image files when a pose needs them
+function heroArtBands(which) {
+    if (typeof loadHeroArtBands !== 'function') return Promise.resolve();
+    return loadHeroArtBands(which === 'early' ? HERO_ART_EARLY_BANDS : HERO_ART_LATER_BANDS);
+}
+// Starts loading the current gear's battle poses in the background, so the first fight does not wait for them
+function warmHeroPoses() {
+    try { if (typeof combatPose === 'function') combatPose(); } catch (e) { /* art loads on demand anyway */ }
+}
 
 function setLoading(percent, text) {
     const fill = document.getElementById('loading-bar-fill');
@@ -405,7 +398,7 @@ function runPreload() {
     }).then(() => {
         if (firstVisit) return; // the town art and hero art load in loadTownArtInBackground
         townArtResolve();
-        return loadHeroArtBands(HERO_ART_EARLY_BANDS); // the hero's early gear art is needed on the town page
+        return heroArtBands('early'); // the hero's early gear art is needed on the town page
     });
 }
 
@@ -419,7 +412,7 @@ function loadTownArtInBackground() {
         return preloadImage(src).then(worker, worker);
     };
     return Promise.all([worker(), worker(), worker()])
-        .then(() => loadHeroArtBands(HERO_ART_EARLY_BANDS))
+        .then(() => heroArtBands('early'))
         .then(() => townArtResolve(), () => townArtResolve());
 }
 
@@ -482,7 +475,8 @@ window.addEventListener('load', () => {
         .then(start)
         .then(() => (firstVisit ? loadTownArtInBackground() : null))
         .then(preloadRest)
-        .then(() => loadHeroArtBands(HERO_ART_LATER_BANDS)); // higher gear art, in level order, after the game starts
+        .then(() => heroArtBands('later')) // higher gear art, in level order, after the game starts (file:// pages only)
+        .then(warmHeroPoses);
 });
 
 // Phone browsers (Chrome): go full screen on a touch, since Chrome does not do it by itself.
