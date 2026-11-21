@@ -57,6 +57,7 @@
         blacksmith: () => switchView('blacksmith'),
         expedition: () => switchView('expeditions'),
         vip:        () => switchView('vip'),
+        tower:      () => switchView('tower'),
     };
 
     inner.querySelectorAll('.ui[data-action]').forEach(el => {

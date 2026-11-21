@@ -183,6 +183,15 @@ function localGameName(text) {
 // Event and friend page text that is written in code (not in the dictionary above).
 // Matched on whole text pieces; the game re-renders these pages, so the observer translates again.
 const DOM_TH = {
+    // Warded Tower page
+    'Friend': 'เพื่อน', 'Normal': 'ปกติ', 'Hard': 'ยาก', 'Hell': 'นรก', 'Pick teammate': 'เลือกเพื่อนร่วมทีม',
+    'Highest floor reached': 'ชั้นสูงสุดที่ไปถึง', 'Previous reward': 'รางวัลครั้งก่อน', 'No run yet on this difficulty.': 'ยังไม่เคยเล่นระดับนี้',
+    'Normal monsters and rewards': 'มอนสเตอร์และรางวัลปกติ', 'Loading friends…': 'กำลังโหลดเพื่อน…',
+    'No friends yet. Go alone, or add friends.': 'ยังไม่มีเพื่อน เข้าคนเดียวหรือเพิ่มเพื่อน',
+    'Sign in to see the leaderboard.': 'เข้าสู่ระบบเพื่อดูอันดับ', 'The leaderboard is unavailable right now.': 'ตอนนี้ดูอันดับไม่ได้',
+    'No records yet. Clear a floor in the Warded Tower to appear here.': 'ยังไม่มีสถิติ ผ่านชั้นในหอคอยผนึกเพื่อติดอันดับ',
+    'Normal difficulty · furthest floor, then fastest time': 'ระดับปกติ · ชั้นไกลสุด แล้วเวลาเร็วสุด',
+    'Gold': 'ทอง', 'Diamond': 'เพชร', 'Plank': 'ไม้กระดาน', 'Bar': 'แท่งแร่', 'Costume Chest': 'หีบคอสตูม',
     'Player': 'ผู้เล่น', 'Team': 'ทีม', 'Floor': 'ชั้น', 'Best time': 'เวลาดีที่สุด', 'Solo': 'เดี่ยว', 'Leaderboard': 'อันดับ',
     'Armor': 'เกราะ', 'CRIT': 'คริติคอล', 'FLEE': 'หลบหลีก',
     'Block': 'บล็อก', 'Min': 'ขั้นต่ำ', 'Bid': 'ประมูล',
@@ -330,6 +339,13 @@ function thHealText(s) {
 }
 
 const DOM_TH_PATTERNS = [
+    { re: /^(\d) \/ 2 selected · or go alone$/, f: m => `เลือกแล้ว ${m[1]} / 2 · หรือเข้าคนเดียว` },
+    { re: /^Resting (\d+) day\(s\)$/, f: m => `พัก ${m[1]} วัน` },
+    { re: /^Floor (\d+) reached$/, f: m => `ไปถึงชั้น ${m[1]}` },
+    { re: /^Monsters x(\d+) · Gold and Diamonds x(\d+)$/, f: m => `มอนสเตอร์ x${m[1]} · ทองและเพชร x${m[2]}` },
+    { re: /^Locked: clear floor (\d+) on (Normal|Hard) first$/, f: m => `ล็อก: ผ่านชั้น ${m[1]} ระดับ${m[2] === 'Normal' ? 'ปกติ' : 'ยาก'}ก่อน` },
+    { re: /^Clear floor (\d+) on (Normal|Hard) first$/, f: m => `ผ่านชั้น ${m[1]} ระดับ${m[2] === 'Normal' ? 'ปกติ' : 'ยาก'}ก่อน` },
+    { re: /^(\w+) Stone$/, f: m => ({ Fire: 'หินไฟ', Wind: 'หินลม', Earth: 'หินดิน', Water: 'หินน้ำ', Ice: 'หินน้ำแข็ง' })[m[1]] || m[0] },
     { re: /^Base Lv\. (\d+)$/, f: m => `เลเวลฐาน ${m[1]}` }, { re: /^Lv\. (\d+)$/, f: m => `เลเวล ${m[1]}` },
     // Market (auction house)
     { re: /^(.+?) · (\d+) bids? · (.+?) · ends in (.+)$/, f: m => `${m[1]} · ${m[2]} ครั้ง · ${marketLeadTh(m[3])} · สิ้นสุดใน ${thMarketTime(m[4])}` },
@@ -436,10 +452,10 @@ function startDomTranslation() {
         pending = true;
         requestAnimationFrame(() => {
             pending = false;
-            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market', 'view-combat'].forEach(id => translateDomIn(document.getElementById(id)));
+            ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market', 'view-tower', 'view-combat'].forEach(id => translateDomIn(document.getElementById(id)));
         });
     });
-    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-market'].forEach(id => {
+    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-market', 'view-tower'].forEach(id => {
         const el = document.getElementById(id);
         if (el) domObserver.observe(el, { childList: true, subtree: true, characterData: true });
     });
@@ -459,7 +475,7 @@ function applyLanguage() {
         if (typeof renderEventsView === 'function' && document.getElementById('events-detail')) renderEventsView();
         if (typeof renderFriendPage === 'function' && document.getElementById('friend-list')) renderFriendPage();
     } catch (e) { console.warn('Language re-render skipped:', e); }
-    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market'].forEach(id => translateDomIn(document.getElementById(id)));
+    ['view-friend', 'view-events', 'view-blacksmith', 'view-quests', 'view-character', 'view-shop', 'view-expeditions', 'view-skills', 'view-vip', 'view-market', 'view-tower'].forEach(id => translateDomIn(document.getElementById(id)));
 }
 
 // Remember the choice on this device only

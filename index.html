@@ -1359,6 +1359,9 @@
             <div class="ui" data-action="setting" style="left:1699px; top:13px; width:206px; height:209px;">
                 <img src="assets/page01/setting_q85.webp" alt="" onerror="townSwap(this,'setting.png')">
             </div>
+            <div class="ui" data-action="tower" title="Warded Tower" style="left:1754px; top:410px; width:150px; height:152px;">
+                <img src="assets/page01/tower_q85.webp" alt="Warded Tower" style="width:100%; height:100%; object-fit:contain; display:block;">
+            </div>
             <div id="beginner-quest" class="bq-panel" style="left:1515px; top:236px; width:390px; height:auto;"></div>
             <div id="beginner-detail" data-drag-panel class="bq-panel bq-detail" style="left:1085px; top:236px; width:390px; height:auto; display:none;"></div>
             <div class="ui" data-action="character" style="left:13px; top:858px; width:206px; height:209px;">
@@ -1734,6 +1737,96 @@
                         <div id="events-banner"></div>
                         <div id="events-detail"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: WARDED TOWER (layout: graphic/cha/page/towerpage/bglayout.png) -->
+        <div id="view-tower" class="hidden art-screen art-dark">
+            <style>
+                #tower-stage, #tower-stage * { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
+                #tower-stage { font-family: 'Roboto', 'Noto Sans Thai', sans-serif; }
+                #tower-stage .tw-tab { position: absolute; z-index: 3; height: 58px; padding: 0 10px; border: 0; cursor: pointer; background: url(assets/events/leftmenu_q85.webp) center / 100% 100% no-repeat; color: #2a1a0e; font-size: 30px; font-weight: 800; white-space: nowrap; filter: brightness(.82) saturate(.85); transition: filter .12s, transform .12s; }
+                #tower-stage .tw-tab:hover { filter: brightness(.95); }
+                #tower-stage .tw-tab.tw-on { filter: brightness(1.12) drop-shadow(0 0 8px #f0c050); transform: translateY(-2px); }
+                #tower-stage .tw-tab.tw-locked { filter: grayscale(1) brightness(.6); }
+                #tower-stage .tw-tab.tw-locked::after { content: '🔒'; position: absolute; right: -8px; top: -12px; font-size: 22px; }
+                #tower-stage .tw-panel { position: absolute; z-index: 2; box-sizing: border-box; padding: 18px 20px; display: flex; flex-direction: column; color: #f3e6c8;
+                    background: linear-gradient(180deg, rgba(34, 24, 14, .9), rgba(20, 14, 8, .9)); border: 3px solid #b8913f; border-radius: 16px;
+                    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .6), inset 0 0 24px rgba(0, 0, 0, .55), 0 8px 24px rgba(0, 0, 0, .55); }
+                #tower-stage .tw-title { flex: none; margin: 0 0 8px; text-align: center; font-size: 38px; font-weight: 800; color: #ffd978; text-shadow: 0 2px 0 #1e1409, 0 0 10px rgba(240, 190, 80, .35); line-height: 1.15; }
+                #tower-stage .tw-body { flex: 1; min-height: 0; overflow-y: auto; padding-right: 4px; }
+                #tower-stage .tw-status { margin: 10px 4px; font-size: 24px; color: #d9c49a; }
+                #tower-stage .tw-sub { margin: 0 0 10px; text-align: center; font-size: 20px; color: #c9b083; }
+                #tower-stage .tw-list { display: flex; flex-direction: column; gap: 10px; }
+                #tower-stage .tw-friend { display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border: 2px solid #6b5432; border-radius: 12px; background: rgba(255, 240, 200, .07); color: inherit; text-align: left; cursor: pointer; }
+                #tower-stage .tw-friend:hover { border-color: #c9a227; }
+                #tower-stage .tw-friend.tw-on { border-color: #ffd45a; background: rgba(230, 180, 60, .22); box-shadow: 0 0 10px rgba(255, 210, 90, .35); }
+                #tower-stage .tw-friend.tw-rest { opacity: .5; cursor: not-allowed; }
+                #tower-stage .tw-num { flex: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #3a2410; background: linear-gradient(#ffe38a, #d9a325); visibility: hidden; }
+                #tower-stage .tw-on .tw-num { visibility: visible; }
+                #tower-stage .tw-av { flex: none; width: 64px; height: 64px; border-radius: 8px; overflow: hidden; background: #1d1a14; box-shadow: 0 0 0 2px #8a6a3a; }
+                #tower-stage .tw-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+                #tower-stage .tw-av-sm { width: 40px; height: 40px; border-radius: 6px; }
+                #tower-stage .tw-who { display: flex; flex-direction: column; min-width: 0; }
+                #tower-stage .tw-who b { font-size: 26px; color: #fff3d6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+                #tower-stage .tw-who small { font-size: 20px; color: #d9b874; font-weight: 600; }
+                #tower-stage .tw-lb-row { padding: 10px 6px; border-bottom: 1px solid rgba(184, 145, 63, .35); }
+                #tower-stage .tw-lb-top { display: flex; align-items: center; gap: 10px; }
+                #tower-stage .tw-lb-top .tw-av { width: 52px; height: 52px; }
+                #tower-stage .tw-lb-top .tw-who { flex: 1; }
+                #tower-stage .tw-lb-top .tw-who b { font-size: 24px; }
+                #tower-stage .tw-rank { flex: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #f3e6c8; background: rgba(255, 255, 255, .08); }
+                #tower-stage .tw-rank-1 .tw-rank { background: linear-gradient(#ffe38a, #d9a325); color: #4a2a00; }
+                #tower-stage .tw-rank-2 .tw-rank { background: linear-gradient(#f2f2f2, #a9a9a9); color: #2a2a2a; }
+                #tower-stage .tw-rank-3 .tw-rank { background: linear-gradient(#f0b27a, #a8612a); color: #3a1a00; }
+                #tower-stage .tw-lb-score { flex: none; display: flex; flex-direction: column; align-items: flex-end; }
+                #tower-stage .tw-lb-score b { font-size: 26px; color: #ffd978; }
+                #tower-stage .tw-lb-score small { font-size: 20px; color: #e9d7ae; font-variant-numeric: tabular-nums; }
+                #tower-stage .tw-lb-team { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 8px 0 0 46px; }
+                #tower-stage .tw-team-label { font-size: 18px; color: #b89a62; font-weight: 700; }
+                #tower-stage .tw-mate { display: flex; align-items: center; gap: 6px; min-width: 0; }
+                #tower-stage .tw-mate .tw-who b { font-size: 19px; max-width: 120px; }
+                #tower-stage .tw-mate .tw-who small { font-size: 15px; }
+                #tower-stage .tw-solo { font-size: 19px; font-style: italic; color: #c9b083; }
+                #tower-stage .tw-best { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin: 4px 0 2px; }
+                #tower-stage .tw-best-num { font-size: 110px; font-weight: 900; line-height: 1; color: #ffd978; text-shadow: 0 4px 0 #1e1409, 0 0 18px rgba(240, 190, 80, .45); }
+                #tower-stage .tw-best-of { font-size: 40px; font-weight: 800; color: #c9b083; }
+                #tower-stage .tw-info { margin: 6px 0 4px; text-align: center; font-size: 22px; color: #e9d7ae; }
+                #tower-stage .tw-lock { margin: 6px 0; text-align: center; font-size: 22px; color: #ff9a7a; font-weight: 700; }
+                #tower-stage .tw-h2 { margin: 22px 0 8px; padding-top: 14px; border-top: 2px solid rgba(184, 145, 63, .5); text-align: center; font-size: 30px; font-weight: 800; color: #ffd978; }
+                #tower-stage .tw-reward { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+                #tower-stage .tw-reward li { display: flex; align-items: center; gap: 12px; padding: 6px 10px; border-radius: 10px; background: rgba(255, 240, 200, .07); font-size: 24px; }
+                #tower-stage .tw-reward img { width: 44px; height: 44px; object-fit: contain; }
+                #tower-stage .tw-reward span { flex: 1; }
+                #tower-stage .tw-reward b { color: #ffd978; font-variant-numeric: tabular-nums; }
+                #tw-start { position: absolute; z-index: 3; left: 1480px; top: 920px; width: 308px; height: 96px; padding: 0; border: 0; background: none; cursor: pointer; transition: transform .1s, filter .1s; }
+                #tw-start img { width: 100%; height: 100%; display: block; }
+                #tw-start:hover { filter: brightness(1.1) drop-shadow(0 0 10px #f0c050); }
+                #tw-start:active { transform: scale(.96); }
+                #tw-start:disabled { filter: grayscale(1); opacity: .5; cursor: not-allowed; }
+            </style>
+            <div id="tower-stage" class="town-stage" data-w="1920" data-h="1080">
+                <div class="ts-inner" style="width:1920px; height:1080px;">
+                    <img loading="lazy" class="ts-bg" src="assets/pages/tower/bg_q85.webp" alt="" style="width:1920px; height:1080px;">
+                    <div class="ui char-return" style="left:1846px; top:2px; width:66px; height:67px;" onclick="switchView('town')">
+                        <img loading="lazy" class="ret-normal" src="assets/cha/button/returnbuttonsmall_q85.webp" alt="">
+                        <img loading="lazy" class="ret-press" src="assets/cha/button/returnbuttonpresssmall_q85.webp" alt="">
+                    </div>
+                    <button class="tw-tab" data-tab="friend" style="left:60px; top:16px; width:170px;" onclick="setTowerPageTab('friend')">Friend</button>
+                    <button class="tw-tab" data-tab="leaderboard" style="left:243px; top:16px; width:225px;" onclick="setTowerPageTab('leaderboard')">Leaderboard</button>
+                    <button class="tw-tab" data-diff="normal" style="left:1444px; top:16px; width:150px;" onclick="setTowerDifficulty('normal')">Normal</button>
+                    <button class="tw-tab" data-diff="hard" style="left:1604px; top:16px; width:110px;" onclick="setTowerDifficulty('hard')">Hard</button>
+                    <button class="tw-tab" data-diff="hell" style="left:1724px; top:16px; width:110px;" onclick="setTowerDifficulty('hell')">Hell</button>
+                    <div class="tw-panel" style="left:60px; top:85px; width:408px; height:943px;">
+                        <div id="tw-left-title" class="tw-title">Pick teammate</div>
+                        <div id="tw-left-body" class="tw-body"></div>
+                    </div>
+                    <div class="tw-panel" style="left:1444px; top:85px; width:408px; height:783px;">
+                        <div class="tw-title">Highest floor reached</div>
+                        <div id="tw-right-body" class="tw-body"></div>
+                    </div>
+                    <button id="tw-start" onclick="towerPageStart()"><img loading="lazy" src="assets/events/start_q85.webp" alt="Start"></button>
                 </div>
             </div>
         </div>
@@ -2212,18 +2305,19 @@
     <!-- hero-art.js holds the hero art as data URLs (948 KB); only file:// pages need it, web pages load the image files -->
     <script>if (location.protocol === 'file:') document.write('<script src="js/hero-art.js?v=20261118t"><\/script>');</script>
     <script src="js/hero-body.js?v=20261121lz"></script>
-    <script src="js/combat.js?v=20261121lb"></script>
+    <script src="js/combat.js?v=20261121tw1"></script>
     <script src="js/crit-fx.js?v=20261118j"></script>
-    <script src="js/ui.js?v=20261121lb"></script>
+    <script src="js/ui.js?v=20261121tw1"></script>
     <script src="js/names-th.js?v=20261121of"></script>
-    <script src="js/i18n.js?v=20261121lb"></script>
+    <script src="js/i18n.js?v=20261121tw2"></script>
     <script src="js/market.js?v=20261121mt"></script>
     <script src="js/guide-intro.js?v=20261116b"></script>
     <script src="js/guide-upgrade.js?v=20261116a"></script>
     <script src="js/guide-elem.js?v=20261119c"></script>
     <script src="js/beginner-quest.js?v=20261121bt"></script>
     <script src="js/friends.js?v=20261121qtnx"></script>
-    <script src="js/town.js?v=20261116b"></script>
+    <script src="js/tower-page.js?v=20261121tw2"></script>
+    <script src="js/town.js?v=20261121tw1"></script>
     <script src="js/loader.js?v=20261121hd"></script>
 
 <script>

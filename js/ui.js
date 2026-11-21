@@ -2092,7 +2092,7 @@ function switchView(viewName) {
         currentShopTab = 'shop';
         viewName = 'shop';
     }
-    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market', 'view-vip'];
+    let views = ['view-town', 'view-expeditions', 'view-events', 'view-skills', 'view-library', 'view-setting', 'view-character', 'view-shop', 'view-blacksmith', 'view-diamond', 'view-quests', 'view-combat', 'view-friend', 'view-market', 'view-vip', 'view-tower'];
     document.getElementById('view-town')?.classList.remove('friend-under');
     views.forEach(id => {
         let el = document.getElementById(id);
@@ -2103,10 +2103,10 @@ function switchView(viewName) {
     // Refresh badges on every screen change, so the character page shows current point alerts
     if (typeof updateTownAlerts === 'function') updateTownAlerts();
     // Header (gold/diamond) only on non-town screens; town shows the full info panel.
-    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market', 'vip'].includes(viewName));
+    document.getElementById('app-header')?.classList.toggle('hidden', ['town', 'expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market', 'vip', 'tower'].includes(viewName));
     if (viewName === 'expeditions' && window.closeCampaignPanel) window.closeCampaignPanel();
     // Transparent html/body background on art screens (see .art-mode in index.html)
-    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market', 'vip'];
+    const artViews = ['expeditions', 'events', 'diamond', 'quests', 'setting', 'shop', 'blacksmith', 'character', 'skills', 'combat', 'friend', 'market', 'vip', 'tower'];
     document.documentElement.classList.toggle('art-mode', artViews.includes(viewName));
     document.body.classList.toggle('art-mode', artViews.includes(viewName));
 
@@ -2141,6 +2141,10 @@ function switchView(viewName) {
     if (viewName === 'vip') {
         showFloatPage('view-vip'); // VIP shop is a floating window over the main page
         renderVipShop();
+    }
+    if (viewName === 'tower') {
+        document.getElementById('view-tower')?.classList.remove('hidden');
+        if (typeof renderTowerPage === 'function') renderTowerPage();
     }
     if (viewName === 'market') {
         showFloatPage('view-market'); // market is a floating window over the main page
@@ -6567,11 +6571,9 @@ const EVENT_MENU = [
     { key: 'daily',    label: 'Daily Challenge', banner: 'assets/events/banner_daily_q85.webp' },
     { key: 'gold',     label: 'Gold Frenzy',     banner: 'assets/events/banner_gold_q85.webp' },
     { key: 'xp',       label: 'Wisdom Trail',    banner: 'assets/events/banner_xp_q85.webp' },
-    { key: 'tower',    label: 'Warded Tower',    banner: null },
     { key: 'endless',  label: 'Void Tower',      banner: null },
     { key: 'voidtest', label: 'Void Test Map',   banner: null },
     { key: 'bossmap',  label: 'Boss Gauntlet',   banner: null },
-    { key: 'leaderboard', label: 'Leaderboard',  banner: null },
 ];
 const eventMapPick = { gold: null, xp: null };
 
@@ -6774,11 +6776,13 @@ async function loadTowerFriends() {
     towerFriendsError = res.error || '';
     towerFriends = (res.data && res.data.friends) || [];
     if (currentEventsTab === 'tower') renderEventsView();
+    if (typeof renderTowerPage === 'function') renderTowerPage();
 }
 function toggleTowerFriend(id) {
     if (towerPick.includes(id)) towerPick = towerPick.filter(x => x !== id);
     else if (towerPick.length < 2 && towerFriendCooldownLeft(id) <= 0) towerPick = [...towerPick, id];
     renderEventsView();
+    if (typeof renderTowerPage === 'function') renderTowerPage();
 }
 function towerFriendsHTML() {
     if (towerFriends === null) return '<p class="ev-status">Loading friends…</p>';

@@ -602,7 +602,9 @@ function startExpedition(mode, opts = {}) {
         const towerTeamIds = (towerPendingIds || []).slice(); // friends who came, shown on the leaderboard
         setupTowerParty();
         towerTimerStart();
-        if (typeof startTowerRun === 'function') startTowerRun(towerTeamIds); // the server keeps the leaderboard clock
+        // Only Normal runs go to the leaderboard (the server keeps that clock); Hard and Hell are not reported
+        if (towerParty && towerParty.diff && towerParty.diff !== 'normal') { if (typeof towerRunPromise !== 'undefined') towerRunPromise = null; }
+        else if (typeof startTowerRun === 'function') startTowerRun(towerTeamIds);
         currentStage = 1;
         maxStages = TOWER_FLOORS;
         if (tagEl) tagEl.innerText = "Warded Tower";
@@ -1770,7 +1772,7 @@ function monsterTurnTick() {
         if (firstDeath) markGuide('death');
         const defeatHtml = buildMapSummaryHTML('lose', undefined, firstDeath);
         playPlayerFallAnim(); // the hero falls first, then the result shows
-        const failReturn = currentMode === 'tower' ? 'town' : (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
+        const failReturn = currentMode === 'tower' ? 'tower' : (currentMode === 'voidtest' || currentMode === 'bossmap') ? 'events' : 'expeditions';
         setTimeout(() => showModal("Expedition Failed", '', defeatHtml, () => switchView(failReturn)), PLAYER_FALL_MS);
     }
     updateUI();
@@ -2088,7 +2090,7 @@ function onStageCleared() {
                 grantTowerRunReward();
                 sendTowerFriendRewards();
                 logMessage(`[Tower] The Warded Tower is cleared!`, 'levelup');
-                showModal("Warded Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Town'), () => switchView('town'));
+                showModal("Warded Tower Cleared!", '', buildMapSummaryHTML('win', 'Return to Tower'), () => switchView('tower'));
                 updateUI();
                 saveGame();
                 return;
@@ -2236,8 +2238,9 @@ function returnToTown() {
     const nextBtn = document.getElementById('next-stage-btn');
     if (nextBtn) nextBtn.classList.add('hidden');
     // Warded Tower: leaving partway still pays the highest floor cleared (once) and the friends' share
+    const leftTower = currentMode === 'tower';
     if (currentMode === 'tower' && towerParty) { grantTowerRunReward(); sendTowerFriendRewards(); }
-    switchView('town');
+    switchView(leftTower ? 'tower' : 'town');
     logMessage(`[System] Safely returned to Haven of Dawn`, 'winlose');
 }
 
@@ -2424,6 +2427,10 @@ function grantTowerFloorReward(f) {
     if (towerParty) {
         towerParty.best = Math.max(towerParty.best || 0, f);
         towerParty.cleared = Math.max(towerParty.cleared || 0, f);
+        // Highest floor reached on this difficulty (Tower page; also unlocks Hard and Hell)
+        const diff = towerParty.diff || 'normal';
+        if (!player.towerBest) player.towerBest = {};
+        player.towerBest[diff] = Math.max(Number(player.towerBest[diff]) || 0, f);
     }
     logMessage(`[Tower] Floor ${f} cleared!`, 'drop');
     saveGame();
@@ -2434,6 +2441,12 @@ function grantTowerRunReward() {
     towerParty.paid = true;
     const f = towerParty.best;
     const r = towerFloorReward(f);
+    const rm = typeof towerDiffRewardMult === 'function' ? towerDiffRewardMult() : 1; // Hard x2, Hell x3 gold and diamonds
+    r.gold = Math.floor(r.gold * rm); r.diamonds = Math.floor(r.diamonds * rm);
+    // What this run paid, shown as "Previous reward" on the Tower page
+    const last = { floor: f, gold: r.gold, diamonds: r.diamonds, planks: 0, ore: 0, stones: {}, costume: 0, at: Date.now() };
+    if (!player.towerLast) player.towerLast = {};
+    player.towerLast[towerParty.diff || 'normal'] = last;
     player.gold += r.gold;
     player.diamonds = (player.diamonds || 0) + r.diamonds;
     const tally = towerParty && towerParty.rewards; // the run's running total for the result screen
@@ -2441,11 +2454,11 @@ function grantTowerRunReward() {
     const got = [`${r.gold} Gold`, `${r.diamonds} Diamond`];
     if (r.planks > 0) {
         const plank = { ...PLANK_ITEM, qty: r.planks };
-        if (placeItemInInventory(plank)) { updateQuestProgress('plank', r.planks || 1); recordStageDrop(plank); got.push(`${r.planks} Plank`); if (tally) tally.planks += r.planks; }
+        if (placeItemInInventory(plank)) { updateQuestProgress('plank', r.planks || 1); recordStageDrop(plank); got.push(`${r.planks} Plank`); if (tally) tally.planks += r.planks; last.planks = r.planks; }
     }
     if (r.ore > 0) {
         const ore = { ...REFINE_MATERIAL_ITEMS[2], qty: r.ore };
-        if (placeItemInInventory(ore)) { recordStageDrop(ore); got.push(`${r.ore} Refine Ore`); if (tally) tally.ore += r.ore; }
+        if (placeItemInInventory(ore)) { recordStageDrop(ore); got.push(`${r.ore} Refine Ore`); if (tally) tally.ore += r.ore; last.ore = r.ore; }
     }
     for (let i = 0; i < r.stones; i++) {
         const els = Object.keys(ELEMENTS);
@@ -2455,10 +2468,11 @@ function grantTowerRunReward() {
         recordStageDrop({ name: `${ELEMENTS[el].name} Elemental Stone`, type: 'estone', element: el, qty: 1, icon: `assets/items/elemental/stone_${el}.webp`, desc: `Forge ${ELEMENTS[el].name} onto a weapon at the Blacksmith.` });
         got.push(`${ELEMENTS[el].name} Elemental Stone`);
         if (tally) tally.stones[el] = (tally.stones[el] || 0) + 1;
+        last.stones[el] = (last.stones[el] || 0) + 1;
     }
     if (r.costume) {
         const chest = { name: "Costume Chest", type: 'chest', chestType: 'costume', qty: 1, icon: 'assets/chest/costume/costumeicon_q85.webp', desc: "" };
-        if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); if (tally) tally.costume++; }
+        if (placeItemInInventory(chest)) { recordStageDrop(chest); got.push('Costume Chest'); if (tally) tally.costume++; last.costume = 1; }
     }
     logMessage(`[Tower] Run reward for floor ${f}: ${got.join(', ')}`, 'drop');
     updateUI();
@@ -2538,7 +2552,7 @@ const TOWER_BOSS_FLOORS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 21];
 // Slots 1-3 are melee or tank. Boss floors: slot 3 is the boss, slot 4 is any other unit,
 // and slots 5-6 are healers. Other floors: slots 4-6 are ranged or mage.
 function towerSetSixMonsters() {
-    const k = towerFloorMult(currentStage);
+    const k = towerFloorMult(currentStage) * (typeof towerDiffMonsterMult === 'function' ? towerDiffMonsterMult() : 1); // Hard x2, Hell x4
     const scaledUnit = u => ({
         ...u,
         hp: Math.floor(u.hp * k), maxHp: Math.floor(u.maxHp * k),
@@ -2696,7 +2710,7 @@ function setupTowerParty() {
     const ids = towerPendingIds || [];
     towerPendingIds = null;
     // cleared: highest floor cleared this run (the friends' mail is sent for it when the run ends)
-    towerParty = { order, members, ids: { a1: ids[0], a2: ids[1] }, cleared: 0, rewards: newTowerRewardTally() };
+    towerParty = { order, members, ids: { a1: ids[0], a2: ids[1] }, cleared: 0, rewards: newTowerRewardTally(), diff: (typeof towerDifficulty !== 'undefined' ? towerDifficulty : 'normal') };
 }
 
 // A hit on the front ally (returns true when the hit went to an ally)
