@@ -658,10 +658,15 @@ function startExpedition(mode, opts = {}) {
     combatPaused = false;
     updatePauseButton();
     monsterOpenerRound = true;
-    spawnStageMonsters();
-
-    stopCombatTimers(); combatRunId++;
-    startCombatTimers(derived);
+    // Black covers (first visit, mini boss and boss fades) go first; monsters and timers start after them
+    if (isBossStage() || isMiniBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
+    const startSid = combatSessionId;
+    whenCombatCoversClear(() => {
+        if (startSid !== combatSessionId) return; // left combat while the cover was up
+        spawnStageMonsters();
+        stopCombatTimers(); combatRunId++;
+        startCombatTimers(derived);
+    });
 }
 
 // ---------- STAGE / BOSS ----------
@@ -843,6 +848,23 @@ function stageFadeIn(ms = 900) {
     stageFadeSet(0, ms);
 }
 
+// True while a black cover is still over the scene: the first-visit map cover or a mini boss / boss fade
+function combatCoverShowing() {
+    const cover = document.getElementById('map-cover');
+    const fade = document.getElementById('stage-fade');
+    const op = el => (el ? parseFloat(getComputedStyle(el).opacity) || 0 : 0);
+    return (!!cover && (cover.classList.contains('show') || op(cover) > 0.01)) || op(fade) > 0.01;
+}
+// Runs fn once the black covers are gone (capped at 6 s so the battle can never hang)
+function whenCombatCoversClear(fn) {
+    const started = Date.now();
+    const tick = () => {
+        if (!combatCoverShowing() || Date.now() - started > 6000) fn();
+        else setTimeout(tick, 40);
+    };
+    tick();
+}
+
 function spawnStageMonsters() {
     const stageEl = document.getElementById('combat-stage');
     if (stageEl) stageEl.classList.remove('final-stage');
@@ -853,8 +875,6 @@ function spawnStageMonsters() {
         stageEl.classList.toggle('boss-stage', bossLike);
         stageEl.classList.toggle('mini-stage', miniLike);
     }
-    if (bossLike || miniLike) stageFadeIn();
-    else stageFadeSet(0, 400); // ordinary stage: clear any black left from the stage before
     // A new stage starts: fold the Max HP gained last stage into the carried bonus,
     // so later gains are a % of the Max HP at this stage's start
     player.mhpCarry = (player.mhpCarry || 1) * (1 + stageMaxHpAdd());
@@ -2126,8 +2146,13 @@ function onStageCleared() {
             // Layers and positions swap first; the stage's monsters and ticks start after that
             changeEarthLayers().then(() => {
                 if (sid !== combatSessionId) return; // left combat while the next stage loaded
-                startCombatTimers(getDerivedStats());
-                spawnStageMonsters();
+                // Mini boss and boss stages fade in from black; monsters and timers start once the black is gone
+                if (isBossStage() || isMiniBossStage()) stageFadeIn(); else stageFadeSet(0, 400);
+                whenCombatCoversClear(() => {
+                    if (sid !== combatSessionId) return;
+                    startCombatTimers(getDerivedStats());
+                    spawnStageMonsters();
+                });
             });
         };
 
