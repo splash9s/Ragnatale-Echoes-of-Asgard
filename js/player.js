@@ -28,18 +28,20 @@ const DAILY_QUEST_POOL = {
     bosslv10: { id: 'q_bosslv10', title: "Boss Hunter Lv. 10", tpl: "Defeat the Lv. 10 boss {n} time.", tiers: [{ t: 1, c: 'gold' }] },
 };
 
+// One quest of a pool type, at a random tier
+function makeDailyQuest(type) {
+    const def = DAILY_QUEST_POOL[type];
+    const tier = def.tiers[Math.floor(Math.random() * def.tiers.length)];
+    return {
+        id: def.id, v: 2, title: def.title,
+        desc: def.tpl.replace('{n}', tier.t.toLocaleString()),
+        target: tier.t, current: 0, rewardChest: tier.c, completed: false,
+    };
+}
 // Picks today's three quests: three different types, each at a random tier
 function rollDailyQuests() {
     const types = Object.keys(DAILY_QUEST_POOL).sort(() => Math.random() - 0.5).slice(0, 3);
-    return types.map(type => {
-        const def = DAILY_QUEST_POOL[type];
-        const tier = def.tiers[Math.floor(Math.random() * def.tiers.length)];
-        return {
-            id: def.id, v: 2, title: def.title,
-            desc: def.tpl.replace('{n}', tier.t.toLocaleString()),
-            target: tier.t, current: 0, rewardChest: tier.c, completed: false,
-        };
-    });
+    return types.map(makeDailyQuest);
 }
 
 let player = {

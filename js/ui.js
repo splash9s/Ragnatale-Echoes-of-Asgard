@@ -6257,8 +6257,10 @@ function renderQuestsView() {
         </div>
     `;
 
-    player.dailyQuests.forEach(q => {
+    player.dailyQuests.forEach((q, i) => {
         let pct = Math.min(100, Math.floor((q.current / q.target) * 100));
+        // Refresh: a watched ad swaps this quest for another one (not finished quests only)
+        const refresh = q.completed ? '' : `<button id="quest-reroll-${i}" onclick="rerollDailyQuest(${i})" class="self-end px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-slate-200 cursor-pointer">▶ Watch ad to refresh</button>`;
         container.innerHTML += `
             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-col gap-1.5 text-xs">
                 <div class="flex justify-between items-center">
@@ -6269,9 +6271,37 @@ function renderQuestsView() {
                 <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
                     <div class="bg-amber-500 h-full transition-all duration-300" style="width: ${pct}%"></div>
                 </div>
+                ${refresh}
             </div>
         `;
     });
+}
+// Refresh a daily quest after watching an ad (placeholder: 5 second countdown on its button). The new quest is a different type not already on the list, at a new tier.
+const QUEST_AD_SECONDS = 5;
+let questAdTimer = null;
+function rerollDailyQuest(index) {
+    const q = player.dailyQuests && player.dailyQuests[index];
+    if (!q || q.completed || questAdTimer) return;
+    let left = QUEST_AD_SECONDS;
+    const showTimer = () => {
+        const btn = document.getElementById('quest-reroll-' + index);
+        if (btn) { btn.disabled = true; btn.textContent = `Watching ad… ${left}s`; }
+    };
+    showTimer();
+    questAdTimer = setInterval(() => {
+        left--;
+        if (left > 0) { showTimer(); return; }
+        clearInterval(questAdTimer);
+        questAdTimer = null;
+        const cur = player.dailyQuests[index];
+        if (cur && !cur.completed) {
+            const taken = player.dailyQuests.map(x => x.id);
+            const types = Object.keys(DAILY_QUEST_POOL).filter(t => !taken.includes(DAILY_QUEST_POOL[t].id));
+            if (types.length) player.dailyQuests[index] = makeDailyQuest(types[Math.floor(Math.random() * types.length)]);
+        }
+        saveGame();
+        renderQuestsView();
+    }, 1000);
 }
 
 // ---------- INVENTORY FILTER + ELEMENT STATS ----------
